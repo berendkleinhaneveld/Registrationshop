@@ -1,27 +1,43 @@
-__author__ = 'Berend Klein Haneveld'
+"""
+ProjectController
+
+Model controller class that manages projects.
+Should be only one instance
+
+@author: Berend Klein Haneveld
+"""
 
 from Project import Project
+try:
+	from PySide.QtCore import QObject
+except ImportError:
+	raise ImportError("Could not import PySide")
 
-class ProjectController():
+from singleton import Singleton
+
+@Singleton
+class ProjectController(QObject):
 
 	def __init__(self, project=None):
 		"""
 		@param project: Project to be made current
 		@type project: Project
 		"""
-		self.currentProject = project
+		QObject.__init__(self)
+
+		self._currentProject = project
 		if project == None:
 			# Create new standard project
-			self.currentProject = Project()
+			self._currentProject = Project()
 
 	def currentProject(self):
 		"""
 		@return: Current project
 		@rtype: Project
 		"""
-		return self.currentProject
+		return self._currentProject
 
-	def loadProject(self, name=""):
+	def loadProject(self, name=None):
 		"""
 		@param name: Name of project file
 		@type name: basestring
@@ -50,10 +66,10 @@ class ProjectController():
 		@return:
 		@rtype:
 		"""
-		# TODO: do some extra magic here like checking if file exists
-		print "load the fixed data set"
-		self.currentProject.setFixedDataSet(name)
-
+		# TODO: some extra magic like checking if file exists
+		print "Load the fixed data set", name
+		self._currentProject.setFixedDataSet(name)
+		
 
 	def loadMovingDataSet(self, name=None):
 		"""
@@ -63,6 +79,6 @@ class ProjectController():
 		@return:
 		@rtype:
 		"""
-		# TODO: do some extra magic here like checking if file exists
-		print "load the moving data set"
-		self.currentProject.setMovingDataSet(name)
+		# TODO: some extra magic like checking if file exists
+		print "Load the moving data set", name
+		self._currentProject.setMovingDataSet(name)
