@@ -9,8 +9,8 @@ Model class for projects.
 try:
 	from PySide.QtCore import QObject
 	from PySide.QtCore import Signal
-except ImportError:
-	raise ImportError("Could not import PySide")
+except ImportError, e:
+	raise e
 
 class Project(QObject):
 

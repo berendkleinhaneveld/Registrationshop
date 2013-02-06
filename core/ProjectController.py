@@ -7,12 +7,12 @@ Should be only one instance
 @author: Berend Klein Haneveld
 """
 
-from Project import Project
 try:
 	from PySide.QtCore import QObject
-except ImportError:
-	raise ImportError("Could not import PySide")
+except ImportError, e:
+	raise e
 
+from Project import Project
 from singleton import Singleton
 
 @Singleton
@@ -26,8 +26,8 @@ class ProjectController(QObject):
 		QObject.__init__(self)
 
 		self._currentProject = project
+		# Create new standard project if no project is provided
 		if project == None:
-			# Create new standard project
 			self._currentProject = Project()
 
 	def currentProject(self):
@@ -69,7 +69,6 @@ class ProjectController(QObject):
 		# TODO: some extra magic like checking if file exists
 		print "Load the fixed data set", name
 		self._currentProject.setFixedDataSet(name)
-		
 
 	def loadMovingDataSet(self, name=None):
 		"""
@@ -82,3 +81,15 @@ class ProjectController(QObject):
 		# TODO: some extra magic like checking if file exists
 		print "Load the moving data set", name
 		self._currentProject.setMovingDataSet(name)
+
+	def loadFixedDataSetFileName(self):
+		slicerWidget = self.sender()
+		fileName = slicerWidget.fileName()
+		self.loadFixedDataSet(fileName)
+		pass
+
+	def loadMovingDataSetFileName(self):
+		slicerWidget = self.sender()
+		fileName = slicerWidget.fileName()
+		self.loadMovingDataSet(fileName)
+		pass

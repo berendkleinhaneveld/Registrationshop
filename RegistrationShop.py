@@ -16,9 +16,8 @@ try:
 	from PySide.QtGui import QDockWidget
 	from PySide.QtGui import QAction
 	from PySide.QtGui import QIcon
-	# from PySide.QtGui import QWidget
-except ImportError:
-	raise ImportError("Could not import PySide")
+except ImportError, e:
+	raise e
 
 # Import ui elements
 from core.AppVars import AppVars
@@ -58,7 +57,7 @@ class RegistrationShop(QMainWindow):
 		super(RegistrationShop, self).__init__()
 		self.arg = arg
 		self.setApplicationPath()
-			
+
 		# Initialize the user interface
 		self.initUI()
 
@@ -66,6 +65,7 @@ class RegistrationShop(QMainWindow):
 		projCont = ProjectController.Instance()
 		proj = projCont.currentProject()
 		proj.setName("New project")
+		pass
 
 	# UI setup methods
 
