@@ -10,6 +10,7 @@ Registrationshop
 import sys
 try:
 	from PySide import QtCore
+	from PySide.QtCore import Qt
 	from PySide.QtGui import QMainWindow
 	from PySide.QtGui import QApplication
 	from PySide.QtGui import QTextEdit
@@ -79,7 +80,7 @@ class RegistrationShop(QMainWindow):
 		# Set some window/application properties
 		self.setUnifiedTitleAndToolBarOnMac(True)
 		self.setWindowTitle(APPNAME)
-		self.setWindowState(QtCore.Qt.WindowActive)
+		self.setWindowState(Qt.WindowActive)
 		self.raise_()
 		self.show()
 		pass
@@ -92,35 +93,35 @@ class RegistrationShop(QMainWindow):
 		# Initialize the main window
 		self.mainWindow = QMainWindow()
 		self.mainWindow.setCentralWidget(QTextEdit())
-		self.mainWindow.setWindowFlags(QtCore.Qt.Widget)
+		self.mainWindow.setWindowFlags(Qt.Widget)
 		self.setCentralWidget(self.mainWindow)
 		
 		# Toolbox on the left side of the window
 		self.dockTransformations = QDockWidget()
 		self.dockTransformations.setWindowTitle("Transformations")
-		self.dockTransformations.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+		self.dockTransformations.setAllowedAreas(Qt.AllDockWidgetAreas)
 		self.dockTransformations.setFeatures(QDockWidget.NoDockWidgetFeatures)
 		self.dockTransformations.setHidden(RegistrationShop.settings.value("ui/dock/transformation/hidden", False))
 		
 		# Toolbox on the bottom of the window
 		self.dockDataSets = QDockWidget()
 		self.dockDataSets.setWindowTitle("Data sets")
-		self.dockDataSets.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+		self.dockDataSets.setAllowedAreas(Qt.AllDockWidgetAreas)
 		self.dockDataSets.setFeatures(QDockWidget.NoDockWidgetFeatures)
 		self.dockDataSets.setHidden(RegistrationShop.settings.value("ui/dock/dataSets/hidden", False))
 		
 		# Toolbox on the right side of the window
 		self.dockVisualParameters = QDockWidget()
 		self.dockVisualParameters.setWindowTitle("Visualization Parameters")
-		self.dockVisualParameters.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+		self.dockVisualParameters.setAllowedAreas(Qt.AllDockWidgetAreas)
 		self.dockVisualParameters.setFeatures(QDockWidget.NoDockWidgetFeatures)
 		self.dockVisualParameters.setHidden(RegistrationShop.settings.value("ui/dock/visualParameters/hidden", False))
 		
 		# Add the dock widgets to their main windows. The one of the left is added to
 		# the top most 'main window' so that it stretches out across the whole left side
-		self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.dockTransformations)
-		self.mainWindow.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.dockVisualParameters)
-		self.mainWindow.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.dockDataSets)
+		self.addDockWidget(Qt.LeftDockWidgetArea, self.dockTransformations)
+		self.mainWindow.addDockWidget(Qt.RightDockWidgetArea, self.dockVisualParameters)
+		self.mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self.dockDataSets)
 		
 		# Create the dock widgets
 		self.transformationWidget = TransformationWidget()
