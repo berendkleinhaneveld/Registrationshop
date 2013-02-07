@@ -64,11 +64,13 @@ class ProjectController(QObject):
 		@param name: File name of fixed data set
 		@type name: basestring
 		@return:
-		@rtype:
+		@rtype: bool
 		"""
 		# TODO: some extra magic like checking if file exists
 		print "Load the fixed data set", name
 		self._currentProject.setFixedDataSet(name)
+		# TODO: return whether the file name is correct
+		return True
 
 	def loadMovingDataSet(self, name=None):
 		"""
@@ -76,20 +78,30 @@ class ProjectController(QObject):
 		@param name: File name of moving data set
 		@type name: basestring
 		@return:
-		@rtype:
+		@rtype: bool
 		"""
 		# TODO: some extra magic like checking if file exists
 		print "Load the moving data set", name
 		self._currentProject.setMovingDataSet(name)
+		# TODO: return whether the file name is correct
+		return True
 
-	def loadFixedDataSetFileName(self):
+	def loadFixedDataSetFileName(self, fileName):
+		"""
+		@type fileName: basestring
+		"""
 		slicerWidget = self.sender()
-		fileName = slicerWidget.fileName()
-		self.loadFixedDataSet(fileName)
+		loaded = self.loadFixedDataSet(fileName)
+		if loaded:
+			slicerWidget.setFileName(fileName)
 		pass
 
-	def loadMovingDataSetFileName(self):
+	def loadMovingDataSetFileName(self, fileName):
+		"""
+		@type fileName: basestring
+		"""
 		slicerWidget = self.sender()
-		fileName = slicerWidget.fileName()
-		self.loadMovingDataSet(fileName)
+		loaded = self.loadMovingDataSet(fileName)
+		if loaded:
+			slicerWidget.setFileName(fileName)
 		pass

@@ -25,7 +25,7 @@ from UAHCore.UAHViewer.BaseViewer import BaseViewer
 from UAHCore.UAHViewer.slicer import Slicer
 
 class SlicerWidget(QWidget):
-	loadedFileName = Signal()
+	loadedFileName = Signal(basestring)
 
 	def __init__(self, title=""):
 		"""
@@ -49,6 +49,26 @@ class SlicerWidget(QWidget):
 		@rtype: basestring
 		"""
 		return self._fileName
+
+	def setFileName(self, fileName):
+		"""
+		Sets the file name and loads the data for it into the slicer
+		@type fileName: basestring
+		"""
+		# TODO: check if it is sane? Project controller should probably do that
+		self._fileName = fileName
+		self._imageReader.SetFileName(self._fileName)
+		self._imageData = self._imageReader.GetOutput()
+
+		self._slicer.set_input(self._imageData)
+		self._slicer.set_perspective()
+		self._slicer.reset_to_default_view(2)
+		self._slicer.reset_camera()
+
+		# Update the title with the last path component
+		index = self._fileName.rfind("/")
+		self.setTitle(self._fileName[index+1:])
+
 
 	# UI methods
 
@@ -110,21 +130,7 @@ class SlicerWidget(QWidget):
 		"""
 		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images (*.mhd)")
 		if len(fileName) > 0:
-
-			self._fileName = fileName
-			self._imageReader.SetFileName(self._fileName)
-			self._imageData = self._imageReader.GetOutput()
-
-			self._slicer.set_input(self._imageData)
-			self._slicer.set_perspective()
-			self._slicer.reset_to_default_view(2)
-			self._slicer.reset_camera()
-
-			# Update the title with the last path component
-			index = self._fileName.rfind("/")
-			self.setTitle(self._fileName[index+1:])
-
 			# Send signal that new file name is available
-			self.loadedFileName.emit()
+			self.loadedFileName.emit(fileName)
 		pass
 
