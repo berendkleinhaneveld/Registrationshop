@@ -10,6 +10,7 @@ Should be only one instance
 try:
 	from PySide.QtCore import QObject
 	from PySide.QtCore import Slot
+	from PySide.QtCore import Signal
 except ImportError, e:
 	raise e
 
@@ -18,6 +19,9 @@ from singleton import Singleton
 
 @Singleton
 class ProjectController(QObject):
+	# Signals for when file name has changed
+	changedFixedDataSetFileName = Signal(basestring)
+	changedMovingDataSetFileName = Signal(basestring)
 
 	def __init__(self, project=None):
 		"""
@@ -59,53 +63,37 @@ class ProjectController(QObject):
 		"""
 		return False
 
+	# Slots for signals of SlicerWidget
+	@Slot(basestring)
 	def loadFixedDataSet(self, name=None):
 		"""
 		Sets the name in the current project as the fixed data set filename
 		@param name: File name of fixed data set
 		@type name: basestring
 		@return:
-		@rtype: bool
+		@rtype:
 		"""
 		# TODO: some extra magic like checking if file exists
 		print "Load the fixed data set", name
 		self._currentProject.setFixedDataSet(name)
-		# TODO: return whether the file name is correct
-		return True
+		
+		# Emit signal that data set file name has changed
+		self.changedFixedDataSetFileName.emit(name)
 
+	@Slot(basestring)
 	def loadMovingDataSet(self, name=None):
 		"""
 		Sets the name in the current project as the moving data set filename
 		@param name: File name of moving data set
 		@type name: basestring
 		@return:
-		@rtype: bool
+		@rtype:
 		"""
 		# TODO: some extra magic like checking if file exists
 		print "Load the moving data set", name
 		self._currentProject.setMovingDataSet(name)
-		# TODO: return whether the file name is correct
-		return True
 
-	# Slots for signals of SlicerWidget
-	@Slot(basestring)
-	def loadFixedDataSetFileName(self, fileName):
-		"""
-		@type fileName: basestring
-		"""
-		slicerWidget = self.sender()
-		loaded = self.loadFixedDataSet(fileName)
-		if loaded:
-			slicerWidget.setFileName(fileName)
-		pass
+		# Emit signal that data set file name has changed
+		self.changedMovingDataSetFileName.emit(name)
 
-	@Slot(basestring)
-	def loadMovingDataSetFileName(self, fileName):
-		"""
-		@type fileName: basestring
-		"""
-		slicerWidget = self.sender()
-		loaded = self.loadMovingDataSet(fileName)
-		if loaded:
-			slicerWidget.setFileName(fileName)
-		pass
+	
