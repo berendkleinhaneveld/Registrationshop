@@ -9,6 +9,7 @@ Should be only one instance
 
 try:
 	from PySide.QtCore import QObject
+	from PySide.QtCore import Slot
 except ImportError, e:
 	raise e
 
@@ -39,7 +40,7 @@ class ProjectController(QObject):
 
 	def loadProject(self, name=None):
 		"""
-		@param name: Name of project file
+		@param name: File name of project
 		@type name: basestring
 		@return: Success
 		@rtype: bool
@@ -86,6 +87,8 @@ class ProjectController(QObject):
 		# TODO: return whether the file name is correct
 		return True
 
+	# Slots for signals of SlicerWidget
+	@Slot(basestring)
 	def loadFixedDataSetFileName(self, fileName):
 		"""
 		@type fileName: basestring
@@ -96,6 +99,7 @@ class ProjectController(QObject):
 			slicerWidget.setFileName(fileName)
 		pass
 
+	@Slot(basestring)
 	def loadMovingDataSetFileName(self, fileName):
 		"""
 		@type fileName: basestring

@@ -66,9 +66,9 @@ class SlicerWidget(QWidget):
 		self._slicer.reset_camera()
 
 		# Update the title with the last path component
+		# TODO: check to see if this works on Windows...
 		index = self._fileName.rfind("/")
 		self.setTitle(self._fileName[index+1:])
-
 
 	# UI methods
 
