@@ -16,6 +16,8 @@ try:
 	from PySide.QtGui import QDockWidget
 	from PySide.QtGui import QAction
 	from PySide.QtGui import QIcon
+	from PySide.QtGui import QFileDialog
+	from PySide.QtGui import QMenuBar
 except ImportError, e:
 	raise e
 
@@ -38,16 +40,7 @@ class RegistrationShop(QMainWindow):
 	"""
 	# Singletons
 	settings = QtCore.QSettings()
-	projectController = ProjectController.Instance()
-
-	# TODO: research why this doesn't seem to work
-	# @staticmethod
-	# def mainSettings():
-	# 	return RegistrationShop.settings
-
-	# @staticmethod
-	# def projectController():
-	# 	return RegistrationShop.projectController
+	# projectController = ProjectController.Instance()
 
 	def __init__(self, arg):
 		"""
@@ -57,14 +50,16 @@ class RegistrationShop(QMainWindow):
 		super(RegistrationShop, self).__init__()
 		self.arg = arg
 		self.setApplicationPath()
+		# Make sure there is a project controller instance
+		ProjectController.Instance()
 
 		# Initialize the user interface
 		self.initUI()
 
 		# TODO: this is for testing purposes only
-		projCont = ProjectController.Instance()
-		proj = projCont.currentProject()
-		proj.setName("New project")
+		# projCont = ProjectController.Instance()
+		# proj = projCont.currentProject()
+		# proj.setName("New project")
 		pass
 
 	# UI setup methods
@@ -161,12 +156,25 @@ class RegistrationShop(QMainWindow):
 		self.actionToggleBottomBar.triggered.connect(self.toggleBottomPanel)
 		self.actionToggleBottomBar.setCheckable(True)
 		self.actionToggleBottomBar.setChecked(not(self.dockDataSets.isHidden()))
+
+		self.actionLoadFixedData = QAction('Load fixed data', self, shortcut='Ctrl+Shift+F')
+		# self.actionLoadFixedData.setIcon(QIcon(AppVars.imagePath() + 'AddButton.png'))
+		self.actionLoadFixedData.triggered.connect(self.loadFixedDataSetFile)
+
+		self.actionLoadMovingData = QAction('Load moving data', self, shortcut='Ctrl+Shift+M')
+		# self.actionLoadMovingData.setIcon(QIcon(AppVars.imagePath() + 'AddButton.png'))
+		self.actionLoadMovingData.triggered.connect(self.loadMovingDataSetFile)
+
 		pass
 
 	def createMenus(self):
 		"""
 		Creates menus from actions.
 		"""
+		self.menuBar = QMenuBar()
+		self.menuItemFile = self.menuBar.addMenu('&File')
+		self.menuItemFile.addAction(self.actionLoadFixedData)
+		self.menuItemFile.addAction(self.actionLoadMovingData)
 		pass
 
 	def createToolbar(self):
@@ -291,6 +299,28 @@ class RegistrationShop(QMainWindow):
 		self.dockDataSets.setHidden(not(self.dockDataSets.isHidden()))
 		self.actionToggleBottomBar.setChecked(not(self.dockDataSets.isHidden()))
 		RegistrationShop.settings.setValue("ui/dock/dataSets/hidden", self.dockDataSets.isHidden())
+		pass
+
+	def loadFixedDataSetFile(self):
+		"""
+		Open file dialog to search for data files. If valid data is given, it will
+		pass the data file location on to the slicer and the project controller.
+		"""
+		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images (*.mhd)")
+		if len(fileName) > 0:
+			projectController = ProjectController.Instance()
+			projectController.loadFixedDataSet(fileName)
+		pass
+
+	def loadMovingDataSetFile(self):
+		"""
+		Open file dialog to search for data files. If valid data is given, it will
+		pass the data file location on to the slicer and the project controller.
+		"""
+		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images (*.mhd)")
+		if len(fileName) > 0:
+			projectController = ProjectController.Instance()
+			projectController.loadMovingDataSet(fileName)
 		pass
 
 def main():
