@@ -75,8 +75,8 @@ class ProjectController(QObject):
 		"""
 		# TODO: some extra magic like checking if file exists
 		print "Load the fixed data set", name
-		self._currentProject.setFixedDataSet(name)
-		
+		self._currentProject.setFixedDataSetName(name)
+
 		# Emit signal that data set file name has changed
 		self.changedFixedDataSetFileName.emit(name)
 
@@ -91,7 +91,7 @@ class ProjectController(QObject):
 		"""
 		# TODO: some extra magic like checking if file exists
 		print "Load the moving data set", name
-		self._currentProject.setMovingDataSet(name)
+		self._currentProject.setMovingDataSetName(name)
 
 		# Emit signal that data set file name has changed
 		self.changedMovingDataSetFileName.emit(name)
