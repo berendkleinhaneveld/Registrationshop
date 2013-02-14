@@ -11,6 +11,7 @@ try:
 	from PySide.QtCore import QObject
 	from PySide.QtCore import Slot
 	from PySide.QtCore import Signal
+	import yaml
 except ImportError, e:
 	raise e
 
@@ -22,6 +23,9 @@ class ProjectController(QObject):
 	# Signals for when file name has changed
 	changedFixedDataSetFileName = Signal(basestring)
 	changedMovingDataSetFileName = Signal(basestring)
+	changedProject = Signal(Project)
+
+	ProjectFile = u"project.yaml"
 
 	def __init__(self, project=None):
 		"""
@@ -44,24 +48,60 @@ class ProjectController(QObject):
 
 	def loadProject(self, name=None):
 		"""
-		@param name: File name of project
-		@type name: basestring
+		@param name: Directory of project
+		@type name: unicode
 		@return: Success
 		@rtype: bool
 		"""
-		return False
+		projectFileName = name + "/" + self.ProjectFile
+		projectFile = open(projectFileName, "r")
+		
+		try:
+			yamlRepresentation = yaml.load(projectFile)
+			project = Project(dictionary=yamlRepresentation)
+			self._currentProject = project
+		except Exception, e:
+			print e
+			return False
+		
+		# Reload all the views!
+		self.changedFixedDataSetFileName.emit(self._currentProject.fixedDataSetName())
+		self.changedMovingDataSetFileName.emit(self._currentProject.movingDataSetName())
+		# TODO: removed the 2 lines above: they shouldn't be necessary
+		self.changedProject.emit(self._currentProject)
 
-	def saveProject(self, name=None):
+		return True
+
+	def saveProject(self):
 		"""
-		Saves project to disk. If no name is provided, then the name
-		in the project is used. If there is no name in the project,
-		then something is wrong...
-		@param name: File name to save the project file to
-		@type name: basestring
+		Saves project to disk. 
+		Assumes: project name is set and correct
+
+		@param name: File/Directory name to save the project file to
+		@type name: unicode
 		@return: Success
 		@rtype: bool
 		"""
-		return False
+		try:
+			dictionary = self._currentProject.dictionary()
+			projectFileName = self._currentProject.name() + "/" + self.ProjectFile
+			projectFile = open(projectFileName, "w+")
+			# Create a readable project file
+			yaml.dump(dictionary, projectFile, default_flow_style=False)
+			projectFile.close()
+		except Exception, e:
+			print e
+			return False
+		
+		# TODO:
+		# If folder is empty:
+			# If the project is set to not reference the datasets:
+				# Copy fixed/moving data over and update the data references
+			# Save a yaml representation of the project into the directory
+		# If folder is not empty:
+			# Ask the user if it should be emptied
+
+		return True
 
 	# Slots for signals of SlicerWidget
 	@Slot(basestring)

@@ -83,13 +83,13 @@ class SlicerController(QObject):
 		button.clicked.connect(self.loadMovingDataSet)
 
 	def loadFixedDataSet(self):
-		fileName, other = QFileDialog.getOpenFileName(self.fixedSlicer.rwi, "Open fixed data set", "", "Images (*.mhd)")
+		fileName, other = QFileDialog.getOpenFileName(self.fixedSlicer.rwi, "Open fixed data set", "", "Images (*.mhd *.vtk)")
 		if len(fileName) > 0:
 			print "Name:", fileName
 			self.projectController.loadFixedDataSet(fileName)
 
 	def loadMovingDataSet(self):
-		fileName, other = QFileDialog.getOpenFileName(self.movingSlicer.rwi, "Open moving data set", "", "Images (*.mhd)")
+		fileName, other = QFileDialog.getOpenFileName(self.movingSlicer.rwi, "Open moving data set", "", "Images (*.mhd *.vtk)")
 		if len(fileName) > 0:
 			print "Name:", fileName
 			self.projectController.loadMovingDataSet(fileName)

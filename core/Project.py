@@ -20,8 +20,8 @@ class Project(QObject):
 
 	def __init__(self, name=None, fixedDataSetName=None, movingDataSetName=None, isReference=True, dictionary=None):
 		"""
-		@param name: Project file name
-		@type name: basestring
+		@param name: Project directory name (also used as display name)
+		@type name: unicode
 		@param fixedDataSetName: Fixed data set name
 		@type fixedDataSetName: basestring
 		@param movingDataSetName: Moving data set name
@@ -106,6 +106,18 @@ class Project(QObject):
 		@rtype: basestring
 		"""
 		return self._name
+
+	def displayName(self):
+		"""
+		Returns the last path component of the directory that the project
+		is saved to.
+		"""
+		result = ""
+		if self._name:
+			index = self._name.rfind("/")
+			if index >= 0:
+				result = self._name[index+1:]
+		return result
 
 	def fixedDataSetName(self):
 		"""

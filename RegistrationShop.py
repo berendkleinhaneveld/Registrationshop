@@ -8,6 +8,7 @@ Registrationshop
 """
 
 import sys
+import os.path
 try:
 	from PySide import QtCore
 	from PySide.QtCore import Qt
@@ -25,6 +26,7 @@ except ImportError, e:
 # Import ui elements
 from core.AppVars import AppVars
 from core.ProjectController import ProjectController
+from core.Project import Project
 from ui.TransformationWidget import TransformationWidget
 from ui.VisualizationParametersWidget import VisualizationParametersWidget
 from ui.DataSetsWidget import DataSetsWidget
@@ -41,7 +43,6 @@ class RegistrationShop(QMainWindow):
 	"""
 	# Singletons
 	settings = QtCore.QSettings()
-	# projectController = ProjectController.Instance()
 
 	def __init__(self, arg):
 		"""
@@ -56,11 +57,13 @@ class RegistrationShop(QMainWindow):
 
 		# Initialize the user interface
 		self.initUI()
-
+		
 		# TODO: this is for testing purposes only
 		# projCont = ProjectController.Instance()
 		# proj = projCont.currentProject()
 		# proj.setName("New project")
+		# print proj
+		
 		pass
 
 	# UI setup methods
@@ -166,6 +169,15 @@ class RegistrationShop(QMainWindow):
 		# self.actionLoadMovingData.setIcon(QIcon(AppVars.imagePath() + 'AddButton.png'))
 		self.actionLoadMovingData.triggered.connect(self.loadMovingDataSetFile)
 
+		self.actionSaveProject = QAction('Save', self, shortcut='Ctrl+S')
+		self.actionSaveProject.triggered.connect(self.saveProject)
+
+		self.actionSaveProjectAs = QAction('Save as...', self, shortcut='Ctrl+Shift+S')
+		self.actionSaveProjectAs.triggered.connect(self.saveProjectAs)
+
+		self.actionOpenProject = QAction('Open...', self, shortcut='Ctrl+O')
+		self.actionOpenProject.triggered.connect(self.openProject)
+
 		pass
 
 	def createMenus(self):
@@ -174,8 +186,18 @@ class RegistrationShop(QMainWindow):
 		"""
 		self.menuBar = QMenuBar()
 		self.menuItemFile = self.menuBar.addMenu('&File')
-		self.menuItemFile.addAction(self.actionLoadFixedData)
-		self.menuItemFile.addAction(self.actionLoadMovingData)
+		# TODO: New Project
+		self.menuItemFile.addAction(self.actionOpenProject)
+		# TODO: Open recent >
+		self.menuItemFile.addAction(self.actionSaveProject)
+		self.menuItemFile.addAction(self.actionSaveProjectAs)
+		# TODO: Save as...
+
+		self.menuItemProject = self.menuBar.addMenu('&Project')
+		self.menuItemProject.addAction(self.actionLoadFixedData)
+		self.menuItemProject.addAction(self.actionLoadMovingData)
+		# self.menuItemProject.addSeparator()
+
 		pass
 
 	def createToolbar(self):
@@ -307,7 +329,7 @@ class RegistrationShop(QMainWindow):
 		Open file dialog to search for data files. If valid data is given, it will
 		pass the data file location on to the slicer and the project controller.
 		"""
-		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images (*.mhd)")
+		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images (*.mhd *.vti)")
 		if len(fileName) > 0:
 			projectController = ProjectController.Instance()
 			projectController.loadFixedDataSet(fileName)
@@ -318,11 +340,55 @@ class RegistrationShop(QMainWindow):
 		Open file dialog to search for data files. If valid data is given, it will
 		pass the data file location on to the slicer and the project controller.
 		"""
-		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images (*.mhd)")
+		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images (*.mhd *.vti)")
 		if len(fileName) > 0:
 			projectController = ProjectController.Instance()
 			projectController.loadMovingDataSet(fileName)
 		pass
+
+	def saveProject(self):
+		"""
+		Save the project to the specified name in the current project. If no name
+		is specified, then 'save project as' is called.
+		"""
+		projCont = ProjectController.Instance()
+		
+		if projCont.currentProject().name() is not None:
+			# Save that project
+			print "Save project at", projCont.currentProject().name()
+			projCont.saveProject()
+		else:
+			self.saveProjectAs()
+
+	def saveProjectAs(self):
+		# Open file dialog
+		fileName = QFileDialog.getExistingDirectory(self, "Select project folder", "", QFileDialog.ShowDirsOnly)
+		if len(fileName) > 0:
+			print "Filename:", fileName
+			print type(fileName)
+
+			# TODO: check for existing project!
+
+			# Set filename of project
+			ProjectController.Instance().currentProject().setName(fileName)
+			# Call save project
+			self.saveProject()
+
+		pass
+
+	def openProject(self):
+		"""
+		Shows a file dialog where the user can select a project file
+		or project folder.
+		"""
+		fileName = QFileDialog.getExistingDirectory(self, "Open project", "", QFileDialog.ShowDirsOnly)
+		if len(fileName) > 0:
+			print ProjectController.Instance().ProjectFile
+			if os.path.isfile(fileName + "/" + ProjectController.Instance().ProjectFile):
+				ProjectController.Instance().loadProject(fileName)
+			else:
+				print "Project file does not exist"
+			
 
 def main():
 	app = QApplication(sys.argv)
