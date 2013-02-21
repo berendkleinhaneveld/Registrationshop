@@ -12,6 +12,7 @@ try:
 	from PySide.QtCore import Slot
 	from PySide.QtCore import Signal
 	import yaml
+	from pyelastix import Elastix
 except ImportError, e:
 	raise e
 
@@ -23,9 +24,10 @@ class ProjectController(QObject):
 	# Signals for when file name has changed
 	changedFixedDataSetFileName = Signal(basestring)
 	changedMovingDataSetFileName = Signal(basestring)
+	changedResultsDataSetFileName = Signal(basestring)
 	changedProject = Signal(Project)
 
-	ProjectFile = u"project.yaml"
+	ProjectFile = u"/project.yaml"
 
 	def __init__(self, project=None):
 		"""
@@ -53,7 +55,7 @@ class ProjectController(QObject):
 		@return: Success
 		@rtype: bool
 		"""
-		projectFileName = name + "/" + self.ProjectFile
+		projectFileName = name + self.ProjectFile
 		projectFile = open(projectFileName, "r")
 		
 		try:
@@ -65,11 +67,11 @@ class ProjectController(QObject):
 			return False
 		
 		# Reload all the views!
+		self.changedProject.emit(self._currentProject)
 		self.changedFixedDataSetFileName.emit(self._currentProject.fixedDataSetName())
 		self.changedMovingDataSetFileName.emit(self._currentProject.movingDataSetName())
-		# TODO: removed the 2 lines above: they shouldn't be necessary
-		self.changedProject.emit(self._currentProject)
-
+		self.changedResultsDataSetFileName.emit(self._currentProject.resultDataSetName())
+		
 		return True
 
 	def saveProject(self):
@@ -84,7 +86,7 @@ class ProjectController(QObject):
 		"""
 		try:
 			dictionary = self._currentProject.dictionary()
-			projectFileName = self._currentProject.name() + "/" + self.ProjectFile
+			projectFileName = self._currentProject.name() + self.ProjectFile
 			projectFile = open(projectFileName, "w+")
 			# Create a readable project file
 			yaml.dump(dictionary, projectFile, default_flow_style=False)
@@ -102,6 +104,34 @@ class ProjectController(QObject):
 			# Ask the user if it should be emptied
 
 		return True
+
+	def newProject(self):
+		# Set a new project as current project
+		self._currentProject = Project()
+		# Send out the signal!
+		self.changedProject.emit(self._currentProject)
+		self.changedFixedDataSetFileName.emit(self._currentProject.fixedDataSetName())
+		self.changedMovingDataSetFileName.emit(self._currentProject.movingDataSetName())
+		self.changedResultsDataSetFileName.emit(self._currentProject.resultDataSetName())
+		
+	def register(self):
+		reg = Elastix()
+		params = reg.get_default_params('affine')
+		params.MaximumNumberOfIterations = 200
+		params.FinalGridSpacingInVoxels = 10
+
+		im1 = self._currentProject.fixedDataSetName()
+		im2 = self._currentProject.movingDataSetName()
+
+		im1_deformed, field = reg.register(im1, im2, params, verbose=1)
+
+		filename = 'registration_result'
+		resultFile, succes = reg.writeImageData(im1_deformed, self._currentProject.name(), filename)
+		if succes:
+			self._currentProject.setResultDataSetName(resultFile)
+			self.changedResultsDataSetFileName.emit(resultFile)
+		
+		pass
 
 	# Slots for signals of SlicerWidget
 	@Slot(basestring)
@@ -135,5 +165,3 @@ class ProjectController(QObject):
 
 		# Emit signal that data set file name has changed
 		self.changedMovingDataSetFileName.emit(name)
-
-	

@@ -14,22 +14,22 @@ try:
 	from PySide.QtCore import Qt
 	from PySide.QtGui import QMainWindow
 	from PySide.QtGui import QApplication
-	from PySide.QtGui import QTextEdit
 	from PySide.QtGui import QDockWidget
 	from PySide.QtGui import QAction
 	from PySide.QtGui import QIcon
 	from PySide.QtGui import QFileDialog
 	from PySide.QtGui import QMenuBar
+	from PySide.QtGui import QProgressBar
 except ImportError, e:
 	raise e
 
 # Import ui elements
 from core.AppVars import AppVars
 from core.ProjectController import ProjectController
-from core.Project import Project
 from ui.TransformationWidget import TransformationWidget
 from ui.VisualizationParametersWidget import VisualizationParametersWidget
 from ui.DataSetsWidget import DataSetsWidget
+from ui.SlicerWidget import SlicerWidget
 
 # Define settings parameters
 APPNAME = "RegistrationShop"
@@ -49,6 +49,7 @@ class RegistrationShop(QMainWindow):
 		Sets app specific properties.
 		Initializes the UI.
 		"""
+		
 		super(RegistrationShop, self).__init__()
 		self.arg = arg
 		self.setApplicationPath()
@@ -58,11 +59,10 @@ class RegistrationShop(QMainWindow):
 		# Initialize the user interface
 		self.initUI()
 		
-		# TODO: this is for testing purposes only
-		# projCont = ProjectController.Instance()
-		# proj = projCont.currentProject()
-		# proj.setName("New project")
-		# print proj
+		lastProject = RegistrationShop.settings.value("project/lastProject", None)
+		if lastProject:
+			"Open the last saved project"
+			self.openProject(lastProject)
 		
 		pass
 
@@ -93,9 +93,12 @@ class RegistrationShop(QMainWindow):
 		Creates the widgets and docks of which the 
 		main window is composed.
 		"""
+		self.mainSlicer = SlicerWidget("Registration results data set")
+		ProjectController.Instance().changedResultsDataSetFileName.connect(self.mainSlicer.setFileName)
+
 		# Initialize the main window
 		self.mainWindow = QMainWindow()
-		self.mainWindow.setCentralWidget(QTextEdit())
+		self.mainWindow.setCentralWidget(self.mainSlicer)
 		self.mainWindow.setWindowFlags(Qt.Widget)
 		self.setCentralWidget(self.mainWindow)
 		
@@ -136,6 +139,15 @@ class RegistrationShop(QMainWindow):
 		self.dockVisualParameters.setWidget(self.visualizationParamWidget)
 		self.dockDataSets.setWidget(self.dataSetsWidget)
 		
+		# Create statusbar and hide it immediately
+		self.progressbar = QProgressBar()
+		self.progressbar.setRange(0, 0)
+		self.progressbar.setHidden(True)
+
+		self.statusbar = self.statusBar()
+		self.statusbar.setHidden(True)
+		self.statusbar.addWidget(self.progressbar)
+
 		pass
 
 	def createActions(self):
@@ -178,6 +190,12 @@ class RegistrationShop(QMainWindow):
 		self.actionOpenProject = QAction('Open...', self, shortcut='Ctrl+O')
 		self.actionOpenProject.triggered.connect(self.openProject)
 
+		self.actionNewProject = QAction('New', self, shortcut='Ctrl+N')
+		self.actionNewProject.triggered.connect(self.newProject)
+
+		self.actionRegister = QAction('Register', self, shortcut='Ctrl+R')
+		self.actionRegister.triggered.connect(self.register)
+
 		pass
 
 	def createMenus(self):
@@ -186,16 +204,17 @@ class RegistrationShop(QMainWindow):
 		"""
 		self.menuBar = QMenuBar()
 		self.menuItemFile = self.menuBar.addMenu('&File')
-		# TODO: New Project
+		self.menuItemFile.addAction(self.actionNewProject)
 		self.menuItemFile.addAction(self.actionOpenProject)
 		# TODO: Open recent >
 		self.menuItemFile.addAction(self.actionSaveProject)
 		self.menuItemFile.addAction(self.actionSaveProjectAs)
-		# TODO: Save as...
 
 		self.menuItemProject = self.menuBar.addMenu('&Project')
 		self.menuItemProject.addAction(self.actionLoadFixedData)
 		self.menuItemProject.addAction(self.actionLoadMovingData)
+		self.menuItemProject.addSeparator()
+		self.menuItemProject.addAction(self.actionRegister)
 		# self.menuItemProject.addSeparator()
 
 		pass
@@ -219,10 +238,10 @@ class RegistrationShop(QMainWindow):
 		application was run. If the application is started for the first time
 		it applies some 'sane' initial values.
 		"""
-		xPosition 	= RegistrationShop.settings.value("ui/window/origin/x", 0)
-		yPosition 	= RegistrationShop.settings.value("ui/window/origin/y", 0)
-		width 		= RegistrationShop.settings.value("ui/window/width", 800)
-		height 		= RegistrationShop.settings.value("ui/window/height", 600)
+		xPosition 	= int(RegistrationShop.settings.value("ui/window/origin/x", 0))
+		yPosition 	= int(RegistrationShop.settings.value("ui/window/origin/y", 0))
+		width 		= int(RegistrationShop.settings.value("ui/window/width", 800))
+		height 		= int(RegistrationShop.settings.value("ui/window/height", 600))
 
 		self.setGeometry(xPosition, yPosition, width, height)
 		pass
@@ -289,7 +308,6 @@ class RegistrationShop(QMainWindow):
 			start = path.rfind("RegistrationShop.py")
 			if start > -1:
 				AppVars.setPath(path[:start])
-				# AppVars.applicationPath = path[:start]
 		pass
 
 	# Action callbacks
@@ -356,17 +374,21 @@ class RegistrationShop(QMainWindow):
 		if projCont.currentProject().name() is not None:
 			# Save that project
 			print "Save project at", projCont.currentProject().name()
-			projCont.saveProject()
+			saved = projCont.saveProject()
+			if saved:
+				# Save it in the settings that this was the last opened project
+				RegistrationShop.settings.setValue("project/lastProject", projCont.currentProject().name())
 		else:
 			self.saveProjectAs()
 
 	def saveProjectAs(self):
+		"""
+		Opens a file dialog so that the user can select a folder
+		in which to save the project.
+		"""
 		# Open file dialog
 		fileName = QFileDialog.getExistingDirectory(self, "Select project folder", "", QFileDialog.ShowDirsOnly)
 		if len(fileName) > 0:
-			print "Filename:", fileName
-			print type(fileName)
-
 			# TODO: check for existing project!
 
 			# Set filename of project
@@ -376,19 +398,47 @@ class RegistrationShop(QMainWindow):
 
 		pass
 
-	def openProject(self):
+	def openProject(self, projectName=None):
 		"""
-		Shows a file dialog where the user can select a project file
+		If no project name is supplied, it will open a file dialog so 
+		that the user can select a project file
 		or project folder.
 		"""
-		fileName = QFileDialog.getExistingDirectory(self, "Open project", "", QFileDialog.ShowDirsOnly)
+		fileName = ""
+		if projectName:
+			fileName = projectName
+		else:
+			fileName = QFileDialog.getExistingDirectory(self, "Open project", "", QFileDialog.ShowDirsOnly)
+		
 		if len(fileName) > 0:
-			print ProjectController.Instance().ProjectFile
-			if os.path.isfile(fileName + "/" + ProjectController.Instance().ProjectFile):
-				ProjectController.Instance().loadProject(fileName)
+			fullName = fileName + ProjectController.Instance().ProjectFile
+			if os.path.isfile(fullName):
+				loaded = ProjectController.Instance().loadProject(fileName)
+				if loaded:
+					RegistrationShop.settings.setValue("project/lastProject", fileName)
 			else:
 				print "Project file does not exist"
-			
+		pass
+
+	def newProject(self):
+		"""
+		Create new project by calling the project controller
+		"""
+		ProjectController.Instance().newProject()
+		pass
+
+	def register(self):
+		"""
+		Temporary method to test if registration works...
+		"""
+		# self.statusbar.setHidden(False)
+		# self.progressbar.setHidden(False)
+
+		ProjectController.Instance().register()
+		
+		# self.statusbar.setHidden(True)
+		# self.progressbar.setHidden(True)
+		pass
 
 def main():
 	app = QApplication(sys.argv)

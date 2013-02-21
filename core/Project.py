@@ -18,7 +18,7 @@ class Project(QObject):
 	# Create a signal to be emitted
 	modified = Signal()
 
-	def __init__(self, name=None, fixedDataSetName=None, movingDataSetName=None, isReference=True, dictionary=None):
+	def __init__(self, name=None, fixedDataSetName=None, movingDataSetName=None, resultDataSetName=None, isReference=True, dictionary=None):
 		"""
 		@param name: Project directory name (also used as display name)
 		@type name: unicode
@@ -35,7 +35,7 @@ class Project(QObject):
 			raise TypeError("Wrong type for name. Please specify variable name.")
 
 		if dictionary:
-			properties = ["name", "fixedDataSetName", "movingDataSetName", "isReference"]
+			properties = ["name", "fixedDataSetName", "movingDataSetName", "resultDataSetName", "isReference"]
 			tempDict = {}
 			# TODO: just check for certain keys in the dictionary
 			# Add a '_' and set as property
@@ -52,6 +52,7 @@ class Project(QObject):
 			self._isReference = isReference
 			self._fixedDataSetName = fixedDataSetName
 			self._movingDataSetName = movingDataSetName
+			self._resultDataSetName = resultDataSetName
 	
 	def __eq__(self, other):
 		"""
@@ -61,7 +62,8 @@ class Project(QObject):
 		return self._name == other.name() \
 			and self._fixedDataSetName == other.fixedDataSetName() \
 			and self._movingDataSetName == other.movingDataSetName() \
-			and self._isReference == other.isReference()
+			and self._isReference == other.isReference() \
+			and self._resultDataSetName == other.resultDataSetName()
 
 	def __ne__(self, other):
 		"""
@@ -81,7 +83,8 @@ class Project(QObject):
 		dictionary = dict(name=self._name, \
 			fixedDataSetName=self._fixedDataSetName, \
 			movingDataSetName=self._movingDataSetName, \
-			isReference = self._isReference)
+			isReference=self._isReference, \
+			resultDataSetName=self._resultDataSetName)
 		return dictionary
 
 	def __repr__(self):
@@ -149,6 +152,21 @@ class Project(QObject):
 		self._movingDataSetName = name
 		self.changed()
 
+	def resultDataSetName(self):
+		"""
+		@return: File name of result data set
+		@rtype: basestring
+		"""
+		return self._resultDataSetName
+
+	def setResultDataSetName(self, name=None):
+		"""
+		@param name: result data set name
+		@type name: basestring
+		"""
+		self._resultDataSetName = name
+		self.changed()
+
 	def isReference(self):
 		"""
 		Returns whether the project has the data files included (relative from project root) 
@@ -193,7 +211,7 @@ def testObjToDictToYamlAndBack():
 	# Test that you don't have to specify a variable name
 	try:
 		anotherObject = Project(dictFromYaml)
-	except TypeError, e:
+	except TypeError:
 		assert True
 	else:
 		assert False

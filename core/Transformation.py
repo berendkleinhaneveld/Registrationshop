@@ -15,5 +15,8 @@ class Transformation(QObject):
 	"""
 	def __init__(self):
 		super(Transformation, self).__init__()
+
+		# Parameters
+		self.parameters = None
 		
 		pass
