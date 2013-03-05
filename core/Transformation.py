@@ -4,12 +4,7 @@ Transformation
 @author: Berend Klein Haneveld
 """
 
-try:
-	from PySide.QtCore import QObject
-except ImportError:
-	raise ImportError("Could not import PySide")
-
-class Transformation(QObject):
+class Transformation(object):
 	"""
 	Model (abstract) class for transformations
 	"""
@@ -17,6 +12,12 @@ class Transformation(QObject):
 		super(Transformation, self).__init__()
 
 		# Parameters
-		self.parameters = None
+		self.parameters = [] # type: Parameters
 		
 		pass
+
+	def name(self):
+		if self.parameters:
+			return self.parameters.Transform
+		else:
+			return "Name of transformation"

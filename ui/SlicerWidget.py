@@ -157,6 +157,15 @@ class SlicerWidget(QWidget):
 		self._titleLabel.setText(self._baseTitle + ": " + self._title)
 		pass
 
+	def setShowsActionBar(self, show):
+		"""
+		@type show: bool
+		"""
+		self._actionButtons.setHidden(not show)
+
+	def showsActionBar(self):
+		return not self._actionButtons.isHidden()
+
 	# UI actions / callbacks
 
 	def loadFile(self):

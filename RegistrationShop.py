@@ -20,6 +20,8 @@ try:
 	from PySide.QtGui import QFileDialog
 	from PySide.QtGui import QMenuBar
 	from PySide.QtGui import QProgressBar
+	from PySide.QtGui import QWidget
+	from PySide.QtGui import QSizePolicy
 except ImportError, e:
 	raise e
 
@@ -30,6 +32,7 @@ from ui.TransformationWidget import TransformationWidget
 from ui.VisualizationParametersWidget import VisualizationParametersWidget
 from ui.DataSetsWidget import DataSetsWidget
 from ui.SlicerWidget import SlicerWidget
+from ui.ParameterWidget import ParameterWidget
 
 # Define settings parameters
 APPNAME = "RegistrationShop"
@@ -49,7 +52,6 @@ class RegistrationShop(QMainWindow):
 		Sets app specific properties.
 		Initializes the UI.
 		"""
-		
 		super(RegistrationShop, self).__init__()
 		self.arg = arg
 		self.setApplicationPath()
@@ -61,7 +63,7 @@ class RegistrationShop(QMainWindow):
 		
 		lastProject = RegistrationShop.settings.value("project/lastProject", None)
 		if lastProject:
-			"Open the last saved project"
+			# Open the last saved project
 			self.openProject(lastProject)
 		
 		pass
@@ -94,6 +96,7 @@ class RegistrationShop(QMainWindow):
 		main window is composed.
 		"""
 		self.mainSlicer = SlicerWidget("Registration results data set")
+		self.mainSlicer.setShowsActionBar(False)
 		ProjectController.Instance().changedResultsDataSetFileName.connect(self.mainSlicer.setFileName)
 
 		# Initialize the main window
@@ -108,6 +111,12 @@ class RegistrationShop(QMainWindow):
 		self.dockTransformations.setAllowedAreas(Qt.AllDockWidgetAreas)
 		self.dockTransformations.setFeatures(QDockWidget.NoDockWidgetFeatures)
 		self.dockTransformations.setHidden(RegistrationShop.settings.value("ui/dock/transformation/hidden", False))
+
+		self.dockParameters = QDockWidget()
+		self.dockParameters.setWindowTitle("Parameters")
+		self.dockParameters.setAllowedAreas(Qt.AllDockWidgetAreas)
+		self.dockParameters.setFeatures(QDockWidget.NoDockWidgetFeatures)
+		self.dockParameters.setHidden(RegistrationShop.settings.value("ui/dock/transformation/hidden", False))
 		
 		# Toolbox on the bottom of the window
 		self.dockDataSets = QDockWidget()
@@ -126,18 +135,25 @@ class RegistrationShop(QMainWindow):
 		# Add the dock widgets to their main windows. The one of the left is added to
 		# the top most 'main window' so that it stretches out across the whole left side
 		self.addDockWidget(Qt.LeftDockWidgetArea, self.dockTransformations)
+		self.addDockWidget(Qt.LeftDockWidgetArea, self.dockParameters)
 		self.mainWindow.addDockWidget(Qt.RightDockWidgetArea, self.dockVisualParameters)
 		self.mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self.dockDataSets)
 		
 		# Create the dock widgets
 		self.transformationWidget = TransformationWidget()
+		self.parameterWidget = ParameterWidget()
 		self.visualizationParamWidget = VisualizationParametersWidget()
 		self.dataSetsWidget = DataSetsWidget()
 		
 		# Assign the dock widgets to their docks
 		self.dockTransformations.setWidget(self.transformationWidget)
+		self.dockParameters.setWidget(self.parameterWidget)
 		self.dockVisualParameters.setWidget(self.visualizationParamWidget)
 		self.dockDataSets.setWidget(self.dataSetsWidget)
+
+		# TODO: this doesn't look good: way too deep...
+		self.transformationWidget.transformationsView.selectedTransformation.connect(
+			self.parameterWidget.parameterModel.setTransformation)
 		
 		# Create statusbar and hide it immediately
 		self.progressbar = QProgressBar()
@@ -227,9 +243,16 @@ class RegistrationShop(QMainWindow):
 		self.toolbar = self.addToolBar('Main tools')
 		
 		# Add the toolbar actions
+
+		# Align the dock buttons to the right with a spacer widget
+		spacer = QWidget()
+		spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+		self.toolbar.addWidget(spacer)
+		# Add the dock buttons to the toolbar
 		self.toolbar.addAction(self.actionToggleLeftBar)
 		self.toolbar.addAction(self.actionToggleBottomBar)
 		self.toolbar.addAction(self.actionToggleRightBar)
+		# TODO: add don't panic button
 		pass
 
 	def restoreState(self):
@@ -318,6 +341,7 @@ class RegistrationShop(QMainWindow):
 		the state of the toolbar button is updated and saves the state in the settings.
 		"""
 		self.dockTransformations.setHidden(not(self.dockTransformations.isHidden()))
+		self.dockParameters.setHidden(self.dockTransformations.isHidden())
 		self.actionToggleLeftBar.setChecked(not(self.dockTransformations.isHidden()))
 		RegistrationShop.settings.setValue("ui/dock/transformation/hidden", self.dockTransformations.isHidden())
 		pass
@@ -358,7 +382,7 @@ class RegistrationShop(QMainWindow):
 		Open file dialog to search for data files. If valid data is given, it will
 		pass the data file location on to the slicer and the project controller.
 		"""
-		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images (*.mhd *.vti)")
+		fileName, other = QFileDialog.getOpenFileName(self, "Open moving data set", "", "Images (*.mhd *.vti)")
 		if len(fileName) > 0:
 			projectController = ProjectController.Instance()
 			projectController.loadMovingDataSet(fileName)

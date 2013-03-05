@@ -5,28 +5,34 @@ Widget that displays a list of transformations
 
 @author: Berend Klein Haneveld 2013
 """
+from core.TransformationModel import TransformationModel
+from core.AppVars import AppVars
+from ButtonContainer import ButtonContainer
+from TransformationListView import TransformationListView
 
 try:
 	from PySide.QtGui import QWidget
 	from PySide.QtGui import QVBoxLayout
 	from PySide.QtGui import QPushButton
 	from PySide.QtGui import QIcon
-	from PySide.QtGui import QTextEdit
-except ImportError:
-	raise ImportError("Could not import PySide")
-
-from core.AppVars import AppVars
-from ButtonContainer import ButtonContainer
+except ImportError as e:
+	raise e
 
 class TransformationWidget(QWidget):
+	"""
+	Widget that controls the display of transformations in a list
+	view. All actions of the view go through the controller.
+	"""
+
 	def __init__(self):
 		"""
 		Sets up the transformations widget
 		"""
 		super(TransformationWidget, self).__init__()
 		
+		self.transformations = []
+
 		self.initUI()
-		pass
 
 	def initUI(self):
 		"""
@@ -35,7 +41,15 @@ class TransformationWidget(QWidget):
 		"""
 		# Create container for action buttons
 		self.actionContainer = ButtonContainer()
+
+		# Create the model for the transformations
+		self.transformationModel = TransformationModel()
 		
+		# Create the view for the transformation model
+		self.transformationsView = TransformationListView()
+		self.transformationsView.setRootIsDecorated(False)
+		self.transformationsView.setModel(self.transformationModel)
+
 		# Create a main layout (vertical) for this widget
 		self.layout = QVBoxLayout()
 		self.layout.setSpacing(0)
@@ -44,18 +58,32 @@ class TransformationWidget(QWidget):
 		# Add the widgets to the layout
 		# Put actions underneath the main part of the widget
 		# Just like in XCode/Finder
-		self.layout.addWidget(QTextEdit())
+		self.layout.addWidget(self.transformationsView)
 		self.layout.addWidget(self.actionContainer)
 		
 		# Set the layout
 		self.setLayout(self.layout)
 		
-		# Add a button to the container
-		button = QPushButton()
-		button.setIcon(QIcon(AppVars.imagePath() + "AddButton.png"))
-		button.clicked.connect(self.empty)
-		self.actionContainer.addButton(button)
-		pass
+		# Add 'add' and 'remove' buttons to the container
+		addButton = QPushButton()
+		addButton.setIcon(QIcon(AppVars.imagePath() + "AddButton.png"))
+		addButton.clicked.connect(self.addButtonClicked)
+		
+		removeButton = QPushButton()
+		removeButton.setIcon(QIcon(AppVars.imagePath() + "RemoveButton.png"))
+		removeButton.clicked.connect(self.removeButtonClicked)
 
-	def empty(self):
-		print "empty"
+		self.actionContainer.addButton(addButton)
+		self.actionContainer.addButton(removeButton)
+
+	def addButtonClicked(self):
+		"""
+		Tells the view to add a transformation to the end of the list.
+		"""
+		self.transformationsView.addTransformation()
+
+	def removeButtonClicked(self):
+		"""
+		Tells the view to remove the selected transformation if there is one.
+		"""
+		self.transformationsView.removeSelectedTransformation()
