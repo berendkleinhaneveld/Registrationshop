@@ -22,6 +22,7 @@ try:
 	from PySide.QtGui import QProgressBar
 	from PySide.QtGui import QWidget
 	from PySide.QtGui import QSizePolicy
+	from PySide.QtGui import QToolBar
 except ImportError, e:
 	raise e
 
@@ -107,7 +108,7 @@ class RegistrationShop(QMainWindow):
 		
 		# Toolbox on the left side of the window
 		self.dockTransformations = QDockWidget()
-		self.dockTransformations.setWindowTitle("Transformations")
+		self.dockTransformations.setWindowTitle("Strategy")
 		self.dockTransformations.setAllowedAreas(Qt.AllDockWidgetAreas)
 		self.dockTransformations.setFeatures(QDockWidget.NoDockWidgetFeatures)
 		self.dockTransformations.setHidden(RegistrationShop.settings.value("ui/dock/transformation/hidden", False))
@@ -253,7 +254,6 @@ class RegistrationShop(QMainWindow):
 		self.toolbar.addAction(self.actionToggleBottomBar)
 		self.toolbar.addAction(self.actionToggleRightBar)
 		# TODO: add don't panic button
-		pass
 
 	def restoreState(self):
 		"""
@@ -395,13 +395,13 @@ class RegistrationShop(QMainWindow):
 		"""
 		projCont = ProjectController.Instance()
 		
-		if projCont.currentProject().name() is not None:
+		if projCont.currentProject.folder is not None:
 			# Save that project
-			print "Save project at", projCont.currentProject().name()
+			print "Save project at", projCont.currentProject.folder
 			saved = projCont.saveProject()
 			if saved:
 				# Save it in the settings that this was the last opened project
-				RegistrationShop.settings.setValue("project/lastProject", projCont.currentProject().name())
+				RegistrationShop.settings.setValue("project/lastProject", projCont.currentProject.folder)
 		else:
 			self.saveProjectAs()
 
@@ -416,21 +416,21 @@ class RegistrationShop(QMainWindow):
 			# TODO: check for existing project!
 
 			# Set filename of project
-			ProjectController.Instance().currentProject().setName(fileName)
+			ProjectController.Instance().currentProject.folder = fileName
 			# Call save project
 			self.saveProject()
 
 		pass
 
-	def openProject(self, projectName=None):
+	def openProject(self, folderName=None):
 		"""
 		If no project name is supplied, it will open a file dialog so 
 		that the user can select a project file
 		or project folder.
 		"""
 		fileName = ""
-		if projectName:
-			fileName = projectName
+		if folderName:
+			fileName = folderName
 		else:
 			fileName = QFileDialog.getExistingDirectory(self, "Open project", "", QFileDialog.ShowDirsOnly)
 		

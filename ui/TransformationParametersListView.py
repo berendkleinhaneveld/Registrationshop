@@ -5,6 +5,7 @@ TransformationParameterListView
 """
 
 from PySide.QtGui import QTreeView
+from PySide.QtGui import QAbstractItemView
 
 class TransformationParameterListView(QTreeView):
 	"""
@@ -13,6 +14,8 @@ class TransformationParameterListView(QTreeView):
 
 	def __init__(self):
 		super(TransformationParameterListView, self).__init__()
+
+		self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
 
 	# Public methods
 

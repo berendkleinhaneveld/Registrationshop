@@ -11,96 +11,53 @@ A node in the strategy tree contains the registration result at that point in th
 @author: Berend Klein Haneveld
 """
 
-# from Strategy import Strategy
-from StrategyEdge import StrategyEdge
-
-try:
-	from PySide.QtCore import QObject
-except ImportError as e:
-	raise e
-
-class StrategyNode(QObject):
+class StrategyNode(object):
 	"""
 	"""
-	def __init__(self):
+	def __init__(self, fixedData=None, dataset=None, outputFolder=None):
 		super(StrategyNode, self).__init__()
 		
 		# properties
 		self.incomingEdge = None
 		self.outgoingEdges = []
-		self.registrationResult = None
-		self.dirty = False
-		pass
+		self.fixedData = fixedData
+		self.dataset = dataset
+		self.outputFolder = outputFolder
+		self.__dirty = False
 
+	@property
+	def dirty(self):
+		return self.__dirty
 
-	def addChild(self, otherNode):
-		edge = StrategyEdge()
-		edge.setParentNode(self)
-		edge.setChildNode(otherNode)
-		otherNode.incomingEdge = edge
-		self.outgoingEdges.append(edge)
-		pass
+	@dirty.setter
+	def dirty(self, value):
+		if self.__dirty != value:
+			self.__dirty = value
+			if value == True:
+				for edge in self.outgoingEdges:
+					edge.childNode.dirty = True
 
+	# def addChild(self, otherNode):
+	# 	edge = StrategyEdge()
+	# 	edge.setParentNode(self)
+	# 	edge.setChildNode(otherNode)
+	# 	otherNode.incomingEdge = edge
+	# 	self.outgoingEdges.append(edge)
 
-	def removeChild(self, otherNode):
-		edges = []
-		for edge in self.outgoingEdges:
-			node = edge.childNode
-			if node is not otherNode:
-				edges.append(edge)
-		self.outgoingEdges = edges
-		otherNode.incomingEdge = None
-		pass
+	# def removeChild(self, otherNode):
+	# 	edges = []
+	# 	for edge in self.outgoingEdges:
+	# 		node = edge.childNode
+	# 		if node is not otherNode:
+	# 			edges.append(edge)
+	# 	self.outgoingEdges = edges
+	# 	otherNode.incomingEdge = None
 
-	def removeFromStrategy(self, withSubTree=False):
-		parent = self.incomingEdge.parentNode
-		parent.removeChild(self)
-		if withSubTree:
-			while len(self.outgoingEdges) > 0:
-				edge = self.outgoingEdges[0]
-				child = edge.childNode
-				child.removeFromStrategy(withSubTree)
-
-
-def testAddAndRemoveChild():
-	root = StrategyNode()
-	childNode = StrategyNode()
-	# Add a child to the root
-	root.addChild(childNode)
-	assert len(root.outgoingEdges) == 1
-	assert childNode.incomingEdge is not None
-	edge = childNode.incomingEdge
-	assert edge.parentNode != None
-	assert edge.childNode != None
-	assert edge in root.outgoingEdges
-
-	# Remove the child
-	root.removeChild(childNode)
-	assert len(root.outgoingEdges) == 0
-	assert childNode.incomingEdge == None
-
-def testAddAndRemoveChild2():
-	root = StrategyNode()
-	childNode = StrategyNode()
-	otherChild = StrategyNode()
-	root.addChild(childNode)
-	childNode.addChild(otherChild)
-	childNode.removeFromStrategy()
-	assert len(root.outgoingEdges) == 0
-	assert childNode.incomingEdge == None
-	assert len(childNode.outgoingEdges) == 1
-	assert childNode.outgoingEdges[0].childNode == otherChild
-	root.addChild(childNode)
-	assert len(root.outgoingEdges) == 1
-	assert childNode.incomingEdge is not None
-	edge = childNode.incomingEdge
-	assert edge.parentNode != None
-	assert edge.childNode != None
-	assert edge in root.outgoingEdges
-	childNode.removeFromStrategy(withSubTree=True)
-	assert len(childNode.outgoingEdges) == 0
-	assert otherChild.incomingEdge is None
-
-if __name__ == '__main__':
-	testAddAndRemoveChild()
-	testAddAndRemoveChild2()
+	# def removeFromStrategy(self, withSubTree=False):
+	# 	parent = self.incomingEdge.parentNode
+	# 	parent.removeChild(self)
+	# 	if withSubTree:
+	# 		while len(self.outgoingEdges) > 0:
+	# 			edge = self.outgoingEdges[0]
+	# 			child = edge.childNode
+	# 			child.removeFromStrategy(withSubTree)

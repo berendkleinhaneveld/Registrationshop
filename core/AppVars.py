@@ -51,3 +51,15 @@ class AppVars(object):
 		else:
 			print "Warning: application path is not set"
 			return extension
+
+	@staticmethod
+	def transformationsPath():
+		"""
+		@rtype: basestring
+		"""
+		extension = "resources/transformations"
+		if AppVars.applicationPath:
+			return AppVars.applicationPath + extension
+		else:
+			print "Warning: application path is not set"
+			return extension

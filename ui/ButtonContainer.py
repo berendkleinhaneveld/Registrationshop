@@ -12,33 +12,58 @@ try:
 	from PySide import QtCore
 	from PySide.QtGui import QWidget
 	from PySide.QtGui import QHBoxLayout
+	from PySide.QtGui import QVBoxLayout
+	from PySide.QtGui import QPalette
+	from PySide.QtGui import QBrush
+	from PySide.QtGui import QLinearGradient
+	from PySide.QtGui import QColor
+	from PySide.QtCore import Qt
 except ImportError:
 	raise ImportError("Could not import PySide")
 
 class ButtonContainer(QWidget):
-	Height = 24
+	Height = 22
 	
-	def __init__(self):
+	def __init__(self, orientation=Qt.Horizontal):
 		"""
 		Sets up the button container.
 		"""
 		super(ButtonContainer, self).__init__()
 		
+		self.orientation = orientation
+
 		self.initUI()
 
 		# Keep track of the number of buttons
 		self._buttonCount = 0
-		pass
 
 	def initUI(self):
 		"""
 		Initializes UI. Creates a horizontal layout
 		to which buttons can be added.
 		"""
+		gradient = QLinearGradient()
+		gradient.setStart(0, 0)
+		gradient.setFinalStop(0, self.Height)
+		color1 = QColor(230, 230, 230, 255)
+		color2 = QColor(177, 177, 177, 255)
+		gradient.setColorAt(0, color1)
+		gradient.setColorAt(1, color2)
+		brush = QBrush(gradient)
+
+		palette = QPalette()
+		palette.setBrush(QPalette.Background, brush)
+		
+		self.setAutoFillBackground(True)
+		self.setPalette(palette)
+
 		# Use a horizontal layout in which to keep
 		# buttons. Initialize with an empty QWidget to 
 		# make the buttons align to the left
-		self.layout = QHBoxLayout()
+		if self.orientation == Qt.Horizontal:
+			self.layout = QHBoxLayout()
+		else:
+			self.layout = QVBoxLayout()
 		self.layout.setSpacing(0)
 		self.layout.setContentsMargins(0, 0, 0, 0)
 		self.layout.addWidget(QWidget())
@@ -72,29 +97,49 @@ class ButtonContainer(QWidget):
 
 	# Overwritten from QWidget
 	
+	def sizeOfButtons(self):
+		return self._buttonCount * ButtonContainer.Height
+
+	def sizeOfContainer(self):
+		if self._buttonCount == 0:
+			return 0
+		return ButtonContainer.Height
+
+	def maximumWidth(self):
+		"""
+		@rtype: int
+		"""
+		if self.orientation == Qt.Horizontal:
+			return 0
+		else:
+			return self.sizeOfContainer()
+
 	def minimumWidth(self):
 		"""
 		@rtype: int
 		"""
-		return self._buttonCount * ButtonContainer.Height
+		if self.orientation == Qt.Horizontal:
+			return self.sizeOfButtons()
+		else:
+			return self.sizeOfContainer()
 		
 	def maximumHeight(self):
 		"""
 		@rtype: int
 		"""
-		if self._buttonCount == 0:
+		if self.orientation == Qt.Horizontal:
+			return self.sizeOfContainer()
+		else:
 			return 0
-		
-		return ButtonContainer.Height
 		
 	def minimumHeight(self):
 		"""
 		@rtype: int
 		"""
-		if self._buttonCount == 0:
-			return 0
-		
-		return ButtonContainer.Height
+		if self.orientation == Qt.Horizontal:
+			return self.sizeOfContainer()
+		else:
+			return self.sizeOfButtons()
 	
 	def sizeHint(self):
 		"""
@@ -104,6 +149,9 @@ class ButtonContainer(QWidget):
 		height = ButtonContainer.Height
 		if self._buttonCount == 0:
 			height = 0
-		sizeHint = QtCore.QSize(width, height)
+		if self.orientation == Qt.Horizontal:
+			sizeHint = QtCore.QSize(width, height)
+		else:
+			sizeHint = QtCore.QSize(height, width)
 		return sizeHint
 	

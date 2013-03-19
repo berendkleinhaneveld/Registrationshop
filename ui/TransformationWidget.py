@@ -5,7 +5,7 @@ Widget that displays a list of transformations
 
 @author: Berend Klein Haneveld 2013
 """
-from core.TransformationModel import TransformationModel
+from TransformationModel import TransformationModel
 from core.AppVars import AppVars
 from ButtonContainer import ButtonContainer
 from TransformationListView import TransformationListView
@@ -80,6 +80,8 @@ class TransformationWidget(QWidget):
 		"""
 		Tells the view to add a transformation to the end of the list.
 		"""
+		# TODO: instead of adding a transformation right away, show a window/
+		# list of some default 'templates' of transformations.
 		self.transformationsView.addTransformation()
 
 	def removeButtonClicked(self):

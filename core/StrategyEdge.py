@@ -12,27 +12,74 @@ An edge can be seen as the function that is applied to a dataset from a node. Cu
 @author: Berend Klein Haneveld
 """
 
-# from Strategy import Strategy
-# from StrategyNode import StrategyNode
+import os, sys
+import subprocess
 
-try:
-	from PySide.QtCore import QObject
-except ImportError as e:
-	raise e
-
-class StrategyEdge(QObject):
+class StrategyEdge(object):
 	"""
 	"""
-	def __init__(self):
+	def __init__(self, parent=None, child=None, transformation=None):
+		"""
+		@type parent: StrategyNode
+		@type child: StrategyNode
+		@type transformation: Transformation
+		"""
 		super(StrategyEdge, self).__init__()
 
 		# define properties
-		self.parentNode = None
+		self.parentNode = parent
 		self.childNode = None
-		self.transformation = None
+		self.transformation = transformation
 
-	def setParentNode(self, node):
-		self.parentNode = node
+	def execute(self):
+		"""
+		Call Elastix to execute the transformation.
+		Needed at least:
+		- Fixed data set (also from parent node)
+		- Moving data set (from parent node)
+		- Parameter file (made from transformation)
+		"""
+		assert self.parentNode is not None
+		assert self.childNode is not None
+		assert self.transformation is not None
+		assert self.parentNode.dataset is not None
+		assert self.parentNode.fixedData is not None
+		assert self.parentNode.outputFolder is not None
+		assert self.childNode.outputFolder is not None
 
-	def setChildNode(self, node):
-		self.childNode = node
+		# Create a parameter file of the transformation in the output folder
+		# of the parent node (next to the (moving) input data)
+		parameterFile = self.parentNode.outputFolder + "/TransformationParameters.txt"
+		self.transformation.saveToFile(parameterFile)
+		assert os.path.exists(parameterFile)
+
+		# Ensure that the output folder actually exists before calling Elastix
+		if not os.path.exists(self.childNode.outputFolder):
+			os.makedirs(self.childNode.outputFolder)
+
+		# Create Elastix command with the right parameters
+		# TODO: build some class or thing to actually call Elastix instead of 
+		# calling directly from the StrategyEdge class
+		command = ["elastix", 
+			"-m", self.parentNode.fixedData, 
+			"-f", self.parentNode.dataset,
+			"-out", self.childNode.outputFolder,
+			"-p", parameterFile]
+
+		# Try and call elastix
+		try:
+			return_code = subprocess.check_call(command)
+			# TODO: call transformix if (WriteResultImage "true") was set to false
+			self.childNode.dataset = self.childNode.outputFolder + "/result.0.mhd"
+			self.childNode.dirty = False
+			del return_code
+		except:
+			print "Image registration failed with command:"
+			print command
+			print "More detailed info:"
+			print sys.exc_info()
+
+		assert self.childNode.dataset is not None
+		assert self.childNode.dirty is False
+
+		

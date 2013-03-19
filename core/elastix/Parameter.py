@@ -41,6 +41,9 @@ class Parameter(object):
 
 		return other.key() == self.key() and other.value() == self.value()
 
+	def __ne__(self, other):
+		return not self.__eq__(other)
+
 	def setKeyValue(self, key, value):
 		"""
 		@type key: basestring
@@ -178,119 +181,37 @@ class Parameter(object):
 
 		return value, False
 
-# Unit tests
+	@classmethod
+	def parameterFromString(cls, line):
+		"""
+		@type value: basestring
+		@rtype: Parameter
+		"""
+		# Remove leading and trailing white space chars
+		line = line.strip()
+		indexOfComment = line.find("//")
+		if indexOfComment >= 0:
+			line = line[0:indexOfComment]
+		if len(line) > 1:
+			indexOfCaretOpen = line.find("(")
+			indexOfSpace = line.find(" ")
+			indexOfCaretClose = line.rfind(")")
+			if indexOfCaretOpen < 0 or indexOfCaretClose < 0 \
+				or indexOfSpace < 0 or indexOfCaretClose < indexOfCaretOpen \
+				or indexOfSpace < indexOfCaretOpen \
+				or indexOfSpace > indexOfCaretClose \
+				or indexOfSpace == indexOfCaretOpen+1:
+				# TODO: make a better exception message.
+				# raise Exception("Line is not correctly formatted.")
+				return None
+			
+			key = line[indexOfCaretOpen+1:indexOfSpace]
+			value = line[indexOfSpace+1:indexOfCaretClose]
+			if len(key) == 0:
+				return None
+			if '"' in value:
+				value = value[1:-1]
+			param = Parameter(key, value)
+			return param
 
-def testParameter():
-	# Test init function
-	param = Parameter("key", 10)
-	assert param.key() is "key"
-	assert param.value() == 10
-	# Test string representation
-	assert param.__str__() == "(key 10)"
-	# Test changing the key
-	param.setKey("otherKey")
-	assert param.key() == "otherKey"
-
-	# Test simple object creation
-	param = Parameter()
-	assert param.key() == None
-	assert param.value() == None
-
-	# Test setting the values with the KeyValue function
-	param.setKeyValue("otherKey", 20)
-	assert param.key() == "otherKey"
-	assert param.value() == 20
-
-	# Test with setting only the key
-	param = Parameter("key")
-	assert param.key() == "key"
-	assert param.value() == None
-
-	param = Parameter("key", 0.4)
-	otherParam = Parameter(''.join(['k','e','y']), 0.4)
-	assert param == otherParam
-
-	# Strip characters from key, but not from value
-	param.setKey("    Key With Spaces  \n")
-	assert param.key() == "KeyWithSpaces"
-	param.setValue("Value with spaces")
-	assert param.value() == "Value with spaces"
-
-	# Test setting a value when Key is still None
-	try:
-		# This should raise an exception
-		param = Parameter(None, "value")
-		assert False, "No exception is raised while a parameter was constructed\
-			with a key with value 'None'"
-	except AssertionError, e:
-		raise e
-	except Exception, e:
-		assert isinstance(e, AttributeError)
-
-	try:
-		param = Parameter()
-		param.setValue(20)
-	except Exception, e:
-		assert isinstance(e, AttributeError)
-
-def testConversionMethods():
-	# Create list of elements with different types
-	values = [True, "true", 20, "20", 0.4, "0.4", "hello", "0.02f"]
-
-	# Put every type of element through the grinder
-	for value in values:
-		newValue, success = Parameter.valueAsBool(value)
-		if success:
-			assert type(newValue) == bool
-			assert value == True or value == "true"
-		newValue, success = Parameter.valueAsInt(value)
-		if success:
-			assert type(newValue) == int
-			assert newValue == 20
-		newValue, success = Parameter.valueAsFloat(value)
-		if success:
-			assert type(newValue) == float
-			assert newValue == 0.4
-
-	param = Parameter("Key", 0)
-	assert isinstance(param.value(), int)
-	param = Parameter("Key", "0")
-	assert isinstance(param.value(), int)
-	param = Parameter("Key", 0.0)
-	assert isinstance(param.value(), float)
-	param = Parameter("Key", "0.0")
-	assert isinstance(param.value(), float)
-	param = Parameter("Key", True)
-	assert isinstance(param.value(), bool)
-	param = Parameter("Key", False)
-	assert isinstance(param.value(), bool)
-	param = Parameter("Key", "True")
-	assert isinstance(param.value(), bool)
-	param = Parameter("Key", "False")
-	assert isinstance(param.value(), bool)
-	param = Parameter("Key", "other")
-	assert isinstance(param.value(), basestring)
-
-def testStringRepresentations():
-	# Test the string representations
-	# String value
-	param = Parameter("key", "value")
-	assert param.__str__() == '(key "value")'
-	# Integer value
-	param.setValue(20)
-	assert param.__str__() == '(key 20)'
-	# Float value
-	param.setValue(20.0)
-	assert param.__str__() == '(key 20.0)'
-	# bool values
-	param.setValue(True)
-	assert param.__str__() == '(key "true")'
-	param.setValue(False)
-	assert param.__str__() == '(key "false")'
-
-if __name__ == '__main__':
-	print "Testing the parameter class"
-	testParameter()
-	testConversionMethods()
-	testStringRepresentations()
-	print "All test have succeeded"
+		return None

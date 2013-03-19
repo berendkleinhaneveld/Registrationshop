@@ -1,60 +1,41 @@
 """
-ParameterModel
+TransformationModel
 
 @author: Berend Klein Haneveld
 """
+from core.Transformation import Transformation
+from PySide.QtCore import Qt
 from PySide.QtCore import QAbstractItemModel
 from PySide.QtCore import QModelIndex
-from PySide.QtCore import Qt
-from PySide.QtCore import Slot
-from Parameter import Parameter
-from core.Transformation import Transformation
 
-class ParameterModel(QAbstractItemModel):
-	"""
-	Model for parameters to be viewed in a view
-	"""
+from core.AppVars import AppVars
+
+class TransformationModel(QAbstractItemModel):
+	"""TransformationModel"""
 
 	def __init__(self):
-		super(ParameterModel, self).__init__()
+		super(TransformationModel, self).__init__()
+		
+		self.headers = ["Name"]
+		self.transformations = []
 
-		self.parameters = []
-		self.headers = ["Parameter", "Value"]
-	
 	# Public interface functions
 
-	def setParameters(self, parameters):
+	def addTransformation(self):
 		"""
-		The parameter value should be a list of Parameter items.
-		The use of a dictionary has no use here, because a dictionary
-		has no fixed ordering.
+		Adds transformation at the end of the list
+		"""
+		transformation = Transformation()
+		transformation.loadFromFile(AppVars.transformationsPath() + "/Default B-spline.c")
+		self.transformations.append(transformation)
+		self.insertRows(len(self.transformations), 1, QModelIndex())
 
-		@type parameters: list
+	def removeTransformationAtIndex(self, index):
 		"""
-		self.parameters = parameters
-		self.layoutChanged.emit()
-
-	def addParameter(self):
+		@type index: QModelIndex
 		"""
-		Add a standard parameter to the end of the list.
-		"""
-		standardParameter = Parameter("ParameterName", "Value")
-		self.parameters.append(standardParameter)
-		self.insertRows(len(self.parameters), 1, QModelIndex())
-
-	def removeParameterAtIndex(self, index):
-		"""
-		@type index: int
-		"""
-		del self.parameters[index]
-		self.removeRow(index, QModelIndex())
-
-	@Slot(Transformation)
-	def setTransformation(self, transformation):
-		"""
-		@type transformation: Transformation
-		"""
-		self.setParameters(transformation.parameters)
+		del self.transformations[index.row()]
+		self.removeRow(index.row(), self.parent(None))
 
 	# Functions needed for read only behaviour
 
@@ -65,16 +46,12 @@ class ParameterModel(QAbstractItemModel):
 		@type parent: QModelIndex
 		@rtype: QModelIndex
 		"""
-		#If the model does not have this index
-		if not self.hasIndex(row, column, parent):
+		if row < 0 or row >= len(self.transformations):
 			return self.invalidIndex()
+			
+		ind = self.createIndex(row, column, self.transformations[row])
 
-		if column == 0:
-			return self.createIndex(row, column, str(self.parameters[row].key()))
-		if column == 1:
-			return self.createIndex(row, column, str(self.parameters[row].value()))
-
-		return None
+		return ind
 
 	def parent(self, index):
 		"""
@@ -90,8 +67,8 @@ class ParameterModel(QAbstractItemModel):
 		"""
 		if index.isValid():
 			return 0
-
-		return len(self.parameters)
+		
+		return len(self.transformations)
 
 	def columnCount(self, parent=None):
 		"""
@@ -107,13 +84,10 @@ class ParameterModel(QAbstractItemModel):
 		@rtype: QVariant
 		"""
 		if role == Qt.DisplayRole or role == Qt.EditRole:
-			parameter = self.parameters[index.row()]
-			if index.column() == 0:
-				return str(parameter.key())
-			if index.column() == 1:
-				return str(parameter.value())
-		
-		return None
+			transform = index.internalPointer()
+			return transform.name
+		else:
+			return None
 
 	# Functions needed for editing
 
@@ -127,19 +101,13 @@ class ParameterModel(QAbstractItemModel):
 		if not role == Qt.EditRole:
 			return False
 
-		parameter = self.parameters[index.row()]
-		if index.column() == 0:
-			parameter.setKey(value)
-		elif index.column() == 1:
-			parameter.setValue(value)
-
+		self.transformations[index.row()].name = value
 		self.dataChanged.emit(index, index)
-		self.layoutChanged.emit()
 		return True
 
 	def flags(self, index):
 		if not index.isValid():
-			return Qt.NoItemFlags
+			return Qt.ItemIsEnabled
 		return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled \
 			| Qt.ItemIsDropEnabled | Qt.ItemIsEditable
 
@@ -182,3 +150,4 @@ class ParameterModel(QAbstractItemModel):
 		@rtype: QModelIndex
 		"""
 		return self.createIndex(-1, -1, None)
+

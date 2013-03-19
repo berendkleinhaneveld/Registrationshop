@@ -7,13 +7,12 @@ Should be only one instance
 @author: Berend Klein Haneveld
 """
 
-import multiprocessing
+# import multiprocessing
 try:
 	from PySide.QtCore import QObject
 	from PySide.QtCore import Slot
 	from PySide.QtCore import Signal
 	import yaml
-	from pyelastix import Elastix
 except ImportError, e:
 	raise e
 
@@ -28,6 +27,7 @@ class ProjectController(QObject):
 	changedResultsDataSetFileName = Signal(basestring)
 	changedProject = Signal(Project)
 
+	# Define the standard project file name
 	ProjectFile = u"/project.yaml"
 
 	def __init__(self, project=None):
@@ -37,41 +37,33 @@ class ProjectController(QObject):
 		"""
 		QObject.__init__(self)
 
-		self._currentProject = project
+		self.currentProject = project
 		# Create new standard project if no project is provided
 		if project == None:
-			self._currentProject = Project()
+			self.currentProject = Project()
 
-	def currentProject(self):
+	def loadProject(self, folder=None):
 		"""
-		@return: Current project
-		@rtype: Project
-		"""
-		return self._currentProject
-
-	def loadProject(self, name=None):
-		"""
-		@param name: Directory of project
-		@type name: unicode
+		@param folder: Directory of project
+		@type folder: unicode
 		@return: Success
 		@rtype: bool
 		"""
-		projectFileName = name + self.ProjectFile
+		projectFileName = folder + self.ProjectFile
 		projectFile = open(projectFileName, "r")
 		
 		try:
-			yamlRepresentation = yaml.load(projectFile)
-			project = Project(dictionary=yamlRepresentation)
-			self._currentProject = project
+			project = yaml.load(projectFile)
+			self.currentProject = project
 		except Exception, e:
 			print e
 			return False
 		
 		# Reload all the views!
-		self.changedProject.emit(self._currentProject)
-		self.changedFixedDataSetFileName.emit(self._currentProject.fixedDataSetName())
-		self.changedMovingDataSetFileName.emit(self._currentProject.movingDataSetName())
-		self.changedResultsDataSetFileName.emit(self._currentProject.resultDataSetName())
+		self.changedProject.emit(self.currentProject)
+		self.changedFixedDataSetFileName.emit(self.currentProject.fixedData)
+		self.changedMovingDataSetFileName.emit(self.currentProject.movingData)
+		self.changedResultsDataSetFileName.emit(self.currentProject.resultData)
 		
 		return True
 
@@ -86,11 +78,10 @@ class ProjectController(QObject):
 		@rtype: bool
 		"""
 		try:
-			dictionary = self._currentProject.dictionary()
-			projectFileName = self._currentProject.name() + self.ProjectFile
+			projectFileName = self.currentProject.folder + self.ProjectFile
 			projectFile = open(projectFileName, "w+")
 			# Create a readable project file
-			yaml.dump(dictionary, projectFile, default_flow_style=False)
+			yaml.dump(self.currentProject, projectFile, default_flow_style=False)
 			projectFile.close()
 		except Exception, e:
 			print e
@@ -108,14 +99,13 @@ class ProjectController(QObject):
 
 	def newProject(self):
 		# Set a new project as current project
-		self._currentProject = Project()
+		self.currentProject = Project()
 		# Send out the signal!
-		self.changedProject.emit(self._currentProject)
-		self.changedFixedDataSetFileName.emit(self._currentProject.fixedDataSetName())
-		self.changedMovingDataSetFileName.emit(self._currentProject.movingDataSetName())
-		self.changedResultsDataSetFileName.emit(self._currentProject.resultDataSetName())
-		
-
+		self.changedProject.emit(self.currentProject)
+		self.changedFixedDataSetFileName.emit(self.currentProject.fixedData)
+		self.changedMovingDataSetFileName.emit(self.currentProject.movingData)
+		self.changedResultsDataSetFileName.emit(self.currentProject.resultData)
+	
 	def register(self):
 		"""
 		Make an Elastix object.
@@ -169,10 +159,10 @@ class ProjectController(QObject):
 		"""
 		# TODO: some extra magic like checking if file exists
 		print "Load the fixed data set", name
-		self._currentProject.setFixedDataSetName(name)
+		self.currentProject.fixedData = name
 
 		# Emit signal that data set file name has changed
-		self.changedFixedDataSetFileName.emit(name)
+		self.changedFixedDataSetFileName.emit(self.currentProject.fixedData)
 
 	@Slot(basestring)
 	def loadMovingDataSet(self, name=None):
@@ -185,7 +175,7 @@ class ProjectController(QObject):
 		"""
 		# TODO: some extra magic like checking if file exists
 		print "Load the moving data set", name
-		self._currentProject.setMovingDataSetName(name)
+		self.currentProject.movingData = name
 
 		# Emit signal that data set file name has changed
-		self.changedMovingDataSetFileName.emit(name)
+		self.changedMovingDataSetFileName.emit(self.currentProject.movingData)

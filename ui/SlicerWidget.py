@@ -11,11 +11,13 @@ try:
 	from PySide.QtGui import QPushButton
 	from PySide.QtGui import QIcon
 	from PySide.QtGui import QVBoxLayout
+	from PySide.QtGui import QHBoxLayout
 	from PySide.QtGui import QFileDialog
 	from PySide.QtGui import QLabel
 	from PySide import QtCore
 	from PySide.QtCore import Signal
 	from PySide.QtCore import Slot
+	from PySide.QtCore import Qt
 	from vtk import *
 except ImportError, e:
 	raise e
@@ -115,16 +117,12 @@ class SlicerWidget(QWidget):
 		a list widget.
 		"""
 		# Create container for action buttons
-		self._actionButtons = ButtonContainer()
+		self._actionButtons = ButtonContainer(Qt.Horizontal)
 		button = QPushButton()
 		button.setIcon(QIcon(AppVars.imagePath() + "AddButton.png"))
 		button.clicked.connect(self.loadFile)
 		self._actionButtons.addButton(button)
 
-		# Create a main layout (vertical) for this widget
-		self._layout = QVBoxLayout()
-		self._layout.setSpacing(0)
-		self._layout.setContentsMargins(0, 0, 0, 0)
 		# Create label with title
 		self._titleLabel = QLabel(self._baseTitle)
 		font = self._titleLabel.font()
@@ -136,14 +134,29 @@ class SlicerWidget(QWidget):
 		# Create the base viewer in which the slices will be shown
 		self._viewer = BaseViewer(BaseViewer.TypeSlice)
 
-		# Put actions underneath the main part of the widget
-		# Just like in XCode/Finder
-		self._layout.addWidget(self._titleLabel)
+		# Create a widget with a layout that holds the view and the action
+		# buttons in it
+		self._layout = QVBoxLayout()
+		self._layout.setSpacing(0)
+		self._layout.setContentsMargins(0, 0, 0, 0)
+
 		self._layout.addWidget(self._viewer)
 		self._layout.addWidget(self._actionButtons)
+
+		widget = QWidget(self)
+		widget.setLayout(self._layout)
+
+		# Create a main layout (vertical) for this widget
+		self._mainLayout = QVBoxLayout()
+		self._mainLayout.setSpacing(0)
+		self._mainLayout.setContentsMargins(0, 0, 0, 0)
+
+		# Put actions underneath the main part of the widget
+		# Just like in XCode/Finder
+		self._mainLayout.addWidget(self._titleLabel)
+		self._mainLayout.addWidget(widget)
 		
-		self.setLayout(self._layout)
-		pass
+		self.setLayout(self._mainLayout)
 
 	def setTitle(self, title):
 		"""
