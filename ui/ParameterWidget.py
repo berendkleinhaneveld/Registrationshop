@@ -5,7 +5,7 @@ from PySide.QtGui import QPushButton
 from PySide.QtGui import QIcon
 from core.AppVars import AppVars
 from ui.ButtonContainer import ButtonContainer
-from core.elastix.ParameterModel import ParameterModel
+from ui.ParameterModel import ParameterModel
 from ui.TransformationParametersListView import TransformationParameterListView
 
 class ParameterWidget(QWidget):
