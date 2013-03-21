@@ -19,6 +19,9 @@ class StrategyEdgeTest(unittest.TestCase):
 
 	def testStrategyEdge(self):
 		self.assertIsNotNone(self.edge)
+		self.assertTrue(hasattr(self.edge, "parentNode"))
+		self.assertTrue(hasattr(self.edge, "childNode"))
+		self.assertTrue(hasattr(self.edge, "transformation"))
 
 	def testExecutingStrategyEdge(self):
 		# Load simple transformation from disk
@@ -51,6 +54,7 @@ class StrategyEdgeTest(unittest.TestCase):
 		self.assertIsNotNone(self.edge.childNode.dataset)
 		self.assertTrue(os.path.exists(self.edge.childNode.dataset))
 
+		# Cleanup test directory
 		try:
 			if os.path.exists(path + "/data/data"):
 				shutil.rmtree(path + "/data/data")

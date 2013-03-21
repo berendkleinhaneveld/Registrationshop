@@ -22,7 +22,6 @@ try:
 	from PySide.QtGui import QProgressBar
 	from PySide.QtGui import QWidget
 	from PySide.QtGui import QSizePolicy
-	from PySide.QtGui import QToolBar
 except ImportError, e:
 	raise e
 
