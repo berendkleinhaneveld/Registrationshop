@@ -1,7 +1,8 @@
 """
 TransformationModel
 
-@author: Berend Klein Haneveld
+:Authors:
+	Berend Klein Haneveld
 """
 from core.Transformation import Transformation
 from PySide.QtCore import Qt
@@ -11,7 +12,12 @@ from PySide.QtCore import QModelIndex
 from core.AppVars import AppVars
 
 class TransformationModel(QAbstractItemModel):
-	"""TransformationModel"""
+	"""
+	TransformationModel that wraps around a collection of transformations.
+
+	TODO: should be connected to Strategy class, instead of using a simple list
+	to keep track of transformations.
+	"""
 
 	def __init__(self):
 		super(TransformationModel, self).__init__()
@@ -32,7 +38,7 @@ class TransformationModel(QAbstractItemModel):
 
 	def removeTransformationAtIndex(self, index):
 		"""
-		@type index: QModelIndex
+		:type index: QModelIndex
 		"""
 		del self.transformations[index.row()]
 		self.removeRow(index.row(), self.parent(None))
@@ -41,10 +47,10 @@ class TransformationModel(QAbstractItemModel):
 
 	def index(self, row, column, parent):
 		"""
-		@type row: int
-		@type column: int
-		@type parent: QModelIndex
-		@rtype: QModelIndex
+		:type row: int
+		:type column: int
+		:type parent: QModelIndex
+		:rtype: QModelIndex
 		"""
 		if row < 0 or row >= len(self.transformations):
 			return self.invalidIndex()
@@ -55,15 +61,15 @@ class TransformationModel(QAbstractItemModel):
 
 	def parent(self, index):
 		"""
-		@type index: QModelIndex
-		@rtype: QModelIndex
+		:type index: QModelIndex
+		:rtype: QModelIndex
 		"""
 		return self.invalidIndex()
 
 	def rowCount(self, index):
 		"""
-		@type parent: QModelIndex
-		@rtype: int
+		:type parent: QModelIndex
+		:rtype: int
 		"""
 		if index.isValid():
 			return 0
@@ -72,16 +78,16 @@ class TransformationModel(QAbstractItemModel):
 
 	def columnCount(self, parent=None):
 		"""
-		@type parent: QModelIndex
-		@rtype: int
+		:type parent: QModelIndex
+		:rtype: int
 		"""
 		return len(self.headers)
 
 	def data(self, index, role):
 		"""
-		@type index: QModelIndex
-		@type role: Qt.ItemDataRole
-		@rtype: QVariant
+		:type index: QModelIndex
+		:type role: Qt.ItemDataRole
+		:rtype: QVariant
 		"""
 		if role == Qt.DisplayRole or role == Qt.EditRole:
 			transform = index.internalPointer()
@@ -93,10 +99,10 @@ class TransformationModel(QAbstractItemModel):
 
 	def setData(self, index, value, role):
 		"""
-		@type index: QModelIndex
-		@type value: QVariant
-		@type role: Qt.ItemDataRole
-		@rtype: bool
+		:type index: QModelIndex
+		:type value: QVariant
+		:type role: Qt.ItemDataRole
+		:rtype: bool
 		"""
 		if not role == Qt.EditRole:
 			return False
@@ -106,6 +112,10 @@ class TransformationModel(QAbstractItemModel):
 		return True
 
 	def flags(self, index):
+		"""
+		:type index: QModelIndex
+		:rtype: int
+		"""
 		if not index.isValid():
 			return Qt.ItemIsEnabled
 		return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled \
@@ -113,10 +123,10 @@ class TransformationModel(QAbstractItemModel):
 
 	def insertRows(self, row, count, parent):
 		"""
-		@type row: int
-		@type count: int
-		@type parent: QModelIndex
-		@rtype: bool
+		:type row: int
+		:type count: int
+		:type parent: QModelIndex
+		:rtype: bool
 		"""
 		self.beginInsertRows(parent, row, row+count-1)
 		self.endInsertRows()
@@ -124,10 +134,10 @@ class TransformationModel(QAbstractItemModel):
 
 	def removeRows(self, row, count, parent):
 		"""
-		@type row: int
-		@type count: int
-		@type parent: QModelIndex
-		@rtype: bool
+		:type row: int
+		:type count: int
+		:type parent: QModelIndex
+		:rtype: bool
 		"""
 		self.beginRemoveRows(parent, row, row+count-1)
 		self.endRemoveRows()
@@ -135,8 +145,8 @@ class TransformationModel(QAbstractItemModel):
 
 	def headerData(self, section, orientation, role=Qt.DisplayRole):
 		"""
-		@type section: int
-		@type orientation: Qt.Orientation
+		:type section: int
+		:type orientation: Qt.Orientation
 		"""
 		if orientation == Qt.Horizontal and role == Qt.DisplayRole:
 			return self.headers[section]
@@ -147,7 +157,8 @@ class TransformationModel(QAbstractItemModel):
 		"""
 		Convenience method for creating an invalid QModelIndex object 
 		for use in some methods.
-		@rtype: QModelIndex
+		
+		:rtype: QModelIndex
 		"""
 		return self.createIndex(-1, -1, None)
 

@@ -1,21 +1,23 @@
 """
 VisualizationParametersWidget
 
-Widget that holds the parameters for the main visualization
-
-@author: Berend Klein Haneveld 2013
+:Authors:
+	Berend Klein Haneveld 2013
 """
 
 try:
 	from PySide.QtGui import QWidget
 	from PySide.QtGui import QVBoxLayout
 	from PySide.QtGui import QTextEdit
-except ImportError:
-	raise ImportError("Could not import PySide")
+except ImportError, e:
+	raise e
 
 from ButtonContainer import ButtonContainer
 
 class VisualizationParametersWidget(QWidget):
+	"""
+	Widget that holds the parameters for the main visualization
+	"""
 
 	def __init__(self):
 		"""

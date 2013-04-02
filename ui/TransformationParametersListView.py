@@ -1,7 +1,8 @@
 """
 TransformationParameterListView
 
-@author: Berend Klein Haneveld
+:Authors:
+	Berend Klein Haneveld
 """
 
 from PySide.QtGui import QTreeView
@@ -34,7 +35,7 @@ class TransformationParameterListView(QTreeView):
 
 	def resizeEvent(self, event):
 		"""
-		@type event: QResizeEvent
+		:type event: QResizeEvent
 		"""
 		size = event.size()
 		width = size.width()

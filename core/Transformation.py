@@ -1,11 +1,12 @@
 """
 Parameters
 
-@author: Berend Klein Haneveld
+:Authors:
+	Berend Klein Haneveld
 """
 
-from elastix.Parameter import Parameter
 import os
+from elastix.Parameter import Parameter
 
 class Transformation(object):
 	"""
@@ -15,13 +16,15 @@ class Transformation(object):
 	transformation[i] to get the same result.
 
 	Implements the following methods:
-	__getitem__(index)
-	__setitem__(index, value)
-	__delitem__(index)
-	__len__()
-	__contains__(value)
-	append(value)
+	- __getitem__(index)
+	- __setitem__(index, value)
+	- __delitem__(index)
+	- __len__()
+	- __contains__(value)
+	- append(value)
+
 	"""
+
 	def __init__(self):
 		super(Transformation, self).__init__()
 		self.parameters = []
@@ -34,8 +37,8 @@ class Transformation(object):
 		Reads a list of parameters from file. Returns whether it has succeeded
 		in doing so.
 
-		@type filename: basestring
-		@rtype: bool
+		:type filename: basestring
+		:rtype: bool
 		"""
 		directory, lastPathComponent = os.path.split(filename)
 		self.name = lastPathComponent
@@ -58,8 +61,8 @@ class Transformation(object):
 		Saves a list of parameters to file. Returns whether it has succeeded in
 		doing so. Overwrites anything on the given path.
 
-		@type filename: basestring
-		@rtype: bool
+		:type filename: basestring
+		:rtype: bool
 		"""
 		lines = []
 		for param in self.parameters:
@@ -113,7 +116,9 @@ class Transformation(object):
 		"""
 		Only if value has the type Parameter it gets added to the list,
 		so that the parameter list stays consistent.
-		@type value: Parameter
+
+		:param value: Parameter to add to the list
+		:type value: Parameter
 		"""
 		if isinstance(value, Parameter):
 			self.parameters.append(value)

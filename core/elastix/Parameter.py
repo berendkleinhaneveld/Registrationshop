@@ -5,7 +5,8 @@ Class that encapsulates a single parameter. Most important
 part is that the string representation is in the format that
 Elastix uses for its parameters.
 
-@author: Berend Klein Haneveld
+:Authors:
+	Berend Klein Haneveld
 """
 
 class Parameter(object):
@@ -14,10 +15,11 @@ class Parameter(object):
 	Just a little more interesting over normal dict entries because of the specific representation
 	to be used in a parameter file for Elastix.
 	"""
+	
 	def __init__(self, key=None, value=None):
 		"""
-		@type key: basestring
-		@type value: basestring or bool or int, float
+		:type key: basestring
+		:type value: basestring or bool or int, float
 		"""
 		super(Parameter, self).__init__()
 
@@ -46,8 +48,8 @@ class Parameter(object):
 
 	def setKeyValue(self, key, value):
 		"""
-		@type key: basestring
-		@type value: float, int, basestring
+		:type key: basestring
+		:type value: float, int, basestring
 		"""
 		# Raise attribute error if the key is None while the value has a value
 		if not key and value:
@@ -63,7 +65,7 @@ class Parameter(object):
 		"""
 		Strips whitespace characters and spaces from key.
 
-		@type key: basestring
+		:type key: basestring
 		"""
 		if not key:
 			raise AttributeError("Can't set a key to None")
@@ -78,7 +80,7 @@ class Parameter(object):
 
 	def setValue(self, value):
 		"""
-		@type value: basestring, float, int
+		:type value: basestring, float, int
 		"""
 		if not self._key:
 			raise AttributeError("Can't set a value when the key is None")
@@ -95,13 +97,13 @@ class Parameter(object):
 
 	def key(self):
 		"""
-		@rtype: basestring
+		:rtype: basestring
 		"""
 		return self._key
 
 	def value(self):
 		"""
-		@rtype: float, int, basestring
+		:rtype: float, int, basestring
 		"""
 		return self._value
 
@@ -128,7 +130,7 @@ class Parameter(object):
 		Returns the (converted) value and a bool whether the value is 
 		succesfully converted or not. If not, the original value is returned.
 
-		@rtype: bool, bool
+		:rtype: bool, bool
 		"""
 		if isinstance(value, bool):
 			return value, True
@@ -149,7 +151,7 @@ class Parameter(object):
 		Returns the (converted) value and a bool whether the value is 
 		succesfully converted or not. If not, the original value is returned.
 
-		@rtype: int, bool
+		:rtype: int, bool
 		"""
 		if isinstance(value, int) and not isinstance(value, bool):
 			return value, True
@@ -168,7 +170,7 @@ class Parameter(object):
 		Returns the (converted) value and a bool whether the value is 
 		succesfully converted or not. If not, the original value is returned.
 
-		@rtype: float, bool
+		:rtype: float, bool
 		"""
 		if isinstance(value, float):
 			return value, True
@@ -184,8 +186,8 @@ class Parameter(object):
 	@classmethod
 	def parameterFromString(cls, line):
 		"""
-		@type value: basestring
-		@rtype: Parameter
+		:type value: basestring
+		:rtype: Parameter
 		"""
 		# Remove leading and trailing white space chars
 		line = line.strip()

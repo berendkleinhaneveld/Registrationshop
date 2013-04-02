@@ -11,7 +11,7 @@ class StrategyNodeTest(unittest.TestCase):
 		path = os.path.dirname(os.path.abspath(__file__))
 		fixedData = unicode(path) + "/data/hi-3.vti"
 		movingData = unicode(path) + "/data/hi-5.vti"
-		self.node = StrategyNode(fixedData=fixedData, dataset=movingData)
+		self.node = StrategyNode(fixedData=fixedData, movingData=movingData)
 
 	def tearDown(self):
 		super(StrategyNodeTest, self).tearDown()
@@ -21,7 +21,7 @@ class StrategyNodeTest(unittest.TestCase):
 		"""
 		Test the basic creation of a StrategyNode
 		"""
-		self.assertIn("hi-5", self.node.dataset)
+		self.assertIn("hi-5", self.node.movingData)
 		self.assertIn("hi-3", self.node.fixedData)
 		self.assertIsNone(self.node.incomingEdge)
 		self.assertEqual(len(self.node.outgoingEdges), 0)

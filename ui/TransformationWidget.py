@@ -1,9 +1,8 @@
 """
 TransformationWidget (QWidget)
 
-Widget that displays a list of transformations
-
-@author: Berend Klein Haneveld 2013
+:Authors:
+	Berend Klein Haneveld 2013
 """
 from TransformationModel import TransformationModel
 from core.AppVars import AppVars
@@ -20,6 +19,8 @@ except ImportError as e:
 
 class TransformationWidget(QWidget):
 	"""
+	Widget that displays a list of transformations
+	
 	Widget that controls the display of transformations in a list
 	view. All actions of the view go through the controller.
 	"""

@@ -1,7 +1,8 @@
 """
 ParameterModel
 
-@author: Berend Klein Haneveld
+:Authors:
+	Berend Klein Haneveld
 """
 from PySide.QtCore import QAbstractItemModel
 from PySide.QtCore import QModelIndex
@@ -29,7 +30,7 @@ class ParameterModel(QAbstractItemModel):
 		The use of a dictionary has no use here, because a dictionary
 		has no fixed ordering.
 
-		@type parameters: list
+		:type parameters: list
 		"""
 		self.parameters = parameters
 		self.layoutChanged.emit()
@@ -44,7 +45,7 @@ class ParameterModel(QAbstractItemModel):
 
 	def removeParameterAtIndex(self, index):
 		"""
-		@type index: int
+		:type index: int
 		"""
 		del self.parameters[index]
 		self.removeRow(index, QModelIndex())
@@ -52,7 +53,7 @@ class ParameterModel(QAbstractItemModel):
 	@Slot(Transformation)
 	def setTransformation(self, transformation):
 		"""
-		@type transformation: Transformation
+		:type transformation: Transformation
 		"""
 		self.setParameters(transformation.parameters)
 
@@ -60,10 +61,10 @@ class ParameterModel(QAbstractItemModel):
 
 	def index(self, row, column, parent):
 		"""
-		@type row: int
-		@type column: int
-		@type parent: QModelIndex
-		@rtype: QModelIndex
+		:type row: int
+		:type column: int
+		:type parent: QModelIndex
+		:rtype: QModelIndex
 		"""
 		#If the model does not have this index
 		if not self.hasIndex(row, column, parent):
@@ -78,15 +79,15 @@ class ParameterModel(QAbstractItemModel):
 
 	def parent(self, index):
 		"""
-		@type index: QModelIndex
-		@rtype: QModelIndex
+		:type index: QModelIndex
+		:rtype: QModelIndex
 		"""
 		return self.invalidIndex()
 
 	def rowCount(self, index):
 		"""
-		@type parent: QModelIndex
-		@rtype: int
+		:type parent: QModelIndex
+		:rtype: int
 		"""
 		if index.isValid():
 			return 0
@@ -95,16 +96,16 @@ class ParameterModel(QAbstractItemModel):
 
 	def columnCount(self, parent=None):
 		"""
-		@type parent: QModelIndex
-		@rtype: int
+		:type parent: QModelIndex
+		:rtype: int
 		"""
 		return len(self.headers)
 
 	def data(self, index, role):
 		"""
-		@type index: QModelIndex
-		@type role: Qt.ItemDataRole
-		@rtype: QVariant
+		:type index: QModelIndex
+		:type role: Qt.ItemDataRole
+		:rtype: QVariant
 		"""
 		if role == Qt.DisplayRole or role == Qt.EditRole:
 			parameter = self.parameters[index.row()]
@@ -119,10 +120,10 @@ class ParameterModel(QAbstractItemModel):
 
 	def setData(self, index, value, role):
 		"""
-		@type index: QModelIndex
-		@type value: QVariant
-		@type role: Qt.ItemDataRole
-		@rtype: bool
+		:type index: QModelIndex
+		:type value: QVariant
+		:type role: Qt.ItemDataRole
+		:rtype: bool
 		"""
 		if not role == Qt.EditRole:
 			return False
@@ -145,10 +146,10 @@ class ParameterModel(QAbstractItemModel):
 
 	def insertRows(self, row, count, parent):
 		"""
-		@type row: int
-		@type count: int
-		@type parent: QModelIndex
-		@rtype: bool
+		:type row: int
+		:type count: int
+		:type parent: QModelIndex
+		:rtype: bool
 		"""
 		self.beginInsertRows(parent, row, row+count-1)
 		self.endInsertRows()
@@ -156,10 +157,10 @@ class ParameterModel(QAbstractItemModel):
 
 	def removeRows(self, row, count, parent):
 		"""
-		@type row: int
-		@type count: int
-		@type parent: QModelIndex
-		@rtype: bool
+		:type row: int
+		:type count: int
+		:type parent: QModelIndex
+		:rtype: bool
 		"""
 		self.beginRemoveRows(parent, row, row+count-1)
 		self.endRemoveRows()
@@ -167,8 +168,8 @@ class ParameterModel(QAbstractItemModel):
 
 	def headerData(self, section, orientation, role=Qt.DisplayRole):
 		"""
-		@type section: int
-		@type orientation: Qt.Orientation
+		:type section: int
+		:type orientation: Qt.Orientation
 		"""
 		if orientation == Qt.Horizontal and role == Qt.DisplayRole:
 			return self.headers[section]
@@ -179,6 +180,6 @@ class ParameterModel(QAbstractItemModel):
 		"""
 		Convenience method for creating an invalid QModelIndex object 
 		for use in some methods.
-		@rtype: QModelIndex
+		:rtype: QModelIndex
 		"""
 		return self.createIndex(-1, -1, None)

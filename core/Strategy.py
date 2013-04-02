@@ -1,9 +1,8 @@
 """
 Strategy
 
-Strategy is the complete tree of transformations and registration results.
-
-@author: Berend Klein Haneveld
+:Authors:
+	Berend Klein Haneveld
 """
 
 from StrategyNode import StrategyNode
@@ -11,12 +10,18 @@ from StrategyEdge import StrategyEdge
 
 class Strategy(object):
 	"""
+	Strategy is the complete tree of transformations and registration results.
+
+	This class manages the structure of all the transformations that are build
+	up by the user. By representing all the actions in a tree, it will be
+	possible to compare the results of leaves to each other.
 	"""
+
 	def __init__(self, fixedData=None, movingData=None, baseDir=None):
 		super(Strategy, self).__init__()
 		
 		# Properties
-		self.rootNode = StrategyNode(fixedData=fixedData, dataset=movingData)
+		self.rootNode = StrategyNode(fixedData=fixedData, movingData=movingData)
 		self.fixedData = fixedData
 		self.baseDir = baseDir
 
@@ -26,6 +31,9 @@ class Strategy(object):
 	def setCurrentNode(self, node):
 		"""
 		Sets the given node as the current node.
+
+		:param node: Node to be set as current node
+		:type node: StrategyNode
 		"""
 		self.currentNode = node
 
@@ -34,6 +42,9 @@ class Strategy(object):
 		Add a transformation to the tree, by adding an edge and node
 		to the current node.
 		Note: might be a temporary method
+
+		:param transformation: Transformation that will be added to the tree
+		:type transformation: Transformation
 		"""
 		# Create an edge with the transformation
 		edge = StrategyEdge()
@@ -62,8 +73,11 @@ class Strategy(object):
 
 	def calculateNode(self, node):
 		"""
-		Cleanup a certain node. It assumes that parents of this
+		Cleanup a certain node. It assumes that parents of the provided
 		node are not dirty.
+
+		:param node: node that should be 'executed'
+		:type node: StrategyNode
 		"""
 		if node.dirty:
 			# TODO: call Elastix on node and incoming edge

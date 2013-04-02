@@ -31,8 +31,8 @@ class StrategyEdgeTest(unittest.TestCase):
 
 		# Create a parent node with pointers to the input datasets
 		parentNode = StrategyNode()
-		parentNode.dataset = path + "/data/hi-3.mhd"
-		parentNode.fixedData = path + "/data/hi-5.mhd"
+		parentNode.movingData = path + "/data/hi-5.mhd"
+		parentNode.fixedData = path + "/data/hi-3.mhd"
 		parentNode.outputFolder = path + "/data/data"
 
 		# Create a child node that points to the output folder
@@ -46,13 +46,13 @@ class StrategyEdgeTest(unittest.TestCase):
 		self.edge.transformation = transformation
 
 		self.assertTrue(self.edge.childNode.dirty)
-		self.assertIsNone(self.edge.childNode.dataset)
+		self.assertIsNone(self.edge.childNode.movingData)
 
 		self.edge.execute() # TODO: make it execute Elastix
 
 		self.assertFalse(self.edge.childNode.dirty)
-		self.assertIsNotNone(self.edge.childNode.dataset)
-		self.assertTrue(os.path.exists(self.edge.childNode.dataset))
+		self.assertIsNotNone(self.edge.childNode.movingData)
+		self.assertTrue(os.path.exists(self.edge.childNode.movingData))
 
 		# Cleanup test directory
 		try:

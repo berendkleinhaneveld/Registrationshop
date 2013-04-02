@@ -1,26 +1,25 @@
 """
 ProjectController
 
-Model controller class that manages projects.
-Should be only one instance
-
-@author: Berend Klein Haneveld
+:Authors:
+	Berend Klein Haneveld
 """
 
-# import multiprocessing
-try:
-	from PySide.QtCore import QObject
-	from PySide.QtCore import Slot
-	from PySide.QtCore import Signal
-	import yaml
-except ImportError, e:
-	raise e
+from PySide.QtCore import QObject
+from PySide.QtCore import Slot
+from PySide.QtCore import Signal
+import yaml
 
 from Project import Project
 from singleton import Singleton
 
 @Singleton
 class ProjectController(QObject):
+	"""
+	Model controller class that manages projects.
+	There should be only one instance in the whole application.
+	"""
+
 	# Signals for when file name has changed
 	changedFixedDataSetFileName = Signal(basestring)
 	changedMovingDataSetFileName = Signal(basestring)
@@ -32,8 +31,8 @@ class ProjectController(QObject):
 
 	def __init__(self, project=None):
 		"""
-		@param project: Project to be made current
-		@type project: Project
+		:param project: Project to be made current
+		:type project: Project
 		"""
 		QObject.__init__(self)
 
@@ -44,10 +43,10 @@ class ProjectController(QObject):
 
 	def loadProject(self, folder=None):
 		"""
-		@param folder: Directory of project
-		@type folder: unicode
-		@return: Success
-		@rtype: bool
+		:param folder: Directory of project
+		:type folder: unicode
+		:returns:: Success, whether the project could be loaded
+		:rtype: bool
 		"""
 		projectFileName = folder + self.ProjectFile
 		projectFile = open(projectFileName, "r")
@@ -72,10 +71,10 @@ class ProjectController(QObject):
 		Saves project to disk. 
 		Assumes: project name is set and correct
 
-		@param name: File/Directory name to save the project file to
-		@type name: unicode
-		@return: Success
-		@rtype: bool
+		:param name: File/Directory name to save the project file to
+		:type name: unicode
+		:returns:: Success
+		:rtype: bool
 		"""
 		try:
 			projectFileName = self.currentProject.folder + self.ProjectFile
@@ -152,10 +151,10 @@ class ProjectController(QObject):
 	def loadFixedDataSet(self, name=None):
 		"""
 		Sets the name in the current project as the fixed data set filename
-		@param name: File name of fixed data set
-		@type name: basestring
-		@return:
-		@rtype:
+		:param name: File name of fixed data set
+		:type name: basestring
+		:returns::
+		:rtype:
 		"""
 		# TODO: some extra magic like checking if file exists
 		print "Load the fixed data set", name
@@ -168,10 +167,10 @@ class ProjectController(QObject):
 	def loadMovingDataSet(self, name=None):
 		"""
 		Sets the name in the current project as the moving data set filename
-		@param name: File name of moving data set
-		@type name: basestring
-		@return:
-		@rtype:
+		:param name: File name of moving data set
+		:type name: basestring
+		:returns::
+		:rtype:
 		"""
 		# TODO: some extra magic like checking if file exists
 		print "Load the moving data set", name

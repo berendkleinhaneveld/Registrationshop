@@ -1,5 +1,9 @@
-__author__ = 'Berend Klein Haneveld'
+"""
+SlicerController
 
+:Authors:
+	Berend Klein Haneveld
+"""
 
 from UAHCore.UAHViewer.slicer import *
 from core.ProjectController import *
@@ -13,9 +17,9 @@ class SlicerController(QObject):
 
 	def __init__(self, mainSlicer=None, fixedSlicer=None, movingSlicer=None):
 		"""
-		@type mainSlicer: Slicer
-		@type fixedSlicer: Slicer
-		@type movingSlicer: Slicer
+		:type mainSlicer: Slicer
+		:type fixedSlicer: Slicer
+		:type movingSlicer: Slicer
 		"""
 		QObject.__init__(self)
 
@@ -26,8 +30,6 @@ class SlicerController(QObject):
 		self.fixedSlicer = fixedSlicer
 		self.movingSlicer = movingSlicer
 
-
-
 		# TODO: subscribe to changes of the project controller
 		self.projectController = RegistrationshopMainWindow.projectController
 		self.projectController.currentProject.modified.connect(self.projectChanged)
@@ -36,13 +38,11 @@ class SlicerController(QObject):
 #		if self.projectController.currentProject.fixedDataSet() is None:
 			# Show button iot load fixed data set
 #			self.projectChanged()
-#			pass
-
 
 	def projectChanged(self):
 		"""
-		@return:
-		@rtype:
+		:returns::
+		:rtype:
 		"""
 		print "Project changed"
 		project = self.projectController.currentProject
@@ -58,7 +58,6 @@ class SlicerController(QObject):
 	def showFixedButton(self):
 		# Hide the slicer
 		self.fixedSlicer.rwi.setHidden(True)
-#		self.fixedSlicer.renderer.setHidden(True)
 
 		# TODO: check to see if parent is not None
 		parent = self.fixedSlicer.rwi.parent()
@@ -73,7 +72,6 @@ class SlicerController(QObject):
 	def showMovingButton(self):
 		# Hide the slicer
 		self.movingSlicer.rwi.setHidden(True)
-#		self.fixedSlicer.renderer.setHidden(True)
 
 		# TODO: check to see if parent is not None
 		parent = self.movingSlicer.rwi.parent()

@@ -24,7 +24,7 @@ class TestStrategy(unittest.TestCase):
 		self.assertIsNotNone(self.strategy.fixedData)
 		self.assertIn("cryo", self.strategy.fixedData)
 		self.assertIsNotNone(self.strategy.rootNode)
-		self.assertIsNotNone(self.strategy.rootNode.dataset)
+		self.assertIsNotNone(self.strategy.rootNode.movingData)
 		self.assertFalse(self.strategy.rootNode.dirty)
 		self.assertEqual(self.strategy.currentNode, self.strategy.rootNode)
 		self.assertIn("output", self.strategy.baseDir)

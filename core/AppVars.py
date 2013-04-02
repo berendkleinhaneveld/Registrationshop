@@ -6,6 +6,7 @@ Global variables for RegistrationShop
 author: Berend Klein Haneveld 2013
 """
 
+import os
 import sys
 
 # Variables are adjusted by RegistrationShop
@@ -15,15 +16,25 @@ import sys
 # to Python framework instead of RegistrationShop.py
 
 class AppVars(object):
+	"""
+	AppVars keeps track of a few global parameters needed for RegistrationShop.
+
+	The parameters are mostly paths to resources. 
+	"""
+
+	#: Path to the application executable
 	applicationPath = None
 	
 	@staticmethod
 	def setPath(path):
 		"""
-		@type path: basestring
+		:type path: basestring
 		"""
 		if not(isinstance(path, basestring)):
 			raise TypeError
+
+		if not os.path.exists(path) and os.path.isdir(path):
+			raise Exception("The provided path does not exist")
 		# TODO: check if path is a real path
 		# path should end with '/'
 		AppVars.applicationPath = path
@@ -31,14 +42,14 @@ class AppVars(object):
 	@staticmethod
 	def path():
 		"""
-		@rtype: basestring
+		:rtype: basestring
 		"""
 		return AppVars.applicationPath
 
 	@staticmethod
 	def imagePath():
 		"""
-		@rtype: basestring
+		:rtype: basestring
 		"""
 		extension = "resources/images/"
 		if AppVars.applicationPath:
@@ -55,7 +66,7 @@ class AppVars(object):
 	@staticmethod
 	def transformationsPath():
 		"""
-		@rtype: basestring
+		:rtype: basestring
 		"""
 		extension = "resources/transformations"
 		if AppVars.applicationPath:

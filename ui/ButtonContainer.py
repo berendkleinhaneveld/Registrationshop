@@ -5,7 +5,8 @@ Container class that holds buttons in a row.
 Buttons are modified to be square buttons and
 they are displayed as flat buttons.
 
-@author: Berend Klein Haneveld 2013
+:Authors:
+	Berend Klein Haneveld 2013
 """
 
 try:
@@ -79,7 +80,7 @@ class ButtonContainer(QWidget):
 		Assumes that the button has no name and has an 
 		icon (preferably in the right size)
 
-		@type button: QPushButton
+		:type button: QPushButton
 		"""
 		# Make sure that the button won't disturb the layout
 		button.setMaximumHeight(ButtonContainer.Height)
@@ -107,7 +108,7 @@ class ButtonContainer(QWidget):
 
 	def maximumWidth(self):
 		"""
-		@rtype: int
+		:rtype: int
 		"""
 		if self.orientation == Qt.Horizontal:
 			return 0
@@ -116,7 +117,7 @@ class ButtonContainer(QWidget):
 
 	def minimumWidth(self):
 		"""
-		@rtype: int
+		:rtype: int
 		"""
 		if self.orientation == Qt.Horizontal:
 			return self.sizeOfButtons()
@@ -125,7 +126,7 @@ class ButtonContainer(QWidget):
 		
 	def maximumHeight(self):
 		"""
-		@rtype: int
+		:rtype: int
 		"""
 		if self.orientation == Qt.Horizontal:
 			return self.sizeOfContainer()
@@ -134,7 +135,7 @@ class ButtonContainer(QWidget):
 		
 	def minimumHeight(self):
 		"""
-		@rtype: int
+		:rtype: int
 		"""
 		if self.orientation == Qt.Horizontal:
 			return self.sizeOfContainer()
@@ -143,7 +144,7 @@ class ButtonContainer(QWidget):
 	
 	def sizeHint(self):
 		"""
-		@rtype: QtCore.QSize
+		:rtype: QtCore.QSize
 		"""
 		width = 150
 		height = ButtonContainer.Height

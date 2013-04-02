@@ -1,26 +1,21 @@
 """
 SlicerWidget
 
-Class that shows a slicer with controls for loading data, etc.
-
-@author: Berend Klein Haneveld 2013
+:Authors:
+	Berend Klein Haneveld 2013
 """
 
-try:
-	from PySide.QtGui import QWidget
-	from PySide.QtGui import QPushButton
-	from PySide.QtGui import QIcon
-	from PySide.QtGui import QVBoxLayout
-	from PySide.QtGui import QHBoxLayout
-	from PySide.QtGui import QFileDialog
-	from PySide.QtGui import QLabel
-	from PySide import QtCore
-	from PySide.QtCore import Signal
-	from PySide.QtCore import Slot
-	from PySide.QtCore import Qt
-	from vtk import *
-except ImportError, e:
-	raise e
+from PySide.QtGui import QWidget
+from PySide.QtGui import QPushButton
+from PySide.QtGui import QIcon
+from PySide.QtGui import QVBoxLayout
+from PySide.QtGui import QFileDialog
+from PySide.QtGui import QLabel
+from PySide import QtCore
+from PySide.QtCore import Signal
+from PySide.QtCore import Slot
+from PySide.QtCore import Qt
+from vtk import *
 
 from core.AppVars import AppVars
 from ButtonContainer import ButtonContainer
@@ -28,6 +23,11 @@ from UAHCore.UAHViewer.BaseViewer import BaseViewer
 from UAHCore.UAHViewer.slicer import Slicer
 
 class SlicerWidget(QWidget):
+	"""
+	SlicerWidget is a widget that shows a slicer with controls for 
+	loading data, etc.
+	"""
+
 	loadedFileName = Signal(basestring)
 
 	def __init__(self, title=""):
@@ -49,7 +49,7 @@ class SlicerWidget(QWidget):
 	def fileName(self):
 		"""
 		Returns the file name of the current loaded set
-		@rtype: basestring
+		:rtype: basestring
 		"""
 		return self._fileName
 
@@ -57,7 +57,7 @@ class SlicerWidget(QWidget):
 	def setFileName(self, fileName):
 		"""
 		Sets the file name and loads the data for it into the slicer
-		@type fileName: basestring
+		:type fileName: basestring
 		"""
 		if fileName:
 			# print "Loading", fileName
@@ -161,7 +161,7 @@ class SlicerWidget(QWidget):
 	def setTitle(self, title):
 		"""
 		Sets the title on the top of the viewer
-		@type title: basestring
+		:type title: basestring
 		"""
 		if title is None:
 			self._title = "No data loaded"
@@ -172,7 +172,7 @@ class SlicerWidget(QWidget):
 
 	def setShowsActionBar(self, show):
 		"""
-		@type show: bool
+		:type show: bool
 		"""
 		self._actionButtons.setHidden(not show)
 

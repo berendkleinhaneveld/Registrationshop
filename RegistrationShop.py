@@ -4,7 +4,8 @@ Registrationshop
 	
 3D registration tool for medical purposes.
 	
-@author: Berend Klein Haneveld 2013
+:Authors:
+	Berend Klein Haneveld 2013
 """
 
 import sys
@@ -44,6 +45,7 @@ class RegistrationShop(QMainWindow):
 	Main class that starts up the application.
 	Creates UI and starts project/plugin managers.
 	"""
+
 	# Singletons
 	settings = QtCore.QSettings()
 
@@ -65,8 +67,6 @@ class RegistrationShop(QMainWindow):
 		if lastProject:
 			# Open the last saved project
 			self.openProject(lastProject)
-		
-		pass
 
 	# UI setup methods
 
@@ -88,7 +88,6 @@ class RegistrationShop(QMainWindow):
 		self.setWindowState(Qt.WindowActive)
 		self.raise_()
 		self.show()
-		pass
 
 	def createElements(self):
 		"""
@@ -164,8 +163,6 @@ class RegistrationShop(QMainWindow):
 		self.statusbar.setHidden(True)
 		self.statusbar.addWidget(self.progressbar)
 
-		pass
-
 	def createActions(self):
 		"""
 		Create actions that can be attached to buttons and menus.
@@ -212,8 +209,6 @@ class RegistrationShop(QMainWindow):
 		self.actionRegister = QAction('Register', self, shortcut='Ctrl+R')
 		self.actionRegister.triggered.connect(self.register)
 
-		pass
-
 	def createMenus(self):
 		"""
 		Creates menus from actions.
@@ -232,8 +227,6 @@ class RegistrationShop(QMainWindow):
 		self.menuItemProject.addSeparator()
 		self.menuItemProject.addAction(self.actionRegister)
 		# self.menuItemProject.addSeparator()
-
-		pass
 
 	def createToolbar(self):
 		"""
@@ -266,16 +259,16 @@ class RegistrationShop(QMainWindow):
 		height 		= int(RegistrationShop.settings.value("ui/window/height", 600))
 
 		self.setGeometry(xPosition, yPosition, width, height)
-		pass
 
 	# Events 
 
-	def resizeEvent(self, ev):
+	def resizeEvent(self, event):
 		"""
 		Saves the size and position of the window when it is resized so that
 		it can be restored on subsequent launches.
 
-		@type ev: QResizeEvent
+		:param event: Resize event
+		:type event: QResizeEvent
 		"""
 		width 	= self.width()
 		height 	= self.height()
@@ -288,12 +281,13 @@ class RegistrationShop(QMainWindow):
 		RegistrationShop.settings.setValue("ui/window/width", width)
 		RegistrationShop.settings.setValue("ui/window/height", height)
 
-	def moveEvent(self, ev):
+	def moveEvent(self, event):
 		"""
 		Saves the position of the window when it is moved so that it can be 
 		restored on subsequent launches.
 
-		@type ev: QMoveEvent
+		:param event: Move event
+		:type event: QMoveEvent
 		"""
 		xPosition = self.geometry().x()
 		yPosition = self.geometry().y()
@@ -301,10 +295,12 @@ class RegistrationShop(QMainWindow):
 		RegistrationShop.settings.setValue("ui/window/origin/x", xPosition)
 		RegistrationShop.settings.setValue("ui/window/origin/y", yPosition)
 
-	def closeEvent(self, ev):
+	def closeEvent(self, event):
 		"""
 		TODO: ask if app should really quit.
-		@type ev: QCloseEvent
+
+		:param event: Close event
+		:type event: QCloseEvent
 		"""
 		pass
 	
@@ -330,7 +326,6 @@ class RegistrationShop(QMainWindow):
 			start = path.rfind("RegistrationShop.py")
 			if start > -1:
 				AppVars.setPath(path[:start])
-		pass
 
 	# Action callbacks
 	
@@ -343,7 +338,6 @@ class RegistrationShop(QMainWindow):
 		self.dockParameters.setHidden(self.dockTransformations.isHidden())
 		self.actionToggleLeftBar.setChecked(not(self.dockTransformations.isHidden()))
 		RegistrationShop.settings.setValue("ui/dock/transformation/hidden", self.dockTransformations.isHidden())
-		pass
 	
 	def toggleRightSidePanel(self):
 		"""
@@ -353,7 +347,6 @@ class RegistrationShop(QMainWindow):
 		self.dockVisualParameters.setHidden(not(self.dockVisualParameters.isHidden()))
 		self.actionToggleRightBar.setChecked(not(self.dockVisualParameters.isHidden()))
 		RegistrationShop.settings.setValue("ui/dock/visualParameters/hidden", self.dockVisualParameters.isHidden())
-		pass
 	
 	def toggleBottomPanel(self):
 		"""
@@ -363,7 +356,6 @@ class RegistrationShop(QMainWindow):
 		self.dockDataSets.setHidden(not(self.dockDataSets.isHidden()))
 		self.actionToggleBottomBar.setChecked(not(self.dockDataSets.isHidden()))
 		RegistrationShop.settings.setValue("ui/dock/dataSets/hidden", self.dockDataSets.isHidden())
-		pass
 
 	def loadFixedDataSetFile(self):
 		"""
@@ -374,7 +366,6 @@ class RegistrationShop(QMainWindow):
 		if len(fileName) > 0:
 			projectController = ProjectController.Instance()
 			projectController.loadFixedDataSet(fileName)
-		pass
 
 	def loadMovingDataSetFile(self):
 		"""
@@ -385,7 +376,6 @@ class RegistrationShop(QMainWindow):
 		if len(fileName) > 0:
 			projectController = ProjectController.Instance()
 			projectController.loadMovingDataSet(fileName)
-		pass
 
 	def saveProject(self):
 		"""
@@ -419,13 +409,14 @@ class RegistrationShop(QMainWindow):
 			# Call save project
 			self.saveProject()
 
-		pass
-
 	def openProject(self, folderName=None):
 		"""
 		If no project name is supplied, it will open a file dialog so 
 		that the user can select a project file
 		or project folder.
+
+		:param folderName: Name of a folder with a project
+		:type folderName: basestring
 		"""
 		fileName = ""
 		if folderName:
@@ -441,7 +432,6 @@ class RegistrationShop(QMainWindow):
 					RegistrationShop.settings.setValue("project/lastProject", fileName)
 			else:
 				print "Project file does not exist"
-		pass
 
 	def newProject(self):
 		"""
@@ -461,7 +451,6 @@ class RegistrationShop(QMainWindow):
 		
 		# self.statusbar.setHidden(True)
 		# self.progressbar.setHidden(True)
-		pass
 
 def main():
 	app = QApplication(sys.argv)
