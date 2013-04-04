@@ -24,14 +24,10 @@ class Elastix(object):
 	implementation of a task.
 	"""
 
-	def __init__(self):
-		super(Elastix, self).__init__()
-
-		self.queue = [] #: Queue of tasks to process
-
-	def process(self, command):
+	@classmethod
+	def process(cls, command):
 		"""
-		Process the task immediately
+		Process the given command.
 		"""
 		assert command is not None
 		assert command.isValid()

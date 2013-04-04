@@ -8,15 +8,13 @@ from core.elastix.ElastixCommand import ElastixCommand
 class ElastixTest(unittest.TestCase):
 
 	def setUp(self):
-		self.elastix = Elastix()
+		pass
 
 	def tearDown(self):
-		del self.elastix
+		pass
 
 	def testElastix(self):
-		self.assertIsNotNone(self.elastix)
-		# self.assertFalse(self.elastix.processing)
-		# self.assertIsNone(self.elastix.currentTask)
+		self.assertTrue(hasattr(Elastix, "process"))
 
 	def testProcessingSingleTask(self):
 		if not hasattr(self, "path"):
@@ -37,7 +35,7 @@ class ElastixTest(unittest.TestCase):
 
 		self.assertTrue(command.isValid())
 
-		self.elastix.process(command)
+		Elastix.process(command)
 
 		# Important parameters to keep track of:
 		# (NumberOfResolutions 1)
@@ -45,7 +43,6 @@ class ElastixTest(unittest.TestCase):
 		# These are the most time consuming operations within Elastix and 
 		# are a good way of keeping track of the process.
 
-		# self.assertTrue(task.finished)
 		self.assertTrue(os.path.exists(outputFolder + "/result.0.mhd"))
 
 		# Cleanup test directory
@@ -59,39 +56,4 @@ class ElastixTest(unittest.TestCase):
 		# Create incomplete task (is missing command)
 		otherTask = ElastixCommand()
 		
-		self.assertRaises(Exception, self.elastix.process, otherTask)
-
-	# def testAddingTaskToQueue(self):
-	# 	task = ElastixTask()
-
-	# 	self.assertFalse(self.elastix.processing)
-	# 	self.assertEqual(len(self.elastix.queue), 0)
-	# 	self.elastix.addTask(task)
-	# 	self.assertEqual(len(self.elastix.queue), 1)
-	# 	self.assertFalse(self.elastix.processing)
-
-	# def testAddingDuplicateTasks(self):
-	# 	task = ElastixTask()
-
-	# 	self.assertEqual(len(self.elastix.queue), 0)
-	# 	self.elastix.addTask(task)
-	# 	self.elastix.addTask(task)
-	# 	self.assertEqual(len(self.elastix.queue), 1)
-		
-	# def testCancelTask(self):
-	# 	task = ElastixTask()
-	# 	self.elastix.addTask(task)
-
-	# 	self.assertEqual(len(self.elastix.queue), 1)
-	# 	self.elastix.cancelTask(task)
-	# 	self.assertEqual(len(self.elastix.queue), 0)
-
-	# def testStartAndStopProcessing(self):
-	# 	self.assertFalse(self.elastix.processing)
-	# 	self.elastix.startProcessing()
-	# 	self.assertTrue(self.elastix.processing)
-
-	# 	self.elastix.stopProcessing()
-	# 	self.assertFalse(self.elastix.processing)
-
-	
+		self.assertRaises(Exception, Elastix.process, otherTask)

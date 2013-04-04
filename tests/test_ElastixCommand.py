@@ -48,5 +48,17 @@ class ElastixCommandTest(unittest.TestCase):
 		self.command.outputFolder = self.path + "/data/subfolder/tooDeep"
 		self.assertFalse(self.command.isValid())
 
-	# def testCommandCanExecute(self):
-		# self.command.execute()
+	def testCommandCanExecute(self):
+		# Set a 'unique' output folder
+		self.command.outputFolder = self.path + "/data/command_output"
+		self.command.execute()
+
+		self.assertTrue(os.path.exists(self.command.outputFolder + "/result.0.mhd"))
+
+		# Cleanup test directory
+		try:
+			if os.path.exists(self.command.outputFolder):
+				import shutil
+				shutil.rmtree(self.command.outputFolder)
+		except Exception, e:
+			raise e

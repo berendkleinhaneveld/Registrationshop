@@ -7,6 +7,8 @@ ElastixCommand
 
 import os
 from core.Command import Command
+from core.elastix.Elastix import Elastix
+from decorators import overrides
 
 class ElastixCommand(Command):
 	"""
@@ -48,6 +50,13 @@ class ElastixCommand(Command):
 
 		return (fixedDataValid and movingDataValid and transformationValid and
 				outputFolderValid)
+
+	@overrides(Command)
+	def execute(self):
+		"""
+		Call Elastix to process itself as a command.
+		"""
+		Elastix.process(self)
 
 def pathIsValidAndExists(path):
 	"""

@@ -6,8 +6,7 @@ Worker
 """
 
 from threading import Thread
-from core.elastix.Elastix import Elastix
-from core.elastix.ElastixCommand import ElastixCommand
+from decorators import overrides
 
 class Worker(Thread):
 	"""
@@ -21,11 +20,15 @@ class Worker(Thread):
 		Initiate the worker with a certain queue. The worker will call the 
 		get() method of the queue so that it blocks until the queue gets filled
 		with commands.
+
+		:param queue: Queue that the worker will attach to
+		:type queue: Queue.Queue
 		"""
 		super(Worker, self).__init__()
 
 		self.queue = queue
 
+	@overrides(Thread)
 	def run(self):
 		"""
 		Overridden method of threading.Thread
@@ -45,11 +48,4 @@ class Worker(Thread):
 		:param command: A command that can be executed / processed.
 		:type command: Command
 		"""
-		if isinstance(command, ElastixCommand):
-			# print "Processing Elastix command"
-			elastix = Elastix()
-			elastix.process(command)
-		else:
-			# print "Processing a general command"
-			pass
-
+		command.execute()
