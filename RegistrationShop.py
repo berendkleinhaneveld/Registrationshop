@@ -32,8 +32,10 @@ from core.ProjectController import ProjectController
 from ui.TransformationWidget import TransformationWidget
 from ui.VisualizationParametersWidget import VisualizationParametersWidget
 from ui.DataSetsWidget import DataSetsWidget
-from ui.SlicerWidget import SlicerWidget
+# from ui.SlicerWidget import SlicerWidget
 from ui.ParameterWidget import ParameterWidget
+from ui.VolumeViewerWidget import VolumeViewerWidget
+from core.DataReader import DataReader
 
 # Define settings parameters
 APPNAME = "RegistrationShop"
@@ -94,12 +96,17 @@ class RegistrationShop(QMainWindow):
 		Creates the widgets and docks of which the 
 		main window is composed.
 		"""
-		self.mainSlicer = SlicerWidget("Registration results data set")
-		self.mainSlicer.setShowsActionBar(False)
-		ProjectController.Instance().changedResultsDataSetFileName.connect(self.mainSlicer.setFileName)
+		# self.mainSlicer = SlicerWidget("Registration results data set")
+		# self.mainSlicer.setShowsActionBar(False)
+		self.mainWindow = QMainWindow()
+		self.mainSlicer = VolumeViewerWidget()
+
+		# ProjectController.Instance().changedResultsDataSetFileName.connect(self.mainSlicer.setFileName)
+		ProjectController.Instance().changedFixedDataSetFileName.connect(self.mainSlicer.setFixedDatasetName)
+		ProjectController.Instance().changedMovingDataSetFileName.connect(self.mainSlicer.setMovingDatasetName)
 
 		# Initialize the main window
-		self.mainWindow = QMainWindow()
+		
 		self.mainWindow.setCentralWidget(self.mainSlicer)
 		self.mainWindow.setWindowFlags(Qt.Widget)
 		self.setCentralWidget(self.mainWindow)
@@ -362,7 +369,9 @@ class RegistrationShop(QMainWindow):
 		Open file dialog to search for data files. If valid data is given, it will
 		pass the data file location on to the slicer and the project controller.
 		"""
-		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images (*.mhd *.vti)")
+		dataReader = DataReader()
+		extensions = dataReader.GetSupportedExtensionsAsString()
+		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images ("+extensions+")", options=QFileDialog.Directory)
 		if len(fileName) > 0:
 			projectController = ProjectController.Instance()
 			projectController.loadFixedDataSet(fileName)
@@ -372,7 +381,9 @@ class RegistrationShop(QMainWindow):
 		Open file dialog to search for data files. If valid data is given, it will
 		pass the data file location on to the slicer and the project controller.
 		"""
-		fileName, other = QFileDialog.getOpenFileName(self, "Open moving data set", "", "Images (*.mhd *.vti)")
+		dataReader = DataReader()
+		extensions = dataReader.GetSupportedExtensionsAsString()
+		fileName, other = QFileDialog.getOpenFileName(self, "Open moving data set", "", "Images ("+extensions+")", options=QFileDialog.Directory)
 		if len(fileName) > 0:
 			projectController = ProjectController.Instance()
 			projectController.loadMovingDataSet(fileName)

@@ -47,4 +47,3 @@ class DataSetsWidget(QWidget):
 		self.layout.addWidget(self.movingDataWidget)
 		
 		self.setLayout(self.layout)
-		pass
