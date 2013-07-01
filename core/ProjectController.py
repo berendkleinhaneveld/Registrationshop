@@ -157,7 +157,7 @@ class ProjectController(QObject):
 		:rtype:
 		"""
 		# TODO: some extra magic like checking if file exists
-		print "Load the fixed data set", name
+		# print "Load the fixed data set", name
 		self.currentProject.fixedData = name
 
 		# Emit signal that data set file name has changed
@@ -173,7 +173,7 @@ class ProjectController(QObject):
 		:rtype:
 		"""
 		# TODO: some extra magic like checking if file exists
-		print "Load the moving data set", name
+		# print "Load the moving data set", name
 		self.currentProject.movingData = name
 
 		# Emit signal that data set file name has changed

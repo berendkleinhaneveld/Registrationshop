@@ -96,12 +96,9 @@ class RegistrationShop(QMainWindow):
 		Creates the widgets and docks of which the 
 		main window is composed.
 		"""
-		# self.mainSlicer = SlicerWidget("Registration results data set")
-		# self.mainSlicer.setShowsActionBar(False)
 		self.mainWindow = QMainWindow()
 		self.mainSlicer = VolumeViewerWidget()
 
-		# ProjectController.Instance().changedResultsDataSetFileName.connect(self.mainSlicer.setFileName)
 		ProjectController.Instance().changedFixedDataSetFileName.connect(self.mainSlicer.setFixedDatasetName)
 		ProjectController.Instance().changedMovingDataSetFileName.connect(self.mainSlicer.setMovingDatasetName)
 
