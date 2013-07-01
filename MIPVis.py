@@ -25,13 +25,10 @@ class MIPVis(object):
 		imageReader = vtkMetaImageReader()
 		imageReader.SetFileName(fileName)
 		imageReader.Update()
-		# self.imageData = imageReader.GetOutput()
+		imageData = imageReader.GetOutput()
 
-		imageCaster = vtkImageCast()
-		imageCaster.SetInput(imageReader.GetOutput())
-		imageCaster.SetOutputScalarTypeToUnsignedShort()
-		imageCaster.Update()
-		self.imageData = imageCaster.GetOutput()
+		# Make sure that the data is not too big
+		self.imageData = self.ResizeData(imageData, maximum=25000000)
 
 		self.minimum, self.maximum = self.imageData.GetScalarRange()
 
@@ -49,9 +46,8 @@ class MIPVis(object):
 		volumeProperty.SetScalarOpacity(opacityFunction)
 
 		self.mapper = vtkGPUVolumeRayCastMapper()
-		# self.mapper = vtkVolumeRayCastMapper()
 		self.mapper.SetBlendModeToMaximumIntensity()
-		self.mapper.SetInput(self.imageData)
+		self.mapper.SetInputData(self.imageData)
 		
 		self.volume = vtkVolume()
 		self.volume.SetProperty(volumeProperty)
@@ -60,6 +56,36 @@ class MIPVis(object):
 		self.renderer.AddViewProp(self.volume)
 		self.renderer.ResetCamera()
 		
+	def ResizeData(self, imageData, factor=1.0, maximum=0):
+		self.imageResampler = vtkImageResample()
+		self.imageResampler.SetInterpolationModeToLinear()
+		self.imageResampler.SetInputData(imageData)
+		
+		# If a maximum has been set: calculate the right factor
+		if maximum > 0:
+			factor = self.calculateFactor(imageData.GetDimensions(), maximum)
+
+		# Make sure that we are never upscaling the data
+		if factor > 1.0:
+			factor = 1.0
+
+		self.resampledImageData = None
+		if factor != 1.0:	
+			self.imageResampler.SetAxisMagnificationFactor(0, factor)
+			self.imageResampler.SetAxisMagnificationFactor(1, factor)
+			self.imageResampler.SetAxisMagnificationFactor(2, factor)
+			self.imageResampler.Update()
+			self.resampledImageData = self.imageResampler.GetOutput()
+		else:
+			self.resampledImageData = imageData
+		
+		return self.resampledImageData
+
+	def calculateFactor(self, dimensions, maximum):
+		voxels = dimensions[0] * dimensions[1] * dimensions[2]
+		factor = float(maximum) / float(voxels)
+		return factor
+
 if __name__ == '__main__':
 	import os, sys
 	if len(sys.argv) > 1:
