@@ -35,8 +35,6 @@ class AppVars(object):
 
 		if not os.path.exists(path) and os.path.isdir(path):
 			raise Exception("The provided path does not exist")
-		# TODO: check if path is a real path
-		# path should end with '/'
 		AppVars.applicationPath = path
 
 	@staticmethod
@@ -56,7 +54,7 @@ class AppVars(object):
 			# Put the application path in front of the extension only on 
 			# OS X systems.
 			if sys.platform.startswith('darwin'):
-				return AppVars.applicationPath + extension
+				return os.path.join(AppVars.applicationPath, extension)
 			else:
 				return extension
 		else:
