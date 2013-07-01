@@ -99,8 +99,8 @@ class RegistrationShop(QMainWindow):
 		self.mainWindow = QMainWindow()
 		self.mainSlicer = VolumeViewerWidget()
 
-		ProjectController.Instance().changedFixedDataSetFileName.connect(self.mainSlicer.setFixedDatasetName)
-		ProjectController.Instance().changedMovingDataSetFileName.connect(self.mainSlicer.setMovingDatasetName)
+		ProjectController.Instance().changedFixedData.connect(self.mainSlicer.setFixedDatasetName)
+		ProjectController.Instance().changedMovingData.connect(self.mainSlicer.setMovingDatasetName)
 
 		# Initialize the main window
 		

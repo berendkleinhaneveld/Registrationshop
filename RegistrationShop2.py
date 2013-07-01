@@ -31,8 +31,10 @@ from PySide.QtGui import QComboBox
 from PySide.QtGui import QTabWidget
 from PySide.QtGui import QLabel
 from PySide.QtGui import QFrame
+from PySide.QtGui import QGridLayout
 from PySide.QtCore import Slot
 
+from MultiRenderWidget import MultiRenderWidget
 # Import ui elements
 from core.AppVars import AppVars
 from core.ProjectController import ProjectController
@@ -104,7 +106,8 @@ class RegistrationShop(QMainWindow):
 		# Render widgets
 		self.fixedDataWidget = RenderWidget()
 		# self.resultDataWidget = VolumeViewerWidget()
-		self.resultDataWidget = RenderWidget()
+		# self.resultDataWidget = RenderWidget()
+		self.resultDataWidget = MultiRenderWidget()
 		self.movingDataWidget = RenderWidget()
 
 		# Render properties widgets
@@ -113,17 +116,22 @@ class RegistrationShop(QMainWindow):
 
 		self.fixedPropWidget = RenderPropWidget(self.fixedDataWidget, parent=self)
 		self.fixedPropWidget.setSizePolicy(spLeft)
+		self.fixedPropWidget.setFileChangedSignal(ProjectController.Instance().changedFixedData)
+		self.fixedPropWidget.setLoadDataSlot(self.loadFixedDataSetFile)
 		self.resultPropWidget = ResultPropWidget(self)
 		self.resultPropWidget.setSizePolicy(spLeft)
 		self.movingPropWidget = RenderPropWidget(self.movingDataWidget, parent=self)
 		self.movingPropWidget.setSizePolicy(spLeft)
+		self.movingPropWidget.setFileChangedSignal(ProjectController.Instance().changedMovingData)
+		self.movingPropWidget.setLoadDataSlot(self.loadMovingDataSetFile)
 
-		ProjectController.Instance().changedFixedDataSetFileName.connect(self.fixedDataWidget.loadFile)
-		ProjectController.Instance().changedFixedDataSetFileName.connect(self.fixedPropWidget.fileNameChanged)
-		# ProjectController.Instance().changedFixedDataSetFileName.connect(self.resultDataWidget.setFixedDatasetName)
-		# ProjectController.Instance().changedMovingDataSetFileName.connect(self.resultDataWidget.setMovingDatasetName)
-		ProjectController.Instance().changedMovingDataSetFileName.connect(self.movingDataWidget.loadFile)
-		ProjectController.Instance().changedMovingDataSetFileName.connect(self.movingPropWidget.fileNameChanged)
+
+		ProjectController.Instance().changedFixedData.connect(self.fixedDataWidget.loadFile)
+		# ProjectController.Instance().changedFixedData.connect(self.fixedPropWidget.loadFile)
+		# ProjectController.Instance().changedFixedData.connect(self.resultDataWidget.setFixedDatasetName)
+		# ProjectController.Instance().changedMovingData.connect(self.resultDataWidget.setMovingDatasetName)
+		ProjectController.Instance().changedMovingData.connect(self.movingDataWidget.loadFile)
+		# ProjectController.Instance().changedMovingData.connect(self.movingPropWidget.loadFile)
 
 		self.verticalSplitter = QSplitter()
 		self.verticalSplitter.setOrientation(Qt.Vertical)
@@ -157,17 +165,22 @@ class RegistrationShop(QMainWindow):
 		"""
 		Create actions that can be attached to buttons and menus.
 		"""
+		userTransformIconName = os.path.join(AppVars.imagePath(), 'UserTransformButton.png')
+		print userTransformIconName
+		landmarkTransformIconName = os.path.join(AppVars.imagePath(), 'LandmarkTransformButton.png')
+		deformableTransformIconName = os.path.join(AppVars.imagePath(), 'DeformableTransformButton.png')
+
 		# Dock toggle actions
 		self.actionFreeTransformTool = QAction('Free transform', self, shortcut='Ctrl+1')
-		self.actionFreeTransformTool.setIcon(QIcon(AppVars.imagePath() + 'UserTransformButton.png'))
+		self.actionFreeTransformTool.setIcon(QIcon(userTransformIconName))
 		self.actionFreeTransformTool.triggered.connect(self.addFreeTransform)
 		
 		self.actionLandmarkTransformTool = QAction('Landmark transform', self, shortcut='Ctrl+2')
-		self.actionLandmarkTransformTool.setIcon(QIcon(AppVars.imagePath() + 'DeformableTransformButton.png'))
+		self.actionLandmarkTransformTool.setIcon(QIcon(landmarkTransformIconName))
 		self.actionLandmarkTransformTool.triggered.connect(self.addLandmarkTransform)
 
 		self.actionDeformableTransformTool = QAction('Deformable transform', self, shortcut='Ctrl+3')
-		self.actionDeformableTransformTool.setIcon(QIcon(AppVars.imagePath() + 'LandmarkTransformButton.png'))
+		self.actionDeformableTransformTool.setIcon(QIcon(deformableTransformIconName))
 		self.actionDeformableTransformTool.triggered.connect(self.addDeformableTransform)
 
 		self.actionLoadFixedData = QAction('Load fixed data', self, shortcut='Ctrl+Shift+F')
@@ -214,8 +227,8 @@ class RegistrationShop(QMainWindow):
 		
 		# Add the transform tool buttons to the toolbar
 		self.toolbar.addAction(self.actionFreeTransformTool)
-		self.toolbar.addAction(self.actionDeformableTransformTool)
 		self.toolbar.addAction(self.actionLandmarkTransformTool)
+		self.toolbar.addAction(self.actionDeformableTransformTool)
 
 		# Insert widget so that other toolbar items will be pushed to the right
 		spacer = QWidget()
@@ -404,11 +417,6 @@ RenderWidget loads the dataset. (But needs its parameters from RPW)
 RenderParameterWidget gets the parameter widget from RenderWidget.
 RenderWidget gets the parameter widget from its VolumeProperty.
 RenderInfoWidget also gets the parameters from RenderWidget.
-
-TODO: What happens when the RenderStyle changes???......
-Reset Camera?
-CT layout needs work
-Disconnect ui elements
 """
 
 class RenderPropWidget(QWidget):
@@ -420,17 +428,17 @@ class RenderPropWidget(QWidget):
 
 		# Two tabs: Visualization and Data info
 		self.visParamTabWidget = RenderParameterWidget(renderWidget)
-		self.dataInfoTabWidget = QWidget()
+		self.dataInfoTabWidget = RenderInfoWidget()
 
 		# Create the load dataset widget
 		self.loadDataWidget = QWidget()
-		button = QPushButton()
-		button.setText("Load a dataset")
+		self.loadDataButton = QPushButton()
+		self.loadDataButton.setText("Load a dataset")
 		# button.clicked.connect(self.parent().loadFixedDataSetFile)
 
 		layout = QVBoxLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(button)
+		layout.addWidget(self.loadDataButton)
 		self.loadDataWidget.setLayout(layout)
 
 		# Create the tab widget
@@ -442,8 +450,16 @@ class RenderPropWidget(QWidget):
 		layout.addWidget(self.loadDataWidget)	
 		self.setLayout(layout)
 
+	def setFileChangedSignal(self, signal):
+		self.signal = signal
+		self.signal.connect(self.loadFile)
+		self.signal.connect(self.dataInfoTabWidget.loadFile)
+
+	def setLoadDataSlot(self, slot):
+		self.loadDataButton.clicked.connect(slot)
+
 	@Slot(basestring)
-	def fileNameChanged(self, fileName):
+	def loadFile(self, fileName):
 		layout = self.layout()
 		if fileName is None:
 			if layout.indexOf(self.tabWidget) != -1:
@@ -515,7 +531,7 @@ class RenderParameterWidget(QWidget):
 			self.renderWidget.renderVolumeProperty.disconnect(QtCore.SIGNAL("updatedTransferFunction"), self.transferFunctionChanged)
 
 		# Get a new parameter widget from the render widget
-		self.paramWidget = self.renderWidget.getParamWidget()
+		self.paramWidget = self.renderWidget.GetParameterWidget()
 		self.scrollArea.setWidget(self.paramWidget)
 		self.renderWidget.renderVolumeProperty.updatedTransferFunction.connect(self.transferFunctionChanged)
 
@@ -547,6 +563,65 @@ class ResultPropWidget(QWidget):
 
 		layout = QVBoxLayout()
 		layout.addWidget(self.tabWidget)
+		self.setLayout(layout)
+
+class RenderInfoWidget(QWidget):
+	"""
+	RenderInfoWidget shows information about the loaded dataset. Things like
+	filenames, range of data values, size of data, etc.
+	"""
+	def __init__(self):
+		super(RenderInfoWidget, self).__init__()
+
+	@Slot(basestring)
+	def loadFile(self, fileName):
+		if fileName is None:
+			return
+
+		# Read info from dataset
+		# TODO: read out the real world dimensions in inch or cm
+		# TODO: scalar type
+		imageReader = DataReader()
+		imageData = imageReader.GetImageData(fileName)
+
+		directory, name = os.path.split(fileName)
+		dimensions = imageData.GetDimensions()
+		minimum, maximum = imageData.GetScalarRange()
+
+		# Create string representations
+		nameField = QLabel("File name:")
+		dimsField = QLabel("Dimensions:")
+		voxsField = QLabel("Voxels:")
+		rangField = QLabel("Range:")
+
+		nameField.setAlignment(Qt.AlignRight)
+		dimsField.setAlignment(Qt.AlignRight)
+		voxsField.setAlignment(Qt.AlignRight)
+		rangField.setAlignment(Qt.AlignRight)
+
+		nameText = name
+		dimsText = "(" + str(dimensions[0]) + ", " + str(dimensions[1]) + ", " + str(dimensions[2]) + ")"
+		voxsText = str(dimensions[0] * dimensions[1] * dimensions[2])
+		rangText = "[" + str(minimum) + " : " + str(maximum) + "]"
+
+		# Create labels
+		labelTitle = QLabel(nameText)
+		labelDimensions = QLabel(dimsText)
+		labelVoxels = QLabel(voxsText)
+		labelRange = QLabel(rangText)
+
+		# Create a nice layout for the labels
+		layout = QGridLayout()
+		layout.setAlignment(Qt.AlignTop)
+		layout.addWidget(nameField, 0, 0)
+		layout.addWidget(dimsField, 1, 0)
+		layout.addWidget(voxsField, 2, 0)
+		layout.addWidget(rangField, 3, 0)
+
+		layout.addWidget(labelTitle, 0, 1)
+		layout.addWidget(labelDimensions, 1, 1)
+		layout.addWidget(labelVoxels, 2, 1)
+		layout.addWidget(labelRange, 3, 1)
 		self.setLayout(layout)
 
 

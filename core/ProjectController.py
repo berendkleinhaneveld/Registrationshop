@@ -21,8 +21,8 @@ class ProjectController(QObject):
 	"""
 
 	# Signals for when file name has changed
-	changedFixedDataSetFileName = Signal(basestring)
-	changedMovingDataSetFileName = Signal(basestring)
+	changedFixedData = Signal(basestring)
+	changedMovingData = Signal(basestring)
 	changedResultsDataSetFileName = Signal(basestring)
 	changedProject = Signal(Project)
 
@@ -60,8 +60,8 @@ class ProjectController(QObject):
 		
 		# Reload all the views!
 		self.changedProject.emit(self.currentProject)
-		self.changedFixedDataSetFileName.emit(self.currentProject.fixedData)
-		self.changedMovingDataSetFileName.emit(self.currentProject.movingData)
+		self.changedFixedData.emit(self.currentProject.fixedData)
+		self.changedMovingData.emit(self.currentProject.movingData)
 		self.changedResultsDataSetFileName.emit(self.currentProject.resultData)
 		
 		return True
@@ -101,8 +101,8 @@ class ProjectController(QObject):
 		self.currentProject = Project()
 		# Send out the signal!
 		self.changedProject.emit(self.currentProject)
-		self.changedFixedDataSetFileName.emit(self.currentProject.fixedData)
-		self.changedMovingDataSetFileName.emit(self.currentProject.movingData)
+		self.changedFixedData.emit(self.currentProject.fixedData)
+		self.changedMovingData.emit(self.currentProject.movingData)
 		self.changedResultsDataSetFileName.emit(self.currentProject.resultData)
 	
 	def register(self):
@@ -161,7 +161,7 @@ class ProjectController(QObject):
 		self.currentProject.fixedData = name
 
 		# Emit signal that data set file name has changed
-		self.changedFixedDataSetFileName.emit(self.currentProject.fixedData)
+		self.changedFixedData.emit(self.currentProject.fixedData)
 
 	@Slot(basestring)
 	def loadMovingDataSet(self, name=None):
@@ -177,4 +177,4 @@ class ProjectController(QObject):
 		self.currentProject.movingData = name
 
 		# Emit signal that data set file name has changed
-		self.changedMovingDataSetFileName.emit(self.currentProject.movingData)
+		self.changedMovingData.emit(self.currentProject.movingData)

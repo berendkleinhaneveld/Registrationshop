@@ -6,6 +6,9 @@ ImageDataResizer
 """
 
 from vtk import vtkImageResample
+from vtk import vtkVersion
+
+VTK_MAJOR_VERSION = vtkVersion.GetVTKMajorVersion()
 
 class ImageDataResizer(object):
 	"""
@@ -26,7 +29,10 @@ class ImageDataResizer(object):
 	def ResizeData(self, imageData, factor=1.0, maximum=0):
 		self.imageResampler = vtkImageResample()
 		self.imageResampler.SetInterpolationModeToLinear()
-		self.imageResampler.SetInput(imageData)
+		if VTK_MAJOR_VERSION <= 5:
+			self.imageResampler.SetInput(imageData)
+		else:
+			self.imageResampler.SetInputData(imageData)
 		
 		# If a maximum has been set: calculate the right factor
 		if maximum > 0:

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """
 Renders a volume with MIP. Give a mhd file as the first argument.
+
+This exposes a bug in VTK where it will say something like: read buffer error
 """
 
 from vtk import *

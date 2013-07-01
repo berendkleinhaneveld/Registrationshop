@@ -9,9 +9,11 @@ from vtk import vtkRenderer
 from vtk import vtkVolume
 from vtk import vtkInteractorStyleTrackballCamera
 from vtk import vtkOpenGLGPUVolumeRayCastMapper
+from vtk import vtkVersion
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
+from PySide.QtCore import Slot
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from core.DataReader import DataReader
 from VolumeProperty import VolumePropertyFactory
@@ -19,6 +21,8 @@ from VolumeProperty import RenderTypeSimple
 from VolumeProperty import RenderTypeCT
 from VolumeProperty import RenderTypeMIP
 from core.ImageDataResizer import ImageDataResizer
+
+VTK_MAJOR_VERSION = vtkVersion.GetVTKMajorVersion()
 
 class RenderWidget(QWidget):
 	"""
@@ -67,7 +71,10 @@ class RenderWidget(QWidget):
 			self.renderer.RemoveViewProp(self.volume)
 
 		self.volume = vtkVolume()
-		self.mapper.SetInput(self.imageData)
+		if VTK_MAJOR_VERSION <= 5:
+			self.mapper.SetInput(self.imageData)
+		else:
+			self.mapper.SetInputData(self.imageData)
 
 		foundPreviouslyUsedProperty = False
 		for volProp in self.volumeProperties:
@@ -87,12 +94,13 @@ class RenderWidget(QWidget):
 		self.volume.SetMapper(self.mapper)
 		self.renderer.AddViewProp(self.volume)
 
-	def getParamWidget(self):
+	def GetParameterWidget(self):
 		if self.renderVolumeProperty is not None:
 			return self.renderVolumeProperty.GetParameterWidget()
 
 		return QWidget()
 
+	@Slot(basestring)
 	def loadFile(self, fileName):
 		# Cleanup the last loaded dataset
 		if self.imageData is not None:

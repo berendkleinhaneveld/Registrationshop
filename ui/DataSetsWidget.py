@@ -35,8 +35,8 @@ class DataSetsWidget(QWidget):
 		# Connect the widgets to the project controller so that when the 
 		# project controller has set the new filename, it gets passed through
 		# to the slicer widgets so they can load their data
-		projectController.changedFixedDataSetFileName.connect(self.fixedDataWidget.setFileName)
-		projectController.changedMovingDataSetFileName.connect(self.movingDataWidget.setFileName)
+		projectController.changedFixedData.connect(self.fixedDataWidget.setFileName)
+		projectController.changedMovingData.connect(self.movingDataWidget.setFileName)
 
 		# Create horizontal layout so the slicer widgets are next to eachother
 		self.layout = QHBoxLayout()
