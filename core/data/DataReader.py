@@ -112,9 +112,9 @@ class DataReader(object):
 				fileData = np.fromfile(f, np.int16)
 
 				dataIndex = 0
-				for z in xrange(0, int(dimensions[2]-1)):
-					for y in xrange(0, int(dimensions[1]-1)):
-						for x in xrange(0, int(dimensions[0]-1)):
+				for z in range(int(dimensions[2])):
+					for y in range(int(dimensions[1])):
+						for x in range(int(dimensions[0])):
 							imageData.SetScalarComponentFromFloat(x, y, z, 0, float(fileData[dataIndex]))
 							dataIndex += 1
 
@@ -157,7 +157,8 @@ class DataReader(object):
 		"""
 		# Check the image data to see if the spacings are correct
 		spacing = list(imageData.GetSpacing())
-		for x in range(0, len(spacing)):
+		# TODO: make this more pythonic...
+		for x in range(len(spacing)):
 			if spacing[x] == 0.0:
 				spacing[x] = 1.0
 				# TODO: instead of 1.0, use a more sane value...

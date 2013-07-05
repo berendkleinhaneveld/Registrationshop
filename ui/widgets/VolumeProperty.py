@@ -138,7 +138,7 @@ class CTVolumeProperty(VolumeProperty):
 
 		# Transfer functions and properties
 		self.colorFunction = vtkColorTransferFunction()
-		for x in range(0,len(self.sections)-1):
+		for x in range(len(self.sections)-1):
 			r = self.sectionColors[x][0]
 			g = self.sectionColors[x][1]
 			b = self.sectionColors[x][2]
@@ -146,7 +146,7 @@ class CTVolumeProperty(VolumeProperty):
 			self.colorFunction.AddRGBPoint(self.sections[x+1]-0.05, r, g, b)
 
 		self.opacityFunction = vtkPiecewiseFunction()
-		for x in range(0,len(self.sections)-1):
+		for x in range(len(self.sections)-1):
 			self.opacityFunction.AddPoint(self.sections[x], self.sectionsOpacity[x])
 			self.opacityFunction.AddPoint(self.sections[x+1]-0.05, self.sectionsOpacity[x])
 
@@ -175,7 +175,7 @@ class CTVolumeProperty(VolumeProperty):
 		layout.setAlignment(Qt.AlignTop)
 
 		self.sliders = []
-		for index in range(0, 7):
+		for index in range(7):
 			slider = QSlider(Qt.Horizontal)
 			slider.setMinimum(0)
 			slider.setMaximum(1000)
@@ -195,7 +195,7 @@ class CTVolumeProperty(VolumeProperty):
 		Parameter 'value' is unused. This is a callback for all the 
 		interactive widgets in the parameter widget.
 		"""
-		for index in range(0, len(self.sliders)):
+		for index in range(len(self.sliders)):
 			slider = self.sliders[index]
 			sliderValue = float(slider.value()) / float(slider.maximum())
 			# Use an square function for easier opacity adjustments
