@@ -38,6 +38,7 @@ from PySide.QtGui import QLabel
 from PySide.QtGui import QComboBox
 from PySide.QtGui import QScrollArea
 from PySide.QtGui import QFrame
+from PySide.QtGui import QCheckBox
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 from PySide.QtCore import SIGNAL
@@ -51,17 +52,17 @@ class RenderPropWidget(QWidget):
 	RenderParameterWidget object.
 	"""
 	def __init__(self, renderWidget, parent=None):
-		super(RenderPropWidget, self).__init__(parent)
+		super(RenderPropWidget, self).__init__(parent=parent)
 
 		# Two tabs: Visualization and Data info
 		self.visParamTabWidget = RenderParameterWidget(renderWidget)
 		self.dataInfoTabWidget = RenderInfoWidget()
+		self.slicesTabWidget = RenderSlicerParamWidget(renderWidget)
 
 		# Create the load dataset widget
 		self.loadDataWidget = QWidget()
 		self.loadDataButton = QPushButton()
 		self.loadDataButton.setText("Load a dataset")
-		# button.clicked.connect(self.parent().loadFixedDataSetFile)
 
 		layout = QVBoxLayout()
 		layout.setAlignment(Qt.AlignTop)
@@ -72,6 +73,7 @@ class RenderPropWidget(QWidget):
 		self.tabWidget = QTabWidget()
 		self.tabWidget.addTab(self.visParamTabWidget, "Visualization")
 		self.tabWidget.addTab(self.dataInfoTabWidget, "Data info")
+		self.tabWidget.addTab(self.slicesTabWidget, "Slices")
 
 		layout = QVBoxLayout()
 		layout.addWidget(self.loadDataWidget)	
@@ -110,7 +112,7 @@ class RenderParameterWidget(QWidget):
 	contains widgets with which parameters of the visualization can be adjusted.
 	"""
 	def __init__(self, renderWidget, parent=None):
-		super(RenderParameterWidget, self).__init__(parent)
+		super(RenderParameterWidget, self).__init__(parent=parent)
 
 		self.renderWidget = renderWidget
 		self.renderWidget.loadedData.connect(self.dataLoaded)
@@ -195,7 +197,7 @@ class RenderInfoWidget(QWidget):
 
 		# Read info from dataset
 		# TODO: read out the real world dimensions in inch or cm
-		# TODO: scalar type
+		# TODO: scalar type (int, float, short, etc.)
 		imageReader = DataReader()
 		imageData = imageReader.GetImageData(fileName)
 
@@ -239,6 +241,56 @@ class RenderInfoWidget(QWidget):
 		layout.addWidget(labelRange, 3, 1)
 		self.setLayout(layout)
 
+class RenderSlicerParamWidget(QWidget):
+	"""
+	RenderSlicerParamWidget shows parameters with which slicers can be 
+	manipulated.
+	"""
+	def __init__(self, renderWidget, parent=None):
+		super(RenderSlicerParamWidget, self).__init__(parent=parent)
+
+		self.renderWidget = renderWidget
+		self.renderWidget.loadedData.connect(self.dataLoaded)
+
+	@Slot()
+	def checkBoxChanged(self):
+		"""
+		Callback function for the check boxes.
+		"""
+		print "hello"
+		for index in range(3):
+			showCheckBox = self.sliceCheckBoxes[index].checkState() == Qt.Checked
+			print "Checked %s: %s" % (index, showCheckBox)
+			self.renderWidget.showSlice(index, showCheckBox)
+
+		self.renderWidget.Update()
+
+	@Slot()
+	def dataLoaded(self):
+		"""
+		Slot for when data is loaded into the corresponding render widget.
+		Creates layout with labels and check boxes.
+		"""
+		self.slicesLabel = QLabel("Show slices for directions:")
+		self.sliceLabelTexts = ["x", "y", "z"]
+		self.sliceLabels = [QLabel(text) for text in self.sliceLabelTexts]
+		self.sliceCheckBoxes = [QCheckBox() for i in range(3)]
+		for index in range(3):
+			self.sliceCheckBoxes[index].clicked.connect(self.checkBoxChanged)
+			self.sliceLabels[index].setAlignment(Qt.AlignRight)
+
+		# Create a nice layout for the labels
+		layout = QGridLayout()
+		self.setLayout(layout)
+		layout.setAlignment(Qt.AlignTop)
+		layout.setColumnStretch(0, 1)
+		layout.setColumnStretch(1, 3)
+		layout.addWidget(self.slicesLabel, 0, 0, 1, -1)
+		for index in range(3):
+			layout.addWidget(self.sliceLabels[index], index+1, 0)
+			layout.addWidget(self.sliceCheckBoxes[index], index+1, 1)
+		
+
 class ResultPropWidget(QWidget):
 	"""
 	ResultPropWidget is a widget that is displayed under the result render
@@ -246,7 +298,7 @@ class ResultPropWidget(QWidget):
 	visualization of the combined render widget.
 	"""
 	def __init__(self, parent=None):
-		super(ResultPropWidget, self).__init__(parent)
+		super(ResultPropWidget, self).__init__(parent=parent)
 
 		# Two tabs: Visualization and Data info
 		self.mixParamWidget = QWidget()

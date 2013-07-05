@@ -12,6 +12,7 @@ from vtk import vtkOpenGLGPUVolumeRayCastMapper
 from vtk import vtkVersion
 from vtk import vtkOrientationMarkerWidget
 from vtk import vtkAxesActor
+from vtk import vtkImagePlaneWidget
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
@@ -47,6 +48,11 @@ class RenderWidget(QWidget):
 		self.rwi = QVTKRenderWindowInteractor(parent=self)
 		self.rwi.SetInteractorStyle(vtkInteractorStyleTrackballCamera())
 		self.rwi.GetRenderWindow().AddRenderer(self.renderer)
+
+		self.imagePlaneWidgets = [vtkImagePlaneWidget() for i in range(3)]
+		for index in range(3):
+			self.imagePlaneWidgets[index].DisplayTextOn()
+			self.imagePlaneWidgets[index].SetInteractor(self.rwi)
 
 		self.renderType = None
 		self.renderVolumeProperty = None
@@ -120,6 +126,16 @@ class RenderWidget(QWidget):
 
 		return QWidget()
 
+	def showSlice(self, index, value):
+		"""
+		:type index: int
+		:type value: bool
+		"""
+		if value:
+			self.imagePlaneWidgets[index].On()
+		else:
+			self.imagePlaneWidgets[index].Off()
+
 	@Slot(basestring)
 	def loadFile(self, fileName):
 		"""
@@ -143,6 +159,13 @@ class RenderWidget(QWidget):
 		imageResizer = DataResizer()
 		self.imageData = imageResizer.ResizeData(imageData, maximum=28000000)
 
+		for index in range(3):
+			if VTK_MAJOR_VERSION <= 5:
+				self.imagePlaneWidgets[index].SetInput(self.imageData)
+			else:
+				self.imagePlaneWidgets[index].SetInputData(self.imageData)
+			self.imagePlaneWidgets[index].SetPlaneOrientation(index)
+
 		# Set the render type
 		self.SetRenderType(self.renderType)
 
@@ -150,6 +173,28 @@ class RenderWidget(QWidget):
 		self.loadedData.emit()
 		self.Update()
 	
+	def exportSettings(self):
+		"""
+		Create RenderWidgetSettings object from current state.
+		The returned object can be converted into a yaml object.
+		:rtype: RenderWidgetSettings
+		"""
+		pass
+
+	def loadSettings(self, settings):
+		"""
+		Read from settings the value for parameters.
+		:type settings: RenderWidgetSettings
+		"""
+		pass
+
+
+class RenderSettings(object):
+	"""RenderSettings is an object that stores information about the render 
+	settings of a render widget."""
+	def __init__(self):
+		super(RenderSettings, self).__init__()
+		
 
 if __name__ == '__main__':
 	import sys
