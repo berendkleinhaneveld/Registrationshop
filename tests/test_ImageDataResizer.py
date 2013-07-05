@@ -1,19 +1,19 @@
 import unittest
-from core.ImageDataResizer import ImageDataResizer
+from core.DataResizer import DataResizer
 from vtk import vtkImageData
 
-class ImageDataResizerTest(unittest.TestCase):
+class DataResizerTest(unittest.TestCase):
 
 	def setUp(self):
-		self.imageResizer = ImageDataResizer()
+		self.imageResizer = DataResizer()
 
 	def tearDown(self):
 		del self.imageResizer
 
-	def testImageDataResizer(self):
+	def testDataResizer(self):
 		self.assertTrue(True)
 
-	def testImageDataResizerDimensions(self):
+	def testDataResizerDimensions(self):
 		dimensions = [512, 512, 196]
 		factor = 0.5
 		imageData = createImageData(dimensions)
@@ -35,7 +35,7 @@ class ImageDataResizerTest(unittest.TestCase):
 		voxels = int(factor * dimensions[0] * dimensions[1] * dimensions[2])
 		self.assertLessEqual(voxels, maxVoxels)
 
-	def testImageDataResizerMaxVoxels(self):
+	def testDataResizerMaxVoxels(self):
 		dimensions = [512, 512, 196]
 		maxVoxels = 17500000
 		imageData = createImageData(dimensions)

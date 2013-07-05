@@ -10,32 +10,34 @@ Registrationshop
 
 import sys
 import os.path
-try:
-	from PySide import QtCore
-	from PySide.QtCore import Qt
-	from PySide.QtGui import QMainWindow
-	from PySide.QtGui import QApplication
-	from PySide.QtGui import QDockWidget
-	from PySide.QtGui import QAction
-	from PySide.QtGui import QIcon
-	from PySide.QtGui import QFileDialog
-	from PySide.QtGui import QMenuBar
-	from PySide.QtGui import QProgressBar
-	from PySide.QtGui import QWidget
-	from PySide.QtGui import QSizePolicy
-except ImportError, e:
-	raise e
 
-# Import ui elements
+# PySide stuff
+from PySide import QtCore
+from PySide.QtGui import QMainWindow
+from PySide.QtGui import QApplication
+from PySide.QtGui import QAction
+from PySide.QtGui import QIcon
+from PySide.QtGui import QFileDialog
+from PySide.QtGui import QVBoxLayout
+from PySide.QtGui import QHBoxLayout
+from PySide.QtGui import QMenuBar
+from PySide.QtGui import QWidget
+from PySide.QtGui import QSizePolicy
+from PySide.QtGui import QSplitter
+from PySide.QtCore import Qt
+from PySide.QtCore import Slot
+
+# Import core stuff
 from core.AppVars import AppVars
-from core.ProjectController import ProjectController
-from ui.TransformationWidget import TransformationWidget
-from ui.VisualizationParametersWidget import VisualizationParametersWidget
-from ui.DataSetsWidget import DataSetsWidget
-# from ui.SlicerWidget import SlicerWidget
-from ui.ParameterWidget import ParameterWidget
-from ui.VolumeViewerWidget import VolumeViewerWidget
-from core.DataReader import DataReader
+from core.project.ProjectController import ProjectController
+from core.data.DataReader import DataReader
+from core.AppResources import AppResources
+# Import ui elements
+from ui.widgets.RenderWidget import RenderWidget
+from ui.widgets.MultiRenderWidget import MultiRenderWidget
+from ui.widgets.TitleWidget import TitleWidget
+from ui.widgets.RenderPropertyWidgets import RenderPropWidget
+from ui.widgets.RenderPropertyWidgets import ResultPropWidget
 
 # Define settings parameters
 APPNAME = "RegistrationShop"
@@ -69,6 +71,7 @@ class RegistrationShop(QMainWindow):
 		if lastProject:
 			# Open the last saved project
 			self.openProject(lastProject)
+			# TODO: when opening last project failed, remove from settings
 
 	# UI setup methods
 
@@ -97,121 +100,124 @@ class RegistrationShop(QMainWindow):
 		main window is composed.
 		"""
 		self.mainWindow = QMainWindow()
-		self.mainSlicer = VolumeViewerWidget()
 
-		ProjectController.Instance().changedFixedData.connect(self.mainSlicer.setFixedDatasetName)
-		ProjectController.Instance().changedMovingData.connect(self.mainSlicer.setMovingDatasetName)
+		# Render widgets
+		self.fixedDataWidget = RenderWidget()
+		self.resultDataWidget = MultiRenderWidget()
+		self.movingDataWidget = RenderWidget()
 
-		# Initialize the main window
-		
-		self.mainWindow.setCentralWidget(self.mainSlicer)
-		self.mainWindow.setWindowFlags(Qt.Widget)
-		self.setCentralWidget(self.mainWindow)
-		
-		# Toolbox on the left side of the window
-		self.dockTransformations = QDockWidget()
-		self.dockTransformations.setWindowTitle("Strategy")
-		self.dockTransformations.setAllowedAreas(Qt.AllDockWidgetAreas)
-		self.dockTransformations.setFeatures(QDockWidget.NoDockWidgetFeatures)
-		self.dockTransformations.setHidden(RegistrationShop.settings.value("ui/dock/transformation/hidden", False))
+		# Render properties widgets
+		spLeft = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+		spLeft.setHorizontalStretch(1)
 
-		self.dockParameters = QDockWidget()
-		self.dockParameters.setWindowTitle("Parameters")
-		self.dockParameters.setAllowedAreas(Qt.AllDockWidgetAreas)
-		self.dockParameters.setFeatures(QDockWidget.NoDockWidgetFeatures)
-		self.dockParameters.setHidden(RegistrationShop.settings.value("ui/dock/transformation/hidden", False))
-		
-		# Toolbox on the bottom of the window
-		self.dockDataSets = QDockWidget()
-		self.dockDataSets.setWindowTitle("Data sets")
-		self.dockDataSets.setAllowedAreas(Qt.AllDockWidgetAreas)
-		self.dockDataSets.setFeatures(QDockWidget.NoDockWidgetFeatures)
-		self.dockDataSets.setHidden(RegistrationShop.settings.value("ui/dock/dataSets/hidden", False))
-		
-		# Toolbox on the right side of the window
-		self.dockVisualParameters = QDockWidget()
-		self.dockVisualParameters.setWindowTitle("Visualization Parameters")
-		self.dockVisualParameters.setAllowedAreas(Qt.AllDockWidgetAreas)
-		self.dockVisualParameters.setFeatures(QDockWidget.NoDockWidgetFeatures)
-		self.dockVisualParameters.setHidden(RegistrationShop.settings.value("ui/dock/visualParameters/hidden", False))
-		
-		# Add the dock widgets to their main windows. The one of the left is added to
-		# the top most 'main window' so that it stretches out across the whole left side
-		self.addDockWidget(Qt.LeftDockWidgetArea, self.dockTransformations)
-		self.addDockWidget(Qt.LeftDockWidgetArea, self.dockParameters)
-		self.mainWindow.addDockWidget(Qt.RightDockWidgetArea, self.dockVisualParameters)
-		self.mainWindow.addDockWidget(Qt.BottomDockWidgetArea, self.dockDataSets)
-		
-		# Create the dock widgets
-		self.transformationWidget = TransformationWidget()
-		self.parameterWidget = ParameterWidget()
-		self.visualizationParamWidget = VisualizationParametersWidget()
-		self.dataSetsWidget = DataSetsWidget()
-		
-		# Assign the dock widgets to their docks
-		self.dockTransformations.setWidget(self.transformationWidget)
-		self.dockParameters.setWidget(self.parameterWidget)
-		self.dockVisualParameters.setWidget(self.visualizationParamWidget)
-		self.dockDataSets.setWidget(self.dataSetsWidget)
+		projectController = ProjectController.Instance()
 
-		# TODO: this doesn't look good: way too deep...
-		self.transformationWidget.transformationsView.selectedTransformation.connect(
-			self.parameterWidget.parameterModel.setTransformation)
-		
-		# Create statusbar and hide it immediately
-		self.progressbar = QProgressBar()
-		self.progressbar.setRange(0, 0)
-		self.progressbar.setHidden(True)
+		self.fixedPropWidget = RenderPropWidget(self.fixedDataWidget, parent=self)
+		self.fixedPropWidget.setSizePolicy(spLeft)
+		self.fixedPropWidget.setFileChangedSignal(projectController.changedFixedData)
+		self.fixedPropWidget.setLoadDataSlot(self.loadFixedDataSetFile)
 
-		self.statusbar = self.statusBar()
-		self.statusbar.setHidden(True)
-		self.statusbar.addWidget(self.progressbar)
+		self.resultPropWidget = ResultPropWidget(self)
+		self.resultPropWidget.setSizePolicy(spLeft)
+
+		self.movingPropWidget = RenderPropWidget(self.movingDataWidget, parent=self)
+		self.movingPropWidget.setSizePolicy(spLeft)
+		self.movingPropWidget.setFileChangedSignal(projectController.changedMovingData)
+		self.movingPropWidget.setLoadDataSlot(self.loadMovingDataSetFile)
+
+		projectController.changedFixedData.connect(self.fixedDataWidget.loadFile)
+		projectController.changedMovingData.connect(self.movingDataWidget.loadFile)
+
+		self.verticalSplitter = QSplitter()
+		self.verticalSplitter.setOrientation(Qt.Vertical)
+
+		fixedDataTitleWidget = TitleWidget("Fixed data")
+		resultDataTitleWidget = TitleWidget("Mix / Result")#, border=True)
+		movingDataTitleWidget = TitleWidget("Moving data")
+
+		titleBoxLayout = QHBoxLayout()
+		titleBoxLayout.setSpacing(0)
+		titleBoxLayout.setContentsMargins(0, 0, 0, 0)
+		titleBoxLayout.addWidget(fixedDataTitleWidget)
+		titleBoxLayout.addWidget(resultDataTitleWidget)
+		titleBoxLayout.addWidget(movingDataTitleWidget)
+
+		titleBoxWidget = QWidget()
+		titleBoxWidget.setLayout(titleBoxLayout)
+
+		rendersLayout = QHBoxLayout()
+		rendersLayout.setSpacing(1)
+		rendersLayout.setContentsMargins(0, 0, 0, 0)
+		rendersLayout.addWidget(self.fixedDataWidget)
+		rendersLayout.addWidget(self.resultDataWidget)
+		rendersLayout.addWidget(self.movingDataWidget)
+
+		propsLayout = QHBoxLayout()
+		propsLayout.setSpacing(1)
+		propsLayout.setContentsMargins(0, 0, 0, 0)
+		propsLayout.addWidget(self.fixedPropWidget)
+		propsLayout.addWidget(self.resultPropWidget)
+		propsLayout.addWidget(self.movingPropWidget)
+
+		rendersWidget = QWidget()
+		rendersWidget.setLayout(rendersLayout)
+		
+		rendersAndTitlesLayout = QVBoxLayout()
+		rendersAndTitlesLayout.setSpacing(0)
+		rendersAndTitlesLayout.setContentsMargins(0, 0, 0, 0)
+		rendersAndTitlesLayout.addWidget(titleBoxWidget)
+		rendersAndTitlesLayout.addWidget(rendersWidget)
+
+		rendersAndTitlesWidget = QWidget()
+		rendersAndTitlesWidget.setLayout(rendersAndTitlesLayout)
+
+		propsWidget = QWidget()
+		propsWidget.setMaximumHeight(300)
+		propsWidget.setMinimumHeight(300)
+		propsWidget.setLayout(propsLayout)
+
+		self.verticalSplitter.addWidget(rendersAndTitlesWidget)
+		self.verticalSplitter.addWidget(propsWidget)
+		self.setCentralWidget(self.verticalSplitter)
 
 	def createActions(self):
 		"""
 		Create actions that can be attached to buttons and menus.
 		"""
-		# Dock toggle actions
-		self.actionToggleLeftBar = QAction('Toggle left bar', self, shortcut='Ctrl+0')
-		self.actionToggleLeftBar.setIcon(QIcon(AppVars.imagePath() + 'ToolbarLeft.png'))
-		self.actionToggleLeftBar.triggered.connect(self.toggleLeftSidePanel)
-		self.actionToggleLeftBar.setCheckable(True)
-		self.actionToggleLeftBar.setChecked(not(self.dockTransformations.isHidden()))
-		
-		self.actionToggleRightBar = QAction('Toggle right bar', self, shortcut='Ctrl+Alt+0')
-		self.actionToggleRightBar.setIcon(QIcon(AppVars.imagePath() + 'ToolbarRight.png'))
-		self.actionToggleRightBar.triggered.connect(self.toggleRightSidePanel)
-		self.actionToggleRightBar.setCheckable(True)
-		self.actionToggleRightBar.setChecked(not(self.dockVisualParameters.isHidden()))
+		userTransformIconName = AppResources.imageNamed('UserTransformButton.png')
+		landmarkTransformIconName = AppResources.imageNamed('LandmarkTransformButton.png')
+		deformableTransformIconName = AppResources.imageNamed('DeformableTransformButton.png')
 
-		self.actionToggleBottomBar = QAction('Toggle bottom bar', self, shortcut='Ctrl+Shift+0')
-		self.actionToggleBottomBar.setIcon(QIcon(AppVars.imagePath() + 'ToolbarBottom.png'))
-		self.actionToggleBottomBar.triggered.connect(self.toggleBottomPanel)
-		self.actionToggleBottomBar.setCheckable(True)
-		self.actionToggleBottomBar.setChecked(not(self.dockDataSets.isHidden()))
+		# Dock toggle actions
+		self.actionFreeTransformTool = QAction('Free transform', self, shortcut='Ctrl+1')
+		self.actionFreeTransformTool.setIcon(QIcon(userTransformIconName))
+		self.actionFreeTransformTool.triggered.connect(self.addFreeTransform)
+		
+		self.actionLandmarkTransformTool = QAction('Landmark transform', self, shortcut='Ctrl+2')
+		self.actionLandmarkTransformTool.setIcon(QIcon(landmarkTransformIconName))
+		self.actionLandmarkTransformTool.triggered.connect(self.addLandmarkTransform)
+
+		self.actionDeformableTransformTool = QAction('Deformable transform', self, shortcut='Ctrl+3')
+		self.actionDeformableTransformTool.setIcon(QIcon(deformableTransformIconName))
+		self.actionDeformableTransformTool.triggered.connect(self.addDeformableTransform)
 
 		self.actionLoadFixedData = QAction('Load fixed data', self, shortcut='Ctrl+Shift+F')
-		# self.actionLoadFixedData.setIcon(QIcon(AppVars.imagePath() + 'AddButton.png'))
 		self.actionLoadFixedData.triggered.connect(self.loadFixedDataSetFile)
 
 		self.actionLoadMovingData = QAction('Load moving data', self, shortcut='Ctrl+Shift+M')
-		# self.actionLoadMovingData.setIcon(QIcon(AppVars.imagePath() + 'AddButton.png'))
 		self.actionLoadMovingData.triggered.connect(self.loadMovingDataSetFile)
 
-		self.actionSaveProject = QAction('Save', self, shortcut='Ctrl+S')
+		self.actionSaveProject = QAction('Save project', self, shortcut='Ctrl+S')
 		self.actionSaveProject.triggered.connect(self.saveProject)
 
-		self.actionSaveProjectAs = QAction('Save as...', self, shortcut='Ctrl+Shift+S')
+		self.actionSaveProjectAs = QAction('Save project as...', self, shortcut='Ctrl+Shift+S')
 		self.actionSaveProjectAs.triggered.connect(self.saveProjectAs)
 
-		self.actionOpenProject = QAction('Open...', self, shortcut='Ctrl+O')
+		self.actionOpenProject = QAction('Open project...', self, shortcut='Ctrl+O')
 		self.actionOpenProject.triggered.connect(self.openProject)
 
-		self.actionNewProject = QAction('New', self, shortcut='Ctrl+N')
+		self.actionNewProject = QAction('New project', self, shortcut='Ctrl+N')
 		self.actionNewProject.triggered.connect(self.newProject)
-
-		self.actionRegister = QAction('Register', self, shortcut='Ctrl+R')
-		self.actionRegister.triggered.connect(self.register)
 
 	def createMenus(self):
 		"""
@@ -229,8 +235,6 @@ class RegistrationShop(QMainWindow):
 		self.menuItemProject.addAction(self.actionLoadFixedData)
 		self.menuItemProject.addAction(self.actionLoadMovingData)
 		self.menuItemProject.addSeparator()
-		self.menuItemProject.addAction(self.actionRegister)
-		# self.menuItemProject.addSeparator()
 
 	def createToolbar(self):
 		"""
@@ -239,17 +243,17 @@ class RegistrationShop(QMainWindow):
 		# Add toolbar
 		self.toolbar = self.addToolBar('Main tools')
 		
-		# Add the toolbar actions
+		# Add the transform tool buttons to the toolbar
+		self.toolbar.addAction(self.actionFreeTransformTool)
+		self.toolbar.addAction(self.actionLandmarkTransformTool)
+		self.toolbar.addAction(self.actionDeformableTransformTool)
 
-		# Align the dock buttons to the right with a spacer widget
+		# Insert widget so that other toolbar items will be pushed to the right
 		spacer = QWidget()
 		spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.toolbar.addWidget(spacer)
-		# Add the dock buttons to the toolbar
-		self.toolbar.addAction(self.actionToggleLeftBar)
-		self.toolbar.addAction(self.actionToggleBottomBar)
-		self.toolbar.addAction(self.actionToggleRightBar)
-		# TODO: add don't panic button
+		
+		# TODO: add "don't panic" button
 
 	def restoreState(self):
 		"""
@@ -264,7 +268,7 @@ class RegistrationShop(QMainWindow):
 
 		self.setGeometry(xPosition, yPosition, width, height)
 
-	# Events 
+	# Events
 
 	def resizeEvent(self, event):
 		"""
@@ -309,58 +313,33 @@ class RegistrationShop(QMainWindow):
 		pass
 	
 	# Private Functions
+
 	def setApplicationPath(self):
 		"""
-		Tries to find the path to the application. This is done so that it
+		Finds the path to the application. This is done so that it
 		can figure out where certain resources are located. 
 		QCoreApplication::applicationDirPath() on OS X does not return the 
 		desired path to the actual application but to the python executable 
 		in /Library/FrameWorks. This is inconvenient because images can't be
 		located that way.
-		This method assumes that the application path is passed on to arg[0].
-		Otherwise it will not set a path and will depend that the image's relative
-		paths will work.
+		So instead os.path is used to find the location of this __file__.
 		"""
-		# Check to see if we can deduce the application path from the
-		# sys arguments
-		if isinstance(self.arg[0], basestring) and self.arg[0].endswith("RegistrationShop.py"):
-			# Assume that first argument is the entry point
-			path = self.arg[0]
-			# Find index of the application name
-			start = path.rfind("RegistrationShop.py")
-			if start > -1:
-				AppVars.setPath(path[:start])
+		AppVars.setPath(os.path.dirname(os.path.abspath(__file__)))
 
 	# Action callbacks
-	
-	def toggleLeftSidePanel(self):
-		"""
-		Toggles the visibility of the transformation panel on the left. Makes sure that
-		the state of the toolbar button is updated and saves the state in the settings.
-		"""
-		self.dockTransformations.setHidden(not(self.dockTransformations.isHidden()))
-		self.dockParameters.setHidden(self.dockTransformations.isHidden())
-		self.actionToggleLeftBar.setChecked(not(self.dockTransformations.isHidden()))
-		RegistrationShop.settings.setValue("ui/dock/transformation/hidden", self.dockTransformations.isHidden())
-	
-	def toggleRightSidePanel(self):
-		"""
-		Toggles the visibility of the visualization parameters panel on the right. Makes sure that
-		the state of the toolbar button is updated and saves the state in the settings.
-		"""
-		self.dockVisualParameters.setHidden(not(self.dockVisualParameters.isHidden()))
-		self.actionToggleRightBar.setChecked(not(self.dockVisualParameters.isHidden()))
-		RegistrationShop.settings.setValue("ui/dock/visualParameters/hidden", self.dockVisualParameters.isHidden())
-	
-	def toggleBottomPanel(self):
-		"""
-		Toggles the visibility of the datasets panel on the bottom. Makes sure that
-		the state of the toolbar button is updated and saves the state in the settings.
-		"""
-		self.dockDataSets.setHidden(not(self.dockDataSets.isHidden()))
-		self.actionToggleBottomBar.setChecked(not(self.dockDataSets.isHidden()))
-		RegistrationShop.settings.setValue("ui/dock/dataSets/hidden", self.dockDataSets.isHidden())
+	@Slot()
+	def addFreeTransform(self):
+		print "Add free transform"
 
+	@Slot()
+	def addLandmarkTransform(self):
+		print "Add landmark transform"
+
+	@Slot()
+	def addDeformableTransform(self):
+		print "Add deformable transform"
+
+	@Slot()
 	def loadFixedDataSetFile(self):
 		"""
 		Open file dialog to search for data files. If valid data is given, it will
@@ -373,6 +352,7 @@ class RegistrationShop(QMainWindow):
 			projectController = ProjectController.Instance()
 			projectController.loadFixedDataSet(fileName)
 
+	@Slot()
 	def loadMovingDataSetFile(self):
 		"""
 		Open file dialog to search for data files. If valid data is given, it will
@@ -385,6 +365,7 @@ class RegistrationShop(QMainWindow):
 			projectController = ProjectController.Instance()
 			projectController.loadMovingDataSet(fileName)
 
+	@Slot()
 	def saveProject(self):
 		"""
 		Save the project to the specified name in the current project. If no name
@@ -394,7 +375,7 @@ class RegistrationShop(QMainWindow):
 		
 		if projCont.currentProject.folder is not None:
 			# Save that project
-			print "Save project at", projCont.currentProject.folder
+			# print "Save project at", projCont.currentProject.folder
 			saved = projCont.saveProject()
 			if saved:
 				# Save it in the settings that this was the last opened project
@@ -402,6 +383,7 @@ class RegistrationShop(QMainWindow):
 		else:
 			self.saveProjectAs()
 
+	@Slot()
 	def saveProjectAs(self):
 		"""
 		Opens a file dialog so that the user can select a folder
@@ -417,6 +399,7 @@ class RegistrationShop(QMainWindow):
 			# Call save project
 			self.saveProject()
 
+	@Slot()
 	def openProject(self, folderName=None):
 		"""
 		If no project name is supplied, it will open a file dialog so 
@@ -439,26 +422,15 @@ class RegistrationShop(QMainWindow):
 				if loaded:
 					RegistrationShop.settings.setValue("project/lastProject", fileName)
 			else:
-				print "Project file does not exist"
+				print "Warning: Project file does not exist"
 
+	@Slot()
 	def newProject(self):
 		"""
 		Create new project by calling the project controller
 		"""
 		ProjectController.Instance().newProject()
-		pass
 
-	def register(self):
-		"""
-		Temporary method to test if registration works...
-		"""
-		# self.statusbar.setHidden(False)
-		# self.progressbar.setHidden(False)
-
-		ProjectController.Instance().register()
-		
-		# self.statusbar.setHidden(True)
-		# self.progressbar.setHidden(True)
 
 def main():
 	app = QApplication(sys.argv)

@@ -1,7 +1,7 @@
 import unittest
 import yaml
 
-from core.Project import Project
+from core.project.Project import Project
 
 class TestProject(unittest.TestCase):
 
