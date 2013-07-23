@@ -188,7 +188,6 @@ class RegistrationShop(QMainWindow):
 		landmarkTransformIconName = AppResources.imageNamed('LandmarkTransformButton.png')
 		deformableTransformIconName = AppResources.imageNamed('DeformableTransformButton.png')
 
-		# Dock toggle actions
 		self.actionFreeTransformTool = QAction('Free transform', self, shortcut='Ctrl+1')
 		self.actionFreeTransformTool.setIcon(QIcon(userTransformIconName))
 		self.actionFreeTransformTool.triggered.connect(self.addFreeTransform)
@@ -375,7 +374,6 @@ class RegistrationShop(QMainWindow):
 		
 		if projCont.currentProject.folder is not None:
 			# Save that project
-			# print "Save project at", projCont.currentProject.folder
 			saved = projCont.saveProject()
 			if saved:
 				# Save it in the settings that this was the last opened project
