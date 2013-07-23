@@ -21,7 +21,7 @@ from VolumeProperty import VolumePropertyFactory
 from VolumeProperty import RenderTypeSimple
 from VolumeProperty import RenderTypeCT
 from VolumeProperty import RenderTypeMIP
-from ui.widgets.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from core.data.DataReader import DataReader
 from core.data.DataResizer import DataResizer
 

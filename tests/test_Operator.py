@@ -1,8 +1,8 @@
 import os
 import unittest
 
-from core.Operator import Operator
-from core.Command import Command
+from core.worker.Operator import Operator
+from core.worker.Command import Command
 from core.elastix.ElastixCommand import ElastixCommand
 
 

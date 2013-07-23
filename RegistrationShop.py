@@ -33,11 +33,11 @@ from core.project.ProjectController import ProjectController
 from core.data.DataReader import DataReader
 from core.AppResources import AppResources
 # Import ui elements
-from ui.widgets.RenderWidget import RenderWidget
-from ui.widgets.MultiRenderWidget import MultiRenderWidget
-from ui.widgets.TitleWidget import TitleWidget
-from ui.widgets.RenderPropertyWidgets import RenderPropWidget
-from ui.widgets.RenderPropertyWidgets import ResultPropWidget
+from ui.RenderWidget import RenderWidget
+from ui.MultiRenderWidget import MultiRenderWidget
+from ui.TitleWidget import TitleWidget
+from ui.RenderPropertyWidgets import RenderPropWidget
+from ui.RenderPropertyWidgets import ResultPropWidget
 
 # Define settings parameters
 APPNAME = "RegistrationShop"

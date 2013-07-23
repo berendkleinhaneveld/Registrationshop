@@ -16,7 +16,7 @@ from PySide.QtGui import QLabel
 from PySide.QtCore import Qt
 from PySide.QtCore import Signal
 from PySide.QtCore import QObject
-from decorators import overrides
+from core.decorators import overrides
 import math
 
 # Define Render Types

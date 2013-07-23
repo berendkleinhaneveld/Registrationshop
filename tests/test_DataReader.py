@@ -1,6 +1,6 @@
 import unittest
 import os
-from core.DataReader import DataReader
+from core.data.DataReader import DataReader
 
 class DataReaderTest(unittest.TestCase):
 

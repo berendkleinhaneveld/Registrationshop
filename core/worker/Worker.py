@@ -6,7 +6,7 @@ Worker
 """
 
 from threading import Thread
-from decorators import overrides
+from core.decorators import overrides
 
 class Worker(Thread):
 	"""

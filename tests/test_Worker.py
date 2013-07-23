@@ -1,7 +1,7 @@
 import unittest
-from core.Worker import Worker
+from core.worker.Worker import Worker
 from Queue import Queue
-from core.Command import Command
+from core.worker.Command import Command
 from core.elastix.ElastixCommand import ElastixCommand
 
 class WorkerTest(unittest.TestCase):

@@ -1,5 +1,5 @@
 import unittest
-from core.DataResizer import DataResizer
+from core.data.DataResizer import DataResizer
 from vtk import vtkImageData
 
 class DataResizerTest(unittest.TestCase):

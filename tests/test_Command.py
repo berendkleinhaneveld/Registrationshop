@@ -1,5 +1,5 @@
 import unittest
-from core.Command import Command
+from core.worker.Command import Command
 
 class CommandTest(unittest.TestCase):
 

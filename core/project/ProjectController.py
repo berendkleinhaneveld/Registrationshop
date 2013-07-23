@@ -11,7 +11,7 @@ from PySide.QtCore import Signal
 import yaml
 
 from Project import Project
-from decorators import Singleton
+from core.decorators import Singleton
 
 @Singleton
 class ProjectController(QObject):

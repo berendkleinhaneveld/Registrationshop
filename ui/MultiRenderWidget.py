@@ -10,7 +10,7 @@ from PySide.QtGui import QGridLayout
 from libvtkGPUMultiVolumeRenderPython import vtkOpenGLGPUMultiVolumeRayCastMapper
 from vtk import vtkRenderer
 from vtk import vtkInteractorStyleTrackballCamera
-from ui.widgets.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 
 class MultiRenderWidget(QWidget):
