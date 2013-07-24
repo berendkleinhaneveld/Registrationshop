@@ -103,7 +103,6 @@ class RenderPropWidget(QWidget):
 				layout.addWidget(self.tabWidget)
 				self.setLayout(layout)
 
-
 class RenderParameterWidget(QWidget):
 	"""
 	RenderParameterWidget is a widget that is shown in the render property 
@@ -257,10 +256,8 @@ class RenderSlicerParamWidget(QWidget):
 		"""
 		Callback function for the check boxes.
 		"""
-		print "hello"
 		for index in range(3):
 			showCheckBox = self.sliceCheckBoxes[index].checkState() == Qt.Checked
-			print "Checked %s: %s" % (index, showCheckBox)
 			self.renderWidget.showSlice(index, showCheckBox)
 
 		self.renderWidget.Update()
@@ -289,7 +286,6 @@ class RenderSlicerParamWidget(QWidget):
 		for index in range(3):
 			layout.addWidget(self.sliceLabels[index], index+1, 0)
 			layout.addWidget(self.sliceCheckBoxes[index], index+1, 1)
-		
 
 class ResultPropWidget(QWidget):
 	"""
