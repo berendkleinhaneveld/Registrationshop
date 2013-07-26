@@ -100,6 +100,7 @@ class RegistrationShop(QMainWindow):
 		main window is composed.
 		"""
 		self.mainWindow = QMainWindow()
+		projectController = ProjectController.Instance()
 
 		# Render widgets
 		self.fixedDataWidget = RenderWidget()
@@ -109,8 +110,6 @@ class RegistrationShop(QMainWindow):
 		# Render properties widgets
 		sizePolicyLeft = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 		sizePolicyLeft.setHorizontalStretch(1)
-
-		projectController = ProjectController.Instance()
 
 		self.fixedPropWidget = RenderPropWidget(self.fixedDataWidget, parent=self)
 		self.fixedPropWidget.setSizePolicy(sizePolicyLeft)
@@ -132,7 +131,7 @@ class RegistrationShop(QMainWindow):
 		self.verticalSplitter.setOrientation(Qt.Vertical)
 
 		fixedDataTitleWidget = TitleWidget("Fixed data")
-		resultDataTitleWidget = TitleWidget("Mix / Result")#, border=True)
+		resultDataTitleWidget = TitleWidget("Mix / Result")
 		movingDataTitleWidget = TitleWidget("Moving data")
 
 		titleBoxLayout = QHBoxLayout()
