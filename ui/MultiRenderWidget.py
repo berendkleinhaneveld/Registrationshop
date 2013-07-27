@@ -114,13 +114,25 @@ class MultiRenderWidget(QWidget):
 			opacityFunction = self.createFunctionFromOpacityAndVolumeProperty(self.fixedOpacity, fixedVolProp)
 			fixedVolProp.SetScalarOpacity(opacityFunction)
 			self.volume.SetProperty(fixedVolProp)
+		else:
+			volProp = vtkVolumeProperty()
+			color, opacityFunction = CreateEmptyFunctions()
+			volProp.SetColor(color)
+			volProp.SetScalarOpacity(opacityFunction)
+			self.volume.SetProperty(volProp)
+
 		if self.movingRenderWidget.renderVolumeProperty is not None:
 			movingVolProp = vtkVolumeProperty()
 			movingVolProp.DeepCopy(self.movingRenderWidget.renderVolumeProperty.volumeProperty)
 			opacityFunction = self.createFunctionFromOpacityAndVolumeProperty(self.movingOpacity, movingVolProp)
 			movingVolProp.SetScalarOpacity(opacityFunction)
 			self.mapper.SetProperty2(movingVolProp)
-
+		else:
+			volProp = vtkVolumeProperty()
+			color, opacityFunction = CreateEmptyFunctions()
+			volProp.SetColor(color)
+			volProp.SetScalarOpacity(opacityFunction)
+			self.mapper.SetProperty2(volProp)
 		# TODO: update all the other UI elements such as boxes, interaction widgets, etc.
 		self.rwi.Render()
 
@@ -142,7 +154,6 @@ class MultiRenderWidget(QWidget):
 		:type volProp: VolumeProperty
 		"""
 		self.fixedImageData = imageData
-		self.fixedVolProp = volProp
 
 		for index in range(3):
 			if VTK_MAJOR_VERSION <= 5:
@@ -152,7 +163,7 @@ class MultiRenderWidget(QWidget):
 			self.imagePlaneWidgets[index].SetPlaneOrientation(index)
 
 		self.mapper.SetInput(0, self.fixedImageData)
-		self.volume.SetProperty(self.fixedRenderWidget.renderVolumeProperty.volumeProperty)
+		self.mapper.SetInput(1, self.movingImageData)
 
 		self.renderer.ResetCamera()
 		self.loadedData.emit()
@@ -163,12 +174,12 @@ class MultiRenderWidget(QWidget):
 		:type volProp: VolumeProperty
 		"""
 		self.movingImageData = imageData
-		self.movingVolProp = volProp
 
+		self.mapper.SetInput(0, self.fixedImageData)
 		self.mapper.SetInput(1, self.movingImageData)
-		self.mapper.SetProperty2(self.movingVolProp.volumeProperty)
 
 		self.renderer.ResetCamera()
+		self.loadedData.emit()
 
 	def showSlice(self, index, value):
 		"""
