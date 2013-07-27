@@ -40,11 +40,15 @@ class DataResizer(object):
 		if factor > 1.0:
 			factor = 1.0
 
+		# The factor is now only in amount of pixels. This has to be translated
+		# to each of the dimensions: factor^(1/3)
+		axisMagnificationFactor = pow(factor, 1.0/3.0)
+
 		self.resampledImageData = None
 		if factor != 1.0:	
-			self.imageResampler.SetAxisMagnificationFactor(0, factor)
-			self.imageResampler.SetAxisMagnificationFactor(1, factor)
-			self.imageResampler.SetAxisMagnificationFactor(2, factor)
+			self.imageResampler.SetAxisMagnificationFactor(0, axisMagnificationFactor)
+			self.imageResampler.SetAxisMagnificationFactor(1, axisMagnificationFactor)
+			self.imageResampler.SetAxisMagnificationFactor(2, axisMagnificationFactor)
 			self.imageResampler.Update()
 			self.resampledImageData = self.imageResampler.GetOutput()
 		else:
@@ -58,3 +62,4 @@ class DataResizer(object):
 		voxels = dimensions[0] * dimensions[1] * dimensions[2]
 		factor = float(maximum) / float(voxels)
 		return factor
+
