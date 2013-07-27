@@ -34,6 +34,7 @@ class RenderWidget(QWidget):
 	"""
 
 	loadedData = Signal()
+	updated = Signal()
 
 	def __init__(self):
 		super(RenderWidget, self).__init__()
@@ -77,6 +78,7 @@ class RenderWidget(QWidget):
 
 	def Update(self):
 		self.rwi.Render()
+		self.updated.emit()
 
 	def SetRenderType(self, renderType):
 		"""
@@ -190,8 +192,10 @@ class RenderWidget(QWidget):
 
 
 class RenderSettings(object):
-	"""RenderSettings is an object that stores information about the render 
-	settings of a render widget."""
+	"""
+	RenderSettings is an object that stores information about the render 
+	settings of a render widget.
+	"""
 	def __init__(self):
 		super(RenderSettings, self).__init__()
 		

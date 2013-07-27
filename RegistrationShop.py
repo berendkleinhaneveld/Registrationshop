@@ -104,8 +104,8 @@ class RegistrationShop(QMainWindow):
 
 		# Render widgets
 		self.fixedDataWidget = RenderWidget()
-		self.resultDataWidget = MultiRenderWidget()
 		self.movingDataWidget = RenderWidget()
+		self.resultDataWidget = MultiRenderWidget(self.fixedDataWidget, self.movingDataWidget)
 
 		# Render properties widgets
 		sizePolicyLeft = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
@@ -116,7 +116,7 @@ class RegistrationShop(QMainWindow):
 		self.fixedPropWidget.setFileChangedSignal(projectController.changedFixedData)
 		self.fixedPropWidget.setLoadDataSlot(self.loadFixedDataSetFile)
 
-		self.resultPropWidget = ResultPropWidget(self)
+		self.resultPropWidget = ResultPropWidget(self.resultDataWidget, parent=self)
 		self.resultPropWidget.setSizePolicy(sizePolicyLeft)
 
 		self.movingPropWidget = RenderPropWidget(self.movingDataWidget, parent=self)

@@ -7,11 +7,19 @@ MultiRenderWidget
 
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
+from PySide.QtCore import Signal
 from libvtkGPUMultiVolumeRenderPython import vtkOpenGLGPUMultiVolumeRayCastMapper
 from vtk import vtkRenderer
 from vtk import vtkInteractorStyleTrackballCamera
+from vtk import vtkImagePlaneWidget
+from vtk import vtkVersion
+from vtk import vtkVolume
+from vtk import vtkImageData
+from vtk import vtkColorTransferFunction
+from vtk import vtkPiecewiseFunction
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
+VTK_MAJOR_VERSION = vtkVersion.GetVTKMajorVersion()
 
 class MultiRenderWidget(QWidget):
 	"""
@@ -41,8 +49,13 @@ class MultiRenderWidget(QWidget):
 	Colorized mix mode makes grayscale visualizations of the 
 	"""
 
-	def __init__(self):
+	loadedData = Signal()
+
+	def __init__(self, fixedRenderWidget, movingRenderWidget):
 		super(MultiRenderWidget, self).__init__()
+
+		self.fixedRenderWidget = fixedRenderWidget
+		self.movingRenderWidget = movingRenderWidget
 
 		self.renderer = vtkRenderer()
 		self.renderer.SetBackground2(0.4, 0.4, 0.4)
@@ -53,11 +66,24 @@ class MultiRenderWidget(QWidget):
 		self.rwi.SetInteractorStyle(vtkInteractorStyleTrackballCamera())
 		self.rwi.GetRenderWindow().AddRenderer(self.renderer)
 
-		self.mapper = vtkOpenGLGPUMultiVolumeRayCastMapper()
+		self.imagePlaneWidgets = [vtkImagePlaneWidget() for i in range(3)]
+		for index in range(3):
+			self.imagePlaneWidgets[index].DisplayTextOn()
+			self.imagePlaneWidgets[index].SetInteractor(self.rwi)
 
-		self.fixedImageData = None
+		self.mapper = vtkOpenGLGPUMultiVolumeRayCastMapper()
+		self.mapper.SetBlendModeToComposite()
+		self.volume = vtkVolume()
+		self.volume.SetMapper(self.mapper)
+
+		# Create two empty datasets
+		self.fixedImageData = CreateEmptyImageData()
+		self.movingImageData = CreateEmptyImageData()
+
+		# These variables will later on be used for creating a comparative
+		# visualization that does not use the volume properties of the 
+		# render widgets
 		self.fixedVolProp = None
-		self.movingImageData = None
 		self.movingVolProp = None
 
 		# self.datasetMix = 0.5 # Value between 0 and 1.0
@@ -70,21 +96,122 @@ class MultiRenderWidget(QWidget):
 		layout.addWidget(self.rwi, 0, 0)
 		self.setLayout(layout)
 
+		self.fixedRenderWidget.updated.connect(self.Update)
+		self.movingRenderWidget.updated.connect(self.Update)
+		self.fixedRenderWidget.loadedData.connect(self.fixedRenderWidgetLoadedData)
+		self.movingRenderWidget.loadedData.connect(self.movingRenderWidgetLoadedData)
+
 	def Update(self):
+		# Get the volume properties from the render widgets and apply them in this renderer
+		# TODO: modify these volume properties: multiply their values with the opacity values
+		if self.fixedRenderWidget.renderVolumeProperty is not None:
+			self.volume.SetProperty(self.fixedRenderWidget.renderVolumeProperty.volumeProperty)
+		if self.movingRenderWidget.renderVolumeProperty is not None:
+			self.mapper.SetProperty2(self.movingRenderWidget.renderVolumeProperty.volumeProperty)
+
+		# TODO: update the visibility of the slices
+		# TODO: update all the other UI elements such as boxes, interaction widgets, etc.
 		self.rwi.Render()
+
+	def fixedRenderWidgetLoadedData(self):
+		self.renderer.RemoveViewProp(self.volume)
+		self.setFixedData(self.fixedRenderWidget.imageData, self.fixedRenderWidget.renderVolumeProperty)
+		self.renderer.AddViewProp(self.volume)
+		self.renderer.ResetCamera()
+
+	def movingRenderWidgetLoadedData(self):
+		self.renderer.RemoveViewProp(self.volume)
+		self.setMovingData(self.movingRenderWidget.imageData, self.movingRenderWidget.renderVolumeProperty)
+		self.renderer.AddViewProp(self.volume)
+		self.renderer.ResetCamera()
 
 	def setFixedData(self, imageData, volProp):
 		"""
 		:type imageData: vtkImageData
 		:type volProp: VolumeProperty
 		"""
+		# resizer = DataResizer()
+		# self.fixedImageData = resizer.ResizeData(imageData, maximum=1200000)
 		self.fixedImageData = imageData
 		self.fixedVolProp = volProp
+
+		for index in range(3):
+			if VTK_MAJOR_VERSION <= 5:
+				self.imagePlaneWidgets[index].SetInput(self.fixedImageData)
+			else:
+				self.imagePlaneWidgets[index].SetInputData(self.fixedImageData)
+			self.imagePlaneWidgets[index].SetPlaneOrientation(index)
+			# self.imagePlaneWidgets[index].On()
+
+		self.mapper.SetInput(0, self.fixedImageData)
+		self.volume.SetProperty(self.fixedRenderWidget.renderVolumeProperty.volumeProperty)
+
+		self.renderer.ResetCamera()
+		self.loadedData.emit()
 
 	def setMovingData(self, imageData, volProp):
 		"""
 		:type imageData: vtkImageData
 		:type volProp: VolumeProperty
 		"""
+		# resizer = DataResizer()
+		# self.movingImageData = resizer.ResizeData(imageData, maximum=1200000)
 		self.movingImageData = imageData
 		self.movingVolProp = volProp
+
+		self.mapper.SetInput(1, self.movingImageData)
+		self.mapper.SetProperty2(self.movingVolProp.volumeProperty)
+
+		self.renderer.ResetCamera()
+
+	def showSlice(self, index, value):
+		"""
+		:type index: int
+		:type value: bool
+		"""
+		if value:
+			self.imagePlaneWidgets[index].On()
+		else:
+			self.imagePlaneWidgets[index].Off()
+
+
+# Helper methods
+def CreateEmptyImageData():
+	"""
+	Create an empty image data object. The multi volume mapper expects two
+	inputs, so if there is only one dataset loaded, a dummy dataset can be 
+	created using this method. Be sure to also set a dummy volume property
+	(CreateVolumePropertyInvisible) so that the volume does not show up in 
+	the renderer.
+
+	:rtype: vtkImageData
+	"""
+	dimensions = [3, 3, 3]
+	imageData = vtkImageData()
+	imageData.SetDimensions(dimensions)
+	imageData.SetSpacing(1, 1, 1);
+	imageData.SetOrigin(0, 0, 0);
+	imageData.SetNumberOfScalarComponents(1)
+	imageData.SetScalarTypeToFloat()
+	imageData.AllocateScalars()
+	for z in xrange(0, dimensions[2]-1):
+		for y in xrange(0, dimensions[1]-1):
+			for x in xrange(0, dimensions[0]-1):
+				imageData.SetScalarComponentFromDouble(x, y, z, 0, 0.0)
+	imageData.Update()
+	return imageData
+
+def CreateEmptyFunctions():
+	"""
+	:rtype: vtkColorTransferFunction, vtkPiecewiseFunction
+	"""
+	# Transfer functions and properties
+	colorFunction = vtkColorTransferFunction()
+	colorFunction.AddRGBPoint( 0, 0, 0, 0, 0.0, 0.0)
+	colorFunction.AddRGBPoint( 1000, 0, 0, 0, 0.0, 0.0)
+
+	opacityFunction = vtkPiecewiseFunction()
+	opacityFunction.AddPoint( 0, 0, 0.0, 0.0)
+	opacityFunction.AddPoint( 1000, 0, 0.0, 0.0)
+
+	return colorFunction, opacityFunction

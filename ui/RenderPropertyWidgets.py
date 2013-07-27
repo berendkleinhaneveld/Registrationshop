@@ -54,7 +54,7 @@ class RenderPropWidget(QWidget):
 	def __init__(self, renderWidget, parent=None):
 		super(RenderPropWidget, self).__init__(parent=parent)
 
-		# Two tabs: Visualization and Data info
+		# Three tabs: Visualization, data info and slices
 		self.visParamTabWidget = RenderParameterWidget(renderWidget)
 		self.dataInfoTabWidget = RenderInfoWidget()
 		self.slicesTabWidget = RenderSlicerParamWidget(renderWidget)
@@ -80,26 +80,44 @@ class RenderPropWidget(QWidget):
 		self.setLayout(layout)
 
 	def setFileChangedSignal(self, signal):
+		"""
+		:param signal: Signal that is connected to some file-loading slots. 
+		:type signal: SIGNAL
+		"""
 		self.signal = signal
 		self.signal.connect(self.loadFile)
 		self.signal.connect(self.dataInfoTabWidget.loadFile)
 
 	def setLoadDataSlot(self, slot):
+		"""
+		The button is connected to the given slot. The slot action should load 
+		a dataset from disk.
+
+		:type slot: Slot
+		"""
 		self.loadDataButton.clicked.connect(slot)
 
 	@Slot(basestring)
 	def loadFile(self, fileName):
+		"""
+		When a file is loaded, the 'load data' button is removed from the widget
+		and the actual tabs with parameters are put on screen.
+		"""
 		layout = self.layout()
 		if fileName is None:
 			if layout.indexOf(self.tabWidget) != -1:
+				# Remove the parameter widgets
 				layout.removeWidget(self.tabWidget)
 				self.tabWidget.setParent(None)
+				# Show the load data button
 				layout.addWidget(self.loadDataWidget)
 				self.setLayout(layout)
 		else:
 			if layout.indexOf(self.loadDataWidget) != -1:
+				# Remove the load data button
 				layout.removeWidget(self.loadDataWidget)
 				self.loadDataWidget.setParent(None)
+				# Add the parameter widgets
 				layout.addWidget(self.tabWidget)
 				self.setLayout(layout)
 
@@ -157,19 +175,28 @@ class RenderParameterWidget(QWidget):
 		# Get a new parameter widget from the render widget
 		self.paramWidget = self.renderWidget.GetParameterWidget()
 		if sys.platform.startswith("darwin"):
-			# default is 237, 237, 237
+			# default background of tabs on OSX is 237, 237, 237
 			self.paramWidget.setStyleSheet("background: rgb(229, 229, 229)")
 		self.scrollArea.setWidget(self.paramWidget)
 		self.renderWidget.renderVolumeProperty.updatedTransferFunction.connect(self.transferFunctionChanged)
 
 	@Slot(int)
 	def renderTypeComboBoxChanged(self, index):
+		"""
+		Slot that changes the render type. Also updates parameters and makes
+		sure that the renderWidget renders with the new renderType.
+		:type index: any
+		"""
 		self.renderWidget.SetRenderType(self.visTypeCompoBox.currentText())
 		self.UpdateWidgetFromRenderWidget()
 		self.renderWidget.Update()
 
 	@Slot()
 	def dataLoaded(self):
+		"""
+		When data has been changed, the parameters have to be updated. This is because
+		some of the parameters are dependent on properties of the data.
+		"""
 		# Get the correct widget from the RenderWidget
 		self.UpdateWidgetFromRenderWidget()
 
@@ -191,6 +218,9 @@ class RenderInfoWidget(QWidget):
 
 	@Slot(basestring)
 	def loadFile(self, fileName):
+		"""
+		Slot that reads properties of the dataset and displays them in a few widgets.
+		"""
 		if fileName is None:
 			return
 
@@ -291,20 +321,37 @@ class ResultPropWidget(QWidget):
 	"""
 	ResultPropWidget is a widget that is displayed under the result render
 	widget. It contains tabs with some controls for interaction and 
-	visualization of the combined render widget.
+	visualization of the combined / multi-volume render widget.
 	"""
-	def __init__(self, parent=None):
+	def __init__(self, renderWidget, parent=None):
 		super(ResultPropWidget, self).__init__(parent=parent)
 
 		# Two tabs: Visualization and Data info
-		self.mixParamWidget = QWidget()
+		self.mixParamWidget = RenderMixerParamWidget(renderWidget)
 		self.registrationHistoryWidget = QWidget()
+		self.slicesTabWidget = RenderSlicerParamWidget(renderWidget)
 
 		# Create the tab widget
 		self.tabWidget = QTabWidget()
 		self.tabWidget.addTab(self.mixParamWidget, "Mix")
 		self.tabWidget.addTab(self.registrationHistoryWidget, "History")
+		self.tabWidget.addTab(self.slicesTabWidget, "Slices")
 
 		layout = QVBoxLayout()
-		layout.addWidget(self.tabWidget)
 		self.setLayout(layout)
+		layout.addWidget(self.tabWidget)
+
+class RenderMixerParamWidget(QWidget):
+	"""
+	RenderMixerParamWidget is a widget that shows some mixer controls
+	for the multi-volume render widget.
+	"""
+	def __init__(self, multiRenderWidget):
+		super(RenderMixerParamWidget, self).__init__()
+		self.multiRenderWidget = multiRenderWidget
+
+		layout = QVBoxLayout()
+		layout.setAlignment(Qt.AlignTop)
+		layout.addWidget(QLabel("Hello world"))
+		self.setLayout(layout)
+		
