@@ -281,6 +281,26 @@ class RenderSlicerParamWidget(QWidget):
 		self.renderWidget = renderWidget
 		self.renderWidget.loadedData.connect(self.dataLoaded)
 
+		self.slicesLabel = QLabel("Show slices for directions:")
+		self.sliceLabelTexts = ["x", "y", "z"]
+		self.sliceLabels = [QLabel(text) for text in self.sliceLabelTexts]
+		self.sliceCheckBoxes = [QCheckBox() for i in range(3)]
+		for index in range(3):
+			self.sliceCheckBoxes[index].clicked.connect(self.checkBoxChanged)
+			self.sliceLabels[index].setAlignment(Qt.AlignRight)
+			self.sliceCheckBoxes[index].setEnabled(False)
+
+		# Create a nice layout for the labels
+		layout = QGridLayout()
+		layout.setAlignment(Qt.AlignTop)
+		layout.setColumnStretch(0, 1)
+		layout.setColumnStretch(1, 3)
+		layout.addWidget(self.slicesLabel, 0, 0, 1, -1)
+		for index in range(3):
+			layout.addWidget(self.sliceLabels[index], index+1, 0)
+			layout.addWidget(self.sliceCheckBoxes[index], index+1, 1)
+		self.setLayout(layout)
+
 	@Slot()
 	def checkBoxChanged(self):
 		"""
@@ -298,24 +318,9 @@ class RenderSlicerParamWidget(QWidget):
 		Slot for when data is loaded into the corresponding render widget.
 		Creates layout with labels and check boxes.
 		"""
-		self.slicesLabel = QLabel("Show slices for directions:")
-		self.sliceLabelTexts = ["x", "y", "z"]
-		self.sliceLabels = [QLabel(text) for text in self.sliceLabelTexts]
-		self.sliceCheckBoxes = [QCheckBox() for i in range(3)]
 		for index in range(3):
-			self.sliceCheckBoxes[index].clicked.connect(self.checkBoxChanged)
-			self.sliceLabels[index].setAlignment(Qt.AlignRight)
+			self.sliceCheckBoxes[index].setEnabled(True)
 
-		# Create a nice layout for the labels
-		layout = QGridLayout()
-		self.setLayout(layout)
-		layout.setAlignment(Qt.AlignTop)
-		layout.setColumnStretch(0, 1)
-		layout.setColumnStretch(1, 3)
-		layout.addWidget(self.slicesLabel, 0, 0, 1, -1)
-		for index in range(3):
-			layout.addWidget(self.sliceLabels[index], index+1, 0)
-			layout.addWidget(self.sliceCheckBoxes[index], index+1, 1)
 
 class ResultPropWidget(QWidget):
 	"""
