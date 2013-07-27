@@ -16,6 +16,7 @@ from vtk import vtkVersion
 from vtk import vtkVolume
 from vtk import vtkImageData
 from vtk import vtkColorTransferFunction
+from vtk import vtkVolumeProperty
 from vtk import vtkPiecewiseFunction
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
@@ -103,13 +104,23 @@ class MultiRenderWidget(QWidget):
 
 	def Update(self):
 		# Get the volume properties from the render widgets and apply them in this renderer
-		# TODO: modify these volume properties: multiply their values with the opacity values
+		# Steps:
+		# 1. Get/copy the volume properties from the render widgets
+		# 2. Adjust the volume properties with help of the slider values
+		# 3. Set the newly created volume properties of the mapper/volume
 		if self.fixedRenderWidget.renderVolumeProperty is not None:
-			self.volume.SetProperty(self.fixedRenderWidget.renderVolumeProperty.volumeProperty)
+			fixedVolProp = vtkVolumeProperty()
+			fixedVolProp.DeepCopy(self.fixedRenderWidget.renderVolumeProperty.volumeProperty)
+			opacityFunction = self.createFunctionFromOpacityAndVolumeProperty(self.fixedOpacity, fixedVolProp)
+			fixedVolProp.SetScalarOpacity(opacityFunction)
+			self.volume.SetProperty(fixedVolProp)
 		if self.movingRenderWidget.renderVolumeProperty is not None:
-			self.mapper.SetProperty2(self.movingRenderWidget.renderVolumeProperty.volumeProperty)
+			movingVolProp = vtkVolumeProperty()
+			movingVolProp.DeepCopy(self.movingRenderWidget.renderVolumeProperty.volumeProperty)
+			opacityFunction = self.createFunctionFromOpacityAndVolumeProperty(self.movingOpacity, movingVolProp)
+			movingVolProp.SetScalarOpacity(opacityFunction)
+			self.mapper.SetProperty2(movingVolProp)
 
-		# TODO: update the visibility of the slices
 		# TODO: update all the other UI elements such as boxes, interaction widgets, etc.
 		self.rwi.Render()
 
@@ -130,8 +141,6 @@ class MultiRenderWidget(QWidget):
 		:type imageData: vtkImageData
 		:type volProp: VolumeProperty
 		"""
-		# resizer = DataResizer()
-		# self.fixedImageData = resizer.ResizeData(imageData, maximum=1200000)
 		self.fixedImageData = imageData
 		self.fixedVolProp = volProp
 
@@ -141,7 +150,6 @@ class MultiRenderWidget(QWidget):
 			else:
 				self.imagePlaneWidgets[index].SetInputData(self.fixedImageData)
 			self.imagePlaneWidgets[index].SetPlaneOrientation(index)
-			# self.imagePlaneWidgets[index].On()
 
 		self.mapper.SetInput(0, self.fixedImageData)
 		self.volume.SetProperty(self.fixedRenderWidget.renderVolumeProperty.volumeProperty)
@@ -154,8 +162,6 @@ class MultiRenderWidget(QWidget):
 		:type imageData: vtkImageData
 		:type volProp: VolumeProperty
 		"""
-		# resizer = DataResizer()
-		# self.movingImageData = resizer.ResizeData(imageData, maximum=1200000)
 		self.movingImageData = imageData
 		self.movingVolProp = volProp
 
@@ -174,6 +180,25 @@ class MultiRenderWidget(QWidget):
 		else:
 			self.imagePlaneWidgets[index].Off()
 
+	def opacityChangedForFixedVolume(self, value):
+		self.fixedOpacity = value
+		self.Update()
+
+	def opacityChangedForMovingVolume(self, value):
+		self.movingOpacity = value
+		self.Update()
+
+	def createFunctionFromOpacityAndVolumeProperty(self, opacity, volProp):
+		"""
+		:type opacityFunction: vtkVolumeProperty
+		"""
+		opacityFunction = volProp.GetScalarOpacity()
+		for index in range(opacityFunction.GetSize()):
+			val = [0 for x in range(4)]
+			opacityFunction.GetNodeValue(index, val)
+			val[1] = val[1] * float(opacity)
+			opacityFunction.SetNodeValue(index, val)
+		return opacityFunction
 
 # Helper methods
 def CreateEmptyImageData():

@@ -39,6 +39,7 @@ from PySide.QtGui import QComboBox
 from PySide.QtGui import QScrollArea
 from PySide.QtGui import QFrame
 from PySide.QtGui import QCheckBox
+from PySide.QtGui import QSlider
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 from PySide.QtCore import SIGNAL
@@ -355,8 +356,34 @@ class RenderMixerParamWidget(QWidget):
 		super(RenderMixerParamWidget, self).__init__()
 		self.multiRenderWidget = multiRenderWidget
 
+		self.sliderFixedOpacity = QSlider(Qt.Horizontal)
+		self.sliderFixedOpacity.valueChanged.connect(self.fixedSliderChangedValue)
+		self.sliderMovingOpacity = QSlider(Qt.Horizontal)
+		self.sliderMovingOpacity.valueChanged.connect(self.movingSliderChangedValue)
+
+		self.sliderFixedOpacity.setValue(100)
+		self.sliderMovingOpacity.setValue(100)
+
 		layout = QVBoxLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(QLabel("Hello world"))
+		layout.addWidget(QLabel("Opacity of fixed volume"))
+		layout.addWidget(self.sliderFixedOpacity)
+		layout.addWidget(QLabel("Opacity of moving volume"))
+		layout.addWidget(self.sliderMovingOpacity)
 		self.setLayout(layout)
-		
+
+	@Slot(int)
+	def fixedSliderChangedValue(self, value):
+		opacity = self.applyOpacityFunction(float(value) / 100.0)
+		self.multiRenderWidget.opacityChangedForFixedVolume(opacity)
+
+	@Slot(int)
+	def movingSliderChangedValue(self, value):
+		opacity = self.applyOpacityFunction(float(value) / 100.0)
+		self.multiRenderWidget.opacityChangedForMovingVolume(opacity)
+
+	def applyOpacityFunction(self, value):
+		"""
+		Make sure that the slider opacity values are not linear.
+		"""
+		return value * value * value
