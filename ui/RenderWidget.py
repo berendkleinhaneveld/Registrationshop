@@ -151,6 +151,9 @@ class RenderWidget(QWidget):
 		self.volumeProperties = []
 
 		if fileName is None:
+			self.imageData = None
+			self.loadedData.emit()
+			self.Update()
 			return
 
 		# Read image data
