@@ -1,6 +1,6 @@
 import unittest
 
-from core.Transformation import Transformation
+from core.elastix.Transformation import Transformation
 from core.elastix.Parameter import Parameter
 
 class TransformationTest(unittest.TestCase):

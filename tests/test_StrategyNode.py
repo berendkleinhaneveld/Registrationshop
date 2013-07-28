@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from core.StrategyNode import StrategyNode
+from core.strategy.StrategyNode import StrategyNode
 
 class StrategyNodeTest(unittest.TestCase):
 	pass

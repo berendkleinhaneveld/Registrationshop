@@ -2,10 +2,9 @@ import unittest
 import os
 import shutil
 
-from core.StrategyEdge import StrategyEdge
-from core.StrategyNode import StrategyNode
-from core.Transformation import Transformation
-
+from core.strategy.StrategyEdge import StrategyEdge
+from core.strategy.StrategyNode import StrategyNode
+from core.elastix.Transformation import Transformation
 
 class StrategyEdgeTest(unittest.TestCase):
 

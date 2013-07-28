@@ -1,7 +1,7 @@
 import unittest
 import os
-from core.Strategy import Strategy
-from core.Transformation import Transformation
+from core.strategy.Strategy import Strategy
+from core.elastix.Transformation import Transformation
 
 class TestStrategy(unittest.TestCase):
 	
