@@ -93,6 +93,14 @@ class MultiRenderWidget(QWidget):
 		self.fixedOpacity = 1.0
 		self.movingOpacity = 1.0
 
+		self.tranformBox = vtkBoxWidget()
+		self.tranformBox.SetInteractor(self.rwi)
+		self.tranformBox.SetDefaultRenderer(self.renderer)
+		
+		self.tranformBox.mapper = self.mapper
+		self.tranformBox.AddObserver("InteractionEvent", TransformCallback)
+		self.tranformBox.GetSelectedFaceProperty().SetOpacity(0.3)
+
 		layout = QGridLayout(self)
 		layout.setSpacing(0)
 		layout.setContentsMargins(0, 0, 0, 0)
@@ -140,34 +148,10 @@ class MultiRenderWidget(QWidget):
 
 	def fixedRenderWidgetLoadedData(self):
 		self.renderer.RemoveViewProp(self.volume)
-		self.setFixedData(self.fixedRenderWidget.imageData, self.fixedRenderWidget.renderVolumeProperty)
-		self.renderer.AddViewProp(self.volume)
-		self.renderer.ResetCamera()
-
-	def movingRenderWidgetLoadedData(self):
-		self.renderer.RemoveViewProp(self.volume)
-		self.setMovingData(self.movingRenderWidget.imageData, self.movingRenderWidget.renderVolumeProperty)
-
-		self.tranformBox = vtkBoxWidget()
-		self.tranformBox.SetInteractor(self.rwi)
-		self.tranformBox.SetPlaceFactor(1.0)
-		self.tranformBox.SetInput(self.movingRenderWidget.imageData)
-		self.tranformBox.SetDefaultRenderer(self.renderer)
-		self.tranformBox.PlaceWidget()
-		self.tranformBox.mapper = self.mapper
-		self.tranformBox.AddObserver("InteractionEvent", TransformCallback)
-		self.tranformBox.GetSelectedFaceProperty().SetOpacity(0.3)
-		self.tranformBox.EnabledOff()
-
-		self.renderer.AddViewProp(self.volume)
-		self.renderer.ResetCamera()
-
-	def setFixedData(self, imageData, volProp):
-		"""
-		:type imageData: vtkImageData
-		:type volProp: VolumeProperty
-		"""
-		self.fixedImageData = imageData
+		if self.fixedRenderWidget.imageData is None:
+			self.fixedImageData = CreateEmptyImageData()
+		else:
+			self.fixedImageData = self.fixedRenderWidget.imageData
 
 		for index in range(3):
 			if VTK_MAJOR_VERSION <= 5:
@@ -179,19 +163,26 @@ class MultiRenderWidget(QWidget):
 		self.mapper.SetInput(0, self.fixedImageData)
 		self.mapper.SetInput(1, self.movingImageData)
 
+		self.renderer.AddViewProp(self.volume)
 		self.renderer.ResetCamera()
 		self.loadedData.emit()
 
-	def setMovingData(self, imageData, volProp):
-		"""
-		:type imageData: vtkImageData
-		:type volProp: VolumeProperty
-		"""
-		self.movingImageData = imageData
+	def movingRenderWidgetLoadedData(self):
+		self.renderer.RemoveViewProp(self.volume)
+		if self.movingRenderWidget.imageData is None:
+			self.movingImageData = CreateEmptyImageData()
+		else:
+			self.movingImageData = self.movingRenderWidget.imageData
+
+		self.tranformBox.SetInput(self.movingImageData)
+		self.tranformBox.PlaceWidget()
+		self.tranformBox.SetPlaceFactor(1.0)
+		self.tranformBox.EnabledOff()
 
 		self.mapper.SetInput(0, self.fixedImageData)
 		self.mapper.SetInput(1, self.movingImageData)
 
+		self.renderer.AddViewProp(self.volume)
 		self.renderer.ResetCamera()
 		self.loadedData.emit()
 
