@@ -15,7 +15,7 @@ class DataResizerTest(unittest.TestCase):
 
 	def testDataResizerDimensions(self):
 		dimensions = [512, 512, 196]
-		factor = 0.5
+		factor = 0.125
 		imageData = createImageData(dimensions)
 
 		resizedData = self.imageResizer.ResizeData(imageData, factor)
