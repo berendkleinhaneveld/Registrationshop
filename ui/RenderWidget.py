@@ -159,7 +159,7 @@ class RenderWidget(QWidget):
 
 		# Resize the image data
 		imageResizer = DataResizer()
-		self.imageData = imageResizer.ResizeData(imageData, maximum=28000000)
+		self.imageData = imageResizer.ResizeData(imageData, maximum=18000000)
 
 		for index in range(3):
 			if VTK_MAJOR_VERSION <= 5:
