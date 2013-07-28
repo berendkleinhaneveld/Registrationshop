@@ -427,6 +427,8 @@ class RegistrationShop(QMainWindow):
 		Create new project by calling the project controller
 		"""
 		ProjectController.Instance().newProject()
+		# Reset the last loaded project in the settings
+		RegistrationShop.settings.setValue("project/lastProject", "")
 
 
 def main():
