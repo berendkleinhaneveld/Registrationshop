@@ -14,7 +14,9 @@ from vtk import vtkInteractorStyleTrackballCamera
 from vtk import vtkImagePlaneWidget
 from vtk import vtkVersion
 from vtk import vtkVolume
+from vtk import vtkBoxWidget
 from vtk import vtkImageData
+from vtk import vtkTransform
 from vtk import vtkColorTransferFunction
 from vtk import vtkVolumeProperty
 from vtk import vtkPiecewiseFunction
@@ -145,6 +147,18 @@ class MultiRenderWidget(QWidget):
 	def movingRenderWidgetLoadedData(self):
 		self.renderer.RemoveViewProp(self.volume)
 		self.setMovingData(self.movingRenderWidget.imageData, self.movingRenderWidget.renderVolumeProperty)
+
+		self.tranformBox = vtkBoxWidget()
+		self.tranformBox.SetInteractor(self.rwi)
+		self.tranformBox.SetPlaceFactor(1.0)
+		self.tranformBox.SetInput(self.movingRenderWidget.imageData)
+		self.tranformBox.SetDefaultRenderer(self.renderer)
+		self.tranformBox.PlaceWidget()
+		self.tranformBox.mapper = self.mapper
+		self.tranformBox.AddObserver("InteractionEvent", TransformCallback)
+		self.tranformBox.GetSelectedFaceProperty().SetOpacity(0.3)
+		self.tranformBox.EnabledOff()
+
 		self.renderer.AddViewProp(self.volume)
 		self.renderer.ResetCamera()
 
@@ -191,6 +205,12 @@ class MultiRenderWidget(QWidget):
 		else:
 			self.imagePlaneWidgets[index].Off()
 
+	def showTransformBox(self, value):
+		if value:
+			self.tranformBox.EnabledOn()
+		else:
+			self.tranformBox.EnabledOff()
+
 	def opacityChangedForFixedVolume(self, value):
 		self.fixedOpacity = value
 		self.Update()
@@ -210,6 +230,16 @@ class MultiRenderWidget(QWidget):
 			val[1] = val[1] * float(opacity)
 			opacityFunction.SetNodeValue(index, val)
 		return opacityFunction
+
+def TransformCallback(arg1, arg2):
+	"""
+	:type arg1: vtkBoxWidget
+	:type arg2: InteractionEvent
+	"""
+	if hasattr(arg1, "mapper"):
+		transform = vtkTransform()
+		arg1.GetTransform(transform)
+		arg1.mapper.SetSecondInputUserTransform(transform)
 
 # Helper methods
 def CreateEmptyImageData():

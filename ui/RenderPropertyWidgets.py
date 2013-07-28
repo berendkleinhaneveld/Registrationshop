@@ -364,12 +364,16 @@ class RenderMixerParamWidget(QWidget):
 		self.sliderFixedOpacity.setValue(100)
 		self.sliderMovingOpacity.setValue(100)
 
+		self.transformCheckBox = QCheckBox()
+		self.transformCheckBox.clicked.connect(self.transformCheckBoxChanged)
+
 		layout = QVBoxLayout()
 		layout.setAlignment(Qt.AlignTop)
 		layout.addWidget(QLabel("Opacity of fixed volume"))
 		layout.addWidget(self.sliderFixedOpacity)
 		layout.addWidget(QLabel("Opacity of moving volume"))
 		layout.addWidget(self.sliderMovingOpacity)
+		layout.addWidget(self.transformCheckBox)
 		self.setLayout(layout)
 
 	@Slot(int)
@@ -381,6 +385,11 @@ class RenderMixerParamWidget(QWidget):
 	def movingSliderChangedValue(self, value):
 		opacity = self.applyOpacityFunction(float(value) / 100.0)
 		self.multiRenderWidget.opacityChangedForMovingVolume(opacity)
+
+	@Slot(bool)
+	def transformCheckBoxChanged(self):
+		showTransformWidget = self.transformCheckBox.checkState() == Qt.Checked
+		self.multiRenderWidget.showTransformBox(showTransformWidget)
 
 	def applyOpacityFunction(self, value):
 		"""
