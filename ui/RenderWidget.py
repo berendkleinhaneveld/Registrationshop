@@ -201,17 +201,3 @@ class RenderSettings(object):
 	"""
 	def __init__(self):
 		super(RenderSettings, self).__init__()
-		
-
-if __name__ == '__main__':
-	import sys
-	from PySide.QtGui import QApplication
-	app = QApplication(sys.argv)
-
-	viewer = RenderWidget()
-	viewer.loadFile("/Users/beer/RegistrationShop/Data/Medical/Noeska/CT.mhd")
-
-	viewer.rwi.Start()
-	viewer.raise_()
-	viewer.show()
-	sys.exit(app.exec_())
