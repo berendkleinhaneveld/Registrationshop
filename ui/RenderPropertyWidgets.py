@@ -356,25 +356,42 @@ class RenderMixerParamWidget(QWidget):
 		super(RenderMixerParamWidget, self).__init__()
 		self.multiRenderWidget = multiRenderWidget
 
+		self.labelFixedOpacity = QLabel("Opacity of fixed volume")
+		self.labelFixedOpacity.setVisible(False)
+		self.labelMovingOpacity = QLabel("Opacity of moving volume")
+		self.labelMovingOpacity.setVisible(False)
+
 		self.sliderFixedOpacity = QSlider(Qt.Horizontal)
 		self.sliderFixedOpacity.valueChanged.connect(self.fixedSliderChangedValue)
+		self.sliderFixedOpacity.setVisible(False)
+		self.sliderFixedOpacity.setValue(100)
+
 		self.sliderMovingOpacity = QSlider(Qt.Horizontal)
 		self.sliderMovingOpacity.valueChanged.connect(self.movingSliderChangedValue)
-
-		self.sliderFixedOpacity.setValue(100)
 		self.sliderMovingOpacity.setValue(100)
+		self.sliderMovingOpacity.setVisible(False)
 
 		self.transformCheckBox = QCheckBox()
 		self.transformCheckBox.clicked.connect(self.transformCheckBoxChanged)
+		self.multiRenderWidget.loadedData.connect(self.loadedData)
+		self.transformCheckBox.setVisible(False)
 
 		layout = QVBoxLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(QLabel("Opacity of fixed volume"))
+		layout.addWidget(self.labelFixedOpacity)
 		layout.addWidget(self.sliderFixedOpacity)
-		layout.addWidget(QLabel("Opacity of moving volume"))
+		layout.addWidget(self.labelMovingOpacity)
 		layout.addWidget(self.sliderMovingOpacity)
 		layout.addWidget(self.transformCheckBox)
 		self.setLayout(layout)
+
+	@Slot()
+	def loadedData(self):
+		self.sliderFixedOpacity.setVisible(self.multiRenderWidget.fixedImageData.GetDimensions()[0] > 3)
+		self.sliderMovingOpacity.setVisible(self.multiRenderWidget.movingImageData.GetDimensions()[0] > 3)
+		self.labelFixedOpacity.setVisible(self.sliderFixedOpacity.isVisible())
+		self.labelMovingOpacity.setVisible(self.sliderMovingOpacity.isVisible())
+		self.transformCheckBox.setVisible(self.sliderMovingOpacity.isVisible())
 
 	@Slot(int)
 	def fixedSliderChangedValue(self, value):
@@ -396,3 +413,12 @@ class RenderMixerParamWidget(QWidget):
 		Make sure that the slider opacity values are not linear.
 		"""
 		return value * value * value
+
+class TransformationHistoryWidget(QWidget):
+	"""
+	TransformationHistoryWidget shows a list of applied transformations.
+	
+	"""
+	def __init__(self):
+		super(TransformationHistoryWidget, self).__init__()
+		
