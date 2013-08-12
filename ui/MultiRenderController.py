@@ -108,12 +108,17 @@ class MultiRenderController(QObject):
 
 	@Slot(object)
 	def setRenderSettings(self, renderSettings):
-		print "Warning: MultiRenderController.setRenderSettings(renderSettings) not implemented yet"
-		pass
+		if renderSettings is not None:
+			self.slices = renderSettings["slices"]
+			self.multiRenderWidget.setSlices(self.slices)
+			self.slicesChanged.emit(self.slices)
+		else:
+			self.slices = [False, False, False]
 
 	def getRenderSettings(self):
-		print "Warning: MultiRenderController.getRenderSettings() not implemented yet"
-		return None
+		settings = dict()
+		settings["slices"] = self.slices
+		return settings
 
 	def setSliceVisibility(self, sliceIndex, visibility):
 		"""
@@ -180,3 +185,5 @@ def CreateEmptyFunctions():
 	opacityFunction.AddPoint( 1000, 0, 0.0, 0.0)
 
 	return colorFunction, opacityFunction
+
+		
