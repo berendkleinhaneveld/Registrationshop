@@ -8,6 +8,7 @@ MultiRenderWidget
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
 from PySide.QtCore import Signal
+from PySide.QtCore import Slot
 from libvtkGPUMultiVolumeRenderPython import vtkOpenGLGPUMultiVolumeRayCastMapper
 from vtk import vtkRenderer
 from vtk import vtkInteractorStyleTrackballCamera
@@ -20,6 +21,8 @@ from vtk import vtkTransform
 from vtk import vtkColorTransferFunction
 from vtk import vtkVolumeProperty
 from vtk import vtkPiecewiseFunction
+from vtk import vtkAxesActor
+from vtk import vtkOrientationMarkerWidget
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 VTK_MAJOR_VERSION = vtkVersion.GetVTKMajorVersion()
@@ -52,13 +55,10 @@ class MultiRenderWidget(QWidget):
 	Colorized mix mode makes grayscale visualizations of the 
 	"""
 
-	loadedData = Signal()
+	dataChanged = Signal()
 
-	def __init__(self, fixedRenderWidget, movingRenderWidget):
+	def __init__(self):
 		super(MultiRenderWidget, self).__init__()
-
-		self.fixedRenderWidget = fixedRenderWidget
-		self.movingRenderWidget = movingRenderWidget
 
 		self.renderer = vtkRenderer()
 		self.renderer.SetBackground2(0.4, 0.4, 0.4)
@@ -86,12 +86,13 @@ class MultiRenderWidget(QWidget):
 		# These variables will later on be used for creating a comparative
 		# visualization that does not use the volume properties of the 
 		# render widgets
-		self.fixedVolProp = None
-		self.movingVolProp = None
+		self.fixedVolumeProperty = None
+		self.movingVolumeProperty = None
 
-		# self.datasetMix = 0.5 # Value between 0 and 1.0
-		self.fixedOpacity = 1.0
-		self.movingOpacity = 1.0
+		self.shouldResetCamera = False
+
+		self.mapper.SetInput(0, self.fixedImageData)
+		self.mapper.SetInput(1, self.movingImageData)
 
 		self.tranformBox = vtkBoxWidget()
 		self.tranformBox.SetInteractor(self.rwi)
@@ -101,57 +102,36 @@ class MultiRenderWidget(QWidget):
 		self.tranformBox.AddObserver("InteractionEvent", TransformCallback)
 		self.tranformBox.GetSelectedFaceProperty().SetOpacity(0.3)
 
+		axesActor = vtkAxesActor();
+		self.orientationWidget = vtkOrientationMarkerWidget()
+		self.orientationWidget.SetViewport(0.05, 0.05, 0.3, 0.3)
+		self.orientationWidget.SetOrientationMarker(axesActor)
+		self.orientationWidget.SetInteractor(self.rwi)
+		self.orientationWidget.EnabledOn()
+		self.orientationWidget.InteractiveOff()
+
 		layout = QGridLayout(self)
 		layout.setSpacing(0)
 		layout.setContentsMargins(0, 0, 0, 0)
 		layout.addWidget(self.rwi, 0, 0)
 		self.setLayout(layout)
 
-		self.fixedRenderWidget.updated.connect(self.Update)
-		self.movingRenderWidget.updated.connect(self.Update)
-		self.fixedRenderWidget.loadedData.connect(self.fixedRenderWidgetLoadedData)
-		self.movingRenderWidget.loadedData.connect(self.movingRenderWidgetLoadedData)
-
-	def Update(self):
-		# Get the volume properties from the render widgets and apply them in this renderer
-		# Steps:
-		# 1. Get/copy the volume properties from the render widgets
-		# 2. Adjust the volume properties with help of the slider values
-		# 3. Set the newly created volume properties of the mapper/volume
-		if self.fixedRenderWidget.renderVolumeProperty is not None:
-			fixedVolProp = vtkVolumeProperty()
-			fixedVolProp.DeepCopy(self.fixedRenderWidget.renderVolumeProperty.volumeProperty)
-			opacityFunction = self.createFunctionFromOpacityAndVolumeProperty(self.fixedOpacity, fixedVolProp)
-			fixedVolProp.SetScalarOpacity(opacityFunction)
-			self.volume.SetProperty(fixedVolProp)
-		else:
-			volProp = vtkVolumeProperty()
-			color, opacityFunction = CreateEmptyFunctions()
-			volProp.SetColor(color)
-			volProp.SetScalarOpacity(opacityFunction)
-			self.volume.SetProperty(volProp)
-
-		if self.movingRenderWidget.renderVolumeProperty is not None:
-			movingVolProp = vtkVolumeProperty()
-			movingVolProp.DeepCopy(self.movingRenderWidget.renderVolumeProperty.volumeProperty)
-			opacityFunction = self.createFunctionFromOpacityAndVolumeProperty(self.movingOpacity, movingVolProp)
-			movingVolProp.SetScalarOpacity(opacityFunction)
-			self.mapper.SetProperty2(movingVolProp)
-		else:
-			volProp = vtkVolumeProperty()
-			color, opacityFunction = CreateEmptyFunctions()
-			volProp.SetColor(color)
-			volProp.SetScalarOpacity(opacityFunction)
-			self.mapper.SetProperty2(volProp)
-		# TODO: update all the other UI elements such as boxes, interaction widgets, etc.
+	def render(self):
+		if self.shouldResetCamera:
+			self.renderer.ResetCamera()
+			self.shouldResetCamera = False
 		self.rwi.Render()
 
-	def fixedRenderWidgetLoadedData(self):
-		self.renderer.RemoveViewProp(self.volume)
-		if self.fixedRenderWidget.imageData is None:
+	@Slot(object)
+	def setFixedData(self, imageData):
+		# TODO: compare with the load data from the normal render widget
+		# self.renderer.RemoveViewProp(self.volume)
+		self.fixedImageData = imageData
+		if self.fixedImageData is None:
 			self.fixedImageData = CreateEmptyImageData()
-		else:
-			self.fixedImageData = self.fixedRenderWidget.imageData
+
+		self.mapper.SetInput(0, self.fixedImageData)
+		self.mapper.SetInput(1, self.movingImageData)
 
 		for index in range(3):
 			if VTK_MAJOR_VERSION <= 5:
@@ -160,19 +140,16 @@ class MultiRenderWidget(QWidget):
 				self.imagePlaneWidgets[index].SetInputData(self.fixedImageData)
 			self.imagePlaneWidgets[index].SetPlaneOrientation(index)
 
-		self.mapper.SetInput(0, self.fixedImageData)
-		self.mapper.SetInput(1, self.movingImageData)
+		# self.renderer.AddViewProp(self.volume)
+		# self.renderer.ResetCamera()
+		self.shouldResetCamera = True
+		# self.dataChanged.emit()
 
-		self.renderer.AddViewProp(self.volume)
-		self.renderer.ResetCamera()
-		self.loadedData.emit()
-
-	def movingRenderWidgetLoadedData(self):
-		self.renderer.RemoveViewProp(self.volume)
-		if self.movingRenderWidget.imageData is None:
+	def setMovingData(self, imageData):
+		# self.renderer.RemoveViewProp(self.volume)
+		self.movingImageData = imageData
+		if self.movingImageData is None:
 			self.movingImageData = CreateEmptyImageData()
-		else:
-			self.movingImageData = self.movingRenderWidget.imageData
 
 		self.tranformBox.SetInput(self.movingImageData)
 		self.tranformBox.PlaceWidget()
@@ -182,19 +159,43 @@ class MultiRenderWidget(QWidget):
 		self.mapper.SetInput(0, self.fixedImageData)
 		self.mapper.SetInput(1, self.movingImageData)
 
-		self.renderer.AddViewProp(self.volume)
-		self.renderer.ResetCamera()
-		self.loadedData.emit()
+		# self.renderer.AddViewProp(self.volume)
+		# self.renderer.ResetCamera()
+		self.shouldResetCamera = True
+		# self.dataChanged.emit()
+			
+	@Slot(object)
+	def setFixedVolumeProperty(self, volumeProperty):
+		self.fixedVolumeProperty = volumeProperty
+		self.updateVolumeProperties()
 
-	def showSlice(self, index, value):
+	@Slot(object)
+	def setMovingVolumeProperty(self, volumeProperty):
+		self.movingVolumeProperty = volumeProperty
+		self.updateVolumeProperties()
+
+	def updateVolumeProperties(self):
 		"""
-		:type index: int
-		:type value: bool
+		Private method to update the volume properties.
 		"""
-		if value:
-			self.imagePlaneWidgets[index].On()
-		else:
-			self.imagePlaneWidgets[index].Off()
+		self.renderer.RemoveViewProp(self.volume)
+		self.volume = None
+
+		self.volume = vtkVolume()
+		self.volume.SetMapper(self.mapper)
+		self.volume.SetProperty(self.fixedVolumeProperty)
+		self.mapper.SetProperty2(self.movingVolumeProperty)
+		self.renderer.AddViewProp(self.volume)
+		self.render()
+	
+	@Slot(object)
+	def setSlices(self, slices):
+		for sliceIndex in range(len(slices)):
+			if slices[sliceIndex]:
+				self.imagePlaneWidgets[sliceIndex].On()
+			else:
+				self.imagePlaneWidgets[sliceIndex].Off()
+
 
 	def showTransformBox(self, value):
 		if value:
@@ -204,23 +205,11 @@ class MultiRenderWidget(QWidget):
 
 	def opacityChangedForFixedVolume(self, value):
 		self.fixedOpacity = value
-		self.Update()
+		self.updateVolumeProperties()
 
 	def opacityChangedForMovingVolume(self, value):
 		self.movingOpacity = value
-		self.Update()
-
-	def createFunctionFromOpacityAndVolumeProperty(self, opacity, volProp):
-		"""
-		:type opacityFunction: vtkVolumeProperty
-		"""
-		opacityFunction = volProp.GetScalarOpacity()
-		for index in range(opacityFunction.GetSize()):
-			val = [0 for x in range(4)]
-			opacityFunction.GetNodeValue(index, val)
-			val[1] = val[1] * float(opacity)
-			opacityFunction.SetNodeValue(index, val)
-		return opacityFunction
+		self.updateVolumeProperties()
 
 def TransformCallback(arg1, arg2):
 	"""
@@ -258,17 +247,3 @@ def CreateEmptyImageData():
 	imageData.Update()
 	return imageData
 
-def CreateEmptyFunctions():
-	"""
-	:rtype: vtkColorTransferFunction, vtkPiecewiseFunction
-	"""
-	# Transfer functions and properties
-	colorFunction = vtkColorTransferFunction()
-	colorFunction.AddRGBPoint( 0, 0, 0, 0, 0.0, 0.0)
-	colorFunction.AddRGBPoint( 1000, 0, 0, 0, 0.0, 0.0)
-
-	opacityFunction = vtkPiecewiseFunction()
-	opacityFunction.AddPoint( 0, 0, 0.0, 0.0)
-	opacityFunction.AddPoint( 1000, 0, 0.0, 0.0)
-
-	return colorFunction, opacityFunction

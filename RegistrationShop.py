@@ -34,10 +34,13 @@ from core.data.DataReader import DataReader
 from core.AppResources import AppResources
 # Import ui elements
 from ui.RenderWidget import RenderWidget
+from ui.RenderController import RenderController
+from ui.MultiRenderController import MultiRenderController
 from ui.MultiRenderWidget import MultiRenderWidget
 from ui.TitleWidget import TitleWidget
 from ui.RenderPropertyWidgets import RenderPropWidget
 from ui.RenderPropertyWidgets import ResultPropWidget
+
 
 # Define settings parameters
 APPNAME = "RegistrationShop"
@@ -66,12 +69,10 @@ class RegistrationShop(QMainWindow):
 
 		# Initialize the user interface
 		self.initUI()
-		
+
 		lastProject = RegistrationShop.settings.value("project/lastProject", None)
 		if lastProject:
-			# Open the last saved project
 			self.openProject(lastProject)
-			# TODO: when opening last project failed, remove from settings
 
 	# UI setup methods
 
@@ -82,6 +83,7 @@ class RegistrationShop(QMainWindow):
 		"""
 		# Create actions and elements
 		self.createElements()
+		self.connectElements()
 		self.createActions()
 		self.createMenus()
 		self.createToolbar()
@@ -105,40 +107,46 @@ class RegistrationShop(QMainWindow):
 		# Render widgets
 		self.fixedDataWidget = RenderWidget()
 		self.movingDataWidget = RenderWidget()
-		self.resultDataWidget = MultiRenderWidget(self.fixedDataWidget, self.movingDataWidget)
+		self.multiDataWidget = MultiRenderWidget()
+
+		self.fixedRenderController = RenderController(self.fixedDataWidget)
+		self.movingRenderController = RenderController(self.movingDataWidget)
+		self.multiRenderController = MultiRenderController(self.multiDataWidget)
+
+		# Give references of the render controllers to the project controller
+		projectController.fixedRenderController = self.fixedRenderController
+		projectController.movingRenderController = self.movingRenderController
+		projectController.multiRenderController = self.multiRenderController
 
 		# Render properties widgets
 		sizePolicyLeft = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 		sizePolicyLeft.setHorizontalStretch(1)
 
-		self.fixedPropWidget = RenderPropWidget(self.fixedDataWidget, parent=self)
+		self.fixedPropWidget = RenderPropWidget(self.fixedRenderController, parent=self)
 		self.fixedPropWidget.setSizePolicy(sizePolicyLeft)
-		self.fixedPropWidget.setFileChangedSignal(projectController.changedFixedData)
+		self.fixedPropWidget.setFileChangedSignal(projectController.fixedFileChanged)
 		self.fixedPropWidget.setLoadDataSlot(self.loadFixedDataSetFile)
 
-		self.resultPropWidget = ResultPropWidget(self.resultDataWidget, parent=self)
-		self.resultPropWidget.setSizePolicy(sizePolicyLeft)
+		self.multiPropWidget = ResultPropWidget(self.multiRenderController, parent=self)
+		self.multiPropWidget.setSizePolicy(sizePolicyLeft)
 
-		self.movingPropWidget = RenderPropWidget(self.movingDataWidget, parent=self)
+		self.movingPropWidget = RenderPropWidget(self.movingRenderController, parent=self)
 		self.movingPropWidget.setSizePolicy(sizePolicyLeft)
-		self.movingPropWidget.setFileChangedSignal(projectController.changedMovingData)
+		self.movingPropWidget.setFileChangedSignal(projectController.movingFileChanged)
 		self.movingPropWidget.setLoadDataSlot(self.loadMovingDataSetFile)
-
-		projectController.changedFixedData.connect(self.fixedDataWidget.loadFile)
-		projectController.changedMovingData.connect(self.movingDataWidget.loadFile)
 
 		self.verticalSplitter = QSplitter()
 		self.verticalSplitter.setOrientation(Qt.Vertical)
 
 		fixedDataTitleWidget = TitleWidget("Fixed data")
-		resultDataTitleWidget = TitleWidget("Mix / Result")
+		multiDataTitleWidget = TitleWidget("Mix / Result")
 		movingDataTitleWidget = TitleWidget("Moving data")
 
 		titleBoxLayout = QHBoxLayout()
 		titleBoxLayout.setSpacing(0)
 		titleBoxLayout.setContentsMargins(0, 0, 0, 0)
 		titleBoxLayout.addWidget(fixedDataTitleWidget)
-		titleBoxLayout.addWidget(resultDataTitleWidget)
+		titleBoxLayout.addWidget(multiDataTitleWidget)
 		titleBoxLayout.addWidget(movingDataTitleWidget)
 
 		titleBoxWidget = QWidget()
@@ -148,14 +156,14 @@ class RegistrationShop(QMainWindow):
 		rendersLayout.setSpacing(1)
 		rendersLayout.setContentsMargins(0, 0, 0, 0)
 		rendersLayout.addWidget(self.fixedDataWidget)
-		rendersLayout.addWidget(self.resultDataWidget)
+		rendersLayout.addWidget(self.multiDataWidget)
 		rendersLayout.addWidget(self.movingDataWidget)
 
 		propsLayout = QHBoxLayout()
 		propsLayout.setSpacing(1)
 		propsLayout.setContentsMargins(0, 0, 0, 0)
 		propsLayout.addWidget(self.fixedPropWidget)
-		propsLayout.addWidget(self.resultPropWidget)
+		propsLayout.addWidget(self.multiPropWidget)
 		propsLayout.addWidget(self.movingPropWidget)
 
 		rendersWidget = QWidget()
@@ -178,6 +186,57 @@ class RegistrationShop(QMainWindow):
 		self.verticalSplitter.addWidget(rendersAndTitlesWidget)
 		self.verticalSplitter.addWidget(propsWidget)
 		self.setCentralWidget(self.verticalSplitter)
+
+	def connectElements(self):
+		"""
+		All the elements have to be connected because they are dependent
+		on each other.
+		There is the project controller, two render controllers and a multi render
+		controller.
+		Also there are two render widgets and a multi render widget. Together with some
+		parameter widgets that show settings and with which the user can interact.
+
+		Possible actions:
+		* load project
+		* load preset
+		* save project
+		* (save preset?)
+		* change setting / parameter
+
+		RenderSettings:
+		* renderType
+		* volumeProperty / volumeProperties
+		* slices
+
+		Signals from the project controller
+		* fixedFileChanged (renderController and ParameterWidget will subscribe)
+		* movingFileChanged (renderController and ParameterWidget will subscribe)
+		* fixedSettingsChanged (renderController will subscribe)
+		* movingSettingsChanged (renderController will subscribe)
+		* multiSettingsChanged (multiRenderController will subscribe)
+
+		Signals from the render controllers
+		* dataChanged (RenderWidget and MultiRenderWidget will subscribe)
+		* volumePropertyChanged (RenderWidget, MultiRenderWidget and ParameterWidget will subscribe)
+		* slicesChanged (RenderWidget will subscribe)
+		"""
+		projectController = ProjectController.Instance()
+
+		projectController.fixedFileChanged.connect(self.fixedRenderController.setFile)
+		projectController.fixedFileChanged.connect(self.multiRenderController.setFixedFile)
+		projectController.movingFileChanged.connect(self.movingRenderController.setFile)
+		projectController.movingFileChanged.connect(self.multiRenderController.setMovingFile)
+		projectController.fixedSettingsChanged.connect(self.fixedRenderController.setRenderSettings)
+		projectController.movingSettingsChanged.connect(self.movingRenderController.setRenderSettings)
+		projectController.multiSettingsChanged.connect(self.multiRenderController.setRenderSettings)
+
+		self.multiRenderController.fixedVolumePropertyUpdated.connect(self.multiDataWidget.setFixedVolumeProperty)
+		self.multiRenderController.movingVolumePropertyUpdated.connect(self.multiDataWidget.setMovingVolumeProperty)
+
+		self.fixedRenderController.volumePropertyChanged.connect(self.multiRenderController.setFixedVolumeProperty)
+		self.fixedRenderController.volumePropertyUpdated.connect(self.multiRenderController.setFixedVolumeProperty)
+		self.movingRenderController.volumePropertyChanged.connect(self.multiRenderController.setMovingVolumeProperty)
+		self.movingRenderController.volumePropertyUpdated.connect(self.multiRenderController.setMovingVolumeProperty)
 
 	def createActions(self):
 		"""
@@ -327,15 +386,15 @@ class RegistrationShop(QMainWindow):
 	# Action callbacks
 	@Slot()
 	def addFreeTransform(self):
-		print "Add free transform"
+		print "Warning: RegistrationShop.addFreeTransform() not implemented yet"
 
 	@Slot()
 	def addLandmarkTransform(self):
-		print "Add landmark transform"
+		print "Warning: RegistrationShop.addLandmarkTransform() not implemented yet"
 
 	@Slot()
 	def addDeformableTransform(self):
-		print "Add deformable transform"
+		print "Warning: RegistrationShop.addDeformableTransform() not implemented yet"
 
 	@Slot()
 	def loadFixedDataSetFile(self):
@@ -420,6 +479,7 @@ class RegistrationShop(QMainWindow):
 					RegistrationShop.settings.setValue("project/lastProject", fileName)
 			else:
 				print "Warning: Project file does not exist"
+				RegistrationShop.settings.remove("project/lastProject")
 
 	@Slot()
 	def newProject(self):

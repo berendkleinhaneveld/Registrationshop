@@ -12,12 +12,17 @@ from vtk import vtkVolumeMapper
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSlider
 from PySide.QtGui import QVBoxLayout
+from PySide.QtGui import QGridLayout
 from PySide.QtGui import QLabel
 from PySide.QtCore import Qt
 from PySide.QtCore import Signal
 from PySide.QtCore import QObject
 from core.decorators import overrides
+from core.vtkObjectWrapper import vtkPiecewiseFunctionWrapper
+from core.vtkObjectWrapper import vtkColorTransferFunctionWrapper
+from core.vtkObjectWrapper import vtkVolumePropertyWrapper
 import math
+import yaml
 
 # Define Render Types
 RenderTypeSimple = "Simple"
@@ -25,19 +30,30 @@ RenderTypeGray = "Gray scale"
 RenderTypeCT = "CT"
 RenderTypeMIP = "MIP"
 
+VolumePropKey = "VolumeProperty"
+RenderTypeKey = "RenderTypeKey"
+ColorFuncKey = "ColorFuncKey"
+TransFuncKey = "TransFuncKey"
+
+# Factory
+
 class VolumePropertyFactory(object):
 	"""
 	VolumePropertyFactory makes and creates proper VolumeProperty objects.
 	"""
 	
 	@classmethod
-	def CreateProperty(cls, renderType, mapper):
+	def CreateProperty(cls, renderType):
 		if renderType == RenderTypeSimple:
-			return SimpleVolumeProperty(mapper)
+			return SimpleVolumeProperty()
 		elif renderType == RenderTypeCT:
-			return CTVolumeProperty(mapper)
+			return CTVolumeProperty()
 		elif renderType == RenderTypeMIP:
-			return MIPVolumeProperty(mapper)
+			return MIPVolumeProperty()
+		else:
+			assert False
+
+# Volume properties
 
 class VolumeProperty(QObject):
 	"""
@@ -52,53 +68,34 @@ class VolumeProperty(QObject):
 		self.volumeProperty = None
 		self.renderType = None
 
-	def GetParameterWidget(self):
+	def getParameterWidget(self):
 		"""
 		This method should be overridden in the subclasses.
 		:rtype: QWidget
 		"""
 		raise NotImplementedError()
 
-	def SetImageData(self, imageData):
+	def setImageData(self, imageData):
 		"""
 		This method should be overridden in the subclasses.
 		:type imageData: vtkImageData
 		"""
 		raise NotImplementedError()
 
-	def UpdateTransferFunction(self):
+	def configureMapper(self, mapper):
+		raise NotImplementedError()
+
+	def updateTransferFunction(self):
 		raise NotImplementedError()
 
 	def valueChanged(self, value):
 		raise NotImplementedError()
 
-class GrayScaleVolumeProperty(VolumeProperty):
-	"""
-	VolumeProperty subclass for Gray Scale visualization
-	"""
-	def __init__(self, mapper):
-		super(GrayScaleVolumeProperty, self).__init__()
-
-		self.renderType = RenderTypeGray
-		self.mapper = mapper
-
-		# Create property and attach the transfer function
-		self.volumeProperty = vtkVolumeProperty()
-		self.volumeProperty.SetIndependentComponents(True)
-		self.volumeProperty.SetInterpolationTypeToLinear()
-		self.volumeProperty.ShadeOn()
-		self.volumeProperty.SetAmbient(0.1)
-		self.volumeProperty.SetDiffuse(0.9)
-		self.volumeProperty.SetSpecular(0.2)
-		self.volumeProperty.SetSpecularPower(10.0)
-		self.volumeProperty.SetScalarOpacityUnitDistance(0.8919)
-
-
 class CTVolumeProperty(VolumeProperty):
 	"""
 	VolumeProperty subclass for CT visualization
 	"""
-	def __init__(self, mapper):
+	def __init__(self):
 		super(CTVolumeProperty, self).__init__()
 
 		self.renderType = RenderTypeCT
@@ -129,13 +126,13 @@ class CTVolumeProperty(VolumeProperty):
 		self.volumeProperty.SetSpecularPower(10.0)
 		self.volumeProperty.SetScalarOpacityUnitDistance(0.8919)
 
-		self.mapper = mapper
+	@overrides(VolumeProperty)
+	def configureMapper(self, mapper):
+		if mapper is not None and mapper.GetBlendMode() != vtkVolumeMapper.COMPOSITE_BLEND:
+			mapper.SetBlendModeToComposite()
 
 	@overrides(VolumeProperty)
-	def UpdateTransferFunction(self):
-		if self.mapper.GetBlendMode() != vtkVolumeMapper.COMPOSITE_BLEND:
-			self.mapper.SetBlendModeToComposite()
-
+	def updateTransferFunction(self):
 		# Transfer functions and properties
 		self.colorFunction = vtkColorTransferFunction()
 		for x in range(len(self.sections)-1):
@@ -156,7 +153,7 @@ class CTVolumeProperty(VolumeProperty):
 		self.updatedTransferFunction.emit()
 
 	@overrides(VolumeProperty)
-	def SetImageData(self, imageData):
+	def setImageData(self, imageData):
 		"""
 		Nothing needs to be done for CT scans. The values of the sliders are
 		not dependent on the imageData.
@@ -165,13 +162,13 @@ class CTVolumeProperty(VolumeProperty):
 		pass
 		
 	@overrides(VolumeProperty)
-	def GetParameterWidget(self):
+	def getParameterWidget(self):
 		"""
 		Returns a widget with sliders / fields with which properties of this 
 		volume property can be adjusted. 
 		:rtype: QWidget
 		"""
-		layout = QVBoxLayout()
+		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
 
 		self.sliders = []
@@ -182,8 +179,8 @@ class CTVolumeProperty(VolumeProperty):
 			slider.setValue(int(math.pow(self.sectionsOpacity[index], 1.0/3.0) * slider.maximum()))
 			slider.valueChanged.connect(self.valueChanged)
 			self.sliders.append(slider)
-			layout.addWidget(QLabel(self.sectionNames[index]))
-			layout.addWidget(slider)
+			layout.addWidget(QLabel(self.sectionNames[index]), index, 0)
+			layout.addWidget(slider, index, 1)
 
 		widget = QWidget()
 		widget.setLayout(layout)
@@ -202,26 +199,25 @@ class CTVolumeProperty(VolumeProperty):
 			convertedValue = math.pow(sliderValue, 3.0)
 			self.sectionsOpacity[index] = convertedValue
 
-		self.UpdateTransferFunction()
+		self.updateTransferFunction()
 
 class MIPVolumeProperty(VolumeProperty):
 	"""
 	VolumeProperty subclass for MIP visualization.
 	"""
-	def __init__(self, mapper):
+	def __init__(self):
 		super(MIPVolumeProperty, self).__init__()
 
 		self.renderType = RenderTypeMIP
 
+		# TODO: add two sliders with which to threshold the data
 		# Create property and attach the transfer function
 		self.volumeProperty = vtkVolumeProperty()
 		self.volumeProperty.SetIndependentComponents(True);
 		self.volumeProperty.SetInterpolationTypeToLinear();
 
-		self.mapper = mapper
-
 	@overrides(VolumeProperty)
-	def GetParameterWidget(self):
+	def getParameterWidget(self):
 		"""
 		Returns a widget with sliders / fields with which properties of this 
 		volume property can be adjusted. 
@@ -239,10 +235,12 @@ class MIPVolumeProperty(VolumeProperty):
 		self.upperBoundSlider.setValue(int(self.upperBound))
 		self.upperBoundSlider.valueChanged.connect(self.valueChanged)
 
-		layout = QVBoxLayout()
+		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(self.lowerBoundSlider)
-		layout.addWidget(self.upperBoundSlider)
+		layout.addWidget(QLabel("Lower bound"), 0, 0)
+		layout.addWidget(self.lowerBoundSlider, 0, 1)
+		layout.addWidget(QLabel("Upper bound"), 1, 0)
+		layout.addWidget(self.upperBoundSlider, 1, 1)
 
 		widget = QWidget()
 		widget.setLayout(layout)
@@ -250,25 +248,25 @@ class MIPVolumeProperty(VolumeProperty):
 		return widget
 
 	@overrides(VolumeProperty)
-	def SetImageData(self, imageData):
-		self.imageData = imageData
-
-		if self.imageData is None:
+	def setImageData(self, imageData):
+		if imageData is None:
 			self.minimum = 0.0
 			self.maximum = 1.0
 			self.lowerBound = self.minimum
 			self.upperBound = self.maximum
 			return
 
-		self.minimum, self.maximum = self.imageData.GetScalarRange()
+		self.minimum, self.maximum = imageData.GetScalarRange()
 		self.lowerBound = self.minimum
 		self.upperBound = self.maximum
 
 	@overrides(VolumeProperty)
-	def UpdateTransferFunction(self):
-		if self.mapper.GetBlendMode() != vtkVolumeMapper.MAXIMUM_INTENSITY_BLEND:
-			self.mapper.SetBlendModeToMaximumIntensity()
+	def configureMapper(self, mapper):
+		if mapper is not None and mapper.GetBlendMode() != vtkVolumeMapper.MAXIMUM_INTENSITY_BLEND:
+			mapper.SetBlendModeToMaximumIntensity()
 
+	@overrides(VolumeProperty)
+	def updateTransferFunction(self):
 		self.colorFunction = vtkColorTransferFunction()
 		self.colorFunction.AddRGBSegment(0.0, 1.0, 1.0, 1.0, 255.0, 1, 1, 1)
 
@@ -292,13 +290,13 @@ class MIPVolumeProperty(VolumeProperty):
 		"""
 		self.lowerBound = self.lowerBoundSlider.value()
 		self.upperBound = self.upperBoundSlider.value()
-		self.UpdateTransferFunction()
+		self.updateTransferFunction()
 
 class SimpleVolumeProperty(VolumeProperty):
 	"""
 	VolumeProperty subclass for a simple visualization.
 	"""
-	def __init__(self, mapper):
+	def __init__(self):
 		super(SimpleVolumeProperty, self).__init__()
 
 		self.renderType = RenderTypeSimple
@@ -314,10 +312,13 @@ class SimpleVolumeProperty(VolumeProperty):
 		self.volumeProperty.SetSpecularPower(10.0)
 		self.volumeProperty.SetScalarOpacityUnitDistance(0.8919)
 
-		self.mapper = mapper
+		self.minimum = 0
+		self.maximum = 1
+		self.lowerBound = 0
+		self.upperBound = 1
 
 	@overrides(VolumeProperty)
-	def GetParameterWidget(self):
+	def getParameterWidget(self):
 		"""
 		Returns a widget with sliders / fields with which properties of this 
 		volume property can be adjusted. 
@@ -335,12 +336,12 @@ class SimpleVolumeProperty(VolumeProperty):
 		self.upperBoundSlider.setValue(int(self.upperBound))
 		self.upperBoundSlider.valueChanged.connect(self.valueChanged)
 
-		layout = QVBoxLayout()
+		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(QLabel("Lower boundary"))
-		layout.addWidget(self.lowerBoundSlider)
-		layout.addWidget(QLabel("Upper boundary"))
-		layout.addWidget(self.upperBoundSlider)
+		layout.addWidget(QLabel("Lower boundary"), 0, 0)
+		layout.addWidget(self.lowerBoundSlider, 0, 1)
+		layout.addWidget(QLabel("Upper boundary"), 1, 0)
+		layout.addWidget(self.upperBoundSlider, 1, 1)
 
 		widget = QWidget()
 		widget.setLayout(layout)
@@ -348,26 +349,25 @@ class SimpleVolumeProperty(VolumeProperty):
 		return widget
 
 	@overrides(VolumeProperty)
-	def SetImageData(self, imageData):
-		self.imageData = imageData
-
-		if self.imageData is None:
+	def setImageData(self, imageData):
+		if imageData is None:
 			self.minimum = 0.0
 			self.maximum = 1.0
 			self.lowerBound = self.minimum
 			self.upperBound = self.maximum
 			return
 
-		self.minimum, self.maximum = self.imageData.GetScalarRange()
+		self.minimum, self.maximum = imageData.GetScalarRange()
 		self.lowerBound = self.minimum
 		self.upperBound = self.maximum
 
 	@overrides(VolumeProperty)
-	def UpdateTransferFunction(self):
+	def configureMapper(self, mapper):
+		if mapper is not None and mapper.GetBlendMode() != vtkVolumeMapper.COMPOSITE_BLEND:
+			mapper.SetBlendModeToComposite()
 
-		if self.mapper.GetBlendMode() != vtkVolumeMapper.COMPOSITE_BLEND:
-			self.mapper.SetBlendModeToComposite()
-
+	@overrides(VolumeProperty)
+	def updateTransferFunction(self):
 		# Transfer functions and properties
 		self.colorFunction = vtkColorTransferFunction()
 		self.colorFunction.AddRGBPoint(self.minimum, 1, 1, 1,)
@@ -399,4 +399,50 @@ class SimpleVolumeProperty(VolumeProperty):
 		"""
 		self.lowerBound = min(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
 		self.upperBound = max(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
-		self.UpdateTransferFunction()
+		self.updateTransferFunction()
+
+
+# Property wrappers
+
+class VolumePropertyObjectWrapper(object):
+	"""
+	VolumePropertyObjectWrapper wraps around a volume property. It wraps
+	all the vtk attributes in their own wrappers.
+	"""
+	standardAttributes = ["renderType", "sectionsOpacity", "lowerBound", "upperBound", "minimum", "maximum"]
+
+	def __init__(self, volumeProperty=None):
+		super(VolumePropertyObjectWrapper, self).__init__()
+
+		if volumeProperty is not None:
+			self.setVolumeProperty(volumeProperty)
+		
+	def setVolumeProperty(self, volumeProperty):
+		for attribute in VolumePropertyObjectWrapper.standardAttributes:
+			if hasattr(volumeProperty, attribute) and getattr(volumeProperty, attribute) is not None:
+				setattr(self, attribute, getattr(volumeProperty, attribute))
+
+		if hasattr(volumeProperty, "volumeProperty"):
+			self.volumeProperty = vtkVolumePropertyWrapper(volumeProperty.volumeProperty)
+		if hasattr(volumeProperty, "opacityFunction"):
+			self.opacityFunction = vtkPiecewiseFunctionWrapper(volumeProperty.opacityFunction)
+		if hasattr(volumeProperty, "colorFunction"):
+			self.colorFunction = vtkColorTransferFunctionWrapper(volumeProperty.colorFunction)
+
+	def getVolumeProperty(self):
+		volProp = VolumePropertyFactory.CreateProperty(self.renderType)
+
+		for attribute in VolumePropertyObjectWrapper.standardAttributes:
+			if hasattr(self, attribute) and getattr(self, attribute) is not None:
+				setattr(volProp, attribute, getattr(self, attribute))
+				# print attribute + ": " + str(getattr(self, attribute))
+
+		if hasattr(self, "volumeProperty") and self.volumeProperty is not None:
+			volProp.volumeProperty = self.volumeProperty.originalObject()
+		if hasattr(self, "opacityFunction") and self.opacityFunction is not None:
+			volProp.opacityFunction = self.opacityFunction.originalObject()
+		if hasattr(self, "colorFunction") and self.colorFunction is not None:
+			volProp.colorFunction = self.colorFunction.originalObject()
+
+		return volProp
+

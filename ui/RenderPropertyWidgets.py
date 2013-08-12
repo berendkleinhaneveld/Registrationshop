@@ -52,13 +52,13 @@ class RenderPropWidget(QWidget):
 	in which visualization parameters can be shown. One of the tabs is a 
 	RenderParameterWidget object.
 	"""
-	def __init__(self, renderWidget, parent=None):
+	def __init__(self, renderController, parent=None):
 		super(RenderPropWidget, self).__init__(parent=parent)
 
 		# Three tabs: Visualization, data info and slices
-		self.visParamTabWidget = RenderParameterWidget(renderWidget)
+		self.visParamTabWidget = RenderParameterWidget(renderController)
 		self.dataInfoTabWidget = RenderInfoWidget()
-		self.slicesTabWidget = RenderSlicerParamWidget(renderWidget)
+		self.slicesTabWidget = RenderSlicerParamWidget(renderController)
 
 		# Create the load dataset widget
 		self.loadDataWidget = QWidget()
@@ -86,8 +86,8 @@ class RenderPropWidget(QWidget):
 		:type signal: SIGNAL
 		"""
 		self.signal = signal
-		self.signal.connect(self.loadFile)
-		self.signal.connect(self.dataInfoTabWidget.loadFile)
+		self.signal.connect(self.setFile)
+		self.signal.connect(self.dataInfoTabWidget.setFile)
 
 	def setLoadDataSlot(self, slot):
 		"""
@@ -99,7 +99,7 @@ class RenderPropWidget(QWidget):
 		self.loadDataButton.clicked.connect(slot)
 
 	@Slot(basestring)
-	def loadFile(self, fileName):
+	def setFile(self, fileName):
 		"""
 		When a file is loaded, the 'load data' button is removed from the widget
 		and the actual tabs with parameters are put on screen.
@@ -129,17 +129,19 @@ class RenderParameterWidget(QWidget):
 	chosen. Beneath the combo box it displays a widget in a scroll view that 
 	contains widgets with which parameters of the visualization can be adjusted.
 	"""
-	def __init__(self, renderWidget, parent=None):
+
+	def __init__(self, renderController, parent=None):
 		super(RenderParameterWidget, self).__init__(parent=parent)
 
-		self.renderWidget = renderWidget
-		self.renderWidget.loadedData.connect(self.dataLoaded)
+		self.renderController = renderController
+		self.renderController.dataChanged.connect(self.dataLoaded)
+		self.renderController.volumePropertyChanged.connect(self.volumePropertyLoaded)
 
 		self.visTypeLabel = QLabel("Visualization type")
 		self.visTypeLabel.setMaximumHeight(20)
 
 		self.visTypeCompoBox = QComboBox()
-		for renderType in self.renderWidget.renderTypes:
+		for renderType in self.renderController.renderTypes:
 			self.visTypeCompoBox.addItem(renderType)
 
 		self.paramWidget = None
@@ -171,15 +173,20 @@ class RenderParameterWidget(QWidget):
 		# Clear the previous parameter widget
 		if self.paramWidget is not None:
 			self.paramWidget.setParent(None)
-			self.renderWidget.renderVolumeProperty.disconnect(SIGNAL("updatedTransferFunction"), self.transferFunctionChanged)
+			if self.renderController.volumeProperty is not None:
+				self.renderController.volumeProperty.disconnect(SIGNAL("updatedTransferFunction"), self.transferFunctionChanged)
 
 		# Get a new parameter widget from the render widget
-		self.paramWidget = self.renderWidget.GetParameterWidget()
+		self.paramWidget = self.renderController.getParameterWidget()
 		if sys.platform.startswith("darwin"):
 			# default background of tabs on OSX is 237, 237, 237
 			self.paramWidget.setStyleSheet("background: rgb(229, 229, 229)")
 		self.scrollArea.setWidget(self.paramWidget)
-		self.renderWidget.renderVolumeProperty.updatedTransferFunction.connect(self.transferFunctionChanged)
+
+		if self.renderController.volumeProperty is not None:
+			self.renderController.volumeProperty.updatedTransferFunction.connect(self.transferFunctionChanged)
+
+		self.visTypeCompoBox.setCurrentIndex(self.visTypeCompoBox.findText(self.renderController.renderType))
 
 	@Slot(int)
 	def renderTypeComboBoxChanged(self, index):
@@ -188,9 +195,9 @@ class RenderParameterWidget(QWidget):
 		sure that the renderWidget renders with the new renderType.
 		:type index: any
 		"""
-		self.renderWidget.SetRenderType(self.visTypeCompoBox.currentText())
+		self.renderController.setRenderType(self.visTypeCompoBox.currentText())
 		self.UpdateWidgetFromRenderWidget()
-		self.renderWidget.Update()
+		self.renderController.updateVolumeProperty()
 
 	@Slot()
 	def dataLoaded(self):
@@ -198,7 +205,11 @@ class RenderParameterWidget(QWidget):
 		When data has been changed, the parameters have to be updated. This is because
 		some of the parameters are dependent on properties of the data.
 		"""
+		pass
 		# Get the correct widget from the RenderWidget
+		# self.UpdateWidgetFromRenderWidget()
+
+	def volumePropertyLoaded(self, volumeProperty):
 		self.UpdateWidgetFromRenderWidget()
 
 	@Slot()
@@ -206,8 +217,9 @@ class RenderParameterWidget(QWidget):
 		"""
 		Slot that can be used when a transfer function has changed so that
 		the render will be updated afterwards.
+		Should be called on valueChanged by the widgets from the parameter widget.
 		"""
-		self.renderWidget.Update()
+		self.renderController.updateVolumeProperty()
 
 class RenderInfoWidget(QWidget):
 	"""
@@ -218,7 +230,7 @@ class RenderInfoWidget(QWidget):
 		super(RenderInfoWidget, self).__init__()
 
 	@Slot(basestring)
-	def loadFile(self, fileName):
+	def setFile(self, fileName):
 		"""
 		Slot that reads properties of the dataset and displays them in a few widgets.
 		"""
@@ -235,52 +247,62 @@ class RenderInfoWidget(QWidget):
 		dimensions = imageData.GetDimensions()
 		minimum, maximum = imageData.GetScalarRange()
 
-		# Create string representations
-		nameField = QLabel("File name:")
-		dimsField = QLabel("Dimensions:")
-		voxsField = QLabel("Voxels:")
-		rangField = QLabel("Range:")
-
-		nameField.setAlignment(Qt.AlignRight)
-		dimsField.setAlignment(Qt.AlignRight)
-		voxsField.setAlignment(Qt.AlignRight)
-		rangField.setAlignment(Qt.AlignRight)
-
 		nameText = name
 		dimsText = "(" + str(dimensions[0]) + ", " + str(dimensions[1]) + ", " + str(dimensions[2]) + ")"
 		voxsText = str(dimensions[0] * dimensions[1] * dimensions[2])
 		rangText = "[" + str(minimum) + " : " + str(maximum) + "]"
 
-		# Create labels
-		labelTitle = QLabel(nameText)
-		labelDimensions = QLabel(dimsText)
-		labelVoxels = QLabel(voxsText)
-		labelRange = QLabel(rangText)
+		layout = self.layout()
+		if not layout:
+			# Create a new layout
+			layout = QGridLayout()
+			layout.setAlignment(Qt.AlignTop)
 
-		# Create a nice layout for the labels
-		layout = QGridLayout()
-		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(nameField, 0, 0)
-		layout.addWidget(dimsField, 1, 0)
-		layout.addWidget(voxsField, 2, 0)
-		layout.addWidget(rangField, 3, 0)
+			# Create string representations
+			nameField = QLabel("File name:")
+			dimsField = QLabel("Dimensions:")
+			voxsField = QLabel("Voxels:")
+			rangField = QLabel("Range:")
 
-		layout.addWidget(labelTitle, 0, 1)
-		layout.addWidget(labelDimensions, 1, 1)
-		layout.addWidget(labelVoxels, 2, 1)
-		layout.addWidget(labelRange, 3, 1)
-		self.setLayout(layout)
+			nameField.setAlignment(Qt.AlignRight)
+			dimsField.setAlignment(Qt.AlignRight)
+			voxsField.setAlignment(Qt.AlignRight)
+			rangField.setAlignment(Qt.AlignRight)
+
+			# Create 'dynamic' labels
+			self.labelTitle = QLabel(nameText)
+			self.labelDimensions = QLabel(dimsText)
+			self.labelVoxels = QLabel(voxsText)
+			self.labelRange = QLabel(rangText)
+
+			layout.addWidget(nameField, 0, 0)
+			layout.addWidget(dimsField, 1, 0)
+			layout.addWidget(voxsField, 2, 0)
+			layout.addWidget(rangField, 3, 0)
+
+			layout.addWidget(self.labelTitle, 0, 1)
+			layout.addWidget(self.labelDimensions, 1, 1)
+			layout.addWidget(self.labelVoxels, 2, 1)
+			layout.addWidget(self.labelRange, 3, 1)
+			self.setLayout(layout)
+		else:
+			# Just update the text for the 'dynamic' labels
+			self.labelTitle.setText(nameText)
+			self.labelDimensions.setText(dimsText)
+			self.labelVoxels.setText(voxsText)
+			self.labelRange.setText(rangText)
+
 
 class RenderSlicerParamWidget(QWidget):
 	"""
 	RenderSlicerParamWidget shows parameters with which slicers can be 
 	manipulated.
 	"""
-	def __init__(self, renderWidget, parent=None):
+	def __init__(self, renderController, parent=None):
 		super(RenderSlicerParamWidget, self).__init__(parent=parent)
 
-		self.renderWidget = renderWidget
-		self.renderWidget.loadedData.connect(self.dataLoaded)
+		self.renderController = renderController
+		self.renderController.slicesChanged.connect(self.setSlices)
 
 		self.slicesLabel = QLabel("Show slices for directions:")
 		self.sliceLabelTexts = ["x", "y", "z"]
@@ -289,7 +311,7 @@ class RenderSlicerParamWidget(QWidget):
 		for index in range(3):
 			self.sliceCheckBoxes[index].clicked.connect(self.checkBoxChanged)
 			self.sliceLabels[index].setAlignment(Qt.AlignRight)
-			self.sliceCheckBoxes[index].setEnabled(False)
+			self.sliceCheckBoxes[index].setEnabled(True)
 
 		# Create a nice layout for the labels
 		layout = QGridLayout()
@@ -309,18 +331,13 @@ class RenderSlicerParamWidget(QWidget):
 		"""
 		for index in range(3):
 			showCheckBox = self.sliceCheckBoxes[index].checkState() == Qt.Checked
-			self.renderWidget.showSlice(index, showCheckBox)
+			self.renderController.setSliceVisibility(index, showCheckBox)
 
-		self.renderWidget.Update()
-
-	@Slot()
-	def dataLoaded(self):
-		"""
-		Slot for when data is loaded into the corresponding render widget.
-		Creates layout with labels and check boxes.
-		"""
-		for index in range(3):
-			self.sliceCheckBoxes[index].setEnabled(True)
+	@Slot(object)
+	def setSlices(self, slices):
+		for index in range(len(slices)):
+			checkBox = self.sliceCheckBoxes[index]
+			checkBox.setChecked(slices[index])
 
 
 class ResultPropWidget(QWidget):
@@ -329,13 +346,13 @@ class ResultPropWidget(QWidget):
 	widget. It contains tabs with some controls for interaction and 
 	visualization of the combined / multi-volume render widget.
 	"""
-	def __init__(self, renderWidget, parent=None):
+	def __init__(self, multiRenderController, parent=None):
 		super(ResultPropWidget, self).__init__(parent=parent)
 
 		# Two tabs: Visualization and Data info
-		self.mixParamWidget = RenderMixerParamWidget(renderWidget)
-		self.registrationHistoryWidget = QWidget()
-		self.slicesTabWidget = RenderSlicerParamWidget(renderWidget)
+		self.mixParamWidget = RenderMixerParamWidget(multiRenderController)
+		self.registrationHistoryWidget = TransformationHistoryWidget()
+		self.slicesTabWidget = RenderSlicerParamWidget(multiRenderController)
 
 		# Create the tab widget
 		self.tabWidget = QTabWidget()
@@ -352,9 +369,9 @@ class RenderMixerParamWidget(QWidget):
 	RenderMixerParamWidget is a widget that shows some mixer controls
 	for the multi-volume render widget.
 	"""
-	def __init__(self, multiRenderWidget):
+	def __init__(self, multiRenderController):
 		super(RenderMixerParamWidget, self).__init__()
-		self.multiRenderWidget = multiRenderWidget
+		self.multiRenderController = multiRenderController
 
 		self.labelFixedOpacity = QLabel("Opacity of fixed volume")
 		self.labelFixedOpacity.setVisible(False)
@@ -373,22 +390,23 @@ class RenderMixerParamWidget(QWidget):
 
 		self.transformCheckBox = QCheckBox()
 		self.transformCheckBox.clicked.connect(self.transformCheckBoxChanged)
-		self.multiRenderWidget.loadedData.connect(self.loadedData)
+		self.multiRenderController.fixedDataChanged.connect(self.dataChanged)
+		self.multiRenderController.movingDataChanged.connect(self.dataChanged)
 		self.transformCheckBox.setVisible(False)
 
-		layout = QVBoxLayout()
+		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(self.labelFixedOpacity)
-		layout.addWidget(self.sliderFixedOpacity)
-		layout.addWidget(self.labelMovingOpacity)
-		layout.addWidget(self.sliderMovingOpacity)
-		layout.addWidget(self.transformCheckBox)
+		layout.addWidget(self.labelFixedOpacity, 0, 0)
+		layout.addWidget(self.sliderFixedOpacity, 0, 1)
+		layout.addWidget(self.labelMovingOpacity, 1, 0)
+		layout.addWidget(self.sliderMovingOpacity, 1, 1)
+		layout.addWidget(self.transformCheckBox, 2, 0)
 		self.setLayout(layout)
 
-	@Slot()
-	def loadedData(self):
-		self.sliderFixedOpacity.setVisible(self.multiRenderWidget.fixedImageData.GetDimensions()[0] > 3)
-		self.sliderMovingOpacity.setVisible(self.multiRenderWidget.movingImageData.GetDimensions()[0] > 3)
+	@Slot(object)
+	def dataChanged(self):
+		self.sliderFixedOpacity.setVisible(self.multiRenderController.fixedImageData is not None)
+		self.sliderMovingOpacity.setVisible(self.multiRenderController.movingImageData is not None)
 		self.labelFixedOpacity.setVisible(self.sliderFixedOpacity.isVisible())
 		self.labelMovingOpacity.setVisible(self.sliderMovingOpacity.isVisible())
 		self.transformCheckBox.setVisible(self.sliderMovingOpacity.isVisible())
@@ -396,17 +414,17 @@ class RenderMixerParamWidget(QWidget):
 	@Slot(int)
 	def fixedSliderChangedValue(self, value):
 		opacity = self.applyOpacityFunction(float(value) / 100.0)
-		self.multiRenderWidget.opacityChangedForFixedVolume(opacity)
+		self.multiRenderController.setFixedOpacity(opacity)
 
 	@Slot(int)
 	def movingSliderChangedValue(self, value):
 		opacity = self.applyOpacityFunction(float(value) / 100.0)
-		self.multiRenderWidget.opacityChangedForMovingVolume(opacity)
+		self.multiRenderController.setMovingOpacity(opacity)
 
 	@Slot(bool)
 	def transformCheckBoxChanged(self):
 		showTransformWidget = self.transformCheckBox.checkState() == Qt.Checked
-		self.multiRenderWidget.showTransformBox(showTransformWidget)
+		self.multiRenderController.setTransformBoxVisibility(showTransformWidget)
 
 	def applyOpacityFunction(self, value):
 		"""
@@ -421,4 +439,9 @@ class TransformationHistoryWidget(QWidget):
 	"""
 	def __init__(self):
 		super(TransformationHistoryWidget, self).__init__()
+
+		layout = QVBoxLayout()
+		layout.setAlignment(Qt.AlignTop)
+		layout.addWidget(QLabel("History of transformations."))
+		self.setLayout(layout)
 		

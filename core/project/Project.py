@@ -19,6 +19,9 @@ class Project(object):
 		self.isReference = isReference
 		self.folder = None
 		self.resultData = None
+		self.fixedSettings = None
+		self.movingSettings = None
+		self.multiSettings = None
 
 	def __eq__(self, other):
 		if not isinstance(other, Project):

@@ -17,13 +17,7 @@ from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
 from PySide.QtCore import Slot
-from VolumeProperty import VolumePropertyFactory
-from VolumeProperty import RenderTypeSimple
-from VolumeProperty import RenderTypeCT
-from VolumeProperty import RenderTypeMIP
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-from core.data.DataReader import DataReader
-from core.data.DataResizer import DataResizer
 
 VTK_MAJOR_VERSION = vtkVersion.GetVTKMajorVersion()
 
@@ -33,13 +27,11 @@ class RenderWidget(QWidget):
 	set and adjusted.
 	"""
 
-	loadedData = Signal()
+	dataChanged = Signal()
 	updated = Signal()
 
 	def __init__(self):
 		super(RenderWidget, self).__init__()
-
-		self.renderTypes = [RenderTypeSimple, RenderTypeCT, RenderTypeMIP]
 
 		self.renderer = vtkRenderer()
 		self.renderer.SetBackground2(0.4, 0.4, 0.4)
@@ -55,12 +47,11 @@ class RenderWidget(QWidget):
 			self.imagePlaneWidgets[index].DisplayTextOn()
 			self.imagePlaneWidgets[index].SetInteractor(self.rwi)
 
-		self.renderType = None
-		self.renderVolumeProperty = None
-		self.imageData = None
-		self.volumeProperties = [] # Keep track of used volume properties
 		self.volume = None
 		self.mapper = vtkOpenGLGPUVolumeRayCastMapper()
+		self.imageData = None
+		self.volumeProperty = None
+		self.shouldResetCamera = False
 
 		axesActor = vtkAxesActor();
 		self.orientationWidget = vtkOrientationMarkerWidget()
@@ -76,94 +67,34 @@ class RenderWidget(QWidget):
 		layout.addWidget(self.rwi, 0, 0)
 		self.setLayout(layout)
 
-	def Update(self):
+	def render(self):
+		if self.shouldResetCamera:
+			self.renderer.ResetCamera()
+			self.shouldResetCamera = False
 		self.rwi.Render()
-		self.updated.emit()
 
-	def SetRenderType(self, renderType):
+	@Slot(object)
+	def setData(self, imageData):
 		"""
-		Swithes the renderer to the given render type. Previously used render 
-		types are saved so that switching back to a previously used render type 
-		will produce the same visualization as before.
-
-		:type renderType: str
+		Updates the image data. If the image data is none, then
+		the volume gets removed from the renderer. Otherwise, the
+		new image data is given to the mapper.
 		"""
-		self.renderType = renderType
-		if self.renderType is None:
-			self.renderType = RenderTypeSimple
+		self.imageData = imageData
+		if self.imageData is None:
+			if self.volume is not None:
+				self.renderer.RemoveViewProp(self.volume) 
+			print "Warning: image data is None"
+			self.render()
+			return
 
-		if self.volume is not None:
-			self.renderer.RemoveViewProp(self.volume)
-
-		self.volume = vtkVolume()
+		# Set the image data for the mapper
 		if VTK_MAJOR_VERSION <= 5:
 			self.mapper.SetInput(self.imageData)
 		else:
 			self.mapper.SetInputData(self.imageData)
 
-		foundPreviouslyUsedProperty = False
-		for volProp in self.volumeProperties:
-			if volProp.renderType == renderType:
-				self.renderVolumeProperty = volProp
-				foundPreviouslyUsedProperty = True
-				break
-
-		if not foundPreviouslyUsedProperty:
-			self.renderVolumeProperty = VolumePropertyFactory.CreateProperty(self.renderType, self.mapper)
-			self.renderVolumeProperty.SetImageData(self.imageData)
-			self.volumeProperties.append(self.renderVolumeProperty)
-
-		self.renderVolumeProperty.UpdateTransferFunction()
-
-		self.volume.SetProperty(self.renderVolumeProperty.volumeProperty)
-		self.volume.SetMapper(self.mapper)
-		self.renderer.AddViewProp(self.volume)
-
-	def GetParameterWidget(self):
-		"""
-		:rtype QWidget
-		"""
-		if self.renderVolumeProperty is not None:
-			return self.renderVolumeProperty.GetParameterWidget()
-
-		return QWidget()
-
-	def showSlice(self, index, value):
-		"""
-		:type index: int
-		:type value: bool
-		"""
-		if value:
-			self.imagePlaneWidgets[index].On()
-		else:
-			self.imagePlaneWidgets[index].Off()
-
-	@Slot(basestring)
-	def loadFile(self, fileName):
-		"""
-		:type fileName: str
-		"""
-		# Cleanup the last loaded dataset
-		if self.imageData is not None:
-			self.renderer.RemoveViewProp(self.volume)
-
-		# Clear out the old render types
-		self.volumeProperties = []
-
-		if fileName is None:
-			self.imageData = None
-			self.loadedData.emit()
-			self.Update()
-			return
-
-		# Read image data
-		dataReader = DataReader()
-		imageData = dataReader.GetImageData(fileName)
-
-		# Resize the image data
-		imageResizer = DataResizer()
-		self.imageData = imageResizer.ResizeData(imageData, maximum=18000000)
-
+		# Set the image data for the slices
 		for index in range(3):
 			if VTK_MAJOR_VERSION <= 5:
 				self.imagePlaneWidgets[index].SetInput(self.imageData)
@@ -171,33 +102,44 @@ class RenderWidget(QWidget):
 				self.imagePlaneWidgets[index].SetInputData(self.imageData)
 			self.imagePlaneWidgets[index].SetPlaneOrientation(index)
 
-		# Set the render type
-		self.SetRenderType(self.renderType)
+		self.shouldResetCamera = True
+		# Don't call render, because camera should only be reset
+		# when a volume property is loaded
 
-		self.renderer.ResetCamera()
-		self.loadedData.emit()
-		self.Update()
-	
-	def exportSettings(self):
+	@Slot(object)
+	def setVolumeProperty(self, volumeProperty):
 		"""
-		Create RenderWidgetSettings object from current state.
-		The returned object can be converted into a yaml object.
-		:rtype: RenderWidgetSettings
+		Updates the volume property. It actually removes the volume, 
+		creates a new volume and sets the updated volume property and
+		then adds the new volume to the renderer.
+		Just updating the vtkVolumeProperty gives artifacts and seems
+		to not work correctly.
+		:type volumeProperty: VolumeProperty
 		"""
-		pass
+		self.volumeProperty = volumeProperty
 
-	def loadSettings(self, settings):
-		"""
-		Read from settings the value for parameters.
-		:type settings: RenderWidgetSettings
-		"""
-		pass
+		if self.volume is not None:
+			self.renderer.RemoveViewProp(self.volume)
+			self.volume = None
 
+		if self.imageData is None or self.volumeProperty is None:
+			print "Warning: image data or volume property is None"
+			return
 
-class RenderSettings(object):
-	"""
-	RenderSettings is an object that stores information about the render 
-	settings of a render widget.
-	"""
-	def __init__(self):
-		super(RenderSettings, self).__init__()
+		# Do the mapper stuff here!
+		assert self.volume is None
+		self.volume = vtkVolume()
+		self.volume.SetProperty(self.volumeProperty.volumeProperty)
+		self.volume.SetMapper(self.mapper)
+		self.renderer.AddViewProp(self.volume)
+		
+		self.render()
+		
+
+	@Slot(object)
+	def setSlices(self, slices):
+		for sliceIndex in range(len(slices)):
+			if slices[sliceIndex]:
+				self.imagePlaneWidgets[sliceIndex].On()
+			else:
+				self.imagePlaneWidgets[sliceIndex].Off()
