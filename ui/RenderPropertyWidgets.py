@@ -394,6 +394,9 @@ class RenderMixerParamWidget(QWidget):
 		self.multiRenderController.movingDataChanged.connect(self.dataChanged)
 		self.transformCheckBox.setVisible(False)
 
+		self.multiRenderController.fixedVolumePropertyUpdated.connect(self.update)
+		self.multiRenderController.movingVolumePropertyUpdated.connect(self.update)
+
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
 		layout.addWidget(self.labelFixedOpacity, 0, 0)
@@ -425,6 +428,13 @@ class RenderMixerParamWidget(QWidget):
 	def transformCheckBoxChanged(self):
 		showTransformWidget = self.transformCheckBox.checkState() == Qt.Checked
 		self.multiRenderController.setTransformBoxVisibility(showTransformWidget)
+
+	@Slot(object)
+	def update(self, volumeProperty):
+		opacity = self.multiRenderController.fixedOpacity
+		self.sliderFixedOpacity.setValue(pow(opacity, 1.0/3.0) * 100.0)
+		opacity = self.multiRenderController.movingOpacity
+		self.sliderMovingOpacity.setValue(pow(opacity, 1.0/3.0) * 100.0)
 
 	def applyOpacityFunction(self, value):
 		"""

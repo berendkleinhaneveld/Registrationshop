@@ -110,7 +110,11 @@ class MultiRenderController(QObject):
 	def setRenderSettings(self, renderSettings):
 		if renderSettings is not None:
 			self.slices = renderSettings["slices"]
+			self.fixedOpacity = renderSettings["fixedOpacity"]
+			self.movingOpacity = renderSettings["movingOpacity"]
 			self.multiRenderWidget.setSlices(self.slices)
+			self.updateFixedVolumeProperty()
+			self.updateMovingVolumeProperty()
 			self.slicesChanged.emit(self.slices)
 		else:
 			self.slices = [False, False, False]
@@ -118,6 +122,8 @@ class MultiRenderController(QObject):
 	def getRenderSettings(self):
 		settings = dict()
 		settings["slices"] = self.slices
+		settings["fixedOpacity"] = self.fixedOpacity
+		settings["movingOpacity"] = self.movingOpacity
 		return settings
 
 	def setSliceVisibility(self, sliceIndex, visibility):
