@@ -12,7 +12,6 @@ import yaml
 
 from Project import Project
 from core.decorators import Singleton
-from ui.RenderController import RenderSettings
 
 @Singleton
 class ProjectController(QObject):

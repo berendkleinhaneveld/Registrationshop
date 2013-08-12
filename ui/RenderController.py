@@ -59,7 +59,7 @@ class RenderController(QObject):
 		self.renderType = None
 		self.imageData = None
 		self.volumeProperty = None
-		self.volumeProperties = [] # Keep track of used volume properties
+		self.volumeProperties = dict() # Keep track of used volume properties
 		self.slices = [False, False, False]
 		
 	@Slot(basestring)
@@ -68,7 +68,7 @@ class RenderController(QObject):
 		:type fileName: str
 		"""
 		# Clear out the old render types
-		self.volumeProperties = []
+		self.volumeProperties = dict()
 
 		if fileName is None:
 			self.imageData = None
@@ -98,15 +98,17 @@ class RenderController(QObject):
 		Apply the settings from the provided RenderSettings object.
 		"""
 		if renderSettings is not None:
-			properties = renderSettings.getProperties()
-			self.volumeProperties = properties[0]
-			self.renderType = properties[1]
-			self.slices = properties[2]
+			self.volumeProperties = dict()
+			volumeProperties = renderSettings["volumeProperties"]
+			for key in volumeProperties:
+				self.volumeProperties[key] = volumeProperties[key].getVolumeProperty()
+			self.renderType = renderSettings["renderType"]
+			self.slices = renderSettings["slices"]
 		else:
-			self.volumeProperties = []
+			self.volumeProperties = dict()
 			self.renderType = None
 			self.slices = [False, False, False]
-			
+
 		self.setRenderType(self.renderType)
 		self.renderWidget.setSlices(self.slices)
 		self.renderWidget.setVolumeProperty(self.volumeProperty)
@@ -118,9 +120,17 @@ class RenderController(QObject):
 		Return a RenderSettings object with all the right properties set.
 		:rtype: RenderSettings
 		"""
-		renderSettings = RenderSettings()
-		renderSettings.setProperties(self.volumeProperties, self.renderType, self.slices)
-		return renderSettings
+		volumeProperties = dict()
+		for key in self.volumeProperties:
+			volProp = VolumePropertyObjectWrapper(self.volumeProperties[key])
+			volumeProperties[key] = volProp
+
+		settings = dict()
+		settings["volumeProperties"] = volumeProperties
+		settings["renderType"] = self.renderType
+		settings["slices"] = self.slices
+		
+		return settings
 
 	def setRenderType(self, renderType):
 		"""
@@ -137,19 +147,14 @@ class RenderController(QObject):
 		if self.imageData is None:
 			return
 
-		foundPreviouslyUsedProperty = False
-		for volProp in self.volumeProperties:
-			if volProp.renderType == self.renderType:
-				self.volumeProperty = volProp
-				self.volumeProperty.updateTransferFunction()
-				foundPreviouslyUsedProperty = True
-				break
-
-		if not foundPreviouslyUsedProperty:
+		if renderType in self.volumeProperties:
+			self.volumeProperty = self.volumeProperties[renderType]
+			self.volumeProperty.updateTransferFunction()
+		else:
 			self.volumeProperty = VolumePropertyFactory.CreateProperty(self.renderType)
 			self.volumeProperty.setImageData(self.imageData)
 			self.volumeProperty.updateTransferFunction()
-			self.volumeProperties.append(self.volumeProperty)
+			self.volumeProperties[self.renderType] = self.volumeProperty
 
 		self.renderWidget.setVolumeProperty(self.volumeProperty)
 		self.volumePropertyChanged.emit(self.volumeProperty)
@@ -180,57 +185,3 @@ class RenderController(QObject):
 		"""
 		self.renderWidget.setVolumeProperty(self.volumeProperty)
 		self.volumePropertyUpdated.emit(self.volumeProperty)
-
-
-
-class RenderSettings(object):
-	"""
-	RenderSettings is an object that stores information about the render 
-	settings of a render widget.
-
-	Already supports:
-	* volumeProperty
-	* renderType
-	* slice visibility
-
-	TODO:
-	* slice location
-	* camera location / orientation
-	"""
-	def __init__(self):
-		super(RenderSettings, self).__init__()
-
-		# All the render properties for different types
-		self.volumeProperties = None
-		# Current render type
-		self.renderType = None
-		# Visibility of the slices
-		self.slices = None
-
-	def setProperties(self, volumeProperties, renderType, slices):
-		"""
-		Creates an array of the given volume properties with 
-		wrapped properties. So pure python objects instead of 
-		vtk objects.
-		:type volumeProperties: [] with VolumeProperty objects
-		"""
-		self.volumeProperties = []
-		for index in range(len(volumeProperties)):
-			volProp = VolumePropertyObjectWrapper(volumeProperties[index])
-			self.volumeProperties.append(volProp)
-
-		self.renderType = renderType
-		self.slices = slices
-
-	def getProperties(self):
-		"""
-		:rtype: [], str
-		"""
-		volumeProperties = []
-
-		for index in range(len(self.volumeProperties)):
-			volProp = self.volumeProperties[index].getVolumeProperty()
-			volumeProperties.append(volProp)
-			
-		return volumeProperties, self.renderType, self.slices
-
