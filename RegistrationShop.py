@@ -195,33 +195,8 @@ class RegistrationShop(QMainWindow):
 		controller.
 		Also there are two render widgets and a multi render widget. Together with some
 		parameter widgets that show settings and with which the user can interact.
-
-		Possible actions:
-		* load project
-		* load preset
-		* save project
-		* (save preset?)
-		* change setting / parameter
-
-		RenderSettings:
-		* renderType
-		* volumeProperty / volumeProperties
-		* slices
-
-		Signals from the project controller
-		* fixedFileChanged (renderController and ParameterWidget will subscribe)
-		* movingFileChanged (renderController and ParameterWidget will subscribe)
-		* fixedSettingsChanged (renderController will subscribe)
-		* movingSettingsChanged (renderController will subscribe)
-		* multiSettingsChanged (multiRenderController will subscribe)
-
-		Signals from the render controllers
-		* dataChanged (RenderWidget and MultiRenderWidget will subscribe)
-		* volumePropertyChanged (RenderWidget, MultiRenderWidget and ParameterWidget will subscribe)
-		* slicesChanged (RenderWidget will subscribe)
 		"""
 		projectController = ProjectController.Instance()
-
 		projectController.fixedFileChanged.connect(self.fixedRenderController.setFile)
 		projectController.fixedFileChanged.connect(self.multiRenderController.setFixedFile)
 		projectController.movingFileChanged.connect(self.movingRenderController.setFile)
