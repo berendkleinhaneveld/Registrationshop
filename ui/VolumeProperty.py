@@ -9,6 +9,7 @@ from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
 from vtk import vtkVolumeMapper
+from vtk import vtkMath
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSlider
 from PySide.QtGui import QVBoxLayout
@@ -316,6 +317,7 @@ class SimpleVolumeProperty(VolumeProperty):
 		self.maximum = 1
 		self.lowerBound = 0
 		self.upperBound = 1
+		self.hue = 0 # 0-360
 
 	@overrides(VolumeProperty)
 	def getParameterWidget(self):
@@ -336,12 +338,20 @@ class SimpleVolumeProperty(VolumeProperty):
 		self.upperBoundSlider.setValue(int(self.upperBound))
 		self.upperBoundSlider.valueChanged.connect(self.valueChanged)
 
+		self.hueSlider = QSlider(Qt.Horizontal)
+		self.hueSlider.setMinimum(0)
+		self.hueSlider.setMaximum(360)
+		self.hueSlider.setValue(self.hue)
+		self.hueSlider.valueChanged.connect(self.valueChanged)
+
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
 		layout.addWidget(QLabel("Lower boundary"), 0, 0)
 		layout.addWidget(self.lowerBoundSlider, 0, 1)
 		layout.addWidget(QLabel("Upper boundary"), 1, 0)
 		layout.addWidget(self.upperBoundSlider, 1, 1)
+		layout.addWidget(QLabel("Hue"), 2, 0)
+		layout.addWidget(self.hueSlider, 2, 1)
 
 		widget = QWidget()
 		widget.setLayout(layout)
@@ -368,12 +378,19 @@ class SimpleVolumeProperty(VolumeProperty):
 
 	@overrides(VolumeProperty)
 	def updateTransferFunction(self):
+		r = g = b = 0.0
+		saturation = 1.0
+		value = 1.0
+		hue = self.hue / 360.0
+		r, g, b = vtkMath.HSVToRGB(hue, saturation, value)
+		# r,g,b = [self.hue / 360.0 for i in range(3)]
+
 		# Transfer functions and properties
 		self.colorFunction = vtkColorTransferFunction()
-		self.colorFunction.AddRGBPoint(self.minimum, 1, 1, 1,)
-		self.colorFunction.AddRGBPoint(self.lowerBound, 1, 1, 1)
-		self.colorFunction.AddRGBPoint(self.lowerBound+1, 1, 1, 1)
-		self.colorFunction.AddRGBPoint(self.maximum, 1, 1, 1)
+		self.colorFunction.AddRGBPoint(self.minimum, r, g, b)
+		self.colorFunction.AddRGBPoint(self.lowerBound, r, g, b)
+		self.colorFunction.AddRGBPoint(self.lowerBound+1, r, g, b)
+		self.colorFunction.AddRGBPoint(self.maximum, r, g, b)
 
 		self.opacityFunction = vtkPiecewiseFunction()
 		self.opacityFunction.AddPoint(self.minimum, 0)
@@ -399,6 +416,7 @@ class SimpleVolumeProperty(VolumeProperty):
 		"""
 		self.lowerBound = min(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
 		self.upperBound = max(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
+		self.hue = self.hueSlider.value()
 		self.updateTransferFunction()
 
 
@@ -409,7 +427,7 @@ class VolumePropertyObjectWrapper(object):
 	VolumePropertyObjectWrapper wraps around a volume property. It wraps
 	all the vtk attributes in their own wrappers.
 	"""
-	standardAttributes = ["renderType", "sectionsOpacity", "lowerBound", "upperBound", "minimum", "maximum"]
+	standardAttributes = ["renderType", "sectionsOpacity", "lowerBound", "upperBound", "minimum", "maximum", "hue"]
 
 	def __init__(self, volumeProperty=None):
 		super(VolumePropertyObjectWrapper, self).__init__()
