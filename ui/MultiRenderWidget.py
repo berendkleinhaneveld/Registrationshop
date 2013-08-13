@@ -78,6 +78,7 @@ class MultiRenderWidget(QWidget):
 		self.mapper.SetBlendModeToComposite()
 		self.volume = vtkVolume()
 		self.volume.SetMapper(self.mapper)
+		self.renderer.AddViewProp(self.volume)
 
 		# Create two empty datasets
 		self.fixedImageData = CreateEmptyImageData()
@@ -124,8 +125,6 @@ class MultiRenderWidget(QWidget):
 
 	@Slot(object)
 	def setFixedData(self, imageData):
-		# TODO: compare with the load data from the normal render widget
-		# self.renderer.RemoveViewProp(self.volume)
 		self.fixedImageData = imageData
 		if self.fixedImageData is None:
 			self.fixedImageData = CreateEmptyImageData()
@@ -140,13 +139,9 @@ class MultiRenderWidget(QWidget):
 				self.imagePlaneWidgets[index].SetInputData(self.fixedImageData)
 			self.imagePlaneWidgets[index].SetPlaneOrientation(index)
 
-		# self.renderer.AddViewProp(self.volume)
-		# self.renderer.ResetCamera()
 		self.shouldResetCamera = True
-		# self.dataChanged.emit()
 
 	def setMovingData(self, imageData):
-		# self.renderer.RemoveViewProp(self.volume)
 		self.movingImageData = imageData
 		if self.movingImageData is None:
 			self.movingImageData = CreateEmptyImageData()
@@ -159,10 +154,7 @@ class MultiRenderWidget(QWidget):
 		self.mapper.SetInput(0, self.fixedImageData)
 		self.mapper.SetInput(1, self.movingImageData)
 
-		# self.renderer.AddViewProp(self.volume)
-		# self.renderer.ResetCamera()
 		self.shouldResetCamera = True
-		# self.dataChanged.emit()
 			
 	@Slot(object)
 	def setFixedVolumeProperty(self, volumeProperty):
@@ -178,14 +170,8 @@ class MultiRenderWidget(QWidget):
 		"""
 		Private method to update the volume properties.
 		"""
-		self.renderer.RemoveViewProp(self.volume)
-		self.volume = None
-
-		self.volume = vtkVolume()
-		self.volume.SetMapper(self.mapper)
 		self.volume.SetProperty(self.fixedVolumeProperty)
 		self.mapper.SetProperty2(self.movingVolumeProperty)
-		self.renderer.AddViewProp(self.volume)
 		self.render()
 	
 	@Slot(object)

@@ -118,21 +118,20 @@ class RenderWidget(QWidget):
 		"""
 		self.volumeProperty = volumeProperty
 
-		if self.volume is not None:
-			self.renderer.RemoveViewProp(self.volume)
-			self.volume = None
-
 		if self.imageData is None or self.volumeProperty is None:
-			print "Warning: image data or volume property is None"
+			if self.volume is not None:
+				self.renderer.RemoveViewProp(self.volume)
+				self.volume = None
 			return
 
-		# Do the mapper stuff here!
-		assert self.volume is None
-		self.volume = vtkVolume()
+		if self.volume is None:
+			self.volume = vtkVolume()
+			self.volumeProperty.configureMapper(self.mapper)
+			self.renderer.AddViewProp(self.volume)
+
 		self.volume.SetProperty(self.volumeProperty.volumeProperty)
 		self.volume.SetMapper(self.mapper)
-		self.renderer.AddViewProp(self.volume)
-		
+
 		self.render()
 		
 
