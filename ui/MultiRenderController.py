@@ -11,6 +11,7 @@ from PySide.QtCore import Signal
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
+from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data.DataReader import DataReader
 from core.data.DataResizer import DataResizer
 
@@ -116,6 +117,8 @@ class MultiRenderController(QObject):
 			self.updateFixedVolumeProperty()
 			self.updateMovingVolumeProperty()
 			self.slicesChanged.emit(self.slices)
+			cameraWrapper = renderSettings["camera"]
+			cameraWrapper.applyToObject(self.multiRenderWidget.renderer.GetActiveCamera())
 		else:
 			self.slices = [False, False, False]
 
@@ -124,6 +127,8 @@ class MultiRenderController(QObject):
 		settings["slices"] = self.slices
 		settings["fixedOpacity"] = self.fixedOpacity
 		settings["movingOpacity"] = self.movingOpacity
+		camera = self.multiRenderWidget.renderer.GetActiveCamera()
+		settings["camera"] = vtkCameraWrapper(camera)
 		return settings
 
 	def setSliceVisibility(self, sliceIndex, visibility):

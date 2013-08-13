@@ -23,6 +23,7 @@ from VolumeProperty import RenderTypeMIP
 from VolumeProperty import VolumeProperty
 from VolumeProperty import VolumePropertyFactory
 from VolumeProperty import VolumePropertyObjectWrapper
+from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data.DataReader import DataReader
 from core.data.DataResizer import DataResizer
 
@@ -114,6 +115,8 @@ class RenderController(QObject):
 		self.renderWidget.setVolumeProperty(self.volumeProperty)
 		self.slicesChanged.emit(self.slices)
 		self.volumePropertyChanged.emit(self.volumeProperty)
+		cameraWrapped = renderSettings["camera"]
+		cameraWrapped.applyToObject(self.renderWidget.renderer.GetActiveCamera())
 
 	def getRenderSettings(self):
 		"""
@@ -129,6 +132,9 @@ class RenderController(QObject):
 		settings["volumeProperties"] = volumeProperties
 		settings["renderType"] = self.renderType
 		settings["slices"] = self.slices
+
+		camera = self.renderWidget.renderer.GetActiveCamera()
+		settings["camera"] = vtkCameraWrapper(camera)
 		
 		return settings
 

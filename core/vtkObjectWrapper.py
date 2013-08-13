@@ -47,6 +47,14 @@ class vtkObjectWrapper(object):
 		"""
 		raise NotImplementedError()
 
+	def applyToObject(self, vtkObject):
+		"""
+		Instead of returning a new object, sometimes only properties
+		of vtkObjects are stored and should be applied to already
+		existing vtkObjects.
+		"""
+		raise NotImplementedError()
+
 
 class vtkColorTransferFunctionWrapper(vtkObjectWrapper):
 	"""
@@ -138,3 +146,26 @@ class vtkVolumePropertyWrapper(vtkObjectWrapper):
 		volumeProperty.SetSpecularPower(self.specularPower)
 		volumeProperty.SetScalarOpacityUnitDistance(self.scalarOpacityUnitDistance)
 		return volumeProperty
+
+class vtkCameraWrapper(vtkObjectWrapper):
+	"""vtkCameraWrapper is a wrapper around 
+	vtkCamera object. It stores the properties of a 
+	vtkCamera as attributes. Do not use the originalObject method
+	to retrieve but rather apply the settings to an already created
+	vtkCamera object."""
+	def __init__(self, camera=None):
+		super(vtkCameraWrapper, self).__init__(camera)
+		
+	@overrides(vtkObjectWrapper)
+	def setOriginalObject(self, camera):
+		self.position = camera.GetPosition()
+		self.focalPoint = camera.GetFocalPoint()
+		self.viewUp = camera.GetViewUp()
+		self.distance = camera.GetDistance()
+
+	@overrides(vtkObjectWrapper)
+	def applyToObject(self, camera):
+		camera.SetPosition(self.position)
+		camera.SetFocalPoint(self.focalPoint)
+		camera.SetViewUp(self.viewUp)
+		camera.SetDistance(self.distance)

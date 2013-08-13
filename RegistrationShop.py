@@ -39,7 +39,7 @@ from ui.MultiRenderController import MultiRenderController
 from ui.MultiRenderWidget import MultiRenderWidget
 from ui.TitleWidget import TitleWidget
 from ui.RenderPropertyWidgets import RenderPropWidget
-from ui.RenderPropertyWidgets import ResultPropWidget
+from ui.RenderPropertyWidgets import MultiPropWidget
 
 
 # Define settings parameters
@@ -127,7 +127,7 @@ class RegistrationShop(QMainWindow):
 		self.fixedPropWidget.setFileChangedSignal(projectController.fixedFileChanged)
 		self.fixedPropWidget.setLoadDataSlot(self.loadFixedDataSetFile)
 
-		self.multiPropWidget = ResultPropWidget(self.multiRenderController, parent=self)
+		self.multiPropWidget = MultiPropWidget(self.multiRenderController, parent=self)
 		self.multiPropWidget.setSizePolicy(sizePolicyLeft)
 
 		self.movingPropWidget = RenderPropWidget(self.movingRenderController, parent=self)
