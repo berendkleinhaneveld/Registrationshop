@@ -114,11 +114,12 @@ class MultiRenderController(QObject):
 			self.fixedOpacity = renderSettings["fixedOpacity"]
 			self.movingOpacity = renderSettings["movingOpacity"]
 			self.multiRenderWidget.setSlices(self.slices)
+			cameraWrapper = renderSettings["camera"]
+			cameraWrapper.applyToObject(self.multiRenderWidget.renderer.GetActiveCamera())
 			self.updateFixedVolumeProperty()
 			self.updateMovingVolumeProperty()
 			self.slicesChanged.emit(self.slices)
-			cameraWrapper = renderSettings["camera"]
-			cameraWrapper.applyToObject(self.multiRenderWidget.renderer.GetActiveCamera())
+			
 		else:
 			self.slices = [False, False, False]
 

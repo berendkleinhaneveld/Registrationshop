@@ -113,10 +113,12 @@ class RenderController(QObject):
 		self.setRenderType(self.renderType)
 		self.renderWidget.setSlices(self.slices)
 		self.renderWidget.setVolumeProperty(self.volumeProperty)
-		self.slicesChanged.emit(self.slices)
-		self.volumePropertyChanged.emit(self.volumeProperty)
 		cameraWrapped = renderSettings["camera"]
 		cameraWrapped.applyToObject(self.renderWidget.renderer.GetActiveCamera())
+		
+		self.volumePropertyChanged.emit(self.volumeProperty)
+		self.slicesChanged.emit(self.slices)
+		
 
 	def getRenderSettings(self):
 		"""

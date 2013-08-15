@@ -162,6 +162,7 @@ class vtkCameraWrapper(vtkObjectWrapper):
 		self.focalPoint = camera.GetFocalPoint()
 		self.viewUp = camera.GetViewUp()
 		self.distance = camera.GetDistance()
+		self.clippingRange = camera.GetClippingRange()
 
 	@overrides(vtkObjectWrapper)
 	def applyToObject(self, camera):
@@ -169,3 +170,4 @@ class vtkCameraWrapper(vtkObjectWrapper):
 		camera.SetFocalPoint(self.focalPoint)
 		camera.SetViewUp(self.viewUp)
 		camera.SetDistance(self.distance)
+		camera.SetClippingRange(self.clippingRange)
