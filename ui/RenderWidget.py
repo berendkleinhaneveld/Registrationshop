@@ -126,9 +126,9 @@ class RenderWidget(QWidget):
 
 		if self.volume is None:
 			self.volume = vtkVolume()
-			self.volumeProperty.configureMapper(self.mapper)
 			self.renderer.AddViewProp(self.volume)
 
+		self.volumeProperty.configureMapper(self.mapper)
 		self.volume.SetProperty(self.volumeProperty.volumeProperty)
 		self.volume.SetMapper(self.mapper)
 
