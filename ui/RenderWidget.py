@@ -9,17 +9,16 @@ from vtk import vtkRenderer
 from vtk import vtkVolume
 from vtk import vtkInteractorStyleTrackballCamera
 from vtk import vtkOpenGLGPUVolumeRayCastMapper
-from vtk import vtkVersion
 from vtk import vtkOrientationMarkerWidget
 from vtk import vtkAxesActor
 from vtk import vtkImagePlaneWidget
+from vtk import vtkBoxWidget
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
 from PySide.QtCore import Slot
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
-VTK_MAJOR_VERSION = vtkVersion.GetVTKMajorVersion()
 
 class RenderWidget(QWidget):
 	"""
@@ -50,10 +49,17 @@ class RenderWidget(QWidget):
 		self.volume = None
 		self.mapper = vtkOpenGLGPUVolumeRayCastMapper()
 		self.imageData = None
-		self.volumeProperty = None
+		self.VolumeVisualization = None
 		self.shouldResetCamera = False
 
-		axesActor = vtkAxesActor();
+		self.transformBox = vtkBoxWidget()
+		self.transformBox.SetInteractor(self.rwi)
+		self.transformBox.SetDefaultRenderer(self.renderer)
+		# self.transformBox.AddObserver("InteractionEvent", TransformCallback)
+		self.transformBox.GetSelectedFaceProperty().SetOpacity(0.3)
+		self.transformBox.mapper = self.mapper
+
+		axesActor = vtkAxesActor()
 		self.orientationWidget = vtkOrientationMarkerWidget()
 		self.orientationWidget.SetViewport(0.05, 0.05, 0.3, 0.3)
 		self.orientationWidget.SetOrientationMarker(axesActor)
@@ -83,23 +89,23 @@ class RenderWidget(QWidget):
 		self.imageData = imageData
 		if self.imageData is None:
 			if self.volume is not None:
-				self.renderer.RemoveViewProp(self.volume) 
+				self.renderer.RemoveViewProp(self.volume)
 			print "Warning: image data is None"
 			self.render()
 			return
 
 		# Set the image data for the mapper
-		if VTK_MAJOR_VERSION <= 5:
-			self.mapper.SetInput(self.imageData)
-		else:
-			self.mapper.SetInputData(self.imageData)
+		self.mapper.SetInputData(self.imageData)
+
+		self.transformBox.SetInputData(self.imageData)
+		self.transformBox.PlaceWidget()
+		self.transformBox.SetPlaceFactor(1.0)
+		self.transformBox.EnabledOff()
+		# self.transformBox.EnabledOn()
 
 		# Set the image data for the slices
 		for index in range(3):
-			if VTK_MAJOR_VERSION <= 5:
-				self.imagePlaneWidgets[index].SetInput(self.imageData)
-			else:
-				self.imagePlaneWidgets[index].SetInputData(self.imageData)
+			self.imagePlaneWidgets[index].SetInputData(self.imageData)
 			self.imagePlaneWidgets[index].SetPlaneOrientation(index)
 
 		self.shouldResetCamera = True
@@ -107,18 +113,18 @@ class RenderWidget(QWidget):
 		# when a volume property is loaded
 
 	@Slot(object)
-	def setVolumeProperty(self, volumeProperty):
+	def setVolumeVisualization(self, volumeVisualization):
 		"""
-		Updates the volume property. It actually removes the volume, 
+		Updates the volume property. It actually removes the volume,
 		creates a new volume and sets the updated volume property and
 		then adds the new volume to the renderer.
 		Just updating the vtkVolumeProperty gives artifacts and seems
 		to not work correctly.
-		:type volumeProperty: VolumeProperty
+		:type volumeVisualization: volumeVisualization
 		"""
-		self.volumeProperty = volumeProperty
+		self.volumeVisualization = volumeVisualization
 
-		if self.imageData is None or self.volumeProperty is None:
+		if self.imageData is None or self.volumeVisualization is None:
 			if self.volume is not None:
 				self.renderer.RemoveViewProp(self.volume)
 				self.volume = None
@@ -128,12 +134,11 @@ class RenderWidget(QWidget):
 			self.volume = vtkVolume()
 			self.renderer.AddViewProp(self.volume)
 
-		self.volumeProperty.configureMapper(self.mapper)
-		self.volume.SetProperty(self.volumeProperty.volumeProperty)
+		self.volumeVisualization.configureMapper(self.mapper)
+		self.volume.SetProperty(self.volumeVisualization.volProp)
 		self.volume.SetMapper(self.mapper)
 
 		self.render()
-		
 
 	@Slot(object)
 	def setSlices(self, slices):

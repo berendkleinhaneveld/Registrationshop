@@ -13,6 +13,7 @@ import yaml
 from Project import Project
 from core.decorators import Singleton
 
+
 @Singleton
 class ProjectController(QObject):
 	"""
@@ -28,7 +29,7 @@ class ProjectController(QObject):
 	multiSettingsChanged = Signal(object)
 	resultFileChanged = Signal(basestring)
 	projectChanged = Signal(Project)
-	
+
 	# Define the standard project file name
 	ProjectFile = u"/project.yaml"
 
@@ -46,7 +47,7 @@ class ProjectController(QObject):
 		self.multiRenderController = None
 
 		# Create new standard project if no project is provided
-		if self.currentProject == None:
+		if self.currentProject is None:
 			self.currentProject = Project()
 
 	def loadProject(self, folder=None):
@@ -58,7 +59,7 @@ class ProjectController(QObject):
 		"""
 		projectFileName = folder + self.ProjectFile
 		projectFile = open(projectFileName, "r")
-		
+
 		try:
 			project = yaml.load(projectFile)
 			self.currentProject = project
@@ -78,7 +79,7 @@ class ProjectController(QObject):
 
 	def saveProject(self):
 		"""
-		Saves project to disk. 
+		Saves project to disk.
 		Assumes: project name is set and correct
 
 		:param name: File/Directory name to save the project file to
@@ -88,7 +89,7 @@ class ProjectController(QObject):
 		"""
 		# Prepare the project
 		if self.fixedRenderController:
-			self.currentProject.fixedSettings = self.fixedRenderController.getRenderSettings()	
+			self.currentProject.fixedSettings = self.fixedRenderController.getRenderSettings()
 		if self.movingRenderController:
 			self.currentProject.movingSettings = self.movingRenderController.getRenderSettings()
 		if self.multiRenderController:
@@ -104,7 +105,7 @@ class ProjectController(QObject):
 		except Exception, e:
 			print e
 			return False
-		
+
 		# TODO:
 		# If folder is empty:
 			# If the project is set to not reference the datasets:
@@ -153,14 +154,14 @@ class ProjectController(QObject):
 
 		# Emit signal that data set file name has changed
 		self.movingFileChanged.emit(self.currentProject.movingData)
-	
+
 	def register(self):
 		"""
 		Make an Elastix object.
 		Specify where this Elastix object should look for/write its files.
 		Set the fixed and moving data sets as parameters. (or the project?)
 		Then create a parameter file, argh, this is where the fault is...
-		
+
 		First, there should be a tree, and for each step there should be parameters,
 		and eacht step has to run with its own parameters...
 

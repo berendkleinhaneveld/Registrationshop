@@ -1,41 +1,38 @@
 """
-RenderParameterWidget
+MultiRenderParamWidget
 
 :Authors:
 	Berend Klein Haneveld
 """
 
 import sys
-from PySide.QtGui import QLabel
-from PySide.QtGui import QComboBox
 from PySide.QtGui import QWidget
+from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QScrollArea
 from PySide.QtGui import QFrame
+from PySide.QtGui import QComboBox
+from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 from PySide.QtCore import SIGNAL
-from PySide.QtCore import Qt
 
 
-class RenderParameterWidget(QWidget):
+class MultiRenderParamWidget(QWidget):
 	"""
-	RenderParameterWidget is a widget that is shown in the render property
-	widget. It holds a combo box with which different visualizations can be
-	chosen. Beneath the combo box it displays a widget in a scroll view that
-	contains widgets with which parameters of the visualization can be adjusted.
+	MultiRenderParamWidget is a widget that shows parameter controls
+	for the multi-volume render widget.
 	"""
+	def __init__(self, multiRenderController, parent=None):
+		super(MultiRenderParamWidget, self).__init__(parent=parent)
 
-	def __init__(self, renderController, parent=None):
-		super(RenderParameterWidget, self).__init__(parent=parent)
-
-		self.renderController = renderController
-		self.renderController.visualizationChanged.connect(self.visualizationLoaded)
+		self.multiRenderController = multiRenderController
+		self.multiRenderController.visualizationChanged.connect(self.visualizationLoaded)
 
 		self.paramWidget = None
 
 		self.visTypeComboBox = QComboBox()
-		for visualizationType in self.renderController.visualizationTypes:
-			self.visTypeComboBox.addItem(visualizationType)
+		for visualization in self.multiRenderController.visualizationTypes:
+			self.visTypeComboBox.addItem(visualization)
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
@@ -64,21 +61,21 @@ class RenderParameterWidget(QWidget):
 		# Clear the previous parameter widget
 		if self.paramWidget is not None:
 			self.paramWidget.setParent(None)
-			if self.renderController.visualization is not None:
-				self.renderController.visualization.disconnect(SIGNAL("updatedTransferFunction"), self.transferFunctionChanged)
+			if self.multiRenderController.visualization is not None:
+				self.multiRenderController.visualization.disconnect(SIGNAL("updatedTransferFunctions"), self.transferFunctionChanged)
 
 		# Get a new parameter widget from the render widget
-		self.paramWidget = self.renderController.getParameterWidget()
+		self.paramWidget = self.multiRenderController.getParameterWidget()
 		if sys.platform.startswith("darwin"):
 			# default background of tabs on OSX is 237, 237, 237
 			self.paramWidget.setStyleSheet("background: rgb(229, 229, 229)")
 		self.scrollArea.setWidget(self.paramWidget)
 
-		if self.renderController.visualization is not None:
-			self.renderController.visualization.updatedTransferFunction.connect(self.transferFunctionChanged)
+		if self.multiRenderController.visualization is not None:
+			self.multiRenderController.visualization.updatedTransferFunctions.connect(self.transferFunctionChanged)
 
-		self.visTypeComboBox.setCurrentIndex(self.visTypeComboBox.findText(self.renderController.visualizationType))
-
+		self.visTypeComboBox.setCurrentIndex(self.visTypeComboBox.findText(self.multiRenderController.visualizationType))
+		
 	@Slot(int)
 	def visTypeComboBoxChanged(self, index):
 		"""
@@ -86,9 +83,9 @@ class RenderParameterWidget(QWidget):
 		sure that the renderWidget renders with the new visualizationType.
 		:type index: any
 		"""
-		self.renderController.setVisualizationType(self.visTypeComboBox.currentText())
+		self.multiRenderController.setVisualizationType(self.visTypeComboBox.currentText())
 		self.UpdateWidgetFromRenderWidget()
-		self.renderController.updateVisualization()
+		self.multiRenderController.updateVisualization()
 
 	def visualizationLoaded(self, visualization):
 		self.UpdateWidgetFromRenderWidget()
@@ -100,4 +97,4 @@ class RenderParameterWidget(QWidget):
 		the render will be updated afterwards.
 		Should be called on valueChanged by the widgets from the parameter widget.
 		"""
-		self.renderController.updateVisualization()
+		self.multiRenderController.updateVisualization()

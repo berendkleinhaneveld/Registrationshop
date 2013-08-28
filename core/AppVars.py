@@ -1,8 +1,8 @@
 """
 AppVars
-	
+
 Global variables for RegistrationShop
-	
+
 author: Berend Klein Haneveld 2013
 """
 
@@ -15,16 +15,17 @@ import sys
 # This is because application path on OS X gives path
 # to Python framework instead of RegistrationShop.py
 
+
 class AppVars(object):
 	"""
 	AppVars keeps track of a few global parameters needed for RegistrationShop.
 
-	The parameters are mostly paths to resources. 
+	The parameters are mostly paths to resources.
 	"""
 
 	#: Path to the application executable
 	applicationPath = None
-	
+
 	@staticmethod
 	def setPath(path):
 		"""
@@ -51,7 +52,7 @@ class AppVars(object):
 		"""
 		extension = "resources/images/"
 		if AppVars.applicationPath:
-			# Put the application path in front of the extension only on 
+			# Put the application path in front of the extension only on
 			# OS X systems.
 			if sys.platform.startswith('darwin'):
 				return os.path.join(AppVars.applicationPath, extension)

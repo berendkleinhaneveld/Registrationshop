@@ -25,11 +25,12 @@ class DataReaderTest(unittest.TestCase):
 	def testSupportedDataTypes(self):
 		self.assertTrue(self.reader.IsExtensionSupported("mhd"))
 		self.assertTrue(self.reader.IsExtensionSupported("vti"))
+		self.assertTrue(self.reader.IsExtensionSupported("dcm"))
+		
 		self.assertFalse(self.reader.IsExtensionSupported("mrb"))
 		self.assertFalse(self.reader.IsExtensionSupported("vtk"))
 		self.assertFalse(self.reader.IsExtensionSupported("raw"))
 		self.assertFalse(self.reader.IsExtensionSupported("dat"))
-		self.assertTrue(self.reader.IsExtensionSupported("dcm"))
 		
 	# def testDatFileFormat(self):
 	# 	path = os.path.dirname(os.path.abspath(__file__))

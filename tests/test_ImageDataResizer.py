@@ -2,6 +2,7 @@ import unittest
 from core.data.DataResizer import DataResizer
 from vtk import vtkImageData
 
+
 class DataResizerTest(unittest.TestCase):
 
 	def setUp(self):
@@ -59,6 +60,7 @@ class DataResizerTest(unittest.TestCase):
 		self.assertEquals(dimensions[0], newDimensions[0])
 		self.assertEquals(dimensions[1], newDimensions[1])
 		self.assertEquals(dimensions[2], newDimensions[2])
+
 
 # Helper method
 

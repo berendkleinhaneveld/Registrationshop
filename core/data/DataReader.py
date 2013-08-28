@@ -11,26 +11,27 @@ from vtk import vtkXMLImageDataReader
 from vtk import vtkDICOMImageReader
 import os
 
+
 class DataReader(object):
 	"""
 	DataReader is a class that tries to figure out what kind of data type a
-	given file is. From the extension it will try to choose the correct reader 
+	given file is. From the extension it will try to choose the correct reader
 	from vtk.
 	"""
 
 	# File extensions
-	TypeMHA = "mhd" # vtkMetaImageReader
-	TypeVTI = "vti" # vtkXMLImageDataReader
-	TypeMRB = "mrb" # Unreadable at the moment (Slicer stuff)
-	TypeVTK = "vtk" # No real volume data... but might be used for polygon stuff
-	TypeRaw = "raw" # needs a mhd file... maybe choose some standard stuff
-	TypeDAT = "dat" # should be read byte by byte
-	TypeDICOM = "dcm" # Dicom does not really have an extension?
+	TypeMHA = "mhd"  # vtkMetaImageReader
+	TypeVTI = "vti"  # vtkXMLImageDataReader
+	TypeMRB = "mrb"  # Unreadable at the moment (Slicer stuff)
+	TypeVTK = "vtk"  # No real volume data... but might be used for polygon stuff
+	TypeRaw = "raw"  # needs a mhd file... maybe choose some standard stuff
+	TypeDAT = "dat"  # should be read byte by byte
+	TypeDICOM = "dcm"  # Dicom does not really have an extension?
 
 	def __init__(self):
 		super(DataReader, self).__init__()
 
-		self.supportedExtensions = [DataReader.TypeMHA, 
+		self.supportedExtensions = [DataReader.TypeMHA,
 									DataReader.TypeVTI,
 									DataReader.TypeDICOM]
 
@@ -64,7 +65,6 @@ class DataReader(object):
 			else:
 				print "Warning: directory does not contain DICOM files:", fileName
 				return None
-			
 
 		baseFileName, extension = fileName.rsplit(".", 1)
 		if not self.IsExtensionSupported(extension):
@@ -152,7 +152,7 @@ class DataReader(object):
 	def SanitizeImageData(self, imageData):
 		"""
 		Sanitizes the given imageData. At the moment it just checks the
-		spacings to see if there are spacings that zero. This gives problems 
+		spacings to see if there are spacings that zero. This gives problems
 		with rendering the data.
 		"""
 		# Check the image data to see if the spacings are correct

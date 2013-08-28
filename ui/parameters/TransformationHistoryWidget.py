@@ -10,6 +10,7 @@ from PySide.QtGui import QLabel
 from PySide.QtGui import QVBoxLayout
 from PySide.QtCore import Qt
 
+
 class TransformationHistoryWidget(QWidget):
 	"""
 	TransformationHistoryWidget shows a list of applied transformations.
@@ -21,4 +22,3 @@ class TransformationHistoryWidget(QWidget):
 		layout.setAlignment(Qt.AlignTop)
 		layout.addWidget(QLabel("History of transformations."))
 		self.setLayout(layout)
-		

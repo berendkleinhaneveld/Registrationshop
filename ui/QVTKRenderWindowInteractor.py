@@ -11,34 +11,35 @@ Created by Prabhu Ramachandran, May 2002
 Based on David Gobbi's QVTKRenderWidget.py
 
 Changes by Gerard Vermeulen Feb. 2003
- Win32 support.
+	Win32 support.
 
 Changes by Gerard Vermeulen, May 2003
- Bug fixes and better integration with the Qt framework.
+	Bug fixes and better integration with the Qt framework.
 
 Changes by Phil Thompson, Nov. 2006
- Ported to PySide v4.
- Added support for wheel events.
+	Ported to PySide v4.
+	Added support for wheel events.
 
 Changes by Phil Thompson, Oct. 2007
- Bug fixes.
+	Bug fixes.
 
 Changes by Phil Thompson, Mar. 2008
- Added cursor support.
+	Added cursor support.
 
 Changes by Stou Sandalski, July. 2009
- Fixed cursor typo, subclassed QGLWidget not GLWidget to allow for embedding
+	Fixed cursor typo, subclassed QGLWidget not GLWidget to allow for embedding
 """
 import sys
 import logging
-# from PySide import QtCore, QtGui, QtOpenGL
 
 try:
-	from PySide import QtCore, QtGui
+	from PySide import QtCore
+	from PySide import QtGui
 	pyqt_flag = False
 except ImportError:
 	try:
-		from PyQt4 import QtCore, QtGui
+		from PyQt4 import QtCore
+		from PyQt4 import QtGui
 		pyqt_flag = True
 		# import PyQt4 as PySide
 	except ImportError as err:
@@ -65,7 +66,6 @@ else:
 
 
 class QVTKRenderWindowInteractor(MSWidget):
-
 	""" A QVTKRenderWindowInteractor for Python and Qt.  Uses a
 	vtkGenericRenderWindowInteractor to handle the interactions.  Use
 	GetRenderWindow() to get the vtkRenderWindow.  Create with the
@@ -134,19 +134,17 @@ class QVTKRenderWindowInteractor(MSWidget):
 	"""
 
 	# Map between VTK and Qt cursors.
-	_CURSOR_MAP = {
-		0:  QtCore.Qt.ArrowCursor,          # VTK_CURSOR_DEFAULT
-		1:  QtCore.Qt.ArrowCursor,          # VTK_CURSOR_ARROW
-		2:  QtCore.Qt.SizeBDiagCursor,      # VTK_CURSOR_SIZENE
-		3:  QtCore.Qt.SizeFDiagCursor,      # VTK_CURSOR_SIZENWSE
-		4:  QtCore.Qt.SizeBDiagCursor,      # VTK_CURSOR_SIZESW
-		5:  QtCore.Qt.SizeFDiagCursor,      # VTK_CURSOR_SIZESE
-		6:  QtCore.Qt.SizeVerCursor,        # VTK_CURSOR_SIZENS
-		7:  QtCore.Qt.SizeHorCursor,        # VTK_CURSOR_SIZEWE
-		8:  QtCore.Qt.SizeAllCursor,        # VTK_CURSOR_SIZEALL
-		9:  QtCore.Qt.PointingHandCursor,   # VTK_CURSOR_HAND
-		10: QtCore.Qt.CrossCursor,          # VTK_CURSOR_CROSSHAIR
-	}
+	_CURSOR_MAP = {0:  QtCore.Qt.ArrowCursor,           # VTK_CURSOR_DEFAULT
+					1:  QtCore.Qt.ArrowCursor,          # VTK_CURSOR_ARROW
+					2:  QtCore.Qt.SizeBDiagCursor,      # VTK_CURSOR_SIZENE
+					3:  QtCore.Qt.SizeFDiagCursor,      # VTK_CURSOR_SIZENWSE
+					4:  QtCore.Qt.SizeBDiagCursor,      # VTK_CURSOR_SIZESW
+					5:  QtCore.Qt.SizeFDiagCursor,      # VTK_CURSOR_SIZESE
+					6:  QtCore.Qt.SizeVerCursor,        # VTK_CURSOR_SIZENS
+					7:  QtCore.Qt.SizeHorCursor,        # VTK_CURSOR_SIZEWE
+					8:  QtCore.Qt.SizeAllCursor,        # VTK_CURSOR_SIZEALL
+					9:  QtCore.Qt.PointingHandCursor,   # VTK_CURSOR_HAND
+					10: QtCore.Qt.CrossCursor}          # VTK_CURSOR_CROSSHAIR
 
 	def __init__(self, parent=None, **kw):
 		logging.debug("In QVTKRenderWindowInteractor::__init__()")
@@ -162,21 +160,16 @@ class QVTKRenderWindowInteractor(MSWidget):
 
 		# do special handling of some keywords:
 		# stereo, rw
-
 		stereo = 0
-
-		if kw.has_key('stereo'):
+		if 'stereo' in kw:
 			if kw['stereo']:
 				stereo = 1
 
 		rw = None
-
-		if kw.has_key('rw'):
+		if 'rw' in kw:
 			rw = kw['rw']
 
 		# create qt-level widget
-		#QtGui.QWidget.__init__(self, parent)
-		#QtOpenGL.QGLWidget.__init__(self, parent)
 		super(QVTKRenderWindowInteractor, self).__init__(parent)
 
 		if rw:  # user-supplied render window
@@ -209,7 +202,7 @@ class QVTKRenderWindowInteractor(MSWidget):
 		self._createTimerObserver = self._Iren.AddObserver('CreateTimerEvent', self.CreateTimer)
 		self._destroyTimerObserver = self._Iren.AddObserver('DestroyTimerEvent', self.DestroyTimer)
 		self._cursorObserver = self._Iren.GetRenderWindow().AddObserver('CursorChangedEvent',
-												 self.CursorChangedEvent)
+																	self.CursorChangedEvent)
 
 	def __getattr__(self, attr):
 		"""Makes the object behave like a vtkGenericRenderWindowInteractor"""
@@ -219,8 +212,8 @@ class QVTKRenderWindowInteractor(MSWidget):
 		elif hasattr(self._Iren, attr):
 			return getattr(self._Iren, attr)
 		else:
-			raise AttributeError, self.__class__.__name__ + \
-				  " has no attribute named " + attr
+			raise AttributeError(self.__class__.__name__ +
+				" has no attribute named " + attr)
 
 	def CreateTimer(self, obj, evt):
 		logging.debug("In QVTKRenderWindowInteractor::CreateTimer()")
@@ -354,6 +347,9 @@ class QVTKRenderWindowInteractor(MSWidget):
 
 		if self._ActiveButton == QtCore.Qt.LeftButton:
 			self._Iren.LeftButtonPressEvent()
+			if hasattr(self, "delegate"):
+				if hasattr(self.delegate, "LeftButtonPressEvent"):
+					self.delegate.LeftButtonPressEvent()
 		elif self._ActiveButton == QtCore.Qt.RightButton:
 			self._Iren.RightButtonPressEvent()
 		elif self._ActiveButton == QtCore.Qt.MidButton:
@@ -428,7 +424,9 @@ class QVTKRenderWindowInteractor(MSWidget):
 
 
 def QVTKRenderWidgetConeExample():
-	"""A simple example that uses the QVTKRenderWindowInteractor class."""
+	"""
+	A simple example that uses the QVTKRenderWindowInteractor class.
+	"""
 
 	# every QT app needs an app
 	app = QtGui.QApplication(['QVTKRenderWindowInteractor'])
@@ -459,6 +457,7 @@ def QVTKRenderWidgetConeExample():
 	widget.show()
 	# start event processing
 	app.exec_()
+
 
 if __name__ == "__main__":
 	QVTKRenderWidgetConeExample()

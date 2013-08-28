@@ -1,7 +1,7 @@
 import unittest
 import os
-
 from core.project.ProjectController import ProjectController
+
 
 class ProjectControllerTest(unittest.TestCase):
 
@@ -11,7 +11,7 @@ class ProjectControllerTest(unittest.TestCase):
 
 		projectController.newProject()
 		self.assertIsNone(projectController.currentProject.title)
-		
+
 	def testSavingAndLoadingProjectsToDisk(self):
 		projectController = ProjectController.Instance()
 

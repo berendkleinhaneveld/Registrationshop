@@ -5,8 +5,8 @@ Class that controls the volume property and settings
 for the render widget.
 The render parameter widget gets its parameters from
 the controller and when a parameter is changed it will
-pass the change over to the controller which will then 
-apply it. The controller will then notify the render 
+pass the change over to the controller which will then
+apply it. The controller will then notify the render
 widget that it should update.
 
 :Authors:
@@ -17,15 +17,16 @@ from PySide.QtCore import QObject
 from PySide.QtCore import Signal
 from PySide.QtCore import Slot
 from PySide.QtGui import QWidget
-from VolumeProperty import RenderTypeCT
-from VolumeProperty import RenderTypeSimple
-from VolumeProperty import RenderTypeMIP
-from VolumeProperty import VolumeProperty
-from VolumeProperty import VolumePropertyFactory
-from VolumeProperty import VolumePropertyObjectWrapper
+from VolumeVisualization import VisualizationTypeCT
+from VolumeVisualization import VisualizationTypeSimple
+from VolumeVisualization import VisualizationTypeMIP
+from VolumeVisualization import VisualizationTypeRamp
+from VolumeVisualization import VolumeVisualizationFactory
+from VolumeVisualization import VolumeVisualizationObjectWrapper
 from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data.DataReader import DataReader
 from core.data.DataResizer import DataResizer
+
 
 class RenderController(QObject):
 	"""
@@ -36,14 +37,13 @@ class RenderController(QObject):
 	dataChanged = Signal(object)
 	# Emitted when the volume property is loaded by the project controller.
 	# RenderWidget, RenderParameterWidget(Vis) should connect
-	volumePropertyChanged = Signal(object)
+	visualizationChanged = Signal(object)
+	# Emitted when the volume property gets updated by the parameter widgets.
+	# RenderWidget should connect
+	visualizationUpdated = Signal(object)
 	# Emitted when the slices are loaded by the project controller.
 	# RenderWidget, RenderParameterWidget(Slices) should connect
 	slicesChanged = Signal(object)
-	
-	# Emitted when the volume property gets updated by the parameter widgets.
-	# RenderWidget should connect
-	volumePropertyUpdated = Signal(object)
 	# Emitted when the visibility of the slices is changed by the slice parameter widget.
 	# RenderWidget should connect
 	slicesUpdated = Signal(object)
@@ -56,28 +56,28 @@ class RenderController(QObject):
 		super(RenderController, self).__init__()
 
 		self.renderWidget = renderWidget
-		self.renderTypes = [RenderTypeSimple, RenderTypeCT, RenderTypeMIP]
-		self.renderType = None
+		self.visualizationTypes = [VisualizationTypeSimple, VisualizationTypeCT, VisualizationTypeMIP, VisualizationTypeRamp]
+		self.visualizationType = None
 		self.imageData = None
-		self.volumeProperty = None
-		self.volumeProperties = dict() # Keep track of used volume properties
+		self.visualization = None
+		self.visualizations = dict()  # Keep track of used volume properties
 		self.slices = [False, False, False]
-		
+
 	@Slot(basestring)
 	def setFile(self, fileName):
 		"""
 		:type fileName: str
 		"""
 		# Clear out the old render types
-		self.volumeProperties = dict()
+		self.visualizations = dict()
 
 		if fileName is None:
 			self.imageData = None
-			self.volumeProperty = None
+			self.visualization = None
 			self.renderWidget.setData(self.imageData)
-			self.renderWidget.setVolumeProperty(self.volumeProperty)
+			self.renderWidget.setVolumeVisualization(self.visualization)
 			self.dataChanged.emit(self.imageData)
-			self.volumePropertyChanged.emit(self.volumeProperty)
+			self.visualizationChanged.emit(self.visualization)
 			return
 
 		# Read image data
@@ -91,7 +91,7 @@ class RenderController(QObject):
 		self.dataChanged.emit(self.imageData)
 
 		# Set the render type
-		self.setRenderType(self.renderType)
+		self.setVisualizationType(self.visualizationType)
 
 	@Slot(object)
 	def setRenderSettings(self, renderSettings):
@@ -99,80 +99,79 @@ class RenderController(QObject):
 		Apply the settings from the provided RenderSettings object.
 		"""
 		if renderSettings is not None:
-			self.volumeProperties = dict()
-			volumeProperties = renderSettings["volumeProperties"]
-			for key in volumeProperties:
-				self.volumeProperties[key] = volumeProperties[key].getVolumeProperty()
-			self.renderType = renderSettings["renderType"]
+			self.visualizations = dict()
+			visualizations = renderSettings["visualizations"]
+			for key in visualizations:
+				self.visualizations[key] = visualizations[key].getVolumeVisualization()
+			self.visualizationType = renderSettings["visualizationType"]
 			self.slices = renderSettings["slices"]
+			cameraWrapped = renderSettings["camera"]
+			cameraWrapped.applyToObject(self.renderWidget.renderer.GetActiveCamera())
 		else:
-			self.volumeProperties = dict()
-			self.renderType = None
+			self.visualizations = dict()
+			self.visualizationType = None
 			self.slices = [False, False, False]
 
-		self.setRenderType(self.renderType)
+		self.setVisualizationType(self.visualizationType)
 		self.renderWidget.setSlices(self.slices)
-		self.renderWidget.setVolumeProperty(self.volumeProperty)
-		cameraWrapped = renderSettings["camera"]
-		cameraWrapped.applyToObject(self.renderWidget.renderer.GetActiveCamera())
-		
-		self.volumePropertyChanged.emit(self.volumeProperty)
+		self.renderWidget.setVolumeVisualization(self.visualization)
+
+		self.visualizationChanged.emit(self.visualization)
 		self.slicesChanged.emit(self.slices)
-		
 
 	def getRenderSettings(self):
 		"""
 		Return a RenderSettings object with all the right properties set.
 		:rtype: RenderSettings
 		"""
-		volumeProperties = dict()
-		for key in self.volumeProperties:
-			volProp = VolumePropertyObjectWrapper(self.volumeProperties[key])
-			volumeProperties[key] = volProp
+		visualizations = dict()
+		for key in self.visualizations:
+			volProp = VolumeVisualizationObjectWrapper(self.visualizations[key])
+			visualizations[key] = volProp
 
 		settings = dict()
-		settings["volumeProperties"] = volumeProperties
-		settings["renderType"] = self.renderType
+		settings["visualizations"] = visualizations
+		settings["visualizationType"] = self.visualizationType
 		settings["slices"] = self.slices
 
 		camera = self.renderWidget.renderer.GetActiveCamera()
 		settings["camera"] = vtkCameraWrapper(camera)
-		
+
 		return settings
 
-	def setRenderType(self, renderType):
+	def setVisualizationType(self, visualizationType):
 		"""
-		Swithes the renderer to the given render type. Previously used render 
-		types are saved so that switching back to a previously used render type 
+		Swithes the renderer to the given render type. Previously used render
+		types are saved so that switching back to a previously used render type
 		will produce the same visualization as before.
 
-		:type renderType: str
+		:type visualizationType: str
 		"""
-		self.renderType = renderType
-		if self.renderType is None:
-			self.renderType = RenderTypeSimple
+		self.visualizationType = visualizationType
+		if self.visualizationType is None:
+			self.visualizationType = VisualizationTypeSimple
 
 		if self.imageData is None:
 			return
 
-		if renderType in self.volumeProperties:
-			self.volumeProperty = self.volumeProperties[renderType]
-			self.volumeProperty.updateTransferFunction()
+		if self.visualizationType in self.visualizations:
+			self.visualization = self.visualizations[self.visualizationType]
+			self.visualization.updateTransferFunction()
 		else:
-			self.volumeProperty = VolumePropertyFactory.CreateProperty(self.renderType)
-			self.volumeProperty.setImageData(self.imageData)
-			self.volumeProperty.updateTransferFunction()
-			self.volumeProperties[self.renderType] = self.volumeProperty
+			self.visualization = VolumeVisualizationFactory.CreateProperty(self.visualizationType)
+			self.visualization.setImageData(self.imageData)
+			self.visualization.updateTransferFunction()
+			self.visualizations[self.visualizationType] = self.visualization
 
-		self.renderWidget.setVolumeProperty(self.volumeProperty)
-		self.volumePropertyChanged.emit(self.volumeProperty)
+		self.renderWidget.setVolumeVisualization(self.visualization)
+		self.visualizationChanged.emit(self.visualization)
 
 	def getParameterWidget(self):
 		"""
 		:rtype: QWidget
 		"""
-		if self.volumeProperty is not None:
-			return self.volumeProperty.getParameterWidget()
+		if self.visualization is not None:
+			return self.visualization.getParameterWidget()
 
 		return QWidget()
 
@@ -184,12 +183,12 @@ class RenderController(QObject):
 		self.slices[sliceIndex] = visibility
 		self.renderWidget.setSlices(self.slices)
 		self.slicesUpdated.emit(self.slices)
-	
-	def updateVolumeProperty(self):
+
+	def updateVisualization(self):
 		"""
-		Should be called by all interface elements that adjust the 
+		Should be called by all interface elements that adjust the
 		volume property. This makes sure that the render widget takes
 		notice and renders accordingly.
 		"""
-		self.renderWidget.setVolumeProperty(self.volumeProperty)
-		self.volumePropertyUpdated.emit(self.volumeProperty)
+		self.renderWidget.setVolumeVisualization(self.visualization)
+		self.visualizationUpdated.emit(self.visualization)

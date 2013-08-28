@@ -5,6 +5,7 @@ Project
 	Berend Klein Haneveld
 """
 
+
 class Project(object):
 	"""
 	Project holds the basic information of a project for RegistrationShop

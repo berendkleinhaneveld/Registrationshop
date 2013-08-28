@@ -10,10 +10,11 @@ from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
 from vtk import vtkVolumeProperty
 
+
 class vtkObjectWrapper(object):
 	"""
-	vtkObjectWrapper is an interface class for 
-	wrapping vtkObjects. The subclass must implement the 
+	vtkObjectWrapper is an interface class for
+	wrapping vtkObjects. The subclass must implement the
 	two methods to set and retrieve the original vtk
 	object.
 	"""
@@ -96,7 +97,7 @@ class vtkPiecewiseFunctionWrapper(vtkObjectWrapper):
 	"""
 	def __init__(self, piecewiseFunction=None):
 		super(vtkPiecewiseFunctionWrapper, self).__init__(piecewiseFunction)
-		
+
 	@overrides(vtkObjectWrapper)
 	def setOriginalObject(self, piecewiseFunction):
 		self.nodes = []
@@ -114,48 +115,50 @@ class vtkPiecewiseFunctionWrapper(vtkObjectWrapper):
 
 		return pieceWiseFunction
 
+
 class vtkVolumePropertyWrapper(vtkObjectWrapper):
 	"""
 	vtkVolumePropertyWrapper is a wrapper around
 	vtkVolumeProperty object. It stores the properties
 	of a vtkVolume as attributes.
 	"""
-	def __init__(self, volumeProperty=None):
-		super(vtkVolumePropertyWrapper, self).__init__(volumeProperty)
-		
+	def __init__(self, VolumeVisualization=None):
+		super(vtkVolumePropertyWrapper, self).__init__(VolumeVisualization)
+
 	@overrides(vtkObjectWrapper)
-	def setOriginalObject(self, volumeProperty):
-		self.independentComponents = volumeProperty.GetIndependentComponents()
-		self.interpolationType = volumeProperty.GetInterpolationType()
-		self.shade = volumeProperty.GetShade()
-		self.ambient = volumeProperty.GetAmbient()
-		self.diffuse = volumeProperty.GetDiffuse()
-		self.specular = volumeProperty.GetSpecular()
-		self.specularPower = volumeProperty.GetSpecularPower()
-		self.scalarOpacityUnitDistance = volumeProperty.GetScalarOpacityUnitDistance()
+	def setOriginalObject(self, VolumeVisualization):
+		self.independentComponents = VolumeVisualization.GetIndependentComponents()
+		self.interpolationType = VolumeVisualization.GetInterpolationType()
+		self.shade = VolumeVisualization.GetShade()
+		self.ambient = VolumeVisualization.GetAmbient()
+		self.diffuse = VolumeVisualization.GetDiffuse()
+		self.specular = VolumeVisualization.GetSpecular()
+		self.specularPower = VolumeVisualization.GetSpecularPower()
+		self.scalarOpacityUnitDistance = VolumeVisualization.GetScalarOpacityUnitDistance()
 
 	@overrides(vtkObjectWrapper)
 	def originalObject(self):
-		volumeProperty = vtkVolumeProperty()
-		volumeProperty.SetIndependentComponents(self.independentComponents)
-		volumeProperty.SetInterpolationType(self.interpolationType)
-		volumeProperty.SetShade(self.shade)
-		volumeProperty.SetAmbient(self.ambient)
-		volumeProperty.SetDiffuse(self.diffuse)
-		volumeProperty.SetSpecular(self.specular)
-		volumeProperty.SetSpecularPower(self.specularPower)
-		volumeProperty.SetScalarOpacityUnitDistance(self.scalarOpacityUnitDistance)
-		return volumeProperty
+		VolumeVisualization = vtkVolumeProperty()
+		VolumeVisualization.SetIndependentComponents(self.independentComponents)
+		VolumeVisualization.SetInterpolationType(self.interpolationType)
+		VolumeVisualization.SetShade(self.shade)
+		VolumeVisualization.SetAmbient(self.ambient)
+		VolumeVisualization.SetDiffuse(self.diffuse)
+		VolumeVisualization.SetSpecular(self.specular)
+		VolumeVisualization.SetSpecularPower(self.specularPower)
+		VolumeVisualization.SetScalarOpacityUnitDistance(self.scalarOpacityUnitDistance)
+		return VolumeVisualization
+
 
 class vtkCameraWrapper(vtkObjectWrapper):
-	"""vtkCameraWrapper is a wrapper around 
-	vtkCamera object. It stores the properties of a 
+	"""vtkCameraWrapper is a wrapper around
+	vtkCamera object. It stores the properties of a
 	vtkCamera as attributes. Do not use the originalObject method
 	to retrieve but rather apply the settings to an already created
 	vtkCamera object."""
 	def __init__(self, camera=None):
 		super(vtkCameraWrapper, self).__init__(camera)
-		
+
 	@overrides(vtkObjectWrapper)
 	def setOriginalObject(self, camera):
 		self.position = camera.GetPosition()

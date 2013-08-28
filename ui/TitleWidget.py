@@ -14,6 +14,7 @@ from PySide.QtGui import QLabel
 from PySide.QtGui import QVBoxLayout
 from PySide.QtCore import Qt
 
+
 class TitleWidget(QWidget):
 	"""
 	TitleWidget holds a title. And paints the background with a gradient.
@@ -35,7 +36,7 @@ class TitleWidget(QWidget):
 		brush = QBrush(gradient)
 		palette = QPalette()
 		palette.setBrush(QPalette.Background, brush)
-		
+
 		self.setAutoFillBackground(True)
 		self.setPalette(palette)
 		self.setMaximumHeight(TitleWidget.TitleHeight)

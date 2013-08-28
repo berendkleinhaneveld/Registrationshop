@@ -8,12 +8,15 @@ MultiRenderController
 from PySide.QtCore import QObject
 from PySide.QtCore import Slot
 from PySide.QtCore import Signal
-from vtk import vtkVolumeProperty
-from vtk import vtkColorTransferFunction
-from vtk import vtkPiecewiseFunction
+from PySide.QtGui import QWidget
 from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data.DataReader import DataReader
 from core.data.DataResizer import DataResizer
+from ui.MultiVolumeVisualization import MultiVisualizationTypeMIDA
+from ui.MultiVolumeVisualization import MultiVisualizationTypeMIP
+from ui.MultiVolumeVisualization import MultiVisualizationTypeMix
+from ui.MultiVolumeVisualization import MultiVolumeVisualizationFactory
+
 
 class MultiRenderController(QObject):
 	"""
@@ -22,10 +25,8 @@ class MultiRenderController(QObject):
 
 	fixedDataChanged = Signal(object)
 	movingDataChanged = Signal(object)
-	fixedVolumePropertyChanged = Signal(object)
-	fixedVolumePropertyUpdated = Signal(object)
-	movingVolumePropertyChanged = Signal(object)
-	movingVolumePropertyUpdated = Signal(object)
+	visualizationChanged = Signal(object)
+	visualizationUpdated = Signal(object)
 	slicesChanged = Signal(object)
 	slicesUpdated = Signal(object)
 
@@ -35,23 +36,31 @@ class MultiRenderController(QObject):
 		super(MultiRenderController, self).__init__()
 
 		self.multiRenderWidget = mulitRenderWidget
-		self.fixedImageData = None
-		self.movingImageData = None
-		self.fixedVolumeProperty = None
-		self.movingVolumeProperty = None
-		self.fixedOpacity = 1.0
-		self.movingOpacity = 1.0
+		self.visualizationTypes = [MultiVisualizationTypeMix, MultiVisualizationTypeMIP, MultiVisualizationTypeMIDA]
+		self.visualizationType = None  # str
+		self.fixedImageData = None  # vtkImageData
+		self.movingImageData = None  # vtkImageData
+		self.fixedVisualization = None  # VolumeVisualization
+		self.movingVisualization = None  # VolumeVisualization
+		self.visualization = None  # MultiVolumeVisualization
+		self.visualizations = dict()  # Dict of MultiVolumeVisualizations, visType as keys
 		self.slices = [False, False, False]
 
 	@Slot(basestring)
 	def setFixedFile(self, fileName):
+		"""
+		:type fileName: str
+		"""
 		if fileName is None:
 			self.fixedImageData = None
-			self.fixedVolumeProperty = None
+			self.fixedVisualization = None
+			self.visualization = None
+			self.visualizations = dict()
+			self.visualizationType = None
 			self.multiRenderWidget.setFixedData(self.fixedImageData)
-			self.multiRenderWidget.setFixedVolumeProperty(self.fixedVolumeProperty)
+			self.multiRenderWidget.setVolumeVisualization(self.fixedVisualization)
 			self.fixedDataChanged.emit(self.fixedImageData)
-			self.fixedVolumePropertyChanged.emit(self.fixedVolumeProperty)
+			self.visualizationChanged.emit(self.visualization)
 			return
 
 		# Read image data
@@ -64,16 +73,18 @@ class MultiRenderController(QObject):
 		self.multiRenderWidget.setFixedData(self.fixedImageData)
 		self.fixedDataChanged.emit(self.fixedImageData)
 
+		# Set the visualization type
+		self.setVisualizationType(self.visualizationType)
 
 	@Slot(basestring)
 	def setMovingFile(self, fileName):
 		if fileName is None:
 			self.movingImageData = None
-			self.movingVolumeProperty = None
+			self.movingVisualization = None
 			self.multiRenderWidget.setMovingData(self.movingImageData)
-			self.multiRenderWidget.setMovingVolumeProperty(self.movingVolumeProperty)
+			self.multiRenderWidget.setVolumeVisualization(self.visualization)
 			self.movingDataChanged.emit(self.movingImageData)
-			self.movingVolumePropertyChanged.emit(self.movingVolumeProperty)
+			self.visualizationChanged.emit(self.movingVisualization)
 			return
 
 		# Read image data
@@ -86,51 +97,64 @@ class MultiRenderController(QObject):
 		self.multiRenderWidget.setMovingData(self.movingImageData)
 		self.movingDataChanged.emit(self.movingImageData)
 
-	def setFixedOpacity(self, opacity):
-		self.fixedOpacity = opacity
-		self.updateFixedVolumeProperty()
-
-	def setMovingOpacity(self, opacity):
-		self.movingOpacity = opacity
-		self.updateMovingVolumeProperty()
-
-	def setTransformBoxVisibility(self, visibility):
-		pass
-
-	@Slot(object)
-	def setFixedVolumeProperty(self, volumeProperty):
-		self.fixedVolumeProperty = volumeProperty
-		self.updateFixedVolumeProperty()
-
-	@Slot(object)
-	def setMovingVolumeProperty(self, volumeProperty):
-		self.movingVolumeProperty = volumeProperty
-		self.updateMovingVolumeProperty()
+		# Set the visualization type
+		self.setVisualizationType(self.visualizationType)
 
 	@Slot(object)
 	def setRenderSettings(self, renderSettings):
 		if renderSettings is not None:
 			self.slices = renderSettings["slices"]
-			self.fixedOpacity = renderSettings["fixedOpacity"]
-			self.movingOpacity = renderSettings["movingOpacity"]
 			self.multiRenderWidget.setSlices(self.slices)
 			cameraWrapper = renderSettings["camera"]
 			cameraWrapper.applyToObject(self.multiRenderWidget.renderer.GetActiveCamera())
-			self.updateFixedVolumeProperty()
-			self.updateMovingVolumeProperty()
+			self.updateVisualization()
 			self.slicesChanged.emit(self.slices)
-			
 		else:
 			self.slices = [False, False, False]
 
 	def getRenderSettings(self):
 		settings = dict()
 		settings["slices"] = self.slices
-		settings["fixedOpacity"] = self.fixedOpacity
-		settings["movingOpacity"] = self.movingOpacity
 		camera = self.multiRenderWidget.renderer.GetActiveCamera()
 		settings["camera"] = vtkCameraWrapper(camera)
 		return settings
+
+	def setVisualizationType(self, visualizationType):
+		"""
+		Swithes the renderer to the given render type. Previously used render
+		types are saved so that switching back to a previously used render type
+		will produce the same visualization as before.
+
+		:type shaderType: str
+		"""
+		self.visualizationType = visualizationType
+		if self.visualizationType is None or \
+			visualizationType not in self.visualizationTypes:
+			self.visualizationType = MultiVisualizationTypeMix
+
+		if self.fixedImageData is None and self.movingImageData is None:
+			return
+
+		if self.visualizationType in self.visualizations:
+			self.visualization = self.visualizations[self.visualizationType]
+			self.visualization.updateTransferFunctions()
+		else:
+			self.visualization = MultiVolumeVisualizationFactory.CreateProperty(self.visualizationType)
+			self.visualization.setImageData(self.fixedImageData, self.movingImageData)
+			self.visualization.updateTransferFunctions()
+			self.visualizations[self.visualizationType] = self.visualization
+
+		self.multiRenderWidget.setVolumeVisualization(self.visualization)
+		self.visualizationChanged.emit(self.visualization)
+
+	def getParameterWidget(self):
+		"""
+		:rtype: QWidget
+		"""
+		if self.visualization is not None:
+			return self.visualization.getParameterWidget()
+
+		return QWidget()
 
 	def setSliceVisibility(self, sliceIndex, visibility):
 		"""
@@ -141,61 +165,82 @@ class MultiRenderController(QObject):
 		self.multiRenderWidget.setSlices(self.slices)
 		self.slicesUpdated.emit(self.slices)
 
+	def updateVisualization(self):
+		"""
+		Should be called by all interface elements that adjust the
+		volume property. This makes sure that the render widget takes
+		notice and renders accordingly.
+		"""
+		if self.visualization:
+			if self.fixedVisualization:
+				self.visualization.setFixedVisualization(self.fixedVisualization)
+			if self.movingVisualization:
+				self.visualization.setMovingVisualization(self.movingVisualization)
+		self.multiRenderWidget.setVolumeVisualization(self.visualization)
+		self.visualizationUpdated.emit(self.visualization)
+
+	@Slot(object)
+	def setFixedVisualization(self, visualization):
+		"""
+		"""
+		self.fixedVisualization = visualization
+		self.updateVisualization()
+
+	@Slot(object)
+	def setMovingVisualization(self, visualization):
+		"""
+		"""
+		self.movingVisualization = visualization
+		self.updateVisualization()
+
 	# Private methods
 
-	def updateFixedVolumeProperty(self):
-		fixedVolumeProperty = vtkVolumeProperty()
-		if self.fixedVolumeProperty is not None:
-			fixedVolumeProperty.DeepCopy(self.fixedVolumeProperty.volumeProperty)
-			fixedOpacityFunction = CreateFunctionFromOpacityAndVolumeProperty(self.fixedOpacity, fixedVolumeProperty)
-			fixedVolumeProperty.SetScalarOpacity(fixedOpacityFunction)
-		else:
-			color, opacityFunction = CreateEmptyFunctions()
-			fixedVolumeProperty.SetColor(color)
-			fixedVolumeProperty.SetScalarOpacity(opacityFunction)
+	# def updateFixedVisualization(self):
+	# 	fixedVolumeVisualization = vtkVolumeProperty()
 
-		self.multiRenderWidget.setFixedVolumeProperty(fixedVolumeProperty)
-		self.fixedVolumePropertyUpdated.emit(fixedVolumeProperty)
+	# 	if self.multiVisualizationType == self.multiVisualizationTypes[0]:
+	# 		# Visualization is default mix type
+	# 		if self.fixedVisualization is not None:
+	# 			fixedVolumeVisualization.DeepCopy(self.fixedVisualization.VolumeVisualization)
+	# 			fixedOpacityFunction = CreateFunctionFromProperties(self.fixedOpacity, fixedVolumeVisualization)
+	# 			fixedVolumeVisualization.SetScalarOpacity(fixedOpacityFunction)
+	# 		else:
+	# 			color, opacityFunction = CreateEmptyFunctions()
+	# 			fixedVolumeVisualization.SetColor(color)
+	# 			fixedVolumeVisualization.SetScalarOpacity(opacityFunction)
+	# 	else:
+	# 		if self.fixedImageData is not None:
+	# 			color, opacityFunction = CreateRangeFunctions(self.fixedImageData)
+	# 			fixedVolumeVisualization.SetColor(color)
+	# 			fixedVolumeVisualization.SetScalarOpacity(opacityFunction)
+	# 		else:
+	# 			color, opacityFunction = CreateEmptyFunctions()
+	# 			fixedVolumeVisualization.SetColor(color)
+	# 			fixedVolumeVisualization.SetScalarOpacity(opacityFunction)
 
-	def updateMovingVolumeProperty(self):
-		movingVolumeProperty = vtkVolumeProperty()
-		if self.movingVolumeProperty is not None:
-			movingVolumeProperty.DeepCopy(self.movingVolumeProperty.volumeProperty)
-			movingOpacityFunction = CreateFunctionFromOpacityAndVolumeProperty(self.movingOpacity, movingVolumeProperty)
-			movingVolumeProperty.SetScalarOpacity(movingOpacityFunction)
-		else:
-			color, opacityFunction = CreateEmptyFunctions()
-			movingVolumeProperty.SetColor(color)
-			movingVolumeProperty.SetScalarOpacity(opacityFunction)
+	# 	self.multiRenderWidget.setFixedVisualization(fixedVolumeVisualization)
+	# 	self.fixedVisualizationUpdated.emit(fixedVolumeVisualization)
 
-		self.multiRenderWidget.setMovingVolumeProperty(movingVolumeProperty)
-		self.movingVolumePropertyUpdated.emit(movingVolumeProperty)
+	# def updatemovingVisualization(self):
+	# 	movingVisualization = vtkVolumeProperty()
+	# 	if self.multiVisualizationType == self.multiVisualizationTypes[0]:
+	# 		if self.movingVisualization is not None:
+	# 			movingVisualization.DeepCopy(self.movingVisualization.VolumeVisualization)
+	# 			movingOpacityFunction = CreateFunctionFromProperties(self.movingOpacity, movingVisualization)
+	# 			movingVisualization.SetScalarOpacity(movingOpacityFunction)
+	# 		else:
+	# 			color, opacityFunction = CreateEmptyFunctions()
+	# 			movingVisualization.SetColor(color)
+	# 			movingVisualization.SetScalarOpacity(opacityFunction)
+	# 	else:
+			# if self.movingImageData is not None:
+			# 	color, opacityFunction = CreateRangeFunctions(self.movingImageData)
+			# 	movingVisualization.SetColor(color)
+			# 	movingVisualization.SetScalarOpacity(opacityFunction)
+			# else:
+			# 	color, opacityFunction = CreateEmptyFunctions()
+			# 	movingVisualization.SetColor(color)
+			# 	movingVisualization.SetScalarOpacity(opacityFunction)
 
-def CreateFunctionFromOpacityAndVolumeProperty(opacity, volProp):
-	"""
-	:type opacityFunction: vtkVolumeProperty
-	"""
-	opacityFunction = volProp.GetScalarOpacity()
-	for index in range(opacityFunction.GetSize()):
-		val = [0 for x in range(4)]
-		opacityFunction.GetNodeValue(index, val)
-		val[1] = val[1] * float(opacity)
-		opacityFunction.SetNodeValue(index, val)
-	return opacityFunction
-
-def CreateEmptyFunctions():
-	"""
-	:rtype: vtkColorTransferFunction, vtkPiecewiseFunction
-	"""
-	# Transfer functions and properties
-	colorFunction = vtkColorTransferFunction()
-	colorFunction.AddRGBPoint( 0, 0, 0, 0, 0.0, 0.0)
-	colorFunction.AddRGBPoint( 1000, 0, 0, 0, 0.0, 0.0)
-
-	opacityFunction = vtkPiecewiseFunction()
-	opacityFunction.AddPoint( 0, 0, 0.0, 0.0)
-	opacityFunction.AddPoint( 1000, 0, 0.0, 0.0)
-
-	return colorFunction, opacityFunction
-
-		
+	# 	self.multiRenderWidget.setMovingVisualization(movingVisualization)
+	# 	self.movingVisualizationUpdated.emit(movingVisualization)

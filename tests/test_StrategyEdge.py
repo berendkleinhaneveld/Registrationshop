@@ -6,6 +6,7 @@ from core.strategy.StrategyEdge import StrategyEdge
 from core.strategy.StrategyNode import StrategyNode
 from core.elastix.Transformation import Transformation
 
+
 class StrategyEdgeTest(unittest.TestCase):
 
 	# Setup and teardown
@@ -47,7 +48,7 @@ class StrategyEdgeTest(unittest.TestCase):
 		self.assertTrue(self.edge.childNode.dirty)
 		self.assertIsNone(self.edge.childNode.movingData)
 
-		self.edge.execute() # TODO: make it execute Elastix
+		self.edge.execute()  # TODO: make it execute Elastix
 
 		self.assertFalse(self.edge.childNode.dirty)
 		self.assertIsNotNone(self.edge.childNode.movingData)

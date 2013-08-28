@@ -3,13 +3,14 @@ import os
 from core.strategy.Strategy import Strategy
 from core.elastix.Transformation import Transformation
 
+
 class TestStrategy(unittest.TestCase):
-	
+
 	# Setup and teardown
 
 	def setUp(self):
 		super(TestStrategy, self).setUp()
-		self.strategy = Strategy("/Users/beer/Registrationshop/Data/datasets/cryo.mhd", 
+		self.strategy = Strategy("/Users/beer/Registrationshop/Data/datasets/cryo.mhd",
 			"/Users/beer/Registrationshop/Data/datasets/CT.mhd",
 			"/Users/beer/Registrationshop/Data/datasets/output")
 

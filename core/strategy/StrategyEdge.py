@@ -5,8 +5,10 @@ StrategyEdge
 	Berend Klein Haneveld
 """
 
-import os, sys
+import os
+import sys
 import subprocess
+
 
 class StrategyEdge(object):
 	"""
@@ -63,10 +65,10 @@ class StrategyEdge(object):
 			os.makedirs(self.childNode.outputFolder)
 
 		# Create Elastix command with the right parameters
-		# TODO: build some class or thing to actually call Elastix instead of 
+		# TODO: build some class or thing to actually call Elastix instead of
 		# calling directly from the StrategyEdge class
-		command = ["elastix", 
-			"-m", self.parentNode.movingData, 
+		command = ["elastix",
+			"-m", self.parentNode.movingData,
 			"-f", self.parentNode.fixedData,
 			"-out", self.childNode.outputFolder,
 			"-p", parameterFile]

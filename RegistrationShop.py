@@ -1,9 +1,9 @@
-#!/usr/bin/python
+#!/usr/local/bin/python
 """
 Registrationshop
-	
+
 3D registration tool for medical purposes.
-	
+
 :Authors:
 	Berend Klein Haneveld 2013
 """
@@ -39,13 +39,14 @@ from ui.MultiRenderController import MultiRenderController
 from ui.MultiRenderWidget import MultiRenderWidget
 from ui.TitleWidget import TitleWidget
 from ui.RenderPropertyWidgets import RenderPropWidget
-from ui.RenderPropertyWidgets import MultiPropWidget
+from ui.RenderPropertyWidgets import MultiRenderPropWidget
 
 
 # Define settings parameters
 APPNAME = "RegistrationShop"
 ORGNAME = "TU Delft"
 ORGDOMAIN = "tudelft.nl"
+
 
 class RegistrationShop(QMainWindow):
 	"""
@@ -93,12 +94,10 @@ class RegistrationShop(QMainWindow):
 		self.setUnifiedTitleAndToolBarOnMac(True)
 		self.setWindowTitle(APPNAME)
 		self.setWindowState(Qt.WindowActive)
-		self.raise_()
-		self.show()
 
 	def createElements(self):
 		"""
-		Creates the widgets and docks of which the 
+		Creates the widgets and docks of which the
 		main window is composed.
 		"""
 		self.mainWindow = QMainWindow()
@@ -119,24 +118,26 @@ class RegistrationShop(QMainWindow):
 		projectController.multiRenderController = self.multiRenderController
 
 		# Render properties widgets
-		sizePolicyLeft = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-		sizePolicyLeft.setHorizontalStretch(1)
+		sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+		sizePolicy.setHorizontalStretch(1)
 
 		self.fixedPropWidget = RenderPropWidget(self.fixedRenderController, parent=self)
-		self.fixedPropWidget.setSizePolicy(sizePolicyLeft)
+		self.fixedPropWidget.setSizePolicy(sizePolicy)
 		self.fixedPropWidget.setFileChangedSignal(projectController.fixedFileChanged)
 		self.fixedPropWidget.setLoadDataSlot(self.loadFixedDataSetFile)
 
-		self.multiPropWidget = MultiPropWidget(self.multiRenderController, parent=self)
-		self.multiPropWidget.setSizePolicy(sizePolicyLeft)
-
 		self.movingPropWidget = RenderPropWidget(self.movingRenderController, parent=self)
-		self.movingPropWidget.setSizePolicy(sizePolicyLeft)
+		self.movingPropWidget.setSizePolicy(sizePolicy)
 		self.movingPropWidget.setFileChangedSignal(projectController.movingFileChanged)
 		self.movingPropWidget.setLoadDataSlot(self.loadMovingDataSetFile)
 
+		self.MultiRenderPropWidget = MultiRenderPropWidget(self.multiRenderController, parent=self)
+		self.MultiRenderPropWidget.setSizePolicy(sizePolicy)
+
 		self.verticalSplitter = QSplitter()
 		self.verticalSplitter.setOrientation(Qt.Vertical)
+
+		# Create the layouts
 
 		fixedDataTitleWidget = TitleWidget("Fixed data")
 		multiDataTitleWidget = TitleWidget("Mix / Result")
@@ -163,12 +164,12 @@ class RegistrationShop(QMainWindow):
 		propsLayout.setSpacing(1)
 		propsLayout.setContentsMargins(0, 0, 0, 0)
 		propsLayout.addWidget(self.fixedPropWidget)
-		propsLayout.addWidget(self.multiPropWidget)
+		propsLayout.addWidget(self.MultiRenderPropWidget)
 		propsLayout.addWidget(self.movingPropWidget)
 
 		rendersWidget = QWidget()
 		rendersWidget.setLayout(rendersLayout)
-		
+
 		rendersAndTitlesLayout = QVBoxLayout()
 		rendersAndTitlesLayout.setSpacing(0)
 		rendersAndTitlesLayout.setContentsMargins(0, 0, 0, 0)
@@ -205,13 +206,10 @@ class RegistrationShop(QMainWindow):
 		projectController.movingSettingsChanged.connect(self.movingRenderController.setRenderSettings)
 		projectController.multiSettingsChanged.connect(self.multiRenderController.setRenderSettings)
 
-		self.multiRenderController.fixedVolumePropertyUpdated.connect(self.multiDataWidget.setFixedVolumeProperty)
-		self.multiRenderController.movingVolumePropertyUpdated.connect(self.multiDataWidget.setMovingVolumeProperty)
-
-		self.fixedRenderController.volumePropertyChanged.connect(self.multiRenderController.setFixedVolumeProperty)
-		self.fixedRenderController.volumePropertyUpdated.connect(self.multiRenderController.setFixedVolumeProperty)
-		self.movingRenderController.volumePropertyChanged.connect(self.multiRenderController.setMovingVolumeProperty)
-		self.movingRenderController.volumePropertyUpdated.connect(self.multiRenderController.setMovingVolumeProperty)
+		self.fixedRenderController.visualizationChanged.connect(self.multiRenderController.setFixedVisualization)
+		self.fixedRenderController.visualizationUpdated.connect(self.multiRenderController.setFixedVisualization)
+		self.movingRenderController.visualizationChanged.connect(self.multiRenderController.setMovingVisualization)
+		self.movingRenderController.visualizationUpdated.connect(self.multiRenderController.setMovingVisualization)
 
 	def createActions(self):
 		"""
@@ -224,7 +222,7 @@ class RegistrationShop(QMainWindow):
 		self.actionFreeTransformTool = QAction('Free transform', self, shortcut='Ctrl+1')
 		self.actionFreeTransformTool.setIcon(QIcon(userTransformIconName))
 		self.actionFreeTransformTool.triggered.connect(self.addFreeTransform)
-		
+
 		self.actionLandmarkTransformTool = QAction('Landmark transform', self, shortcut='Ctrl+2')
 		self.actionLandmarkTransformTool.setIcon(QIcon(landmarkTransformIconName))
 		self.actionLandmarkTransformTool.triggered.connect(self.addLandmarkTransform)
@@ -274,7 +272,7 @@ class RegistrationShop(QMainWindow):
 		"""
 		# Add toolbar
 		self.toolbar = self.addToolBar('Main tools')
-		
+
 		# Add the transform tool buttons to the toolbar
 		self.toolbar.addAction(self.actionFreeTransformTool)
 		self.toolbar.addAction(self.actionLandmarkTransformTool)
@@ -284,7 +282,7 @@ class RegistrationShop(QMainWindow):
 		spacer = QWidget()
 		spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.toolbar.addWidget(spacer)
-		
+
 		# TODO: add "don't panic" button
 
 	def restoreState(self):
@@ -293,10 +291,10 @@ class RegistrationShop(QMainWindow):
 		application was run. If the application is started for the first time
 		it applies some 'sane' initial values.
 		"""
-		xPosition 	= int(RegistrationShop.settings.value("ui/window/origin/x", 0))
-		yPosition 	= int(RegistrationShop.settings.value("ui/window/origin/y", 0))
-		width 		= int(RegistrationShop.settings.value("ui/window/width", 800))
-		height 		= int(RegistrationShop.settings.value("ui/window/height", 600))
+		xPosition = int(RegistrationShop.settings.value("ui/window/origin/x", 0))
+		yPosition = int(RegistrationShop.settings.value("ui/window/origin/y", 0))
+		width = int(RegistrationShop.settings.value("ui/window/width", 800))
+		height = int(RegistrationShop.settings.value("ui/window/height", 600))
 
 		self.setGeometry(xPosition, yPosition, width, height)
 
@@ -310,8 +308,8 @@ class RegistrationShop(QMainWindow):
 		:param event: Resize event
 		:type event: QResizeEvent
 		"""
-		width 	= self.width()
-		height 	= self.height()
+		width = self.width()
+		height = self.height()
 
 		xPosition = self.geometry().x()
 		yPosition = self.geometry().y()
@@ -323,7 +321,7 @@ class RegistrationShop(QMainWindow):
 
 	def moveEvent(self, event):
 		"""
-		Saves the position of the window when it is moved so that it can be 
+		Saves the position of the window when it is moved so that it can be
 		restored on subsequent launches.
 
 		:param event: Move event
@@ -343,15 +341,15 @@ class RegistrationShop(QMainWindow):
 		:type event: QCloseEvent
 		"""
 		pass
-	
+
 	# Private Functions
 
 	def setApplicationPath(self):
 		"""
 		Finds the path to the application. This is done so that it
-		can figure out where certain resources are located. 
-		QCoreApplication::applicationDirPath() on OS X does not return the 
-		desired path to the actual application but to the python executable 
+		can figure out where certain resources are located.
+		QCoreApplication::applicationDirPath() on OS X does not return the
+		desired path to the actual application but to the python executable
 		in /Library/FrameWorks. This is inconvenient because images can't be
 		located that way.
 		So instead os.path is used to find the location of this __file__.
@@ -404,7 +402,7 @@ class RegistrationShop(QMainWindow):
 		is specified, then 'save project as' is called.
 		"""
 		projCont = ProjectController.Instance()
-		
+
 		if projCont.currentProject.folder is not None:
 			# Save that project
 			saved = projCont.saveProject()
@@ -433,7 +431,7 @@ class RegistrationShop(QMainWindow):
 	@Slot()
 	def openProject(self, folderName=None):
 		"""
-		If no project name is supplied, it will open a file dialog so 
+		If no project name is supplied, it will open a file dialog so
 		that the user can select a project file
 		or project folder.
 
@@ -445,7 +443,7 @@ class RegistrationShop(QMainWindow):
 			fileName = folderName
 		else:
 			fileName = QFileDialog.getExistingDirectory(self, "Open project", "", QFileDialog.ShowDirsOnly)
-		
+
 		if len(fileName) > 0:
 			fullName = fileName + ProjectController.Instance().ProjectFile
 			if os.path.isfile(fullName):
@@ -474,7 +472,9 @@ def main():
 	app.setOrganizationDomain(ORGDOMAIN)
 
 	mainWindow = RegistrationShop(sys.argv)
+	mainWindow.raise_()
+	mainWindow.show()
 	sys.exit(app.exec_())
-		
+
 if __name__ == '__main__':
 	main()

@@ -1,124 +1,117 @@
 import unittest
 import yaml
-from ui.VolumeProperty import VolumePropertyFactory
-from ui.VolumeProperty import RenderTypeCT
-from ui.VolumeProperty import RenderTypeSimple
-from ui.VolumeProperty import VolumeProperty
+from ui.VolumeVisualization import VolumeVisualizationFactory
+from ui.VolumeVisualization import VisualizationTypeCT
+from ui.VolumeVisualization import VisualizationTypeSimple
 from core.vtkObjectWrapper import vtkVolumePropertyWrapper
 from core.vtkObjectWrapper import vtkColorTransferFunctionWrapper
 from core.vtkObjectWrapper import vtkPiecewiseFunctionWrapper
-from ui.VolumeProperty import VolumePropertyObjectWrapper
+from ui.VolumeVisualization import VolumeVisualizationObjectWrapper
 
-class VolumePropertyTest(unittest.TestCase):
+
+class VolumeVisualizationTest(unittest.TestCase):
 
 	def setUp(self):
-		self.volumePropertyCT = VolumePropertyFactory.CreateProperty(renderType=RenderTypeCT)
-		self.volumePropertySimple = VolumePropertyFactory.CreateProperty(renderType=RenderTypeSimple)
+		self.VolumeVisualizationCT = VolumeVisualizationFactory.CreateProperty(visualizationType=VisualizationTypeCT)
+		self.VolumeVisualizationSimple = VolumeVisualizationFactory.CreateProperty(visualizationType=VisualizationTypeSimple)
 
 	def tearDown(self):
-		del self.volumePropertyCT
+		del self.VolumeVisualizationCT
 
-	def testVolumeProperty(self):
-		self.assertTrue(self.volumePropertyCT is not None)
+	def testVolumeVisualization(self):
+		self.assertTrue(self.VolumeVisualizationCT is not None)
 
-	def testVtkVolumePropertyWrapper(self):
-		self.assertIsNotNone(self.volumePropertyCT.volumeProperty)
+	def testvtkVolumePropertyWrapper(self):
+		self.assertIsNotNone(self.VolumeVisualizationCT.VolumeVisualization)
 
-		self.volumePropWrap = vtkVolumePropertyWrapper(self.volumePropertyCT.volumeProperty)
+		self.volumePropWrap = vtkVolumePropertyWrapper(self.VolumeVisualizationCT.VolumeVisualization)
 
 		self.assertIsNotNone(self.volumePropWrap.independentComponents)
 		self.assertIsNotNone(self.volumePropWrap.interpolationType)
 
-	def testVtkVolumePropertyWrapperGetter(self):
+	def testvtkVolumePropertyWrapperGetter(self):
 		volPropWrapper = vtkVolumePropertyWrapper()
-		volPropWrapper.setOriginalObject(self.volumePropertyCT.volumeProperty)
+		volPropWrapper.setOriginalObject(self.VolumeVisualizationCT.VolumeVisualization)
 		vtkVolProp = volPropWrapper.originalObject()
 		# Check that it is a vtkVolumeProperty by checking specific vtkVolumeProperty attributes
 		self.assertTrue(hasattr(vtkVolProp, "GetIndependentComponents"))
-		self.assertEqual(self.volumePropertyCT.volumeProperty.GetAmbient(), vtkVolProp.GetAmbient())
+		self.assertEqual(self.VolumeVisualizationCT.VolumeVisualization.GetAmbient(), vtkVolProp.GetAmbient())
 
-	def testVtkVolumePropertyWrapperYaml(self):
+	def testvtkVolumePropertyWrapperYaml(self):
 		volPropWrapper = vtkVolumePropertyWrapper()
-		volPropWrapper.setOriginalObject(self.volumePropertyCT.volumeProperty)
+		volPropWrapper.setOriginalObject(self.VolumeVisualizationCT.VolumeVisualization)
 
 		dump = yaml.dump(volPropWrapper)
-		
-		volumePropertyWrapper2 = yaml.load(dump)
+		VolumeVisualizationWrapper2 = yaml.load(dump)
 
-		self.assertEqual(volPropWrapper.independentComponents, volumePropertyWrapper2.independentComponents)
-		self.assertEqual(volPropWrapper.interpolationType, volumePropertyWrapper2.interpolationType)
-		self.assertEqual(volPropWrapper.shade, volumePropertyWrapper2.shade)
+		self.assertEqual(volPropWrapper.independentComponents, VolumeVisualizationWrapper2.independentComponents)
+		self.assertEqual(volPropWrapper.interpolationType, VolumeVisualizationWrapper2.interpolationType)
+		self.assertEqual(volPropWrapper.shade, VolumeVisualizationWrapper2.shade)
 
 	def testvtkColorTransferFunctionWrapper(self):
-		self.volumePropertyCT.updateTransferFunction()
+		self.VolumeVisualizationCT.updateTransferFunction()
 
 		colorFunctionWrapper = vtkColorTransferFunctionWrapper()
-		colorFunctionWrapper.setOriginalObject(self.volumePropertyCT.colorFunction)
+		colorFunctionWrapper.setOriginalObject(self.VolumeVisualizationCT.colorFunction)
 
-		self.assertEqual(len(colorFunctionWrapper.nodes), self.volumePropertyCT.colorFunction.GetSize())
+		self.assertEqual(len(colorFunctionWrapper.nodes), self.VolumeVisualizationCT.colorFunction.GetSize())
 
 	def testColorTransferFunctionYaml(self):
-		self.volumePropertyCT.updateTransferFunction()
+		self.VolumeVisualizationCT.updateTransferFunction()
 
 		colorFunctionWrapper = vtkColorTransferFunctionWrapper()
-		colorFunctionWrapper.setOriginalObject(self.volumePropertyCT.colorFunction)
-		
+		colorFunctionWrapper.setOriginalObject(self.VolumeVisualizationCT.colorFunction)
 		dump = yaml.dump(colorFunctionWrapper)
 		colorFunctionWrapper2 = yaml.load(dump)
 
 		self.assertEqual(len(colorFunctionWrapper.nodes), len(colorFunctionWrapper2.nodes))
 
 	def testColorTransferFunctionWrapperGetter(self):
-		self.volumePropertyCT.updateTransferFunction()
+		self.VolumeVisualizationCT.updateTransferFunction()
 
 		colorFunctionWrapper = vtkColorTransferFunctionWrapper()
-		colorFunctionWrapper.setOriginalObject(self.volumePropertyCT.colorFunction)
-
+		colorFunctionWrapper.setOriginalObject(self.VolumeVisualizationCT.colorFunction)
 		colorFunction = colorFunctionWrapper.originalObject()
 
 		self.assertEqual(len(colorFunctionWrapper.nodes), colorFunction.GetSize())
 
 	def testPiecewiseFunctionWrapper(self):
-		self.volumePropertySimple.updateTransferFunction()
+		self.VolumeVisualizationSimple.updateTransferFunction()
 
 		piecewiseFunctionWrapper = vtkPiecewiseFunctionWrapper()
-		piecewiseFunctionWrapper.setOriginalObject(self.volumePropertySimple.opacityFunction)
+		piecewiseFunctionWrapper.setOriginalObject(self.VolumeVisualizationSimple.opacityFunction)
 
-		self.assertEqual(len(piecewiseFunctionWrapper.nodes), self.volumePropertySimple.opacityFunction.GetSize())
+		self.assertEqual(len(piecewiseFunctionWrapper.nodes), self.VolumeVisualizationSimple.opacityFunction.GetSize())
 
 	def testPiecewiseFunctionWrapperGetter(self):
-		self.volumePropertySimple.updateTransferFunction()
+		self.VolumeVisualizationSimple.updateTransferFunction()
 
 		piecewiseFunctionWrapper = vtkPiecewiseFunctionWrapper()
-		piecewiseFunctionWrapper.setOriginalObject(self.volumePropertySimple.opacityFunction)
-
+		piecewiseFunctionWrapper.setOriginalObject(self.VolumeVisualizationSimple.opacityFunction)
 		piecewiseFunction = piecewiseFunctionWrapper.originalObject()
 
-		self.assertTrue(piecewiseFunction.GetSize(), self.volumePropertySimple.opacityFunction.GetSize())
+		self.assertTrue(piecewiseFunction.GetSize(), self.VolumeVisualizationSimple.opacityFunction.GetSize())
 
 	def testPiecewiseFunctionWrapperYaml(self):
-		self.volumePropertySimple.updateTransferFunction()
+		self.VolumeVisualizationSimple.updateTransferFunction()
 
-		piecewiseFunctionWrapper = vtkPiecewiseFunctionWrapper(self.volumePropertySimple.opacityFunction)
-
+		piecewiseFunctionWrapper = vtkPiecewiseFunctionWrapper(self.VolumeVisualizationSimple.opacityFunction)
 		dump = yaml.dump(piecewiseFunctionWrapper)
-
 		piecewiseFunctionWrapper2 = yaml.load(dump)
 
 		self.assertEqual(len(piecewiseFunctionWrapper.nodes), len(piecewiseFunctionWrapper2.nodes))
 
+	def testVolumeVisualizationWrapper(self):
+		self.VolumeVisualizationSimple.updateTransferFunction()
 
-	def testVolumePropertyWrapper(self):
-		self.volumePropertySimple.updateTransferFunction()
+		volPropWrapper = VolumeVisualizationObjectWrapper(self.VolumeVisualizationSimple)
 
-		volPropWrapper = VolumePropertyObjectWrapper(self.volumePropertySimple)
-
-		self.assertEqual(volPropWrapper.renderType, RenderTypeSimple)
-		self.assertIsNotNone(volPropWrapper.volumeProperty)
+		self.assertEqual(volPropWrapper.visualizationType, VisualizationTypeSimple)
+		self.assertIsNotNone(volPropWrapper.VolumeVisualization)
 		self.assertIsNotNone(volPropWrapper.colorFunction)
 		self.assertIsNotNone(volPropWrapper.opacityFunction)
 
 		dump = yaml.dump(volPropWrapper)
 		volPropWrapper2 = yaml.load(dump)
 
-		self.assertEqual(volPropWrapper.renderType, volPropWrapper2.renderType)
+		self.assertEqual(volPropWrapper.visualizationType, volPropWrapper2.visualizationType)

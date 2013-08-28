@@ -2,13 +2,12 @@
 RenderPropertyWidgets
 
 * RenderPropWidget
-* MultiPropWidget
+* MultiRenderPropWidget
 
 :Authors:
 	Berend Klein Haneveld
 """
 
-import os
 from PySide.QtGui import QWidget
 from PySide.QtGui import QPushButton
 from PySide.QtGui import QVBoxLayout
@@ -18,14 +17,14 @@ from PySide.QtCore import Slot
 from parameters.RenderParameterWidget import RenderParameterWidget
 from parameters.RenderInfoWidget import RenderInfoWidget
 from parameters.RenderSlicerParamWidget import RenderSlicerParamWidget
-from parameters.RenderMixerParamWidget import RenderMixerParamWidget
 from parameters.TransformationHistoryWidget import TransformationHistoryWidget
+
 
 class RenderPropWidget(QWidget):
 	"""
 	RenderPropWidget is a widget that is displayed under the render widgets. It
-	contains a tabwidget in which information of the data can be displayed and 
-	in which visualization parameters can be shown. One of the tabs is a 
+	contains a tabwidget in which information of the data can be displayed and
+	in which visualization parameters can be shown. One of the tabs is a
 	RenderParameterWidget object.
 	"""
 	def __init__(self, renderController, parent=None):
@@ -53,12 +52,12 @@ class RenderPropWidget(QWidget):
 		self.tabWidget.addTab(self.slicesTabWidget, "Slices")
 
 		layout = QVBoxLayout()
-		layout.addWidget(self.loadDataWidget)	
+		layout.addWidget(self.loadDataWidget)
 		self.setLayout(layout)
 
 	def setFileChangedSignal(self, signal):
 		"""
-		:param signal: Signal that is connected to some file-loading slots. 
+		:param signal: Signal that is connected to some file-loading slots.
 		:type signal: SIGNAL
 		"""
 		self.signal = signal
@@ -67,7 +66,7 @@ class RenderPropWidget(QWidget):
 
 	def setLoadDataSlot(self, slot):
 		"""
-		The button is connected to the given slot. The slot action should load 
+		The button is connected to the given slot. The slot action should load
 		a dataset from disk.
 
 		:type slot: Slot
@@ -99,17 +98,17 @@ class RenderPropWidget(QWidget):
 				self.setLayout(layout)
 
 
-class MultiPropWidget(QWidget):
+class MultiRenderPropWidget(QWidget):
 	"""
-	MultiPropWidget is a widget that is displayed under the multi render
-	widget. It contains tabs with some controls for interaction and 
+	MultiRenderPropWidget is a widget that is displayed under the multi render
+	widget. It contains tabs with some controls for interaction and
 	visualization of the combined / multi-volume render widget.
 	"""
 	def __init__(self, multiRenderController, parent=None):
-		super(MultiPropWidget, self).__init__(parent=parent)
+		super(MultiRenderPropWidget, self).__init__(parent=parent)
 
 		# Two tabs: Visualization and Data info
-		self.mixParamWidget = RenderMixerParamWidget(multiRenderController)
+		self.mixParamWidget = RenderParameterWidget(multiRenderController)
 		self.registrationHistoryWidget = TransformationHistoryWidget()
 		self.slicesTabWidget = RenderSlicerParamWidget(multiRenderController)
 
