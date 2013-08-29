@@ -253,7 +253,7 @@ class RegistrationShop(QMainWindow):
 		"""
 		Creates menus from actions.
 		"""
-		self.menuBar = QMenuBar()
+		self.menuBar = self.menuBar()
 		self.menuItemFile = self.menuBar.addMenu('&File')
 		self.menuItemFile.addAction(self.actionNewProject)
 		self.menuItemFile.addAction(self.actionOpenProject)
