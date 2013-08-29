@@ -13,7 +13,6 @@ from PySide.QtGui import QWidget
 from PySide.QtCore import Qt
 from PySide.QtCore import QObject
 from PySide.QtCore import Signal
-from PySide.QtCore import SIGNAL
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
@@ -112,14 +111,13 @@ class MixMultiVolumeVisualization(MultiVolumeVisualization):
 
 	@overrides(MultiVolumeVisualization)
 	def setFixedVisualization(self, visualization):
-		if self.fixedVisualization is not None:
-			self.fixedVisualization.disconnect(SIGNAL("updatedTransferFunction"), self.updateTransferFunctions)
 		self.fixedVisualization = visualization
-		self.fixedVisualization.updatedTransferFunction.connect(self.updateTransferFunctions)
+		self.fixedVolProp = self._createVolPropFromVis(self.fixedVisualization, self.fixedOpacity)
 
 	@overrides(MultiVolumeVisualization)
 	def setMovingVisualization(self, visualization):
 		self.movingVisualization = visualization
+		self.movingVolProp = self._createVolPropFromVis(self.movingVisualization, self.movingOpacity)
 
 	@overrides(MultiVolumeVisualization)
 	def getParameterWidget(self):
@@ -161,27 +159,23 @@ class MixMultiVolumeVisualization(MultiVolumeVisualization):
 		self.updateTransferFunctions()
 
 	def updateTransferFunctions(self):
-		self.fixedVolProp = vtkVolumeProperty()
-		if self.fixedVisualization:
-			self.fixedVolProp.DeepCopy(self.fixedVisualization.volProp)
-			fixedOpacityFunction = CreateFunctionFromProperties(self.fixedOpacity, self.fixedVolProp)
-			self.fixedVolProp.SetScalarOpacity(fixedOpacityFunction)
-		else:
-			color, opacityFunction = CreateEmptyFunctions()
-			self.fixedVolProp.SetColor(color)
-			self.fixedVolProp.SetScalarOpacity(opacityFunction)
-
-		self.movingVolProp = vtkVolumeProperty()
-		if self.movingVisualization:
-			self.movingVolProp.DeepCopy(self.movingVisualization.volProp)
-			movingOpacityFunction = CreateFunctionFromProperties(self.movingOpacity, self.movingVolProp)
-			self.movingVolProp.SetScalarOpacity(movingOpacityFunction)
-		else:
-			color, opacityFunction = CreateEmptyFunctions()
-			self.movingVolProp.SetColor(color)
-			self.movingVolProp.SetScalarOpacity(opacityFunction)
+		self.fixedVolProp = self._createVolPropFromVis(self.fixedVisualization, self.fixedOpacity)
+		self.movingVolProp = self._createVolPropFromVis(self.movingVisualization, self.movingOpacity)
 
 		self.updatedTransferFunction.emit()
+
+	def _createVolPropFromVis(self, visualization, opacity):
+		volProp = vtkVolumeProperty()
+		if visualization:
+			volProp.DeepCopy(visualization.volProp)
+			opacityFunction = CreateFunctionFromProperties(opacity, volProp)
+			volProp.SetScalarOpacity(opacityFunction)
+		else:
+			color, opacityFunction = CreateEmptyFunctions()
+			volProp.SetColor(color)
+			volProp.SetScalarOpacity(opacityFunction)
+
+		return volProp
 
 	@overrides(MultiVolumeVisualization)
 	def configureMapper(self, mapper):
@@ -228,27 +222,21 @@ class MIPMultiVolumeVisualization(MultiVolumeVisualization):
 		self.movingImageData = movingImageData
 
 	def updateTransferFunctions(self):
-		self.fixedVolProp = vtkVolumeProperty()
-		if self.fixedImageData is not None:
-			color, opacityFunction = CreateRangeFunctions(self.fixedImageData)
-			self.fixedVolProp.SetColor(color)
-			self.fixedVolProp.SetScalarOpacity(opacityFunction)
-		else:
-			color, opacityFunction = CreateEmptyFunctions()
-			self.fixedVolProp.SetColor(color)
-			self.fixedVolProp.SetScalarOpacity(opacityFunction)
-
-		self.movingVolProp = vtkVolumeProperty()
-		if self.movingImageData is not None:
-			color, opacityFunction = CreateRangeFunctions(self.movingImageData)
-			self.movingVolProp.SetColor(color)
-			self.movingVolProp.SetScalarOpacity(opacityFunction)
-		else:
-			color, opacityFunction = CreateEmptyFunctions()
-			self.movingVolProp.SetColor(color)
-			self.movingVolProp.SetScalarOpacity(opacityFunction)
+		self.fixedVolProp = self._createVolPropFromImageData(self.fixedImageData)
+		self.movingVolProp = self._createVolPropFromImageData(self.movingImageData)
 
 		self.updatedTransferFunction.emit()
+
+	def _createVolPropFromImageData(self, imageData):
+		volProp = vtkVolumeProperty()
+		if imageData is not None:
+			color, opacityFunction = CreateRangeFunctions(imageData)
+		else:
+			color, opacityFunction = CreateEmptyFunctions()
+		volProp.SetColor(color)
+		volProp.SetScalarOpacity(opacityFunction)
+
+		return volProp
 
 	def valueChanged(self, value):
 		self.fixedHue = self.hueSlider.value()
@@ -274,27 +262,21 @@ class MIDAMultiVolumeVisualization(MultiVolumeVisualization):
 		self.movingImageData = movingImageData
 
 	def updateTransferFunctions(self):
-		self.fixedVolProp = vtkVolumeProperty()
-		if self.fixedImageData is not None:
-			color, opacityFunction = CreateRangeFunctions(self.fixedImageData, [1.0, 0.5, 0.0])
-			self.fixedVolProp.SetColor(color)
-			self.fixedVolProp.SetScalarOpacity(opacityFunction)
-		else:
-			color, opacityFunction = CreateEmptyFunctions()
-			self.fixedVolProp.SetColor(color)
-			self.fixedVolProp.SetScalarOpacity(opacityFunction)
-
-		self.movingVolProp = vtkVolumeProperty()
-		if self.movingImageData is not None:
-			color, opacityFunction = CreateRangeFunctions(self.movingImageData, [1.0, 1.0, 1.0])
-			self.movingVolProp.SetColor(color)
-			self.movingVolProp.SetScalarOpacity(opacityFunction)
-		else:
-			color, opacityFunction = CreateEmptyFunctions()
-			self.movingVolProp.SetColor(color)
-			self.movingVolProp.SetScalarOpacity(opacityFunction)
+		self.fixedVolProp = self._createVolPropFromImageData(self.fixedImageData, [1.0, 0.5, 0.0])
+		self.movingVolProp = self._createVolPropFromImageData(self.movingImageData, [1.0, 1.0, 1.0])
 
 		self.updatedTransferFunction.emit()
+
+	def _createVolPropFromImageData(self, imageData, color):
+		volProp = vtkVolumeProperty()
+		if imageData is not None:
+			color, opacityFunction = CreateRangeFunctions(imageData, color)
+		else:
+			color, opacityFunction = CreateEmptyFunctions()
+		volProp.SetColor(color)
+		volProp.SetScalarOpacity(opacityFunction)
+
+		return volProp
 
 	def valueChanged(self, value):
 		self.updateTransferFunctions()

@@ -180,10 +180,6 @@ class MultiRenderWidget(QWidget):
 			self.movingVolumeProperty.SetColor(color)
 			self.movingVolumeProperty.SetScalarOpacity(opacityFunction)
 		else:
-			# FIXME: the visualization should first update the volume
-			# properties before simply copying them over! Or it should happen
-			# as soon as these properties are updated in the visualization...
-			# self.visualization.updateTransferFunctions()
 			self.fixedVolumeProperty = self.visualization.fixedVolProp
 			self.movingVolumeProperty = self.visualization.movingVolProp
 			self.visualization.configureMapper(self.mapper)
@@ -195,7 +191,7 @@ class MultiRenderWidget(QWidget):
 		"""
 		self.volume.SetProperty(self.fixedVolumeProperty)
 		self.mapper.SetProperty2(self.movingVolumeProperty)
-		# self.render()
+		self.render()
 
 	@Slot(object)
 	def setSlices(self, slices):
