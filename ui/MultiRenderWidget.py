@@ -254,7 +254,6 @@ def CreateEmptyImageData():
 		for y in xrange(0, dimensions[1]-1):
 			for x in xrange(0, dimensions[0]-1):
 				imageData.SetScalarComponentFromDouble(x, y, z, 0, 0.0)
-	# imageData.Update()
 	return imageData
 
 

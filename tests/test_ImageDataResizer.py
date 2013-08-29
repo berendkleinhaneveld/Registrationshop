@@ -1,6 +1,7 @@
 import unittest
 from core.data.DataResizer import DataResizer
 from vtk import vtkImageData
+from vtk import VTK_FLOAT
 
 
 class DataResizerTest(unittest.TestCase):
@@ -68,7 +69,5 @@ def createImageData(dimensions):
 	imageData = vtkImageData()
 	imageData.Initialize()
 	imageData.SetDimensions(dimensions)
-	imageData.SetNumberOfScalarComponents(1)
-	imageData.AllocateScalars()
-	imageData.Update()
+	imageData.AllocateScalars(VTK_FLOAT, 1)
 	return imageData

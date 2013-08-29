@@ -162,5 +162,5 @@ class DataReader(object):
 			if spacing[x] == 0.0:
 				spacing[x] = 1.0
 				# TODO: instead of 1.0, use a more sane value...
+				# Or at least check whether it is the right thing to do
 		imageData.SetSpacing(spacing)
-		imageData.Update()
