@@ -502,37 +502,36 @@ class VolumeVisualizationObjectWrapper(object):
 	"""
 	standardAttributes = ["visualizationType", "sectionsOpacity", "lowerBound", "upperBound", "minimum", "maximum", "hue"]
 
-	def __init__(self, VolumeVisualization=None):
+	def __init__(self, volumeVisualization=None):
 		super(VolumeVisualizationObjectWrapper, self).__init__()
 
-		if VolumeVisualization is not None:
-			self.setVolumeVisualization(VolumeVisualization)
+		if volumeVisualization is not None:
+			self.setVolumeVisualization(volumeVisualization)
 
-	def setVolumeVisualization(self, VolumeVisualization):
+	def setVolumeVisualization(self, volumeVisualization):
 		for attribute in VolumeVisualizationObjectWrapper.standardAttributes:
-			if hasattr(VolumeVisualization, attribute) and getattr(VolumeVisualization, attribute) is not None:
-				setattr(self, attribute, getattr(VolumeVisualization, attribute))
+			if hasattr(volumeVisualization, attribute) and getattr(volumeVisualization, attribute) is not None:
+				setattr(self, attribute, getattr(volumeVisualization, attribute))
 
-		if hasattr(VolumeVisualization, "VolumeVisualization"):
-			self.volProp = vtkVolumePropertyWrapper(VolumeVisualization.VolumeVisualization)
-		if hasattr(VolumeVisualization, "opacityFunction"):
-			self.opacityFunction = vtkPiecewiseFunctionWrapper(VolumeVisualization.opacityFunction)
-		if hasattr(VolumeVisualization, "colorFunction"):
-			self.colorFunction = vtkColorTransferFunctionWrapper(VolumeVisualization.colorFunction)
+		if hasattr(volumeVisualization, "volProp"):
+			self.volProp = vtkVolumePropertyWrapper(volumeVisualization.volProp)
+		if hasattr(volumeVisualization, "opacityFunction"):
+			self.opacityFunction = vtkPiecewiseFunctionWrapper(volumeVisualization.opacityFunction)
+		if hasattr(volumeVisualization, "colorFunction"):
+			self.colorFunction = vtkColorTransferFunctionWrapper(volumeVisualization.colorFunction)
 
 	def getVolumeVisualization(self):
-		volProp = VolumeVisualizationFactory.CreateProperty(self.visualizationType)
+		volumeVisualization = VolumeVisualizationFactory.CreateProperty(self.visualizationType)
 
 		for attribute in VolumeVisualizationObjectWrapper.standardAttributes:
 			if hasattr(self, attribute) and getattr(self, attribute) is not None:
-				setattr(volProp, attribute, getattr(self, attribute))
-				# print attribute + ": " + str(getattr(self, attribute))
+				setattr(volumeVisualization, attribute, getattr(self, attribute))
 
-		if hasattr(self, "VolumeVisualization") and self.volProp is not None:
-			volProp.VolumeVisualization = self.volProp.originalObject()
+		if hasattr(self, "volProp") and self.volProp is not None:
+			volumeVisualization.volProp = self.volProp.originalObject()
 		if hasattr(self, "opacityFunction") and self.opacityFunction is not None:
-			volProp.opacityFunction = self.opacityFunction.originalObject()
+			volumeVisualization.opacityFunction = self.opacityFunction.originalObject()
 		if hasattr(self, "colorFunction") and self.colorFunction is not None:
-			volProp.colorFunction = self.colorFunction.originalObject()
+			volumeVisualization.colorFunction = self.colorFunction.originalObject()
 
-		return volProp
+		return volumeVisualization

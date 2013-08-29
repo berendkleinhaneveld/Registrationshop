@@ -122,32 +122,32 @@ class vtkVolumePropertyWrapper(vtkObjectWrapper):
 	vtkVolumeProperty object. It stores the properties
 	of a vtkVolume as attributes.
 	"""
-	def __init__(self, VolumeVisualization=None):
-		super(vtkVolumePropertyWrapper, self).__init__(VolumeVisualization)
+	def __init__(self, volumeProperty=None):
+		super(vtkVolumePropertyWrapper, self).__init__(volumeProperty)
 
 	@overrides(vtkObjectWrapper)
-	def setOriginalObject(self, VolumeVisualization):
-		self.independentComponents = VolumeVisualization.GetIndependentComponents()
-		self.interpolationType = VolumeVisualization.GetInterpolationType()
-		self.shade = VolumeVisualization.GetShade()
-		self.ambient = VolumeVisualization.GetAmbient()
-		self.diffuse = VolumeVisualization.GetDiffuse()
-		self.specular = VolumeVisualization.GetSpecular()
-		self.specularPower = VolumeVisualization.GetSpecularPower()
-		self.scalarOpacityUnitDistance = VolumeVisualization.GetScalarOpacityUnitDistance()
+	def setOriginalObject(self, volumeProperty):
+		self.independentComponents = volumeProperty.GetIndependentComponents()
+		self.interpolationType = volumeProperty.GetInterpolationType()
+		self.shade = volumeProperty.GetShade()
+		self.ambient = volumeProperty.GetAmbient()
+		self.diffuse = volumeProperty.GetDiffuse()
+		self.specular = volumeProperty.GetSpecular()
+		self.specularPower = volumeProperty.GetSpecularPower()
+		self.scalarOpacityUnitDistance = volumeProperty.GetScalarOpacityUnitDistance()
 
 	@overrides(vtkObjectWrapper)
 	def originalObject(self):
-		VolumeVisualization = vtkVolumeProperty()
-		VolumeVisualization.SetIndependentComponents(self.independentComponents)
-		VolumeVisualization.SetInterpolationType(self.interpolationType)
-		VolumeVisualization.SetShade(self.shade)
-		VolumeVisualization.SetAmbient(self.ambient)
-		VolumeVisualization.SetDiffuse(self.diffuse)
-		VolumeVisualization.SetSpecular(self.specular)
-		VolumeVisualization.SetSpecularPower(self.specularPower)
-		VolumeVisualization.SetScalarOpacityUnitDistance(self.scalarOpacityUnitDistance)
-		return VolumeVisualization
+		volumeProperty = vtkVolumeProperty()
+		volumeProperty.SetIndependentComponents(self.independentComponents)
+		volumeProperty.SetInterpolationType(self.interpolationType)
+		volumeProperty.SetShade(self.shade)
+		volumeProperty.SetAmbient(self.ambient)
+		volumeProperty.SetDiffuse(self.diffuse)
+		volumeProperty.SetSpecular(self.specular)
+		volumeProperty.SetSpecularPower(self.specularPower)
+		volumeProperty.SetScalarOpacityUnitDistance(self.scalarOpacityUnitDistance)
+		return volumeProperty
 
 
 class vtkCameraWrapper(vtkObjectWrapper):
