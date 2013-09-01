@@ -12,7 +12,6 @@ import sys
 import os.path
 
 # PySide stuff
-from PySide import QtCore
 from PySide.QtGui import QMainWindow
 from PySide.QtGui import QApplication
 from PySide.QtGui import QAction
@@ -20,7 +19,6 @@ from PySide.QtGui import QIcon
 from PySide.QtGui import QFileDialog
 from PySide.QtGui import QVBoxLayout
 from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QMenuBar
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSizePolicy
 from PySide.QtGui import QSplitter
@@ -33,6 +31,7 @@ from core.project.ProjectController import ProjectController
 from core.data.DataReader import DataReader
 from core.AppResources import AppResources
 # Import ui elements
+from ui.MainWindow import MainWindow
 from ui.RenderWidget import RenderWidget
 from ui.RenderController import RenderController
 from ui.MultiRenderController import MultiRenderController
@@ -48,24 +47,21 @@ ORGNAME = "TU Delft"
 ORGDOMAIN = "tudelft.nl"
 
 
-class RegistrationShop(QMainWindow):
+class RegistrationShop(MainWindow):
 	"""
 	Main class that starts up the application.
 	Creates UI and starts project/plugin managers.
 	"""
 
-	# Singletons
-	settings = QtCore.QSettings()
-
-	def __init__(self, arg):
+	def __init__(self, args):
 		"""
 		Sets app specific properties.
 		Initializes the UI.
 		"""
-		super(RegistrationShop, self).__init__()
-		self.arg = arg
+		super(RegistrationShop, self).__init__(args)
+		
 		self.setApplicationPath()
-		# Make sure there is a project controller instance
+		# Instantiate the project controller
 		ProjectController.Instance()
 
 		# Initialize the user interface
@@ -284,63 +280,6 @@ class RegistrationShop(QMainWindow):
 		self.toolbar.addWidget(spacer)
 
 		# TODO: add "don't panic" button
-
-	def restoreState(self):
-		"""
-		Restores the window size and position of the last time the
-		application was run. If the application is started for the first time
-		it applies some 'sane' initial values.
-		"""
-		xPosition = int(RegistrationShop.settings.value("ui/window/origin/x", 0))
-		yPosition = int(RegistrationShop.settings.value("ui/window/origin/y", 0))
-		width = int(RegistrationShop.settings.value("ui/window/width", 800))
-		height = int(RegistrationShop.settings.value("ui/window/height", 600))
-
-		self.setGeometry(xPosition, yPosition, width, height)
-
-	# Events
-
-	def resizeEvent(self, event):
-		"""
-		Saves the size and position of the window when it is resized so that
-		it can be restored on subsequent launches.
-
-		:param event: Resize event
-		:type event: QResizeEvent
-		"""
-		width = self.width()
-		height = self.height()
-
-		xPosition = self.geometry().x()
-		yPosition = self.geometry().y()
-
-		RegistrationShop.settings.setValue("ui/window/origin/x", xPosition)
-		RegistrationShop.settings.setValue("ui/window/origin/y", yPosition)
-		RegistrationShop.settings.setValue("ui/window/width", width)
-		RegistrationShop.settings.setValue("ui/window/height", height)
-
-	def moveEvent(self, event):
-		"""
-		Saves the position of the window when it is moved so that it can be
-		restored on subsequent launches.
-
-		:param event: Move event
-		:type event: QMoveEvent
-		"""
-		xPosition = self.geometry().x()
-		yPosition = self.geometry().y()
-
-		RegistrationShop.settings.setValue("ui/window/origin/x", xPosition)
-		RegistrationShop.settings.setValue("ui/window/origin/y", yPosition)
-
-	def closeEvent(self, event):
-		"""
-		TODO: ask if app should really quit.
-
-		:param event: Close event
-		:type event: QCloseEvent
-		"""
-		pass
 
 	# Private Functions
 
