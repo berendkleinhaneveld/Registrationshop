@@ -13,6 +13,7 @@ from PySide.QtCore import Slot
 from PySide.QtCore import Qt
 from core.data.DataReader import DataReader
 
+
 class RenderInfoWidget(QWidget):
 	"""
 	RenderInfoWidget shows information about the loaded dataset. Things like
