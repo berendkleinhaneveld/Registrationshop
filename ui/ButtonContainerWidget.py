@@ -9,28 +9,26 @@ they are displayed as flat buttons.
 	Berend Klein Haneveld 2013
 """
 
-try:
-	from PySide import QtCore
-	from PySide.QtGui import QWidget
-	from PySide.QtGui import QHBoxLayout
-	from PySide.QtGui import QVBoxLayout
-	from PySide.QtGui import QPalette
-	from PySide.QtGui import QBrush
-	from PySide.QtGui import QLinearGradient
-	from PySide.QtGui import QColor
-	from PySide.QtCore import Qt
-except ImportError:
-	raise ImportError("Could not import PySide")
+from PySide import QtCore
+from PySide.QtGui import QWidget
+from PySide.QtGui import QHBoxLayout
+from PySide.QtGui import QVBoxLayout
+from PySide.QtGui import QPalette
+from PySide.QtGui import QBrush
+from PySide.QtGui import QLinearGradient
+from PySide.QtGui import QColor
+from PySide.QtCore import Qt
+
 
 class ButtonContainer(QWidget):
 	Height = 22
-	
+
 	def __init__(self, orientation=Qt.Horizontal):
 		"""
 		Sets up the button container.
 		"""
 		super(ButtonContainer, self).__init__()
-		
+
 		self.orientation = orientation
 
 		self.initUI()
@@ -46,6 +44,7 @@ class ButtonContainer(QWidget):
 		gradient = QLinearGradient()
 		gradient.setStart(0, 0)
 		gradient.setFinalStop(0, self.Height)
+		# TODO: get colors from theme
 		color1 = QColor(230, 230, 230, 255)
 		color2 = QColor(177, 177, 177, 255)
 		gradient.setColorAt(0, color1)
@@ -54,12 +53,12 @@ class ButtonContainer(QWidget):
 
 		palette = QPalette()
 		palette.setBrush(QPalette.Background, brush)
-		
+
 		self.setAutoFillBackground(True)
 		self.setPalette(palette)
 
 		# Use a horizontal layout in which to keep
-		# buttons. Initialize with an empty QWidget to 
+		# buttons. Initialize with an empty QWidget to
 		# make the buttons align to the left
 		if self.orientation == Qt.Horizontal:
 			self.layout = QHBoxLayout()
@@ -77,7 +76,7 @@ class ButtonContainer(QWidget):
 		"""
 		Adds a button to the container. The button is styled and
 		resized to fit in the container widget.
-		Assumes that the button has no name and has an 
+		Assumes that the button has no name and has an
 		icon (preferably in the right size)
 
 		:type button: QPushButton
@@ -86,18 +85,18 @@ class ButtonContainer(QWidget):
 		button.setMaximumHeight(ButtonContainer.Height)
 		button.setMaximumWidth(ButtonContainer.Height)
 		button.setFlat(True)
-		
+
 		# Insert button into the horizontal layout. Make sure
 		# that the empty QWidget stays on the right
 		self.layout.insertWidget(self._buttonCount, button)
-		
+
 		# TODO: Style the buttons or make some kind of seperator
-		
+
 		self._buttonCount += 1
 		pass
 
 	# Overwritten from QWidget
-	
+
 	def sizeOfButtons(self):
 		return self._buttonCount * ButtonContainer.Height
 
@@ -123,7 +122,7 @@ class ButtonContainer(QWidget):
 			return self.sizeOfButtons()
 		else:
 			return self.sizeOfContainer()
-		
+
 	def maximumHeight(self):
 		"""
 		:rtype: int
@@ -132,7 +131,7 @@ class ButtonContainer(QWidget):
 			return self.sizeOfContainer()
 		else:
 			return 0
-		
+
 	def minimumHeight(self):
 		"""
 		:rtype: int
@@ -141,7 +140,7 @@ class ButtonContainer(QWidget):
 			return self.sizeOfContainer()
 		else:
 			return self.sizeOfButtons()
-	
+
 	def sizeHint(self):
 		"""
 		:rtype: QtCore.QSize
@@ -155,4 +154,4 @@ class ButtonContainer(QWidget):
 		else:
 			sizeHint = QtCore.QSize(height, width)
 		return sizeHint
-	
+
