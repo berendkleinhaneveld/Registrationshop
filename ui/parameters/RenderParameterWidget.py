@@ -72,6 +72,9 @@ class RenderParameterWidget(QWidget):
 		if sys.platform.startswith("darwin"):
 			# default background of tabs on OSX is 237, 237, 237
 			self.paramWidget.setStyleSheet("background: rgb(229, 229, 229)")
+		elif sys.platform.startswith("linux"):
+			# TODO: read background property from tab widget
+			self.parent().setStyleSheet("background: rgb(236, 236, 236)")
 		self.scrollArea.setWidget(self.paramWidget)
 
 		if self.renderController.visualization is not None:
