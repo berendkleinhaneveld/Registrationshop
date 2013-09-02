@@ -5,6 +5,7 @@ TitleWidget
 	Berend Klein Haneveld
 """
 
+import sys
 from PySide.QtGui import QWidget
 from PySide.QtGui import QColor
 from PySide.QtGui import QLinearGradient
@@ -24,21 +25,22 @@ class TitleWidget(QWidget):
 	def __init__(self, title=None):
 		super(TitleWidget, self).__init__()
 
-		color1 = QColor(230, 230, 230, 255)
-		color2 = QColor(177, 177, 177, 255)
+		if sys.platform.startswith("darwin"):
+			color1 = QColor(230, 230, 230, 255)
+			color2 = QColor(177, 177, 177, 255)
 
-		gradient = QLinearGradient()
-		gradient.setStart(0, 0)
-		gradient.setFinalStop(0, TitleWidget.TitleHeight)
-		gradient.setColorAt(0, color1)
-		gradient.setColorAt(1, color2)
+			gradient = QLinearGradient()
+			gradient.setStart(0, 0)
+			gradient.setFinalStop(0, TitleWidget.TitleHeight)
+			gradient.setColorAt(0, color1)
+			gradient.setColorAt(1, color2)
 
-		brush = QBrush(gradient)
-		palette = QPalette()
-		palette.setBrush(QPalette.Background, brush)
+			brush = QBrush(gradient)
+			palette = QPalette()
+			palette.setBrush(QPalette.Background, brush)
+			self.setPalette(palette)
+			self.setAutoFillBackground(True)
 
-		self.setAutoFillBackground(True)
-		self.setPalette(palette)
 		self.setMaximumHeight(TitleWidget.TitleHeight)
 		self.setMinimumHeight(TitleWidget.TitleHeight)
 
