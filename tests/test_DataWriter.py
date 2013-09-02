@@ -34,3 +34,8 @@ class DataWriterTest(unittest.TestCase):
 
 	def testUnsupportedDataType(self):
 		self.assertRaises(NotImplementedError, self.writer.WriteToFile, None, "", DataReader.TypeRaw)
+
+	def testSuppportedExtensions(self):
+		extensions = self.writer.GetSupportedExtensionsAsString()
+		self.assertIn("vti", extensions)
+		self.assertIn("mhd", extensions)

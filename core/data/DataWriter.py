@@ -2,18 +2,22 @@
 DataWriter.py
 """
 
+from DataController import DataController
 from DataReader import DataReader
 from vtk import vtkMetaImageWriter
 from vtk import vtkXMLImageDataReader
 
 
-class DataWriter(object):
+class DataWriter(DataController):
 	"""
 	DataWriter writes an image data object to
 	disk using the provided format.
 	"""
 	def __init__(self):
 		super(DataWriter, self).__init__()
+
+		self.supportedExtensions = [DataReader.TypeMHA,
+									DataReader.TypeVTI]
 
 	def WriteToFile(self, imageData, exportFileName, fileType):
 		if fileType == DataReader.TypeMHA:

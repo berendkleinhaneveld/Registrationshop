@@ -9,10 +9,11 @@ from vtk import vtkImageData
 from vtk import vtkMetaImageReader
 from vtk import vtkXMLImageDataReader
 from vtk import vtkDICOMImageReader
+from DataController import DataController
 import os
 
 
-class DataReader(object):
+class DataReader(DataController):
 	"""
 	DataReader is a class that tries to figure out what kind of data type a
 	given file is. From the extension it will try to choose the correct reader
@@ -35,20 +36,6 @@ class DataReader(object):
 									DataReader.TypeVTI,
 									DataReader.TypeDICOM]
 
-	def IsExtensionSupported(self, extension):
-		"""
-		:type extension: basestring
-		:rtype: bool
-		"""
-		result = False
-
-		for ext in self.supportedExtensions:
-			if ext == extension:
-				result = True
-				break
-
-		return result
-
 	def GetImageData(self, fileName):
 		"""
 		:type fileName: basestr
@@ -63,6 +50,7 @@ class DataReader(object):
 				self.SanitizeImageData(imageData)
 				return imageData
 			else:
+				# TODO: make this a proper Exception
 				print "Warning: directory does not contain DICOM files:", fileName
 				return None
 
@@ -137,17 +125,6 @@ class DataReader(object):
 		imageReader.SetDirectoryName(dirName)
 		imageReader.Update()
 		return imageReader.GetOutput()
-
-	def GetSupportedExtensionsAsString(self):
-		"""
-		Create string representation of all the supported file extensions.
-		It will be formatted as follows: '*.mbr *.dcm'
-		:rtype: basestr
-		"""
-		stringRepresentation = ""
-		for extension in self.supportedExtensions:
-			stringRepresentation += ("*." + extension + " ")
-		return stringRepresentation
 
 	def SanitizeImageData(self, imageData):
 		"""
