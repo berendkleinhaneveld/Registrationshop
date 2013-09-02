@@ -2,6 +2,7 @@ import unittest
 import os
 from core.data.DataReader import DataReader
 
+
 class DataReaderTest(unittest.TestCase):
 
 	def setUp(self):
@@ -12,7 +13,7 @@ class DataReaderTest(unittest.TestCase):
 
 	def testDataReader(self):
 		path = os.path.dirname(os.path.abspath(__file__))
-		
+
 		fileName = path + "/data/hi-3.mhd"
 		imageData = self.reader.GetImageData(fileName)
 		self.assertIsNotNone(imageData)
@@ -26,12 +27,12 @@ class DataReaderTest(unittest.TestCase):
 		self.assertTrue(self.reader.IsExtensionSupported("mhd"))
 		self.assertTrue(self.reader.IsExtensionSupported("vti"))
 		self.assertTrue(self.reader.IsExtensionSupported("dcm"))
-		
+
 		self.assertFalse(self.reader.IsExtensionSupported("mrb"))
 		self.assertFalse(self.reader.IsExtensionSupported("vtk"))
 		self.assertFalse(self.reader.IsExtensionSupported("raw"))
 		self.assertFalse(self.reader.IsExtensionSupported("dat"))
-		
+
 	# def testDatFileFormat(self):
 	# 	path = os.path.dirname(os.path.abspath(__file__))
 	# 	fileName = path + "/data/present492x492x442.dat"
