@@ -1,0 +1,36 @@
+import unittest
+import os
+from core.data.DataWriter import DataWriter
+from core.data.DataReader import DataReader
+
+
+class DataWriterTest(unittest.TestCase):
+	"""Test cases for the DataWriter class"""
+
+	def setUp(self):
+		self.writer = DataWriter()
+
+	def tearDown(self):
+		del self.writer
+
+	def testDataWriter(self):
+		path = os.path.dirname(os.path.abspath(__file__))
+		fileName = path + "/data/hi-3.mhd"
+		outputFolder = path + "/data/DataWriter"
+		exportFileName = outputFolder + "/output.mhd"
+		dataReader = DataReader()
+		imageData = dataReader.GetImageData(fileName)
+		fileType = DataReader.TypeMHA
+
+		self.writer.WriteToFile(imageData, exportFileName, fileType)
+
+		# Cleanup test directory
+		try:
+			if os.path.exists(outputFolder):
+				import shutil
+				shutil.rmtree(outputFolder)
+		except Exception, e:
+			raise e
+
+	def testUnsupportedDataType(self):
+		self.assertRaises(NotImplementedError, self.writer.WriteToFile, None, "", DataReader.TypeRaw)
