@@ -19,6 +19,7 @@ from PySide.QtGui import QIcon
 from PySide.QtGui import QFileDialog
 from PySide.QtGui import QVBoxLayout
 from PySide.QtGui import QHBoxLayout
+from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSizePolicy
 from PySide.QtGui import QSplitter
@@ -139,22 +140,35 @@ class RegistrationShop(MainWindow):
 		multiDataTitleWidget = TitleWidget("Mix / Result")
 		movingDataTitleWidget = TitleWidget("Moving data")
 
-		titleBoxLayout = QHBoxLayout()
-		titleBoxLayout.setSpacing(0)
-		titleBoxLayout.setContentsMargins(0, 0, 0, 0)
-		titleBoxLayout.addWidget(fixedDataTitleWidget)
-		titleBoxLayout.addWidget(multiDataTitleWidget)
-		titleBoxLayout.addWidget(movingDataTitleWidget)
+		fixedLayout = QGridLayout()
+		fixedLayout.setSpacing(0)
+		fixedLayout.setContentsMargins(0, 0, 0, 0)
+		fixedLayout.addWidget(fixedDataTitleWidget)
+		fixedLayout.addWidget(self.fixedDataWidget)
+		fixedWidget = QWidget()
+		fixedWidget.setLayout(fixedLayout)
 
-		titleBoxWidget = QWidget()
-		titleBoxWidget.setLayout(titleBoxLayout)
+		multiLayout = QGridLayout()
+		multiLayout.setSpacing(0)
+		multiLayout.setContentsMargins(0, 0, 0, 0)
+		multiLayout.addWidget(multiDataTitleWidget)
+		multiLayout.addWidget(self.multiDataWidget)
+		multiWidget = QWidget()
+		multiWidget.setLayout(multiLayout)
 
-		rendersLayout = QHBoxLayout()
-		rendersLayout.setSpacing(1)
-		rendersLayout.setContentsMargins(0, 0, 0, 0)
-		rendersLayout.addWidget(self.fixedDataWidget)
-		rendersLayout.addWidget(self.multiDataWidget)
-		rendersLayout.addWidget(self.movingDataWidget)
+		movingLayout = QGridLayout()
+		movingLayout.setSpacing(0)
+		movingLayout.setContentsMargins(0, 0, 0, 0)
+		movingLayout.addWidget(movingDataTitleWidget)
+		movingLayout.addWidget(self.movingDataWidget)
+		movingWidget = QWidget()
+		movingWidget.setLayout(movingLayout)
+
+		horizontalSplitter = QSplitter()
+		horizontalSplitter.setOrientation(Qt.Horizontal)
+		horizontalSplitter.addWidget(fixedWidget)
+		horizontalSplitter.addWidget(multiWidget)
+		horizontalSplitter.addWidget(movingWidget)
 
 		propsLayout = QHBoxLayout()
 		propsLayout.setSpacing(1)
@@ -163,24 +177,12 @@ class RegistrationShop(MainWindow):
 		propsLayout.addWidget(self.MultiRenderPropWidget)
 		propsLayout.addWidget(self.movingPropWidget)
 
-		rendersWidget = QWidget()
-		rendersWidget.setLayout(rendersLayout)
-
-		rendersAndTitlesLayout = QVBoxLayout()
-		rendersAndTitlesLayout.setSpacing(0)
-		rendersAndTitlesLayout.setContentsMargins(0, 0, 0, 0)
-		rendersAndTitlesLayout.addWidget(titleBoxWidget)
-		rendersAndTitlesLayout.addWidget(rendersWidget)
-
-		rendersAndTitlesWidget = QWidget()
-		rendersAndTitlesWidget.setLayout(rendersAndTitlesLayout)
-
 		propsWidget = QWidget()
 		propsWidget.setMaximumHeight(300)
 		propsWidget.setMinimumHeight(300)
 		propsWidget.setLayout(propsLayout)
 
-		self.verticalSplitter.addWidget(rendersAndTitlesWidget)
+		self.verticalSplitter.addWidget(horizontalSplitter)
 		self.verticalSplitter.addWidget(propsWidget)
 		self.setCentralWidget(self.verticalSplitter)
 
