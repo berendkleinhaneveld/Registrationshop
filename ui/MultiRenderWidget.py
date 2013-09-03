@@ -10,9 +10,7 @@ from vtk import vtkRenderer
 from vtk import vtkInteractorStyleTrackballCamera
 from vtk import vtkImagePlaneWidget
 from vtk import vtkVolume
-from vtk import vtkBoxWidget
 from vtk import vtkImageData
-from vtk import vtkTransform
 from vtk import vtkAxesActor
 from vtk import vtkOrientationMarkerWidget
 from vtk import vtkColorTransferFunction
@@ -84,9 +82,6 @@ class MultiRenderWidget(QWidget):
 		self.fixedImageData = CreateEmptyImageData()
 		self.movingImageData = CreateEmptyImageData()
 
-		# These variables will later on be used for creating a comparative
-		# visualization that does not use the volume properties of the
-		# render widgets
 		self.fixedVolumeProperty = vtkVolumeProperty()
 		self.movingVolumeProperty = vtkVolumeProperty()
 		color, opacityFunction = CreateEmptyFunctions()
@@ -100,14 +95,6 @@ class MultiRenderWidget(QWidget):
 
 		self.mapper.SetInputData(0, self.fixedImageData)
 		self.mapper.SetInputData(1, self.movingImageData)
-
-		self.transformBox = vtkBoxWidget()
-		self.transformBox.SetInteractor(self.rwi)
-		self.transformBox.SetDefaultRenderer(self.renderer)
-
-		self.transformBox.mapper = self.mapper
-		self.transformBox.AddObserver("InteractionEvent", TransformCallback)
-		self.transformBox.GetSelectedFaceProperty().SetOpacity(0.3)
 
 		axesActor = vtkAxesActor()
 		self.orientationWidget = vtkOrientationMarkerWidget()
@@ -153,11 +140,6 @@ class MultiRenderWidget(QWidget):
 		if self.fixedImageData is None:
 			self.fixedImageData = CreateEmptyImageData()
 
-		self.transformBox.SetInputData(self.movingImageData)
-		self.transformBox.PlaceWidget()
-		self.transformBox.SetPlaceFactor(1.0)
-		self.transformBox.EnabledOff()
-
 		self.mapper.SetInputData(0, self.fixedImageData)
 		self.mapper.SetInputData(1, self.movingImageData)
 
@@ -200,33 +182,6 @@ class MultiRenderWidget(QWidget):
 				self.imagePlaneWidgets[sliceIndex].On()
 			else:
 				self.imagePlaneWidgets[sliceIndex].Off()
-
-	def showTransformBox(self, value):
-		if value:
-			self.transformBox.EnabledOn()
-		else:
-			self.transformBox.EnabledOff()
-
-	def opacityChangedForFixedVolume(self, value):
-		print "eeeuh, should not come here? MultiRenderWidget.opacityChangedForFixedVolume()"
-		self.fixedOpacity = value
-		self.updateVolumeProperties()
-
-	def opacityChangedForMovingVolume(self, value):
-		print "eeeuh, should not come here? MultiRenderWidget.opacityChangedForMovingVolume()"
-		self.movingOpacity = value
-		self.updateVolumeProperties()
-
-
-def TransformCallback(arg1, arg2):
-	"""
-	:type arg1: vtkBoxWidget
-	:type arg2: InteractionEvent
-	"""
-	if hasattr(arg1, "mapper"):
-		transform = vtkTransform()
-		arg1.GetTransform(transform)
-		arg1.mapper.SetSecondInputUserTransform(transform)
 
 
 # Helper methods
