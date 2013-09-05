@@ -8,6 +8,7 @@ Strategy
 from StrategyNode import StrategyNode
 from StrategyEdge import StrategyEdge
 
+
 class Strategy(object):
 	"""
 	Strategy is the complete tree of transformations and registration results.

@@ -5,6 +5,7 @@ Command
 	Berend Klein Haneveld
 """
 
+
 class Command(object):
 	"""
 	Command is an interface class for wrapping different kind of
@@ -25,7 +26,7 @@ class Command(object):
 
 
 def overrides(interface_class):
-    def overrider(method):
-        assert(method.__name__ in dir(interface_class))
-        return method
-    return overrider
+	def overrider(method):
+		assert(method.__name__ in dir(interface_class))
+		return method
+	return overrider

@@ -5,12 +5,13 @@ StrategyNode
 	Berend Klein Haneveld
 """
 
+
 class StrategyNode(object):
 	"""
 	Node in a Strategy that represents some registration result.
 
-	A node in the strategy tree contains the registration result at that point 
-	in the tree. This registration result can be 'dirty' and might need a 
+	A node in the strategy tree contains the registration result at that point
+	in the tree. This registration result can be 'dirty' and might need a
 	rebuild.
 	Has references to an incoming edge and outgoing edges.
 
@@ -57,6 +58,6 @@ class StrategyNode(object):
 			self.__dirty = value
 			# If the node is made dirty, then all its siblings should be made
 			# dirty as well.
-			if value == True:
+			if value is True:
 				for edge in self.outgoingEdges:
 					edge.childNode.dirty = True

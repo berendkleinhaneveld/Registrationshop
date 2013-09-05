@@ -6,11 +6,12 @@
 from Queue import Queue
 from core.worker.Worker import Worker
 
+
 class Operator(object):
 	"""
 	Operator is an operator of command. It creates a queue of commands.
 	Each command should be a subclass of the type Command. For each type
-	there is a specific kind of operator that will be called to process the 
+	there is a specific kind of operator that will be called to process the
 	command.
 
 	An operator collects all the commands that are 'fired'. There are one or more
