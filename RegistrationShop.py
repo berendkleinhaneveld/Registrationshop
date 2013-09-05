@@ -40,6 +40,7 @@ from ui.MultiRenderWidget import MultiRenderWidget
 from ui.TitleWidget import TitleWidget
 from ui.RenderPropertyWidgets import RenderPropWidget
 from ui.RenderPropertyWidgets import MultiRenderPropWidget
+from ui.TransformationTool import UserTransformationTool
 
 
 # Define settings parameters
@@ -300,7 +301,23 @@ class RegistrationShop(MainWindow):
 	# Action callbacks
 	@Slot()
 	def addFreeTransform(self):
-		print "Warning: RegistrationShop.addFreeTransform() not implemented yet"
+		"""
+		What happens when free transform is added:
+		* Entry is added to the tab history
+			* Translation fields
+			* Rotation fields
+			* Scale field(s)
+		* Transform box is added to the render widget
+		* Button with apply (will apply the transform to the data)
+
+		Applying the transform to the data means:
+		* Create new dataset from transformed data
+		* Save this data to the project folder
+		* Read in the new data and update this in the multi render widget
+		* this would mean a new data model for the multi render widget
+		"""
+		transformTool = UserTransformationTool()
+		transformTool.setRenderWidget(self.multiDataWidget)
 
 	@Slot()
 	def addLandmarkTransform(self):
