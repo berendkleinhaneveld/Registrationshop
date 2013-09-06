@@ -7,6 +7,7 @@ Decorators to be used in Registrationshop.
 
 # Singleton decorator
 
+
 class Singleton:
     """
     A non-thread-safe helper class to ease implementing singletons.
@@ -46,12 +47,13 @@ class Singleton:
     def __instancecheck__(self, inst):
         return isinstance(inst, self._decorated)
 
+
 # Override decorator
 
 def overrides(interface_class):
     """
     Use this to override a method explicitely. It will check for the existance
-    of an attribute or function with the same name in the superclass. Method 
+    of an attribute or function with the same name in the superclass. Method
     foot print is not checked (yet). But at least it will fail when typos are
     made or when refactoring goes wrong.
 
