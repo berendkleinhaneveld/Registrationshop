@@ -21,6 +21,8 @@ class DataWriter(DataController):
 
 	def WriteToFile(self, imageData, exportFileName, fileType):
 		if fileType == DataReader.TypeMHA:
+			if not exportFileName.endswith(".mhd"):
+				exportFileName = exportFileName + ".mhd"
 			writer = vtkMetaImageWriter()
 			writer.SetFileName(exportFileName)
 			writer.SetInputData(imageData)
