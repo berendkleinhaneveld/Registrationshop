@@ -347,9 +347,6 @@ class QVTKRenderWindowInteractor(MSWidget):
 
 		if self._ActiveButton == QtCore.Qt.LeftButton:
 			self._Iren.LeftButtonPressEvent()
-			if hasattr(self, "delegate"):
-				if hasattr(self.delegate, "LeftButtonPressEvent"):
-					self.delegate.LeftButtonPressEvent()
 		elif self._ActiveButton == QtCore.Qt.RightButton:
 			self._Iren.RightButtonPressEvent()
 		elif self._ActiveButton == QtCore.Qt.MidButton:
