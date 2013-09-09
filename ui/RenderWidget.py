@@ -12,7 +12,6 @@ from vtk import vtkOpenGLGPUVolumeRayCastMapper
 from vtk import vtkOrientationMarkerWidget
 from vtk import vtkAxesActor
 from vtk import vtkImagePlaneWidget
-from vtk import vtkBoxWidget
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
@@ -52,13 +51,6 @@ class RenderWidget(QWidget):
 		self.VolumeVisualization = None
 		self.shouldResetCamera = False
 
-		self.transformBox = vtkBoxWidget()
-		self.transformBox.SetInteractor(self.rwi)
-		self.transformBox.SetDefaultRenderer(self.renderer)
-		# self.transformBox.AddObserver("InteractionEvent", TransformCallback)
-		self.transformBox.GetSelectedFaceProperty().SetOpacity(0.3)
-		self.transformBox.mapper = self.mapper
-
 		axesActor = vtkAxesActor()
 		self.orientationWidget = vtkOrientationMarkerWidget()
 		self.orientationWidget.SetViewport(0.05, 0.05, 0.3, 0.3)
@@ -96,12 +88,6 @@ class RenderWidget(QWidget):
 
 		# Set the image data for the mapper
 		self.mapper.SetInputData(self.imageData)
-
-		self.transformBox.SetInputData(self.imageData)
-		self.transformBox.PlaceWidget()
-		self.transformBox.SetPlaceFactor(1.0)
-		self.transformBox.EnabledOff()
-		# self.transformBox.EnabledOn()
 
 		# Set the image data for the slices
 		for index in range(3):
