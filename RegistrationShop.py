@@ -244,6 +244,9 @@ class RegistrationShop(MainWindow):
 		self.actionSaveProjectAs = QAction('Save project as...', self, shortcut='Ctrl+Shift+S')
 		self.actionSaveProjectAs.triggered.connect(self.saveProjectAs)
 
+		self.actionExportDataAs = QAction('Export data...', self, shortcut='Ctrl+E')
+		self.actionExportDataAs.triggered.connect(self.exportDataAs)
+
 		self.actionOpenProject = QAction('Open project...', self, shortcut='Ctrl+O')
 		self.actionOpenProject.triggered.connect(self.openProject)
 
@@ -261,6 +264,7 @@ class RegistrationShop(MainWindow):
 		# TODO: Open recent >
 		self.menuItemFile.addAction(self.actionSaveProject)
 		self.menuItemFile.addAction(self.actionSaveProjectAs)
+		self.menuItemFile.addAction(self.actionExportDataAs)
 
 		self.menuItemProject = self.menuBar.addMenu('&Project')
 		self.menuItemProject.addAction(self.actionLoadFixedData)
@@ -398,6 +402,19 @@ class RegistrationShop(MainWindow):
 			ProjectController.Instance().currentProject.folder = fileName
 			# Call save project
 			self.saveProject()
+
+	@Slot()
+	def exportDataAs(self):
+		"""
+		Opens a file dialog so that the user can provide a filename
+		for saving the transformed dataset to.
+		"""
+		print "Warning: RegistrationShop.exportDataAs() not implemented yet"
+		return
+
+		fileName, other = QFileDialog.getSaveFileName(self, "Save registration result to...", "", "(*.mhd)")
+		if len(fileName) == 0:
+			return
 
 	@Slot()
 	def openProject(self, folderName=None):
