@@ -10,17 +10,18 @@ from core.worker.Command import Command
 from core.elastix.Elastix import Elastix
 from core.decorators import overrides
 
+
 class ElastixCommand(Command):
 	"""
 	ElastixCommand that can be used to construct and  verify Elastix commands.
 
-	Provides a placeholder for a command for Elastix that can be processed by 
+	Provides a placeholder for a command for Elastix that can be processed by
 	Elastix.py. This makes is possible to validate a command before sending it
 	off to elastix (the command line tool).
 	"""
 
-	def __init__(self, fixedData=None, movingData=None, outputFolder=None, 
-				 transformation=None):
+	def __init__(self, fixedData=None, movingData=None, outputFolder=None,
+		transformation=None):
 		"""
 		Constructs a simple object with the provided parameters.
 
@@ -38,7 +39,7 @@ class ElastixCommand(Command):
 
 	def isValid(self):
 		"""
-		Returns whether the given arguments are valid. Valid means that the 
+		Returns whether the given arguments are valid. Valid means that the
 		fixed and moving data sets exists and that the parameter file is valid.
 
 		:rtype: bool
@@ -58,6 +59,7 @@ class ElastixCommand(Command):
 		"""
 		Elastix.process(self)
 
+
 def pathIsValidAndExists(path):
 	"""
 	Returns whether the given value is not None and whether it exists
@@ -67,9 +69,10 @@ def pathIsValidAndExists(path):
 	"""
 	return path is not None and os.path.exists(path)
 
+
 def pathIsValidOutputFolder(path):
 	"""
-	Returns wheter the given value is not None and whether the path can 
+	Returns wheter the given value is not None and whether the path can
 	be constructed by creating one directory. So without the last path part
 	it should ba a valid and existing directory.
 

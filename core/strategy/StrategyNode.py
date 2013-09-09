@@ -5,6 +5,8 @@ StrategyNode
 	Berend Klein Haneveld
 """
 
+from core.data.DataReader import DataReader
+
 
 class StrategyNode(object):
 	"""
@@ -21,7 +23,7 @@ class StrategyNode(object):
 	* edges (outgoing, childs)
 	"""
 
-	def __init__(self, fixedData=None, movingData=None, outputFolder=None):
+	def __init__(self, fixedFile=None, movingFile=None, outputFolder=None):
 		"""
 		:param fixedData: Path to the fixed data set
 		:type fixedData: basestring
@@ -35,29 +37,39 @@ class StrategyNode(object):
 		# properties
 		self.incomingEdge = None
 		self.outgoingEdges = []
-		self.fixedData = fixedData
-		self.movingData = movingData
+
+		# Create wrappers around the file name
+		self.fixed = DataWrapper(fixedFile)
+		self.moving = DataWrapper(movingFile)
+
 		self.outputFolder = outputFolder
-		self.__dirty = False
+		self.dirty = False
+		
+
+class DataWrapper(object):
+	"""
+	DataWrapper is a simple container object for
+	a file name plus a vtkImageData object. The file
+	name should be set, but the image data can be cleared.
+	"""
+	def __init__(self, fileName=None):
+		super(DataWrapper, self).__init__()
+		self.filename = fileName    # Required property
+		self.__imageData = None  	# Optional property
+		self.outgoingEdge = None
+		self.incomingEdge = None
 
 	@property
-	def dirty(self):
-		"""
-		:rtype: bool
-		"""
-		return self.__dirty
+	def imageData(self):
+		if not self.filename:
+			return None
 
-	@dirty.setter
-	def dirty(self, value):
-		"""
-		Marking a node dirty will also mark all its siblings as dirty.
+		if not self.__imageData:
+			dataReader = DataReader()
+			self.__imageData = dataReader.GetImageData(self._filename)
 
-		:type value: bool
-		"""
-		if self.__dirty != value:
-			self.__dirty = value
-			# If the node is made dirty, then all its siblings should be made
-			# dirty as well.
-			if value is True:
-				for edge in self.outgoingEdges:
-					edge.childNode.dirty = True
+		return self.__imageData
+
+	def clearImageData(self):
+		del self.__imageData
+		self.__imageData = None

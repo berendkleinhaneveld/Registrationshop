@@ -3,15 +3,15 @@ import os
 
 from core.strategy.StrategyNode import StrategyNode
 
+
 class StrategyNodeTest(unittest.TestCase):
-	pass
 
 	def setUp(self):
 		super(StrategyNodeTest, self).setUp()
 		path = os.path.dirname(os.path.abspath(__file__))
 		fixedData = unicode(path) + "/data/hi-3.vti"
 		movingData = unicode(path) + "/data/hi-5.vti"
-		self.node = StrategyNode(fixedData=fixedData, movingData=movingData)
+		self.node = StrategyNode(fixedFile=fixedData, movingFile=movingData)
 
 	def tearDown(self):
 		super(StrategyNodeTest, self).tearDown()
@@ -21,12 +21,13 @@ class StrategyNodeTest(unittest.TestCase):
 		"""
 		Test the basic creation of a StrategyNode
 		"""
-		self.assertIn("hi-5", self.node.movingData)
-		self.assertIn("hi-3", self.node.fixedData)
+		self.assertIn("hi-5", self.node.moving.filename)
+		self.assertIn("hi-3", self.node.fixed.filename)
 		self.assertIsNone(self.node.incomingEdge)
 		self.assertEqual(len(self.node.outgoingEdges), 0)
-		self.assertFalse(self.node.dirty, False)
 		self.assertIsNone(self.node.outputFolder)
+		self.assertFalse(self.node.dirty)
+
 
 	# def testAddAndRemoveChild(self):
 	# 	root = StrategyNode()
@@ -73,6 +74,6 @@ class StrategyNodeTest(unittest.TestCase):
 	# 	self.node.addChild(childNode1)
 	# 	self.node.addChild(childNode2)
 	# 	self.node.dirty = True
-	# 	assert self.node.dirty == True
-	# 	assert childNode1.dirty == True
-	# 	assert childNode2.dirty == True
+	# 	assert self.node.dirty is True
+	# 	assert childNode1.dirty is True
+	# 	assert childNode2.dirty is True

@@ -22,7 +22,7 @@ class Strategy(object):
 		super(Strategy, self).__init__()
 		
 		# Properties
-		self.rootNode = StrategyNode(fixedData=fixedData, movingData=movingData)
+		self.rootNode = StrategyNode(fixedFile=fixedData, movingFile=movingData)
 		self.fixedData = fixedData
 		self.baseDir = baseDir
 

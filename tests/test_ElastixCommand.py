@@ -2,6 +2,7 @@ import unittest
 import os
 from core.elastix.ElastixCommand import ElastixCommand
 
+
 class ElastixCommandTest(unittest.TestCase):
 
 	def setUp(self):
@@ -16,9 +17,9 @@ class ElastixCommandTest(unittest.TestCase):
 		transformation = self.path + "/data/Sample.txt"
 
 		# Construct a simple command object
-		self.command = ElastixCommand(fixedData=fixedData, 
-			movingData=movingData, 
-			outputFolder=outputFolder, 
+		self.command = ElastixCommand(fixedData=fixedData,
+			movingData=movingData,
+			outputFolder=outputFolder,
 			transformation=transformation)
 
 	def tearDown(self):

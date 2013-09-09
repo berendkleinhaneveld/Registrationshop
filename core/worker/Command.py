@@ -5,6 +5,8 @@ Command
 	Berend Klein Haneveld
 """
 
+from core.decorators import overrides
+
 
 class Command(object):
 	"""
@@ -25,8 +27,16 @@ class Command(object):
 		pass
 
 
-def overrides(interface_class):
-	def overrider(method):
-		assert(method.__name__ in dir(interface_class))
-		return method
-	return overrider
+class TransformCommand(Command):
+	"""
+	TransformCommand is a command that takes a linear transform
+	and transforms the input data.
+	"""
+	def __init__(self):
+		super(TransformCommand, self).__init__()
+
+		self.node
+		
+	@overrides(Command)
+	def execute(self):
+		pass
