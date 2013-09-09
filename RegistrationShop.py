@@ -41,6 +41,7 @@ from ui.TitleWidget import TitleWidget
 from ui.RenderPropertyWidgets import RenderPropWidget
 from ui.RenderPropertyWidgets import MultiRenderPropWidget
 from ui.TransformationTool import UserTransformationTool
+from ui.TransformationTool import LandmarkTransformationTool
 
 
 # Define settings parameters
@@ -100,6 +101,7 @@ class RegistrationShop(MainWindow):
 		"""
 		self.mainWindow = QMainWindow()
 		projectController = ProjectController.Instance()
+		self.transformTool = None
 
 		# Render widgets
 		self.fixedDataWidget = RenderWidget()
@@ -316,15 +318,27 @@ class RegistrationShop(MainWindow):
 		* Read in the new data and update this in the multi render widget
 		* this would mean a new data model for the multi render widget
 		"""
-		transformTool = UserTransformationTool()
-		transformTool.setRenderWidget(self.multiDataWidget)
+		if self.transformTool is not None:
+			self.transformTool.cleanUp()
+
+		self.transformTool = UserTransformationTool()
+		self.transformTool.setRenderWidgets(multi=self.multiDataWidget)
 
 	@Slot()
 	def addLandmarkTransform(self):
 		print "Warning: RegistrationShop.addLandmarkTransform() not implemented yet"
+		if self.transformTool is not None:
+			self.transformTool.cleanUp()
+
+		self.transformTool = LandmarkTransformationTool()
+		self.transformTool.setRenderWidgets(fixed=self.fixedDataWidget,
+			moving=self.movingDataWidget,
+			multi=self.multiDataWidget)
 
 	@Slot()
 	def addDeformableTransform(self):
+		if self.transformTool is not None:
+			self.transformTool.cleanUp()
 		print "Warning: RegistrationShop.addDeformableTransform() not implemented yet"
 
 	@Slot()
