@@ -326,7 +326,6 @@ class RegistrationShop(MainWindow):
 
 	@Slot()
 	def addLandmarkTransform(self):
-		print "Warning: RegistrationShop.addLandmarkTransform() not implemented yet"
 		if self.transformTool is not None:
 			self.transformTool.cleanUp()
 

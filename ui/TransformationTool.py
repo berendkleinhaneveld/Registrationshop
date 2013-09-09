@@ -2,8 +2,7 @@
 TransformationTool
 
 TODO:
-* Create unified AddViewProp method for easier cleanup of renderer
-* Show spheres for landmarks in both single and multi render widget
+* Give the spheres corresponding colors or numbers
 * Spread this class over multiple files?
 
 :Authors:
@@ -19,6 +18,7 @@ from vtk import vtkVolumePicker
 from vtk import vtkDataSetMapper
 from vtk import vtkActor
 from vtk import vtkPoints
+from vtk import vtkLandmarkTransform
 from core.decorators import overrides
 
 
@@ -89,11 +89,15 @@ class UserTransformationTool(TransformationTool):
 
 
 class LandmarkTransformationTool(TransformationTool):
+	"""
+	Use the 'A' key to set a landmark.
+	"""
+	
 	def __init__(self):
 		super(LandmarkTransformationTool, self).__init__()
 
-		self.fixedPoints = vtkPoints()
-		self.movingPoints = vtkPoints()
+		self.fixedPoints = []
+		self.movingPoints = []
 
 	@overrides(TransformationTool)
 	def setRenderWidgets(self, fixed=None, moving=None, multi=None):
@@ -101,15 +105,35 @@ class LandmarkTransformationTool(TransformationTool):
 		self.movingWidget = moving
 		self.multiWidget = multi
 
+		self.fixedProps = []
+		self.movingProps = []
+		self.multiProps = []
+
 		self.setupTool()
 
 	def cleanUp(self):
-		self.fixedWidget.renderer.RemoveViewProp(self.fixedProps[0])
-		self.fixedWidget.renderer.RemoveViewProp(self.fixedProps[1])
-		self.movingWidget.renderer.RemoveViewProp(self.movingProps[0])
-		self.movingWidget.renderer.RemoveViewProp(self.movingProps[1])
-
 		self.cleanUpCallbacks()
+
+		for prop in self.fixedProps:
+			self.fixedWidget.renderer.RemoveViewProp(prop)
+		for prop in self.movingProps:
+			self.movingWidget.renderer.RemoveViewProp(prop)
+		for prop in self.multiProps:
+			self.multiWidget.renderer.RemoveViewProp(prop)
+
+		self.fixedProps = []
+		self.movingProps = []
+		self.multiProps = []
+
+	def AddPropToWidget(self, prop, widget):
+		if widget is self.fixedWidget:
+			self.fixedProps.append(prop)
+		elif widget is self.movingWidget:
+			self.movingProps.append(prop)
+		elif widget is self.multiWidget:
+			self.multiProps.append(prop)
+		widget.renderer.AddViewProp(prop)
+		widget.render()
 
 	def setupTool(self):
 		multiplier = 5
@@ -124,8 +148,8 @@ class LandmarkTransformationTool(TransformationTool):
 		self.coneMapper = vtkDataSetMapper()
 		self.coneMapper.SetInputConnection(self.coneSource.GetOutputPort())
 
-		self.fixedProps = self.addConesToWidget(self.fixedWidget)
-		self.movingProps = self.addConesToWidget(self.movingWidget)
+		self.fixedProps, self.fixedPicker = self.addConesToWidget(self.fixedWidget)
+		self.movingProps, self.movingPicker = self.addConesToWidget(self.movingWidget)
 
 		# Note: do not add observers to the interactor but to an actor iot receive
 		# messages about mouse released.
@@ -135,6 +159,9 @@ class LandmarkTransformationTool(TransformationTool):
 		self.AddObserver(self.movingWidget.rwi, "KeyPressEvent", self.PressedVolumeMoving)
 
 	def addConesToWidget(self, widget):
+		"""
+		Returns array of props (2 cones) and the picker
+		"""
 		redCone = vtkActor()
 		redCone.PickableOff()
 		redCone.SetMapper(self.coneMapper)
@@ -146,8 +173,8 @@ class LandmarkTransformationTool(TransformationTool):
 		greenCone.GetProperty().SetColor(0, 1, 0)
 
 		# Add the two cones (or just one, if you want)
-		widget.renderer.AddViewProp(redCone)
-		widget.renderer.AddViewProp(greenCone)
+		self.AddPropToWidget(redCone, widget)
+		self.AddPropToWidget(greenCone, widget)
 
 		picker = vtkVolumePicker()
 		picker.SetTolerance(1e-6)
@@ -155,18 +182,17 @@ class LandmarkTransformationTool(TransformationTool):
 		# locator is optional, but improves performance for large polydata
 		# picker.AddLocator(boneLocator)
 
-		return [redCone, greenCone, picker]
+		return [redCone, greenCone], picker
 
-	# A function to move the cursor with the mouse
 	def MoveCursorFixed(self, iren, event=""):
-		self.MoveCursor(self.fixedWidget, self.fixedProps, iren, event)
+		self.MoveCursor(self.fixedWidget, self.fixedProps, self.fixedPicker, iren, event)
 
 	def MoveCursorMoving(self, iren, event=""):
-		self.MoveCursor(self.movingWidget, self.movingProps, iren, event)
+		self.MoveCursor(self.movingWidget, self.movingProps, self.movingPicker, iren, event)
 
-	def MoveCursor(self, widget, props, iren, event=""):
+	def MoveCursor(self, widget, props, picker, iren, event=""):
 		widget.rwi.HideCursor()
-		redCone, greenCone, picker = props[0:3]
+		redCone, greenCone = props[0:2]
 		p, n = PickPoint(iren, widget, picker)
 		
 		redCone.SetPosition(p[0], p[1], p[2])
@@ -176,35 +202,92 @@ class LandmarkTransformationTool(TransformationTool):
 
 		iren.Render()
 
+	def AddFixedLandmark(self, position):
+		self.fixedPoints.append(position)
+		self.UpdateTransform()
+
+		sphere = CreateSphere()
+		sphere.SetPosition(position[0], position[1], position[2])
+
+		self.AddPropToWidget(sphere, self.fixedWidget)
+		self.AddPropToWidget(sphere, self.multiWidget)
+
+	def AddMovingLandmark(self, position):
+		"""
+		Adds the given position to the list of landmark points.
+		Also creates spheres in the moving widget and the multi
+		widget.
+		"""
+		self.movingPoints.append(position)
+		self.UpdateTransform()
+
+		sphere = CreateSphere()
+		sphere.SetPosition(position[0], position[1], position[2])
+		self.AddPropToWidget(sphere, self.movingWidget)
+
+		sphere2 = CreateSphere()
+		sphere2.SetPosition(position[0], position[1], position[2])
+		sphere2.SetUserTransform(self.multiWidget.mapper.GetSecondInputUserTransform())
+		self.AddPropToWidget(sphere2, self.multiWidget)
+
+	def UpdateTransform(self):
+		"""
+		Update the landmark transform
+		"""
+		if len(self.fixedPoints) == 0 or len(self.movingPoints) == 0:
+			return
+
+		fixedPoints = vtkPoints()
+		movingPoints = vtkPoints()
+		numberOfSets = min(len(self.fixedPoints), len(self.movingPoints))
+		fixedPoints.SetNumberOfPoints(numberOfSets)
+		movingPoints.SetNumberOfPoints(numberOfSets)
+
+		for index in range(numberOfSets):
+			fixedPoint = self.fixedPoints[index]
+			movingPoint = self.movingPoints[index]
+			fixedPoints.SetPoint(index, fixedPoint)
+			movingPoints.SetPoint(index, movingPoint)
+
+		landmarkTransform = vtkLandmarkTransform()
+		landmarkTransform.SetModeToRigidBody()
+		landmarkTransform.SetSourceLandmarks(fixedPoints)
+		landmarkTransform.SetTargetLandmarks(movingPoints)
+		landmarkTransform.Update()
+
+		matrix = landmarkTransform.GetMatrix()
+
+		transform = vtkTransform()
+		transform.Identity()
+		transform.SetMatrix(matrix)
+		transform.Update()
+		transform.Inverse()
+		
+		self.multiWidget.mapper.SetSecondInputUserTransform(transform)
+		# TODO: the multi render widget only updates on mouse over...
+
 	def PressedVolumeFixed(self, iren, event=""):
 		"""
 		Add sphere in multi render.
 		If there are both fixed and moving points, do
 		the transform.
 		"""
-		sphere = CreateSphere()
-
 		# Do not pick again, but instead use the position of
 		# the cone so that you can rotate the volume and then
 		# after rotating it and seeing that it is in the right
 		# position can secure that location
+		key = iren.GetKeyCode()
+		if key != "a":
+			return
 		p = self.fixedProps[0].GetPosition()
-		sphere.SetPosition(p[0], p[1], p[2])
-
-		self.fixedWidget.renderer.AddViewProp(sphere)
+		self.AddFixedLandmark(p)
 
 	def PressedVolumeMoving(self, iren, event=""):
+		key = iren.GetKeyCode()
+		if key != "a":
+			return
 		p = self.movingProps[0].GetPosition()
-		sphere = CreateSphere()
-		sphere.SetPosition(p[0], p[1], p[2])
-		self.movingWidget.renderer.AddViewProp(sphere)
-
-	def ClickedVolume(self, iren, event=""):
-		"""
-		Left button release does not seem to get forwarded from interactor
-		to listeners...
-		"""
-		pass
+		self.AddMovingLandmark(p)
 
 
 def CreateSphere():
