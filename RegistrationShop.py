@@ -131,8 +131,8 @@ class RegistrationShop(MainWindow):
 		self.movingPropWidget.setFileChangedSignal(projectController.movingFileChanged)
 		self.movingPropWidget.setLoadDataSlot(self.loadMovingDataSetFile)
 
-		self.MultiRenderPropWidget = MultiRenderPropWidget(self.multiRenderController, parent=self)
-		self.MultiRenderPropWidget.setSizePolicy(sizePolicy)
+		self.multiPropWidget = MultiRenderPropWidget(self.multiRenderController, parent=self)
+		self.multiPropWidget.setSizePolicy(sizePolicy)
 
 		self.verticalSplitter = QSplitter()
 		self.verticalSplitter.setOrientation(Qt.Vertical)
@@ -177,7 +177,7 @@ class RegistrationShop(MainWindow):
 		propsLayout.setSpacing(1)
 		propsLayout.setContentsMargins(0, 0, 0, 0)
 		propsLayout.addWidget(self.fixedPropWidget)
-		propsLayout.addWidget(self.MultiRenderPropWidget)
+		propsLayout.addWidget(self.multiPropWidget)
 		propsLayout.addWidget(self.movingPropWidget)
 
 		propsWidget = QWidget()
