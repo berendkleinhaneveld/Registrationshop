@@ -322,6 +322,8 @@ class RegistrationShop(MainWindow):
 		* Read in the new data and update this in the multi render widget
 		* this would mean a new data model for the multi render widget
 		"""
+		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)
+		
 		if self.transformTool is not None:
 			self.transformTool.cleanUp()
 
@@ -331,6 +333,8 @@ class RegistrationShop(MainWindow):
 
 	@Slot()
 	def addLandmarkTransform(self):
+		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)
+
 		if self.transformTool is not None:
 			self.transformTool.cleanUp()
 
@@ -342,6 +346,8 @@ class RegistrationShop(MainWindow):
 
 	@Slot()
 	def addDeformableTransform(self):
+		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)
+
 		if self.transformTool is not None:
 			self.transformTool.cleanUp()
 		print "Warning: RegistrationShop.addDeformableTransform() not implemented yet"
