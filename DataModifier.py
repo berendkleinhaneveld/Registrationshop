@@ -97,7 +97,7 @@ class ImageDataResizer(MainWindow):
 			return
 
 		if float(self.factorLine.text()) < 0.0:
-			self.statusBar.showMessage("You funny")
+			self.statusBar.showMessage("You trying to be funny?")
 
 		self.statusBar.clearMessage()
 
