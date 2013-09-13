@@ -18,6 +18,7 @@ from parameters.RenderParameterWidget import RenderParameterWidget
 from parameters.RenderInfoWidget import RenderInfoWidget
 from parameters.RenderSlicerParamWidget import RenderSlicerParamWidget
 from parameters.TransformationHistoryWidget import TransformationHistoryWidget
+from parameters.TransformationParameterWidget import TransformationParameterWidget
 
 
 class RenderPropWidget(QWidget):
@@ -109,12 +110,14 @@ class MultiRenderPropWidget(QWidget):
 
 		# Two tabs: Visualization and Data info
 		self.mixParamWidget = RenderParameterWidget(multiRenderController)
+		self.transformParamWidget = TransformationParameterWidget()
 		self.registrationHistoryWidget = TransformationHistoryWidget()
 		self.slicesTabWidget = RenderSlicerParamWidget(multiRenderController)
 
 		# Create the tab widget
 		self.tabWidget = QTabWidget()
 		self.tabWidget.addTab(self.mixParamWidget, "Mix")
+		self.tabWidget.addTab(self.transformParamWidget, "Transformation")
 		self.tabWidget.addTab(self.registrationHistoryWidget, "History")
 		self.tabWidget.addTab(self.slicesTabWidget, "Slices")
 

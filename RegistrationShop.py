@@ -327,6 +327,7 @@ class RegistrationShop(MainWindow):
 
 		self.transformTool = UserTransformationTool()
 		self.transformTool.setRenderWidgets(multi=self.multiDataWidget)
+		self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
 
 	@Slot()
 	def addLandmarkTransform(self):
@@ -337,6 +338,7 @@ class RegistrationShop(MainWindow):
 		self.transformTool.setRenderWidgets(fixed=self.fixedDataWidget,
 			moving=self.movingDataWidget,
 			multi=self.multiDataWidget)
+		self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
 
 	@Slot()
 	def addDeformableTransform(self):

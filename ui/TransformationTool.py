@@ -20,6 +20,11 @@ from vtk import vtkActor
 from vtk import vtkPoints
 from vtk import vtkLandmarkTransform
 from core.decorators import overrides
+from PySide.QtGui import QLabel
+from PySide.QtGui import QWidget
+from PySide.QtGui import QGridLayout
+from PySide.QtGui import QLineEdit
+from PySide.QtGui import QDoubleValidator
 
 
 class TransformationTool(object):
@@ -43,9 +48,15 @@ class TransformationTool(object):
 		self.__callbacks.append((obj, callback))
 
 	def cleanUpCallbacks(self):
+		"""
+		Cleans up the vtkCallBacks
+		"""
 		for obj, callback in self.__callbacks:
 			obj.RemoveObserver(callback)
 		self.__callbacks = []
+
+	def getParameterWidget(self):
+		raise NotImplementedError()
 
 
 class UserTransformationTool(TransformationTool):
@@ -86,18 +97,79 @@ class UserTransformationTool(TransformationTool):
 		transform = vtkTransform()
 		arg1.GetTransform(transform)
 		self.renderWidget.mapper.SetSecondInputUserTransform(transform)
+		self.transformUpdated(transform)
+
+	@overrides(TransformationTool)
+	def getParameterWidget(self):
+		layout = QGridLayout()
+		layout.addWidget(QLabel("Translation"), 0, 0)
+
+		self.translateEdits = [QLineEdit() for x in range(3)]
+		self.initLineEdits(self.translateEdits, layout, 0, 1)
+
+		layout.addWidget(QLabel("Rotation"), 1, 0)
+		self.rotationEdits = [QLineEdit() for x in range(3)]
+		self.initLineEdits(self.rotationEdits, layout, 1, 1)
+		
+		layout.addWidget(QLabel("Scale"), 2, 0)
+		self.scaleEdits = [QLineEdit() for x in range(3)]
+		self.initLineEdits(self.scaleEdits, layout, 2, 1)
+		
+		widget = QWidget()
+		widget.setLayout(layout)
+		return widget
+
+	def initLineEdits(self, lineEdits, layout, row, colOffset):
+		colIndex = 0
+		for lineEdit in lineEdits:
+			lineEdit.setValidator(QDoubleValidator())
+			lineEdit.setText("0.0")
+			layout.addWidget(lineEdit, row, colOffset + colIndex)
+			colIndex += 1
+
+	def transformUpdated(self, transform):
+		"""
+		:type transform: vtkTransform
+		"""
+		# TODO: get the transform from the multi render widget when
+		# transform is adjusted
+		orientation = transform.GetOrientation()
+		position = transform.GetPosition()
+		scale = transform.GetScale()
+		
+		self.updateText(self.rotationEdits, orientation)
+		self.updateText(self.translateEdits, position)
+		self.updateText(self.scaleEdits, scale)
+
+	def updateText(self, lineEdits, values):
+		"""
+		Update the text of the given QLineEdit objects to
+		the values in values object.
+		:type lineEdits: list (QLineEdit)
+		:type values: list (float)
+		"""
+		assert len(lineEdits) == len(values)
+		for index in range(len(lineEdits)):
+			value = values[index]
+			lineEdit = lineEdits[index]
+			lineEdit.setText("%6.4f" % value)
 
 
 class LandmarkTransformationTool(TransformationTool):
 	"""
 	Use the 'A' key to set a landmark.
 	"""
-	
+
 	def __init__(self):
 		super(LandmarkTransformationTool, self).__init__()
 
 		self.fixedPoints = []
 		self.movingPoints = []
+
+	@overrides(TransformationTool)
+	def getParameterWidget(self):
+		widget = QWidget()
+		return widget
 
 	@overrides(TransformationTool)
 	def setRenderWidgets(self, fixed=None, moving=None, multi=None):
@@ -141,7 +213,7 @@ class LandmarkTransformationTool(TransformationTool):
 		self.coneSource.CappingOn()
 		self.coneSource.SetHeight(12*multiplier)
 		self.coneSource.SetRadius(5*multiplier)
-		self.coneSource.SetResolution(31)
+		self.coneSource.SetResolution(6)
 		self.coneSource.SetCenter(6*multiplier, 0, 0)
 		self.coneSource.SetDirection(-1, 0, 0)
 
@@ -293,8 +365,8 @@ class LandmarkTransformationTool(TransformationTool):
 def CreateSphere():
 	sphereSource = vtkSphereSource()
 	sphereSource.SetRadius(20)
-	sphereSource.SetThetaResolution(18)
-	sphereSource.SetPhiResolution(18)
+	sphereSource.SetThetaResolution(6)
+	sphereSource.SetPhiResolution(6)
 
 	sphereMapper = vtkPolyDataMapper()
 	sphereMapper.SetInputConnection(sphereSource.GetOutputPort())
