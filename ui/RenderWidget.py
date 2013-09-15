@@ -47,6 +47,7 @@ class RenderWidget(QWidget):
 
 		self.volume = None
 		self.mapper = vtkOpenGLGPUVolumeRayCastMapper()
+		self.mapper.SetAutoAdjustSampleDistances(1)
 		self.imageData = None
 		self.VolumeVisualization = None
 		self.shouldResetCamera = False
