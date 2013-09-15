@@ -146,12 +146,6 @@ class MultiRenderWidget(QWidget):
 		self.shouldResetCamera = True
 
 	def setVolumeVisualization(self, visualization):
-		"""
-		"""
-		if visualization is not None and visualization is self.visualization:
-			# Just update the volume properties
-			pass
-
 		self.visualization = visualization
 		if self.visualization is None:
 			color, opacityFunction = CreateEmptyFunctions()
