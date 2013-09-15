@@ -17,7 +17,6 @@ from PySide.QtGui import QApplication
 from PySide.QtGui import QAction
 from PySide.QtGui import QIcon
 from PySide.QtGui import QFileDialog
-from PySide.QtGui import QVBoxLayout
 from PySide.QtGui import QHBoxLayout
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
