@@ -40,8 +40,8 @@ from ui.MultiRenderWidget import MultiRenderWidget
 from ui.TitleWidget import TitleWidget
 from ui.RenderPropertyWidgets import RenderPropWidget
 from ui.RenderPropertyWidgets import MultiRenderPropWidget
-from ui.TransformationTool import UserTransformationTool
-from ui.TransformationTool import LandmarkTransformationTool
+from ui.UserTransformationTool import UserTransformationTool
+from ui.LandmarkTransformationTool import LandmarkTransformationTool
 
 
 # Define settings parameters
