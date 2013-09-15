@@ -1,11 +1,14 @@
 """
 LandmarkTransformationTool (TransformationTool)
 
+TODO:
+* Give the spheres corresponding colors or numbers
+
 :Authors:
 	Berend Klein Haneveld
 """
 import math
-from ui.TransformationTool import TransformationTool
+from TransformationTool import TransformationTool
 from core.decorators import overrides
 from PySide.QtGui import QWidget
 from vtk import vtkConeSource

@@ -1,0 +1,6 @@
+from RenderInfoWidget import RenderInfoWidget
+from RenderParameterWidget import RenderParameterWidget
+from RenderSlicerParamWidget import RenderSlicerParamWidget
+from TransformationHistoryWidget import TransformationHistoryWidget
+from TransformationParameterWidget import TransformationParameterWidget
+from MultiRenderParamWidget import MultiRenderParamWidget

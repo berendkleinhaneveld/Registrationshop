@@ -4,7 +4,7 @@ UserTransformationTool (TransformationTool)
 :Authors:
 	Berend Klein Haneveld
 """
-from ui.TransformationTool import TransformationTool
+from TransformationTool import TransformationTool
 from core.decorators import overrides
 from vtk import vtkBoxWidget
 from vtk import vtkTransform

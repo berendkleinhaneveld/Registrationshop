@@ -1,9 +1,6 @@
 """
 TransformationTool
 
-TODO:
-* Give the spheres corresponding colors or numbers
-
 :Authors:
 	Berend Klein Haneveld
 """
@@ -42,8 +39,3 @@ class TransformationTool(object):
 
 	def getParameterWidget(self):
 		raise NotImplementedError()
-
-
-class DeformableTransformationTool(TransformationTool):
-	def __init__(self):
-		super(DeformableTransformationTool, self).__init__()

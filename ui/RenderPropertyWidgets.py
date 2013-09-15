@@ -14,11 +14,11 @@ from PySide.QtGui import QVBoxLayout
 from PySide.QtGui import QTabWidget
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
-from parameters.RenderParameterWidget import RenderParameterWidget
-from parameters.RenderInfoWidget import RenderInfoWidget
-from parameters.RenderSlicerParamWidget import RenderSlicerParamWidget
-from parameters.TransformationHistoryWidget import TransformationHistoryWidget
-from parameters.TransformationParameterWidget import TransformationParameterWidget
+from parameters import RenderParameterWidget
+from parameters import RenderInfoWidget
+from parameters import RenderSlicerParamWidget
+from parameters import TransformationHistoryWidget
+from parameters import TransformationParameterWidget
 
 
 class RenderPropWidget(QWidget):
