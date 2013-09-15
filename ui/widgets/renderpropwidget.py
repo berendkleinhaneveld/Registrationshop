@@ -1,24 +1,18 @@
 """
-RenderPropertyWidgets
-
-* RenderPropWidget
-* MultiRenderPropWidget
+RenderPropWidget
 
 :Authors:
 	Berend Klein Haneveld
 """
-
 from PySide.QtGui import QWidget
 from PySide.QtGui import QPushButton
 from PySide.QtGui import QVBoxLayout
 from PySide.QtGui import QTabWidget
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
-from parameters import RenderParameterWidget
-from parameters import RenderInfoWidget
-from parameters import RenderSlicerParamWidget
-from parameters import TransformationHistoryWidget
-from parameters import TransformationParameterWidget
+from ui.parameters import RenderParameterWidget
+from ui.parameters import RenderInfoWidget
+from ui.parameters import RenderSlicerParamWidget
 
 
 class RenderPropWidget(QWidget):
@@ -97,30 +91,3 @@ class RenderPropWidget(QWidget):
 				# Add the parameter widgets
 				layout.addWidget(self.tabWidget)
 				self.setLayout(layout)
-
-
-class MultiRenderPropWidget(QWidget):
-	"""
-	MultiRenderPropWidget is a widget that is displayed under the multi render
-	widget. It contains tabs with some controls for interaction and
-	visualization of the combined / multi-volume render widget.
-	"""
-	def __init__(self, multiRenderController, parent=None):
-		super(MultiRenderPropWidget, self).__init__(parent=parent)
-
-		# Two tabs: Visualization and Data info
-		self.mixParamWidget = RenderParameterWidget(multiRenderController)
-		self.transformParamWidget = TransformationParameterWidget()
-		self.registrationHistoryWidget = TransformationHistoryWidget()
-		self.slicesTabWidget = RenderSlicerParamWidget(multiRenderController)
-
-		# Create the tab widget
-		self.tabWidget = QTabWidget()
-		self.tabWidget.addTab(self.mixParamWidget, "Mix")
-		self.tabWidget.addTab(self.transformParamWidget, "Transformation")
-		self.tabWidget.addTab(self.registrationHistoryWidget, "History")
-		self.tabWidget.addTab(self.slicesTabWidget, "Slices")
-
-		layout = QVBoxLayout()
-		self.setLayout(layout)
-		layout.addWidget(self.tabWidget)

@@ -12,10 +12,10 @@ from PySide.QtGui import QWidget
 from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data.DataReader import DataReader
 from core.data.DataResizer import DataResizer
-from ui.MultiVolumeVisualization import MultiVisualizationTypeMIDA
-from ui.MultiVolumeVisualization import MultiVisualizationTypeMIP
-from ui.MultiVolumeVisualization import MultiVisualizationTypeMix
-from ui.MultiVolumeVisualization import MultiVolumeVisualizationFactory
+from ui.visualizations import MultiVisualizationTypeMIDA
+from ui.visualizations import MultiVisualizationTypeMIP
+from ui.visualizations import MultiVisualizationTypeMix
+from ui.visualizations import MultiVolumeVisualizationFactory
 
 
 class MultiRenderController(QObject):

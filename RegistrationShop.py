@@ -32,13 +32,13 @@ from core.data.DataReader import DataReader
 from core.AppResources import AppResources
 # Import ui elements
 from ui.MainWindow import MainWindow
-from ui.RenderWidget import RenderWidget
+from ui.widgets import RenderWidget
+from ui.widgets import MultiRenderWidget
+from ui.widgets import TitleWidget
+from ui.widgets import RenderPropWidget
+from ui.widgets import MultiRenderPropWidget
 from ui.RenderController import RenderController
 from ui.MultiRenderController import MultiRenderController
-from ui.MultiRenderWidget import MultiRenderWidget
-from ui.TitleWidget import TitleWidget
-from ui.RenderPropertyWidgets import RenderPropWidget
-from ui.RenderPropertyWidgets import MultiRenderPropWidget
 from ui.transformations import UserTransformationTool
 from ui.transformations import LandmarkTransformationTool
 

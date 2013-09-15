@@ -17,12 +17,12 @@ from PySide.QtCore import QObject
 from PySide.QtCore import Signal
 from PySide.QtCore import Slot
 from PySide.QtGui import QWidget
-from VolumeVisualization import VisualizationTypeCT
-from VolumeVisualization import VisualizationTypeSimple
-from VolumeVisualization import VisualizationTypeMIP
-from VolumeVisualization import VisualizationTypeRamp
-from VolumeVisualization import VolumeVisualizationFactory
-from VolumeVisualization import VolumeVisualizationObjectWrapper
+from ui.visualizations import VisualizationTypeCT
+from ui.visualizations import VisualizationTypeSimple
+from ui.visualizations import VisualizationTypeMIP
+from ui.visualizations import VisualizationTypeRamp
+from ui.visualizations import VolumeVisualizationFactory
+from ui.visualizations import VolumeVisualizationWrapper
 from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data.DataReader import DataReader
 from core.data.DataResizer import DataResizer
@@ -126,7 +126,7 @@ class RenderController(QObject):
 		"""
 		visualizations = dict()
 		for key in self.visualizations:
-			volProp = VolumeVisualizationObjectWrapper(self.visualizations[key])
+			volProp = VolumeVisualizationWrapper(self.visualizations[key])
 			visualizations[key] = volProp
 
 		settings = dict()

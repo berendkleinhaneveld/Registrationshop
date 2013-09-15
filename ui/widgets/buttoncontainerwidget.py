@@ -154,4 +154,3 @@ class ButtonContainer(QWidget):
 		else:
 			sizeHint = QtCore.QSize(height, width)
 		return sizeHint
-
