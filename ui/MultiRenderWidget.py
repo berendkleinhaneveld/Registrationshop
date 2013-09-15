@@ -199,7 +199,7 @@ def CreateEmptyImageData():
 	imageData = vtkImageData()
 	imageData.SetDimensions(dimensions)
 	imageData.SetSpacing(1, 1, 1)
-	imageData.SetOrigin(0, 0, 0)
+	imageData.SetOrigin(10, 10, 0)
 	imageData.AllocateScalars(VTK_FLOAT, 1)
 	for z in xrange(0, dimensions[2]-1):
 		for y in xrange(0, dimensions[1]-1):
