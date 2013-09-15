@@ -64,7 +64,8 @@ class TransformationParameterWidget(QWidget):
 		"""
 		Applies the transform and hides the apply / cancel buttons
 		"""
-		# TODO: apply transformation
+		self.transformationTool.applyTransform()
+
 		self.showControls(False)
 		self.cleanUpTransformWidget()
 		self.transformationTool.cleanUp()

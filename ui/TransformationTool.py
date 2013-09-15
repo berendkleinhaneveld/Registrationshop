@@ -40,6 +40,9 @@ class TransformationTool(object):
 	def setRenderWidgets(self, fixed=None, moving=None, multi=None):
 		raise NotImplementedError()
 
+	def applyTransform(self):
+		raise NotImplementedError()
+
 	def cleanUp(self):
 		raise NotImplementedError()
 
@@ -75,10 +78,10 @@ class UserTransformationTool(TransformationTool):
 		self.cleanUpCallbacks()
 
 		# Reset the transformation
-		transform = vtkTransform()
-		transform.Identity()
-		self.renderWidget.mapper.SetSecondInputUserTransform(transform)
-		self.renderWidget.render()
+		self.renderWidget.resetUserTransform()
+
+	def applyTransform(self):
+		self.renderWidget.applyUserTransform()
 
 	def setImageData(self, movingImageData):
 		self.transformBox = vtkBoxWidget()
@@ -96,7 +99,7 @@ class UserTransformationTool(TransformationTool):
 	def transformCallback(self, arg1, arg2):
 		transform = vtkTransform()
 		arg1.GetTransform(transform)
-		self.renderWidget.mapper.SetSecondInputUserTransform(transform)
+		self.renderWidget.setUserTransform(transform)
 		self.transformUpdated(transform)
 
 	@overrides(TransformationTool)
@@ -115,6 +118,8 @@ class UserTransformationTool(TransformationTool):
 		self.scaleEdits = [QLineEdit() for x in range(3)]
 		self.initLineEdits(self.scaleEdits, layout, 2, 1)
 		
+		self.transformUpdated(self.renderWidget.getUserTransform())
+
 		widget = QWidget()
 		widget.setLayout(layout)
 		return widget
@@ -124,8 +129,35 @@ class UserTransformationTool(TransformationTool):
 		for lineEdit in lineEdits:
 			lineEdit.setValidator(QDoubleValidator())
 			lineEdit.setText("0.0")
+			lineEdit.textEdited.connect(self.updateTransformFromText)
 			layout.addWidget(lineEdit, row, colOffset + colIndex)
 			colIndex += 1
+
+	def updateTransformFromText(self, text):
+		transform = vtkTransform()
+
+		translate = self.readArrayOfValues(self.translateEdits)
+		transform.Translate(translate)
+		rotate = self.readArrayOfValues(self.rotationEdits)
+		transform.RotateZ(rotate[2])
+		transform.RotateY(rotate[1])
+		transform.RotateX(rotate[0])
+		scale = self.readArrayOfValues(self.scaleEdits, 1.0)
+		transform.Scale(scale)
+		transform.Modified()
+		transform.Update()
+		self.renderWidget.setUserTransform(transform)
+		# TODO: fix 'latency' of update...
+
+	def readArrayOfValues(self, lineEdits, default=0.0):
+		values = []
+		for translateEdit in lineEdits:
+			try:
+				value = float(translateEdit.text())
+				values.append(value)
+			except Exception:
+				values.append(default)
+		return values
 
 	def transformUpdated(self, transform):
 		"""
@@ -152,7 +184,7 @@ class UserTransformationTool(TransformationTool):
 		for index in range(len(lineEdits)):
 			value = values[index]
 			lineEdit = lineEdits[index]
-			lineEdit.setText("%6.4f" % value)
+			lineEdit.setText("%6.2f" % value)
 
 
 class LandmarkTransformationTool(TransformationTool):

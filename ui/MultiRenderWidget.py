@@ -15,7 +15,9 @@ from vtk import vtkAxesActor
 from vtk import vtkOrientationMarkerWidget
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
+from vtk import vtkTransform
 from vtk import vtkVolumeProperty
+from vtk import vtkMatrix4x4
 from vtk import VTK_FLOAT
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
@@ -95,6 +97,11 @@ class MultiRenderWidget(QWidget):
 
 		self.mapper.SetInputData(0, self.fixedImageData)
 		self.mapper.SetInputData(1, self.movingImageData)
+
+		# Keep track of the base and user transforms
+		self.baseTransform = vtkTransform()
+		self.userTransform = vtkTransform()
+		# TODO: save the base transform in the project file
 
 		axesActor = vtkAxesActor()
 		self.orientationWidget = vtkOrientationMarkerWidget()
@@ -176,6 +183,58 @@ class MultiRenderWidget(QWidget):
 				self.imagePlaneWidgets[sliceIndex].On()
 			else:
 				self.imagePlaneWidgets[sliceIndex].Off()
+
+	def getUserTransform(self):
+		return self.userTransform
+
+	def setUserTransform(self, transform):
+		self.userTransform = transform
+
+		self._updateTransform()
+
+	def resetUserTransform(self):
+		self.userTransform = vtkTransform()
+		self._updateTransform()
+
+	def resetAllTransforms(self):
+		self.baseTransform = vtkTransform()
+		self.userTransform = vtkTransform()
+		self._updateTransform()
+
+	def applyUserTransform(self):
+		"""
+		Concatenates the user transform with the base transform
+		into the new base transform. Resets the user transform.
+		"""
+		self.baseTransform = self._getConcatenatedTransform()
+		self.resetUserTransform()
+
+	def _updateTransform(self):
+		"""
+		Updates the transform of the second volume.
+		"""
+		transform = self._getConcatenatedTransform()
+		transform.Update()
+		self.mapper.SetSecondInputUserTransform(transform)
+
+	def _getConcatenatedTransform(self):
+		"""
+		Creates and returns a new vtkTransform that exists
+		of the base and user transforms concatenated.
+		"""
+		completeTransform = vtkTransform()
+		completeTransform.Concatenate(self.userTransform)
+		completeTransform.Concatenate(self.baseTransform)
+		completeTransform.Update()
+
+		return self.getCopyOfTransform(completeTransform)
+
+	def getCopyOfTransform(self, transform):
+		newTransform = vtkTransform()
+		matrix = vtkMatrix4x4()
+		matrix.DeepCopy(transform.GetMatrix())
+		newTransform.SetMatrix(matrix)
+		return newTransform
 
 
 # Helper methods
