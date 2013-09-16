@@ -7,8 +7,8 @@ are hard to keep track of.
 Use multiple inheritance to inherit from this class to get access
 to the convenience methods.
 
-Observers for vtk events can be added through 
-AddObserver(obj, eventName, callbackFunction) and when it is time 
+Observers for vtk events can be added through
+AddObserver(obj, eventName, callbackFunction) and when it is time
 to clean up, just call cleanUpCallbacks().
 
 :Authors:
