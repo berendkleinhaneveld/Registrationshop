@@ -6,54 +6,40 @@ UserTransformationTool (TransformationTool)
 """
 from TransformationTool import TransformationTool
 from core.decorators import overrides
-from vtk import vtkBoxWidget
+from ui.transformations import TransformBox
 from vtk import vtkTransform
 from PySide.QtGui import QLabel
 from PySide.QtGui import QWidget
 from PySide.QtGui import QLineEdit
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QDoubleValidator
+from PySide.QtCore import Slot
 
 
 class UserTransformationTool(TransformationTool):
 	def __init__(self):
 		super(UserTransformationTool, self).__init__()
 
+		self.transformBox = TransformBox()
+		self.transformBox.transformUpdated.connect(self.transformUpdated)
+
 	@overrides(TransformationTool)
 	def setRenderWidgets(self, fixed=None, moving=None, multi=None):
 		self.renderWidget = multi
-		self.setImageData(self.renderWidget.movingImageData)
+		self.transformBox.setWidget(self.renderWidget)
+		self.transformBox.setImageData(self.renderWidget.movingImageData)
 
 	@overrides(TransformationTool)
 	def cleanUp(self):
-		# Hide the transformation box
-		self.transformBox.EnabledOff()
-		self.cleanUpCallbacks()
+		self.transformBox.cleanUp()
 
 		# Reset the transformation
 		self.renderWidget.resetUserTransform()
+		self.renderWidget.render()
 
+	@overrides(TransformationTool)
 	def applyTransform(self):
 		self.renderWidget.applyUserTransform()
-
-	def setImageData(self, movingImageData):
-		self.transformBox = vtkBoxWidget()
-		self.transformBox.SetInteractor(self.renderWidget.rwi)
-		self.transformBox.SetPlaceFactor(1.01)
-		self.transformBox.SetInputData(movingImageData)
-		self.transformBox.SetDefaultRenderer(self.renderWidget.renderer)
-		self.transformBox.InsideOutOn()
-		self.transformBox.PlaceWidget()
-
-		self.AddObserver(self.transformBox, "InteractionEvent", self.transformCallback)
-		self.transformBox.GetSelectedFaceProperty().SetOpacity(0.3)
-		self.transformBox.EnabledOn()
-
-	def transformCallback(self, arg1, arg2):
-		transform = vtkTransform()
-		arg1.GetTransform(transform)
-		self.renderWidget.setUserTransform(transform)
-		self.transformUpdated(transform)
 
 	@overrides(TransformationTool)
 	def getParameterWidget(self):
@@ -76,6 +62,21 @@ class UserTransformationTool(TransformationTool):
 		widget = QWidget()
 		widget.setLayout(layout)
 		return widget
+	
+	@Slot(object)
+	def transformUpdated(self, transform):
+		"""
+		:type transform: vtkTransform
+		"""
+		# TODO: get the transform from the multi render widget when
+		# transform is adjusted
+		orientation = transform.GetOrientation()
+		position = transform.GetPosition()
+		scale = transform.GetScale()
+		
+		self._updateText(self.rotationEdits, orientation)
+		self._updateText(self.translateEdits, position)
+		self._updateText(self.scaleEdits, scale)
 
 	def initLineEdits(self, lineEdits, layout, row, colOffset):
 		colIndex = 0
@@ -89,44 +90,20 @@ class UserTransformationTool(TransformationTool):
 	def updateTransformFromText(self, text):
 		transform = vtkTransform()
 
-		translate = self.readArrayOfValues(self.translateEdits)
+		translate = self._readArrayOfValues(self.translateEdits)
 		transform.Translate(translate)
-		rotate = self.readArrayOfValues(self.rotationEdits)
+		rotate = self._readArrayOfValues(self.rotationEdits)
 		transform.RotateZ(rotate[2])
 		transform.RotateY(rotate[1])
 		transform.RotateX(rotate[0])
-		scale = self.readArrayOfValues(self.scaleEdits, 1.0)
+		scale = self._readArrayOfValues(self.scaleEdits, 1.0)
 		transform.Scale(scale)
 		transform.Modified()
 		transform.Update()
 		self.renderWidget.setUserTransform(transform)
 		# TODO: fix 'latency' of update...
 
-	def readArrayOfValues(self, lineEdits, default=0.0):
-		values = []
-		for translateEdit in lineEdits:
-			try:
-				value = float(translateEdit.text())
-				values.append(value)
-			except Exception:
-				values.append(default)
-		return values
-
-	def transformUpdated(self, transform):
-		"""
-		:type transform: vtkTransform
-		"""
-		# TODO: get the transform from the multi render widget when
-		# transform is adjusted
-		orientation = transform.GetOrientation()
-		position = transform.GetPosition()
-		scale = transform.GetScale()
-		
-		self.updateText(self.rotationEdits, orientation)
-		self.updateText(self.translateEdits, position)
-		self.updateText(self.scaleEdits, scale)
-
-	def updateText(self, lineEdits, values):
+	def _updateText(self, lineEdits, values):
 		"""
 		Update the text of the given QLineEdit objects to
 		the values in values object.
@@ -138,3 +115,13 @@ class UserTransformationTool(TransformationTool):
 			value = values[index]
 			lineEdit = lineEdits[index]
 			lineEdit.setText("%6.2f" % value)
+
+	def _readArrayOfValues(self, lineEdits, default=0.0):
+		values = []
+		for translateEdit in lineEdits:
+			try:
+				value = float(translateEdit.text())
+				values.append(value)
+			except Exception:
+				values.append(default)
+		return values
