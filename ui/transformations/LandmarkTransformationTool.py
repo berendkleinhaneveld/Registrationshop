@@ -14,8 +14,13 @@ from vtk import vtkActor
 from vtk import vtkPoints
 from vtk import vtkLandmarkTransform
 from vtk import vtkTransform
+from PySide.QtGui import QWidget
+from PySide.QtGui import QGridLayout
+from PySide.QtGui import QComboBox
+from PySide.QtGui import QLabel
 from PySide.QtCore import Signal
 from PySide.QtCore import Slot
+from PySide.QtCore import Qt
 
 
 class LandmarkTransformationTool(TransformationTool):
@@ -38,12 +43,27 @@ class LandmarkTransformationTool(TransformationTool):
 		self.movingMultiLandmarks = []  # Spheres, vtkActors
 
 		self.activeIndex = 0
+		self.landmarkTransformType = 0  # Rigid
 
 	@overrides(TransformationTool)
 	def getParameterWidget(self):
-		widget = PointsWidget()
-		self.updatedLandmarks.connect(widget.setPoints)
-		widget.activeLandmarkChanged.connect(self.setActiveLandmark)
+		pointsWidget = PointsWidget()
+		self.updatedLandmarks.connect(pointsWidget.setPoints)
+		pointsWidget.activeLandmarkChanged.connect(self.setActiveLandmark)
+
+		self.landmarkComboBox = QComboBox()
+		self.landmarkComboBox.addItem("Rigid body")
+		self.landmarkComboBox.addItem("Similarity")
+		self.landmarkComboBox.addItem("Affine")
+		self.landmarkComboBox.currentIndexChanged.connect(self.landmarkTypeChanged)
+
+		layout = QGridLayout()
+		layout.setAlignment(Qt.AlignTop)
+		layout.addWidget(QLabel("Transform type"), 0, 0)
+		layout.addWidget(self.landmarkComboBox, 0, 1)
+		layout.addWidget(pointsWidget, 1, 0, 1, 2)
+		widget = QWidget()
+		widget.setLayout(layout)
 		return widget
 
 	@overrides(TransformationTool)
@@ -102,6 +122,12 @@ class LandmarkTransformationTool(TransformationTool):
 		self.movingWidget.render()
 		self.multiWidget.render()
 
+	@Slot(int)
+	def landmarkTypeChanged(self, value):
+		self.landmarkTransformType = value
+		self.updateTransform()
+		self.multiWidget.render()
+
 	def updateTransform(self):
 		"""
 		Update the landmark transform
@@ -122,7 +148,12 @@ class LandmarkTransformationTool(TransformationTool):
 			movingPoints.SetPoint(index, movingPoint)
 
 		landmarkTransform = vtkLandmarkTransform()
-		landmarkTransform.SetModeToRigidBody()
+		if self.landmarkTransformType == 0:
+			landmarkTransform.SetModeToRigidBody()
+		elif self.landmarkTransformType == 1:
+			landmarkTransform.SetModeToSimilarity()
+		elif self.landmarkTransformType == 2:
+			landmarkTransform.SetModeToAffine()
 		landmarkTransform.SetSourceLandmarks(fixedPoints)
 		landmarkTransform.SetTargetLandmarks(movingPoints)
 		landmarkTransform.Update()
