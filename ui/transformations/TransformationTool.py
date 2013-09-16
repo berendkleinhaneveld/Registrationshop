@@ -4,17 +4,16 @@ TransformationTool
 :Authors:
 	Berend Klein Haneveld
 """
+from PySide.QtCore import QObject
 
 
-class TransformationTool(object):
+class TransformationTool(QObject):
 	"""
 	TransformationTool
 	"""
 
 	def __init__(self):
 		super(TransformationTool, self).__init__()
-
-		self.__callbacks = []
 
 	def setRenderWidgets(self, fixed=None, moving=None, multi=None):
 		raise NotImplementedError()
@@ -24,18 +23,6 @@ class TransformationTool(object):
 
 	def cleanUp(self):
 		raise NotImplementedError()
-
-	def AddObserver(self, obj, eventName, callbackFunction):
-		callback = obj.AddObserver(eventName, callbackFunction)
-		self.__callbacks.append((obj, callback))
-
-	def cleanUpCallbacks(self):
-		"""
-		Cleans up the vtkCallBacks
-		"""
-		for obj, callback in self.__callbacks:
-			obj.RemoveObserver(callback)
-		self.__callbacks = []
 
 	def getParameterWidget(self):
 		raise NotImplementedError()
