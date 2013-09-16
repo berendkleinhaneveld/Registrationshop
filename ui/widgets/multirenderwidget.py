@@ -122,6 +122,7 @@ class MultiRenderWidget(QWidget):
 			self.renderer.ResetCamera()
 			self.shouldResetCamera = False
 		self.rwi.Render()
+		self.rwi.GetRenderWindow().Render()
 
 	@Slot(object)
 	def setFixedData(self, imageData):
