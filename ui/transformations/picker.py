@@ -23,11 +23,11 @@ class Picker(QObject, Interactor):
 
 	def __init__(self):
 		super(Picker, self).__init__()
-		self.initInteractor()
 		self.props = []
 		self.picker = vtkVolumePicker()
 		self.picker.SetTolerance(1e-6)
 		self.picker.SetVolumeOpacityIsovalue(0.1)
+		self.widget = None
 
 	def setWidget(self, widget):
 		self.widget = widget
@@ -62,8 +62,10 @@ class Picker(QObject, Interactor):
 		self.AddObserver(self.widget.rwi, "KeyPressEvent", self.keyPress)
 
 	def cleanUp(self):
-		self.widget.renderer.RemoveViewProp(self.greenCone)
-		self.widget.renderer.RemoveViewProp(self.redCone)
+		if self.widget:
+			self.widget.renderer.RemoveViewProp(self.greenCone)
+			self.widget.renderer.RemoveViewProp(self.redCone)
+			self.widget.rwi.ShowCursor()
 
 		self.cleanUpCallbacks()
 
