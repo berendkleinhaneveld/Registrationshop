@@ -188,6 +188,9 @@ class MultiRenderWidget(QWidget):
 	def getUserTransform(self):
 		return self.userTransform
 
+	def getFullTransform(self):
+		return self._getConcatenatedTransform()
+
 	def setUserTransform(self, transform):
 		self.userTransform = transform
 
