@@ -24,8 +24,8 @@ from ui.visualizations import VisualizationTypeRamp
 from ui.visualizations import VolumeVisualizationFactory
 from ui.visualizations import VolumeVisualizationWrapper
 from core.vtkObjectWrapper import vtkCameraWrapper
-from core.data.DataReader import DataReader
-from core.data.DataResizer import DataResizer
+from core.data import DataReader
+from core.data import DataResizer
 
 
 class RenderController(QObject):

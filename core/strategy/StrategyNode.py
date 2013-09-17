@@ -5,7 +5,7 @@ StrategyNode
 	Berend Klein Haneveld
 """
 
-from core.data.DataReader import DataReader
+from core.data import DataReader
 
 
 class StrategyNode(object):

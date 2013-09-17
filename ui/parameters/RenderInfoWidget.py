@@ -11,7 +11,7 @@ from PySide.QtGui import QGridLayout
 from PySide.QtGui import QLabel
 from PySide.QtCore import Slot
 from PySide.QtCore import Qt
-from core.data.DataReader import DataReader
+from core.data import DataReader
 
 
 class RenderInfoWidget(QWidget):

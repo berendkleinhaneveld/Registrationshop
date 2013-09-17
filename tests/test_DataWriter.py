@@ -1,7 +1,7 @@
 import unittest
 import os
-from core.data.DataWriter import DataWriter
-from core.data.DataReader import DataReader
+from core.data import DataWriter
+from core.data import DataReader
 
 
 class DataWriterTest(unittest.TestCase):

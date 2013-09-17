@@ -10,8 +10,8 @@ from PySide.QtCore import Slot
 from PySide.QtCore import Signal
 from PySide.QtGui import QWidget
 from core.vtkObjectWrapper import vtkCameraWrapper
-from core.data.DataReader import DataReader
-from core.data.DataResizer import DataResizer
+from core.data import DataReader
+from core.data import DataResizer
 from ui.visualizations import MultiVisualizationTypeMIDA
 from ui.visualizations import MultiVisualizationTypeMIP
 from ui.visualizations import MultiVisualizationTypeMix

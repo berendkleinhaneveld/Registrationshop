@@ -1,5 +1,5 @@
 import unittest
-from core.data.DataResizer import DataResizer
+from core.data import DataResizer
 from vtk import vtkImageData
 from vtk import VTK_FLOAT
 
