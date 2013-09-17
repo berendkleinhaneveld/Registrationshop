@@ -25,6 +25,7 @@ from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSizePolicy
 from PySide.QtGui import QSplitter
+from PySide.QtGui import QProgressBar
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 
@@ -464,13 +465,19 @@ class RegistrationShop(MainWindow):
 		fileName, other = QFileDialog.getSaveFileName(self, "Save registration result to...", "", extension)
 		if len(fileName) == 0:
 			return
+		
+		self.progressDialog = ExportProgressDialog(self, "Exporting data...")
+		self.progressDialog.open()
 
+		transform = self.multiDataWidget.getFullTransform()
 		dataReader = DataReader()
 		imageData = dataReader.GetImageData(ProjectController.Instance().currentProject.movingData)
 		transformer = DataTransformer()
-		outputData = transformer.TransformImageData(imageData, self.multiDataWidget.getFullTransform())
+		outputData = transformer.TransformImageData(imageData, transform)
 		writer = DataWriter()
 		writer.WriteToFile(outputData, fileName, fileType)
+		
+		self.progressDialog.accept()
 
 
 class FileTypeDialog(QDialog):
@@ -509,6 +516,29 @@ class FileTypeDialog(QDialog):
 		if result == QDialog.Accepted:
 			return widget.result
 		return ""
+
+
+class ExportProgressDialog(QDialog):
+	"""
+	ExportProgressDialog is a dialog that
+	shows a progress bar or busy indicator
+	"""
+	def __init__(self, parent, message):
+		super(ExportProgressDialog, self).__init__(parent)
+
+		self.setModal(True)
+		self.setWindowTitle(message)
+
+		indicator = QProgressBar()
+		indicator.setMinimum(0)
+		indicator.setMaximum(0)
+
+		messageLabel = QLabel(message)
+
+		layout = QGridLayout()
+		layout.addWidget(messageLabel)
+		layout.addWidget(indicator)
+		self.setLayout(layout)
 
 
 def main():
