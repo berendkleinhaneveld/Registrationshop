@@ -18,14 +18,10 @@ from PySide.QtGui import QAction
 from PySide.QtGui import QIcon
 from PySide.QtGui import QFileDialog
 from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QDialog
-from PySide.QtGui import QLabel
-from PySide.QtGui import QPushButton
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSizePolicy
 from PySide.QtGui import QSplitter
-from PySide.QtGui import QProgressBar
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 
@@ -38,6 +34,8 @@ from core.data import DataWriter
 from core.AppResources import AppResources
 # Import ui elements
 from ui.MainWindow import MainWindow
+from ui.dialogs import ExportProgressDialog
+from ui.dialogs import FileTypeDialog
 from ui.widgets import RenderWidget
 from ui.widgets import MultiRenderWidget
 from ui.widgets import TitleWidget
@@ -478,67 +476,6 @@ class RegistrationShop(MainWindow):
 		writer.WriteToFile(outputData, fileName, fileType)
 		
 		self.progressDialog.accept()
-
-
-class FileTypeDialog(QDialog):
-	"""Custom dialog that shows some file type options."""
-	def __init__(self, parent):
-		super(FileTypeDialog, self).__init__(parent)
-		self.result = None
-
-	@Slot()
-	def _mhaButtonClicked(self):
-		self.result = DataReader.TypeMHA
-		self.accept()
-
-	@Slot()
-	def _vtiButtonClicked(self):
-		self.result = DataReader.TypeVTI
-		self.accept()
-
-	@classmethod
-	def getFileType(cls, parent, title):
-		widget = FileTypeDialog(parent)
-		widget.setModal(True)
-
-		mhdButton = QPushButton("MHD")
-		mhdButton.clicked.connect(widget._mhaButtonClicked)
-		vtiButton = QPushButton("VTI")
-		vtiButton.clicked.connect(widget._vtiButtonClicked)
-
-		layout = QGridLayout()
-		layout.addWidget(QLabel("Choose file format:"), 0, 0, 1, 2)
-		layout.addWidget(mhdButton, 1, 0)
-		layout.addWidget(vtiButton, 1, 1)
-
-		widget.setLayout(layout)
-		result = widget.exec_()
-		if result == QDialog.Accepted:
-			return widget.result
-		return ""
-
-
-class ExportProgressDialog(QDialog):
-	"""
-	ExportProgressDialog is a dialog that
-	shows a progress bar or busy indicator
-	"""
-	def __init__(self, parent, message):
-		super(ExportProgressDialog, self).__init__(parent)
-
-		self.setModal(True)
-		self.setWindowTitle(message)
-
-		indicator = QProgressBar()
-		indicator.setMinimum(0)
-		indicator.setMaximum(0)
-
-		messageLabel = QLabel(message)
-
-		layout = QGridLayout()
-		layout.addWidget(messageLabel)
-		layout.addWidget(indicator)
-		self.setLayout(layout)
 
 
 def main():
