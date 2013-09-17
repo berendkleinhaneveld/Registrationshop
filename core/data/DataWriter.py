@@ -5,7 +5,7 @@ DataWriter.py
 from DataController import DataController
 from DataReader import DataReader
 from vtk import vtkMetaImageWriter
-from vtk import vtkXMLImageDataReader
+from vtk import vtkXMLImageDataWriter
 
 
 class DataWriter(DataController):
@@ -28,7 +28,7 @@ class DataWriter(DataController):
 			writer.SetInputData(imageData)
 			writer.Write()
 		elif fileType == DataReader.TypeVTI:
-			writer = vtkXMLImageDataReader()
+			writer = vtkXMLImageDataWriter()
 			writer.SetFileName(exportFileName)
 			writer.SetInputData(imageData)
 			writer.Write()
