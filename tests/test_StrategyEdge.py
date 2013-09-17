@@ -17,11 +17,11 @@ class StrategyEdgeTest(unittest.TestCase):
 	def tearDown(self):
 		del self.edge
 
-	def testStrategyEdge(self):
-		self.assertIsNotNone(self.edge)
-		self.assertTrue(hasattr(self.edge, "parentNode"))
-		self.assertTrue(hasattr(self.edge, "childNode"))
-		self.assertTrue(hasattr(self.edge, "transformation"))
+	# def testStrategyEdge(self):
+	# 	self.assertIsNotNone(self.edge)
+	# 	self.assertTrue(hasattr(self.edge, "parentNode"))
+	# 	self.assertTrue(hasattr(self.edge, "childNode"))
+	# 	self.assertTrue(hasattr(self.edge, "transformation"))
 
 	# def testExecutingStrategyEdge(self):
 	# 	# Load simple transformation from disk

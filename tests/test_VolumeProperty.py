@@ -1,12 +1,12 @@
 import unittest
 import yaml
-from ui.VolumeVisualization import VolumeVisualizationFactory
-from ui.VolumeVisualization import VisualizationTypeCT
-from ui.VolumeVisualization import VisualizationTypeSimple
+from ui.visualizations import VolumeVisualizationFactory
+from ui.visualizations import VisualizationTypeCT
+from ui.visualizations import VisualizationTypeSimple
+from ui.visualizations import VolumeVisualizationWrapper
 from core.vtkObjectWrapper import vtkVolumePropertyWrapper
 from core.vtkObjectWrapper import vtkColorTransferFunctionWrapper
 from core.vtkObjectWrapper import vtkPiecewiseFunctionWrapper
-from ui.VolumeVisualization import VolumeVisualizationObjectWrapper
 
 
 class VolumeVisualizationTest(unittest.TestCase):
@@ -104,7 +104,7 @@ class VolumeVisualizationTest(unittest.TestCase):
 	def testVolumeVisualizationWrapper(self):
 		self.visualizationSimple.updateTransferFunction()
 
-		volPropWrapper = VolumeVisualizationObjectWrapper(self.visualizationSimple)
+		volPropWrapper = VolumeVisualizationWrapper(self.visualizationSimple)
 
 		self.assertEqual(volPropWrapper.visualizationType, VisualizationTypeSimple)
 		self.assertIsNotNone(volPropWrapper.volProp)

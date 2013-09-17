@@ -35,7 +35,7 @@ class TransformCommand(Command):
 	def __init__(self):
 		super(TransformCommand, self).__init__()
 
-		self.node
+		# self.node
 		
 	@overrides(Command)
 	def execute(self):
