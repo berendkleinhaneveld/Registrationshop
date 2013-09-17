@@ -18,6 +18,9 @@ from PySide.QtGui import QAction
 from PySide.QtGui import QIcon
 from PySide.QtGui import QFileDialog
 from PySide.QtGui import QHBoxLayout
+from PySide.QtGui import QDialog
+from PySide.QtGui import QLabel
+from PySide.QtGui import QPushButton
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSizePolicy
@@ -29,6 +32,8 @@ from PySide.QtCore import Slot
 from core.AppVars import AppVars
 from core.project.ProjectController import ProjectController
 from core.data.DataReader import DataReader
+from core.data.DataTransformer import DataTransformer
+from core.data.DataWriter import DataWriter
 from core.AppResources import AppResources
 # Import ui elements
 from ui.MainWindow import MainWindow
@@ -411,19 +416,6 @@ class RegistrationShop(MainWindow):
 			self.saveProject()
 
 	@Slot()
-	def exportDataAs(self):
-		"""
-		Opens a file dialog so that the user can provide a filename
-		for saving the transformed dataset to.
-		"""
-		print "Warning: RegistrationShop.exportDataAs() not implemented yet"
-		return
-
-		fileName, other = QFileDialog.getSaveFileName(self, "Save registration result to...", "", "(*.mhd)")
-		if len(fileName) == 0:
-			return
-
-	@Slot()
 	def openProject(self, folderName=None):
 		"""
 		If no project name is supplied, it will open a file dialog so
@@ -457,6 +449,66 @@ class RegistrationShop(MainWindow):
 		ProjectController.Instance().newProject()
 		# Reset the last loaded project in the settings
 		RegistrationShop.settings.setValue("project/lastProject", "")
+
+	@Slot()
+	def exportDataAs(self):
+		"""
+		Opens a file dialog so that the user can provide a filename
+		for saving the transformed dataset to.
+		"""
+		fileType = FileTypeDialog.getFileType(self, "Choose file type for export")
+		if len(fileType) == 0:
+			return
+
+		extension = "(*." + fileType + ")"
+		fileName, other = QFileDialog.getSaveFileName(self, "Save registration result to...", "", extension)
+		if len(fileName) == 0:
+			return
+
+		dataReader = DataReader()
+		imageData = dataReader.GetImageData(ProjectController.Instance().currentProject.movingData)
+		transformer = DataTransformer()
+		outputData = transformer.TransformImageData(imageData, self.multiDataWidget.getFullTransform())
+		writer = DataWriter()
+		writer.WriteToFile(outputData, fileName, fileType)
+
+
+class FileTypeDialog(QDialog):
+	"""Custom dialog that shows some file type options."""
+	def __init__(self, parent):
+		super(FileTypeDialog, self).__init__(parent)
+		self.result = None
+
+	@Slot()
+	def _mhaButtonClicked(self):
+		self.result = DataReader.TypeMHA
+		self.accept()
+
+	@Slot()
+	def _vtiButtonClicked(self):
+		self.result = DataReader.TypeVTI
+		self.accept()
+
+	@classmethod
+	def getFileType(cls, parent, title):
+		widget = FileTypeDialog(parent)
+		widget.setModal(True)
+
+		mhdButton = QPushButton("MHD")
+		mhdButton.clicked.connect(widget._mhaButtonClicked)
+		vtiButton = QPushButton("VTI")
+		vtiButton.clicked.connect(widget._vtiButtonClicked)
+
+		layout = QGridLayout()
+		layout.addWidget(QLabel("Choose file format:"), 0, 0, 1, 2)
+		layout.addWidget(mhdButton, 1, 0)
+		layout.addWidget(vtiButton, 1, 1)
+
+		widget.setLayout(layout)
+		result = widget.exec_()
+		if result == QDialog.Accepted:
+			return widget.result
+		return ""
 
 
 def main():
