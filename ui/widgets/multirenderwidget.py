@@ -228,9 +228,9 @@ class MultiRenderWidget(QWidget):
 		completeTransform.Concatenate(self.baseTransform)
 		completeTransform.Update()
 
-		return self.getCopyOfTransform(completeTransform)
+		return self._getCopyOfTransform(completeTransform)
 
-	def getCopyOfTransform(self, transform):
+	def _getCopyOfTransform(self, transform):
 		newTransform = vtkTransform()
 		matrix = vtkMatrix4x4()
 		matrix.DeepCopy(transform.GetMatrix())
