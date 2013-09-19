@@ -7,6 +7,7 @@ AppResources
 
 import os
 from AppVars import AppVars
+from core.elastix.Transformation import Transformation
 
 
 class AppResources(object):
@@ -30,3 +31,18 @@ class AppResources(object):
 		:rtype: basestring
 		"""
 		return os.path.join(AppVars.imagePath(), imageName)
+
+	@staticmethod
+	def elastixTemplates():
+		"""
+		Returns a list of all the available elastix templates in the
+		resource folder.
+		"""
+		transformations = []
+		fileNames = os.listdir(AppVars.transformationsPath())
+		for fileName in fileNames:
+			fullFileName = os.path.join(AppVars.transformationsPath(), fileName)
+			transformation = Transformation()
+			if transformation.loadFromFile(fullFileName):
+				transformations.append(transformation)
+		return transformations
