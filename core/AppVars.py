@@ -67,9 +67,9 @@ class AppVars(object):
 		"""
 		:rtype: basestring
 		"""
-		extension = "resources/transformations"
+		extension = "resources/transformations/"
 		if AppVars.applicationPath:
-			return AppVars.applicationPath + extension
+			return os.path.join(AppVars.applicationPath, extension)
 		else:
 			print "Warning: application path is not set"
 			return extension
