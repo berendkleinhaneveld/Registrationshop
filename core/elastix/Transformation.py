@@ -8,6 +8,7 @@ Parameters
 import os
 from Parameter import Parameter
 
+
 class Transformation(object):
 	"""
 	Object that manages a collection of parameters. By implementing some
@@ -43,18 +44,19 @@ class Transformation(object):
 		directory, lastPathComponent = os.path.split(filename)
 		self.name = lastPathComponent
 
-		parameterFile = open(filename, "r")
-		# TODO: set a name for this object from the filename
-		try:
-			for line in parameterFile:
-				param = Parameter.parameterFromString(line)
-				if param:
-					self.append(param)
+		# TODO: write tests for this method in order to better specify its behaviour
+		noErrors = True
+		with open(filename, "r") as parameterFile:
+			try:
+				for line in parameterFile:
+					param = Parameter.parameterFromString(line)
+					if param:
+						self.append(param)
 
-		except Exception, e:
-			raise e
+			except Exception:
+				noErrors = False
 			
-		return False
+		return noErrors
 
 	def saveToFile(self, filename):
 		"""
