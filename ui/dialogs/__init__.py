@@ -1,2 +1,3 @@
 from exportprogressdialog import ExportProgressDialog
 from filetypedialog import FileTypeDialog
+from elastixmaindialog import ElastixMainDialog
