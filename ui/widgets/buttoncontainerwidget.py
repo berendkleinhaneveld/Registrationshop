@@ -15,22 +15,26 @@ from PySide.QtGui import QHBoxLayout
 from PySide.QtGui import QVBoxLayout
 from PySide.QtGui import QPalette
 from PySide.QtGui import QBrush
+from PySide.QtGui import QPainter
+from PySide.QtCore import QPoint
+from PySide.QtGui import QFrame
 from PySide.QtGui import QLinearGradient
 from PySide.QtGui import QColor
 from PySide.QtCore import Qt
+import sys
 
 
 class ButtonContainer(QWidget):
-	Height = 22
+	Height = 21
 
 	def __init__(self, orientation=Qt.Horizontal):
 		"""
 		Sets up the button container.
 		"""
 		super(ButtonContainer, self).__init__()
-
 		self.orientation = orientation
-
+		# Perform custom painting on OS X
+		self._osx = sys.platform.startswith("darwin")
 		self.initUI()
 
 		# Keep track of the number of buttons
@@ -41,21 +45,29 @@ class ButtonContainer(QWidget):
 		Initializes UI. Creates a horizontal layout
 		to which buttons can be added.
 		"""
-		gradient = QLinearGradient()
-		gradient.setStart(0, 0)
-		gradient.setFinalStop(0, self.Height)
-		# TODO: get colors from theme
-		color1 = QColor(230, 230, 230, 255)
-		color2 = QColor(177, 177, 177, 255)
-		gradient.setColorAt(0, color1)
-		gradient.setColorAt(1, color2)
-		brush = QBrush(gradient)
+		if self._osx:
+			# Mimic the style of buttons underneath a list view
+			gradient = QLinearGradient()
+			gradient.setStart(0, 0)
+			gradient.setFinalStop(0, self.Height)
 
-		palette = QPalette()
-		palette.setBrush(QPalette.Background, brush)
+			colorTop = QColor(250, 250, 250, 255)
+			colorMid = QColor(244, 244, 244, 255)
+			colorInBetween = QColor(238, 238, 238, 255)
+			colorMidLow = QColor(234, 234, 234, 255)
+			colorLow = QColor(239, 239, 239, 255)
+			gradient.setColorAt(0, colorTop)
+			gradient.setColorAt(0.45, colorMid)
+			gradient.setColorAt(0.5, colorInBetween)
+			gradient.setColorAt(0.55, colorMidLow)
+			gradient.setColorAt(1, colorLow)
 
-		self.setAutoFillBackground(True)
-		self.setPalette(palette)
+			brush = QBrush(gradient)
+			palette = QPalette()
+			palette.setBrush(QPalette.Background, brush)
+
+			self.setAutoFillBackground(True)
+			self.setPalette(palette)
 
 		# Use a horizontal layout in which to keep
 		# buttons. Initialize with an empty QWidget to
@@ -68,7 +80,6 @@ class ButtonContainer(QWidget):
 		self.layout.setContentsMargins(0, 0, 0, 0)
 		self.layout.addWidget(QWidget())
 		self.setLayout(self.layout)
-		pass
 
 	# Public methods
 
@@ -85,6 +96,7 @@ class ButtonContainer(QWidget):
 		button.setMaximumHeight(ButtonContainer.Height)
 		button.setMaximumWidth(ButtonContainer.Height)
 		button.setFlat(True)
+		# button.setFrameStyle(QFrame.StyledPanel)
 
 		# Insert button into the horizontal layout. Make sure
 		# that the empty QWidget stays on the right
@@ -93,9 +105,26 @@ class ButtonContainer(QWidget):
 		# TODO: Style the buttons or make some kind of seperator
 
 		self._buttonCount += 1
-		pass
 
 	# Overwritten from QWidget
+
+	def paintEvent(self, ev):
+		if not self._osx:
+			return
+		size = self.size()
+		height = size.height()-1
+		width = size.width()-1
+		print size
+		painter = QPainter(self)
+		painter.setPen(QColor(165, 165, 165, 255))
+		painter.begin(self)
+		painter.drawLine(QPoint(0, 0), QPoint(0, height))
+		painter.drawLine(QPoint(0, height), QPoint(width, height))
+		painter.drawLine(QPoint(width, height), QPoint(width, 0))
+		for index in range(self._buttonCount):
+			xCoord = (index + 1) * 21 - 1
+			painter.drawLine(QPoint(xCoord, 0), QPoint(xCoord, height))
+		painter.end()
 
 	def sizeOfButtons(self):
 		return self._buttonCount * ButtonContainer.Height
