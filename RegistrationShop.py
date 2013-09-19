@@ -32,10 +32,12 @@ from core.data import DataReader
 from core.data import DataTransformer
 from core.data import DataWriter
 from core.AppResources import AppResources
+from core.elastix.Transformation import Transformation
 # Import ui elements
 from ui.MainWindow import MainWindow
 from ui.dialogs import ExportProgressDialog
 from ui.dialogs import FileTypeDialog
+from ui.dialogs import ElastixMainDialog
 from ui.widgets import RenderWidget
 from ui.widgets import MultiRenderWidget
 from ui.widgets import TitleWidget
@@ -45,6 +47,7 @@ from ui.RenderController import RenderController
 from ui.MultiRenderController import MultiRenderController
 from ui.transformations import UserTransformationTool
 from ui.transformations import LandmarkTransformationTool
+from ui.transformations import DeformableTransformationTool
 
 
 # Define settings parameters
@@ -353,7 +356,31 @@ class RegistrationShop(MainWindow):
 
 		if self.transformTool is not None:
 			self.transformTool.cleanUp()
-		print "Warning: RegistrationShop.addDeformableTransform() not implemented yet"
+
+		dialog = ElastixMainDialog(self)
+		dialog.setModal(True)
+		result = dialog.exec_()
+		if not result:
+			print "Not accepted"
+			return
+		if not dialog.transformation:
+			# load custom file
+			filename, other = QFileDialog.getOpenFileName(self, "Open custom parameter file", "", "(*.c)")
+			if len(filename) == 0:
+				return
+			transformation = Transformation()
+			if not transformation.loadFromFile(filename):
+				transformation = None
+				print "Warning: could not load transformation file"
+		else:
+			transformation = dialog.transformation
+
+		self.transformTool = DeformableTransformationTool()
+		self.transformTool.setTransformation(transformation)
+		self.transformTool.setRenderWidgets(fixed=self.fixedDataWidget,
+			moving=self.movingDataWidget,
+			multi=self.multiDataWidget)
+		self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
 
 	@Slot()
 	def loadFixedDataSetFile(self):
