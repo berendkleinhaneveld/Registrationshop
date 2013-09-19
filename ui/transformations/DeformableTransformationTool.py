@@ -7,6 +7,10 @@ DeformableTransformationTool
 from TransformationTool import TransformationTool
 from core.decorators import overrides
 from PySide.QtGui import QWidget
+from PySide.QtGui import QLabel
+from PySide.QtGui import QGridLayout
+from PySide.QtCore import Qt
+from ParameterWidget import ParameterWidget
 
 
 class DeformableTransformationTool(TransformationTool):
@@ -32,5 +36,18 @@ class DeformableTransformationTool(TransformationTool):
 
 	@overrides(TransformationTool)
 	def getParameterWidget(self):
+		titleLabel = QLabel(self.transformation.name)
+
+		paramWidget = ParameterWidget()
+		paramWidget.parameterModel.setTransformation(self.transformation)
+
+		layout = QGridLayout()
+		layout.setContentsMargins(0, 0, 0, 0)
+		layout.setSpacing(0)
+		layout.setAlignment(Qt.AlignTop)
+		layout.addWidget(titleLabel)
+		layout.addWidget(paramWidget)
+
 		widget = QWidget()
+		widget.setLayout(layout)
 		return widget
