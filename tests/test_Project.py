@@ -1,13 +1,14 @@
 import unittest
 import yaml
 
-from core.project.Project import Project
+from core.project import Project
+
 
 class TestProject(unittest.TestCase):
 
 	def setUp(self):
 		super(TestProject, self).setUp()
-		self.project = Project(title="TestProject", fixedData="FixedTest", 
+		self.project = Project(title="TestProject", fixedData="FixedTest",
 			movingData="MovingTest", isReference=True)
 
 	def tearDown(self):
@@ -23,9 +24,9 @@ class TestProject(unittest.TestCase):
 		self.assertTrue(hasattr(self.project, "resultData"))
 
 	def testEqual(self):
-		testProjectA = Project(title="TestProjectA", fixedData="FixedTest", 
+		testProjectA = Project(title="TestProjectA", fixedData="FixedTest",
 			movingData="MovingTest", isReference=True)
-		testProjectB = Project(title="TestProjectB", fixedData="FixedTest", 
+		testProjectB = Project(title="TestProjectB", fixedData="FixedTest",
 			movingData="MovingTest", isReference=True)
 		self.assertEqual(testProjectA, testProjectA)
 		self.assertNotEqual(testProjectA, testProjectB)
@@ -40,7 +41,6 @@ class TestProject(unittest.TestCase):
 		self.assertEqual(project, self.project)
 
 	# def testStrategy(self):
-	# 	# testProject = Project(title="TestProject", fixedData="FixedTest", 
+	# 	# testProject = Project(title="TestProject", fixedData="FixedTest",
 	# 	# 	movingData="MovingTest", isReference=True)
 	# 	self.assertIsNotNone(self.project.strategy)
-		

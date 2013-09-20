@@ -1,5 +1,6 @@
 import unittest
-from core.elastix.Parameter import Parameter
+from core.elastix import Parameter
+
 
 class ParameterTest(unittest.TestCase):
 
@@ -30,7 +31,7 @@ class ParameterTest(unittest.TestCase):
 		self.assertIsNone(param.value())
 
 		param = Parameter("key", 0.4)
-		otherParam = Parameter(''.join(['k','e','y']), 0.4)
+		otherParam = Parameter(''.join(['k', 'e', 'y']), 0.4)
 		self.assertEquals(param, otherParam)
 
 		# Strip characters from key, but not from value
@@ -58,7 +59,7 @@ class ParameterTest(unittest.TestCase):
 			newValue, success = Parameter.valueAsBool(value)
 			if success:
 				self.assertIsInstance(newValue, bool)
-				self.assertTrue(value == True or value == "true")
+				self.assertTrue(value is True or value == "true")
 			newValue, success = Parameter.valueAsInt(value)
 			if success:
 				self.assertIsInstance(newValue, int)

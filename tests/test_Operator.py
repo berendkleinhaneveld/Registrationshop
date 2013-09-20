@@ -1,9 +1,9 @@
 import os
 import unittest
 
-from core.worker.Operator import Operator
-from core.worker.Command import Command
-from core.elastix.ElastixCommand import ElastixCommand
+from core.worker import Operator
+from core.worker import Command
+from core.elastix import ElastixCommand
 
 
 class OperatorTest(unittest.TestCase):
@@ -17,26 +17,26 @@ class OperatorTest(unittest.TestCase):
 	def testOperator(self):
 		self.assertIsNotNone(self.operator)
 
-	# def testAddingSimpleCommand(self):
-	# 	import time
-	# 	import types
-	# 	# Create empty command
-	# 	command = Command()
-	# 	# Override the execute function
-	# 	def execute(self):
-	# 		time.sleep(0.1)
-	# 	function = types.MethodType(execute, command, Command)
-	# 	command.execute = function
+	def testAddingSimpleCommand(self):
+		import time
+		import types
+		# Create empty command
+		command = Command()
+		# Override the execute function
+		def execute(self):
+			time.sleep(0.1)
+		function = types.MethodType(execute, command, Command)
+		command.execute = function
 
-	# 	# Add command to the queue
-	# 	self.operator.addCommand(command)
+		# Add command to the queue
+		self.operator.addCommand(command)
 
-	# 	# An immediate check should find that the queue is not empty
-	# 	self.assertFalse(self.operator.queue.empty())
+		# An immediate check should find that the queue is not empty
+		self.assertFalse(self.operator.queue.empty())
 
-	# 	# Wait until the queue is finished
-	# 	self.operator.queue.join()
-	# 	self.assertTrue(self.operator.queue.empty())
+		# Wait until the queue is finished
+		self.operator.queue.join()
+		self.assertTrue(self.operator.queue.empty())
 
 	# def testAddingElastixCommand(self):
 	# 	path = os.path.dirname(os.path.abspath(__file__))

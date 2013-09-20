@@ -8,16 +8,17 @@ Worker
 from threading import Thread
 from core.decorators import overrides
 
+
 class Worker(Thread):
 	"""
-	Worker class that can process all kinds of commands. Depending on the 
-	type of command it will execute it. The operator can use a worker to 
+	Worker class that can process all kinds of commands. Depending on the
+	type of command it will execute it. The operator can use a worker to
 	process commands in different threads.
 	"""
 
 	def __init__(self, queue):
 		"""
-		Initiate the worker with a certain queue. The worker will call the 
+		Initiate the worker with a certain queue. The worker will call the
 		get() method of the queue so that it blocks until the queue gets filled
 		with commands.
 

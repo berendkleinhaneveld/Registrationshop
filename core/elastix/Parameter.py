@@ -9,6 +9,7 @@ Elastix uses for its parameters.
 	Berend Klein Haneveld
 """
 
+
 class Parameter(object):
 	"""
 	Simple parameter object that consists out of a key and a value.
@@ -124,10 +125,10 @@ class Parameter(object):
 	@classmethod
 	def valueAsBool(cls, value):
 		"""
-		Tries to convert the given value into a boolean type. If the type is 
+		Tries to convert the given value into a boolean type. If the type is
 		a string, then it checks for the existance of 'true' or 'false' in the
 		string.
-		Returns the (converted) value and a bool whether the value is 
+		Returns the (converted) value and a bool whether the value is
 		succesfully converted or not. If not, the original value is returned.
 
 		:rtype: bool, bool
@@ -145,10 +146,10 @@ class Parameter(object):
 	@classmethod
 	def valueAsInt(cls, value):
 		"""
-		Tries to convert the given value into an integer type. If the type is 
+		Tries to convert the given value into an integer type. If the type is
 		a string, then it checks whether the string is a representation of a
 		digit. If there is a dot in the string, it is not converted.
-		Returns the (converted) value and a bool whether the value is 
+		Returns the (converted) value and a bool whether the value is
 		succesfully converted or not. If not, the original value is returned.
 
 		:rtype: int, bool
@@ -160,14 +161,14 @@ class Parameter(object):
 		
 		return value, False
 	
-	@classmethod	
+	@classmethod
 	def valueAsFloat(cls, value):
 		"""
-		Tries to convert the given value into a float type. If the type is 
+		Tries to convert the given value into a float type. If the type is
 		a string, then it checks for the existance of a float number in the
 		string. If the value in the string is actually an integer, it will not
 		be converted.
-		Returns the (converted) value and a bool whether the value is 
+		Returns the (converted) value and a bool whether the value is
 		succesfully converted or not. If not, the original value is returned.
 
 		:rtype: float, bool

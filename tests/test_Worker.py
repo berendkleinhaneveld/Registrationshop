@@ -1,8 +1,9 @@
 import unittest
 from core.worker.Worker import Worker
 from Queue import Queue
-from core.worker.Command import Command
-from core.elastix.ElastixCommand import ElastixCommand
+from core.worker import Command
+from core.elastix import ElastixCommand
+
 
 class WorkerTest(unittest.TestCase):
 
@@ -41,9 +42,9 @@ class WorkerTest(unittest.TestCase):
 	# 	transformation = self.path + "/data/Sample.txt"
 
 	# 	# Construct a simple command object
-	# 	command = ElastixCommand(fixedData=fixedData, 
-	# 		movingData=movingData, 
-	# 		outputFolder=outputFolder, 
+	# 	command = ElastixCommand(fixedData=fixedData,
+	# 		movingData=movingData,
+	# 		outputFolder=outputFolder,
 	# 		transformation=transformation)
 
 	# 	self.queue.put(command)

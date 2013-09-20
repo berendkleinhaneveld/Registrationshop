@@ -1,8 +1,8 @@
 import unittest
 import os
 import shutil
-from core.elastix.Elastix import Elastix
-from core.elastix.ElastixCommand import ElastixCommand
+from core.elastix import Elastix
+from core.elastix import ElastixCommand
 
 
 class ElastixTest(unittest.TestCase):
@@ -28,10 +28,10 @@ class ElastixTest(unittest.TestCase):
 		transformation = self.path + "/data/Sample.txt"
 
 		# Construct a simple valid command object
-		command = ElastixCommand(fixedData=fixedData, 
-								 movingData=movingData, 
-								 outputFolder=outputFolder, 
-								 transformation=transformation)
+		command = ElastixCommand(fixedData=fixedData,
+			movingData=movingData,
+			outputFolder=outputFolder,
+			transformation=transformation)
 
 		self.assertTrue(command.isValid())
 
@@ -40,7 +40,7 @@ class ElastixTest(unittest.TestCase):
 		# Important parameters to keep track of:
 		# (NumberOfResolutions 1)
 		# (MaximumNumberOfIterations 50)
-		# These are the most time consuming operations within Elastix and 
+		# These are the most time consuming operations within Elastix and
 		# are a good way of keeping track of the process.
 
 		self.assertTrue(os.path.exists(outputFolder + "/result.0.mhd"))

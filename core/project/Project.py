@@ -27,10 +27,10 @@ class Project(object):
 	def __eq__(self, other):
 		if not isinstance(other, Project):
 			return False
-		return self.title == other.title \
-			and self.fixedData == other.fixedData \
-			and self.movingData == other.movingData \
-			and self.isReference == other.isReference
+		return (self.title == other.title
+			and self.fixedData == other.fixedData
+			and self.movingData == other.movingData
+			and self.isReference == other.isReference)
 
 	def __ne__(self, other):
 		return not self.__eq__(other)
