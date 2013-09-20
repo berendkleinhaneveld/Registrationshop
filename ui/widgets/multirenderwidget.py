@@ -111,6 +111,9 @@ class MultiRenderWidget(QWidget):
 		self.orientationWidget.EnabledOn()
 		self.orientationWidget.InteractiveOff()
 
+		self.setMinimumWidth(400)
+		self.setMinimumHeight(400)
+
 		layout = QGridLayout(self)
 		layout.setSpacing(0)
 		layout.setContentsMargins(0, 0, 0, 0)
