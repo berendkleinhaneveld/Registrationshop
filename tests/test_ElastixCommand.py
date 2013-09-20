@@ -1,6 +1,6 @@
 import unittest
 import os
-from core.elastix.ElastixCommand import ElastixCommand
+from core.elastix import ElastixCommand
 
 
 class ElastixCommandTest(unittest.TestCase):

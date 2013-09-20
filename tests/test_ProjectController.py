@@ -1,6 +1,6 @@
 import unittest
 import os
-from core.project.ProjectController import ProjectController
+from core.project import ProjectController
 
 
 class ProjectControllerTest(unittest.TestCase):

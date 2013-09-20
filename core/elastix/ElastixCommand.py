@@ -7,7 +7,7 @@ ElastixCommand
 
 import os
 from core.worker.Command import Command
-from core.elastix.Elastix import Elastix
+from core.elastix import Elastix
 from core.decorators import overrides
 
 

@@ -4,31 +4,78 @@ DeformableTransformationTool
 :Authors:
 	Berend Klein Haneveld 2013
 """
+import os
 from TransformationTool import TransformationTool
 from core.decorators import overrides
+from ParameterWidget import ParameterWidget
+from core.worker import Operator
+from core.elastix import ElastixCommand
+from core.project import ProjectController
 from PySide.QtGui import QWidget
 from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
 from PySide.QtCore import Qt
-from ParameterWidget import ParameterWidget
+from PySide.QtCore import Signal
 
 
 class DeformableTransformationTool(TransformationTool):
+
+	startedElastix = Signal(str)
+	endedElastix = Signal()
+
 	def __init__(self):
 		super(DeformableTransformationTool, self).__init__()
 
 	def setTransformation(self, transformation):
 		self.transformation = transformation
-		print self.transformation.name
 
 	@overrides(TransformationTool)
 	def setRenderWidgets(self, fixed, moving, multi):
+		self.fixedWidget = fixed
 		self.multiWidget = multi
 		self.movingWidget = moving
 
+		self.multiWidget.resetAllTransforms()
+
 	@overrides(TransformationTool)
 	def applyTransform(self):
-		pass
+		"""
+		# DONE
+		* Show progress bar dialog
+		* Define location for output
+		* Write transformation to output folder
+		* Call elastix to process the data
+		# TODO
+		* Load the new data into the moving widget / project (or
+			maybe ask the user whether he wants to import it)
+		* Maybe construct an extra entry in ProjectController for
+			the transformed data. So that the reference to the old
+			data is not lost.
+		"""
+		self.startedElastix.emit("Transforming data...")
+
+		currentProject = ProjectController.Instance().currentProject
+		path = currentProject.folder
+		transformationPath = os.path.join(path, "/data/Transformation.txt")
+		outputFolder = os.path.join(path, "/data")
+		
+		self.transformation.saveToFile(transformationPath)
+
+		command = ElastixCommand(fixedData=currentProject.fixedData,
+			movingData=currentProject.movingData,
+			outputFolder=outputFolder,
+			transformation=transformationPath)
+
+		self.operator = Operator()
+		self.operator.addCommand(command)
+		self.operator.queue.join()
+
+		self.endedElastix.emit()
+
+		outputData = os.path.join(outputFolder, "result.0.mhd")
+		if os.path.exists(outputData):
+			projectController = ProjectController.Instance()
+			projectController.loadMovingDataSet(outputData)
 
 	@overrides(TransformationTool)
 	def cleanUp(self):

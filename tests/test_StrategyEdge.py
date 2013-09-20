@@ -4,7 +4,7 @@ import shutil
 
 from core.strategy.StrategyEdge import StrategyEdge
 from core.strategy.StrategyNode import StrategyNode
-from core.elastix.Transformation import Transformation
+from core.elastix import Transformation
 
 
 class StrategyEdgeTest(unittest.TestCase):

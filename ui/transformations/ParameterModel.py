@@ -8,8 +8,8 @@ from PySide.QtCore import QAbstractItemModel
 from PySide.QtCore import QModelIndex
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
-from core.elastix.Parameter import Parameter
-from core.elastix.Transformation import Transformation
+from core.elastix import Parameter
+from core.elastix import Transformation
 
 
 class ParameterModel(QAbstractItemModel):

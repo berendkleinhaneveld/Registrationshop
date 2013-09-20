@@ -27,12 +27,12 @@ from PySide.QtCore import Slot
 
 # Import core stuff
 from core.AppVars import AppVars
-from core.project.ProjectController import ProjectController
+from core.project import ProjectController
 from core.data import DataReader
 from core.data import DataTransformer
 from core.data import DataWriter
 from core.AppResources import AppResources
-from core.elastix.Transformation import Transformation
+from core.elastix import Transformation
 # Import ui elements
 from ui.MainWindow import MainWindow
 from ui.WindowDialog import WindowDialog

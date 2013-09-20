@@ -7,7 +7,7 @@ AppResources
 
 import os
 from AppVars import AppVars
-from core.elastix.Transformation import Transformation
+from core.elastix import Transformation
 
 
 class AppResources(object):
