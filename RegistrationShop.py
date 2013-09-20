@@ -376,6 +376,8 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 		self.transformTool = DeformableTransformationTool()
 		self.transformTool.setTransformation(transformation)
+		self.transformTool.startedElastix.connect(self.showProgressBar)
+		self.transformTool.endedElastix.connect(self.hideProgressBar)
 		self.transformTool.setRenderWidgets(fixed=self.fixedDataWidget,
 			moving=self.movingDataWidget,
 			multi=self.multiDataWidget)
