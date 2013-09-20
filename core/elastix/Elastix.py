@@ -8,6 +8,8 @@ Elastix
 import os
 import sys
 import subprocess
+import multiprocessing
+
 
 class Elastix(object):
 	"""
@@ -17,8 +19,8 @@ class Elastix(object):
 	Inspired by pyelastix by Almar Klein. His project can be found
 	at https://code.google.com/p/pirt/
 
-	At the moment Elastix must be explicitly started and stopped in order to 
-	process tasks, but what might be a better idea is to just start 
+	At the moment Elastix must be explicitly started and stopped in order to
+	process tasks, but what might be a better idea is to just start
 	processing tasks at the moment they are added and queue other incoming
 	tasks. Implementing this would have to wait though on a working
 	implementation of a task.
@@ -36,14 +38,17 @@ class Elastix(object):
 		if not os.path.exists(command.outputFolder):
 			os.makedirs(command.outputFolder)
 
+		numberOfCores = multiprocessing.cpu_count()
+
 		# Create Elastix command with the right parameters
-		# TODO: build some class or thing to actually call Elastix instead of 
+		# TODO: build some class or thing to actually call Elastix instead of
 		# calling directly from the StrategyEdge class
-		command = ["elastix", 
-			"-m", command.movingData, 
+		command = ["elastix",
+			"-m", command.movingData,
 			"-f", command.fixedData,
 			"-out", command.outputFolder,
-			"-p", command.transformation]
+			"-p", command.transformation,
+			"-threads", str(numberOfCores)]
 
 		# Try and call elastix
 		try:
