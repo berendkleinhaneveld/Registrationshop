@@ -109,6 +109,8 @@ class LandmarkTransformationTool(TransformationTool):
 
 		self.fixedPicker = Picker()
 		self.movingPicker = Picker()
+		
+		self.multiWidget.resetUserTransform()
 
 		self.fixedWidget.render()
 		self.movingWidget.render()
