@@ -35,6 +35,7 @@ from core.AppResources import AppResources
 from core.elastix.Transformation import Transformation
 # Import ui elements
 from ui.MainWindow import MainWindow
+from ui.WindowDialog import WindowDialog
 from ui.dialogs import ExportProgressDialog
 from ui.dialogs import FileTypeDialog
 from ui.dialogs import ElastixMainDialog
@@ -56,7 +57,7 @@ ORGNAME = "TU Delft"
 ORGDOMAIN = "tudelft.nl"
 
 
-class RegistrationShop(MainWindow):
+class RegistrationShop(MainWindow, WindowDialog):
 	"""
 	Main class that starts up the application.
 	Creates UI and starts project/plugin managers.
@@ -490,9 +491,8 @@ class RegistrationShop(MainWindow):
 		fileName, other = QFileDialog.getSaveFileName(self, "Save registration result to...", "", extension)
 		if len(fileName) == 0:
 			return
-		
-		self.progressDialog = ExportProgressDialog(self, "Exporting data...")
-		self.progressDialog.open()
+
+		self.showProgressBar("Exporting data...")
 
 		transform = self.multiDataWidget.getFullTransform()
 		dataReader = DataReader()
@@ -502,7 +502,7 @@ class RegistrationShop(MainWindow):
 		writer = DataWriter()
 		writer.WriteToFile(outputData, fileName, fileType)
 		
-		self.progressDialog.accept()
+		self.hideProgressBar()
 
 
 def main():
