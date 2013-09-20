@@ -36,7 +36,6 @@ from core.elastix import Transformation
 # Import ui elements
 from ui.MainWindow import MainWindow
 from ui.WindowDialog import WindowDialog
-from ui.dialogs import ExportProgressDialog
 from ui.dialogs import FileTypeDialog
 from ui.dialogs import ElastixMainDialog
 from ui.widgets import RenderWidget
@@ -362,7 +361,6 @@ class RegistrationShop(MainWindow, WindowDialog):
 		dialog.setModal(True)
 		result = dialog.exec_()
 		if not result:
-			print "Not accepted"
 			return
 		if not dialog.transformation:
 			# load custom file
