@@ -17,7 +17,6 @@ from PySide.QtGui import QPalette
 from PySide.QtGui import QBrush
 from PySide.QtGui import QPainter
 from PySide.QtCore import QPoint
-from PySide.QtGui import QFrame
 from PySide.QtGui import QLinearGradient
 from PySide.QtGui import QColor
 from PySide.QtCore import Qt
@@ -96,13 +95,10 @@ class ButtonContainer(QWidget):
 		button.setMaximumHeight(ButtonContainer.Height)
 		button.setMaximumWidth(ButtonContainer.Height)
 		button.setFlat(True)
-		# button.setFrameStyle(QFrame.StyledPanel)
 
 		# Insert button into the horizontal layout. Make sure
 		# that the empty QWidget stays on the right
 		self.layout.insertWidget(self._buttonCount, button)
-
-		# TODO: Style the buttons or make some kind of seperator
 
 		self._buttonCount += 1
 
@@ -114,17 +110,14 @@ class ButtonContainer(QWidget):
 		size = self.size()
 		height = size.height()-1
 		width = size.width()-1
-		print size
 		painter = QPainter(self)
 		painter.setPen(QColor(165, 165, 165, 255))
-		painter.begin(self)
 		painter.drawLine(QPoint(0, 0), QPoint(0, height))
 		painter.drawLine(QPoint(0, height), QPoint(width, height))
 		painter.drawLine(QPoint(width, height), QPoint(width, 0))
 		for index in range(self._buttonCount):
 			xCoord = (index + 1) * 21 - 1
 			painter.drawLine(QPoint(xCoord, 0), QPoint(xCoord, height))
-		painter.end()
 
 	def sizeOfButtons(self):
 		return self._buttonCount * ButtonContainer.Height
