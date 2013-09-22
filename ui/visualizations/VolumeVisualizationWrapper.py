@@ -9,7 +9,16 @@ class VolumeVisualizationWrapper(object):
 	VolumeVisualizationWrapper wraps around a volume property. It wraps
 	all the vtk attributes in their own wrappers.
 	"""
-	standardAttributes = ["visualizationType", "sectionsOpacity", "lowerBound", "upperBound", "minimum", "maximum", "hue"]
+	standardAttributes = ["visualizationType",
+		"sectionsOpacity",
+		"lowerBound",
+		"upperBound",
+		"minimum",
+		"maximum",
+		"hue",
+		"brightness",
+		"window",
+		"level"]
 
 	def __init__(self, volumeVisualization=None):
 		super(VolumeVisualizationWrapper, self).__init__()

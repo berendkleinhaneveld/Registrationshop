@@ -9,7 +9,6 @@ from VolumeVisualization import VisualizationTypeMIP
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from vtk import vtkVolumeMapper
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSlider
 from PySide.QtGui import QGridLayout
@@ -90,7 +89,6 @@ class VolumeVisualizationMIP(VolumeVisualization):
 
 	@overrides(VolumeVisualization)
 	def setImageData(self, imageData):
-		self.imageData = imageData
 		if imageData is None:
 			self.minimum = 0.0
 			self.maximum = 1.0
@@ -114,9 +112,17 @@ class VolumeVisualizationMIP(VolumeVisualization):
 
 	@overrides(VolumeVisualization)
 	def updateTransferFunction(self):
-		self.colorFunction, self.opacityFunction = CreateRangeFunctions(self.imageData, self.window, self.level)
+		self.colorFunction, self.opacityFunction = CreateRangeFunctions(self.minimum, self.maximum, self.window, self.level)
 		self.volProp.SetColor(self.colorFunction)
 		self.volProp.SetScalarOpacity(self.opacityFunction)
+
+		lowerBound = (self.lowerBound - self.minimum) / (self.maximum - self.minimum)
+		upperBound = (self.upperBound - self.minimum) / (self.maximum - self.minimum)
+
+		if self.mapper:
+			self.mapper.SetLowerBound(lowerBound)
+			self.mapper.SetUpperBound(upperBound)
+
 		self.updatedTransferFunction.emit()
 
 	@overrides(VolumeVisualization)
@@ -138,21 +144,15 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		self.levelLabel.setText(str(self.level))
 		self.windowLabel.setText(str(self.window))
 
-		lowerBound = (self.lowerBound - self.minimum) / (self.maximum - self.minimum)
-		upperBound = (self.upperBound - self.minimum) / (self.maximum - self.minimum)
-		self.mapper.SetLowerBound(lowerBound)
-		self.mapper.SetUpperBound(upperBound)
 		self.updateTransferFunction()
 
 
-def CreateRangeFunctions(imageData, window, level):
+def CreateRangeFunctions(minimum, maximum, window, level):
 	"""
 	:type imageData: vktImageData
 	:type color: array of length 3 (r, g, b)
 	:rtype: vtkColorTransferFunction, vtkPiecewiseFunction
 	"""
-	minimum, maximum = imageData.GetScalarRange()
-
 	minV = level - 0.5*window
 	maxV = level + 0.5*window
 

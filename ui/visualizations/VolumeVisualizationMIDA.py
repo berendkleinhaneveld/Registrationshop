@@ -26,6 +26,7 @@ class VolumeVisualizationMIDA(VolumeVisualization):
 		super(VolumeVisualizationMIDA, self).__init__()
 
 		self.visualizationType = VisualizationTypeMIDA
+		self.mapper = None
 
 		# TODO: add two sliders with which to threshold the data
 		# Create property and attach the transfer function
@@ -43,37 +44,37 @@ class VolumeVisualizationMIDA(VolumeVisualization):
 		self.brightnessSlider = QSlider(Qt.Horizontal)
 		self.brightnessSlider.setMinimum(0)
 		self.brightnessSlider.setMaximum(500)
-		self.brightnessSlider.setValue(100)
+		self.brightnessSlider.setValue(int(self.brightness))
 		self.brightnessSlider.valueChanged.connect(self.valueChanged)
-		self.brightnessLabel = QLabel(str(self.brightnessSlider.value()/100.0))
+		self.brightnessLabel = QLabel(str(self.brightness/100.0))
 
 		self.windowSlider = QSlider(Qt.Horizontal)
 		self.windowSlider.setMinimum(0)
 		self.windowSlider.setMaximum(int(abs(self.maximum - self.minimum)))
 		self.windowSlider.setValue(int(self.window))
 		self.windowSlider.valueChanged.connect(self.valueChanged)
-		self.windowLabel = QLabel(str(self.windowSlider.value()))
+		self.windowLabel = QLabel(str(self.window))
 
 		self.levelSlider = QSlider(Qt.Horizontal)
 		self.levelSlider.setMinimum(int(self.minimum))
 		self.levelSlider.setMaximum(int(self.maximum))
 		self.levelSlider.setValue(int(self.level))
 		self.levelSlider.valueChanged.connect(self.valueChanged)
-		self.levelLabel = QLabel(str(self.levelSlider.value()))
+		self.levelLabel = QLabel(str(self.level))
 
 		self.lowerBoundSlider = QSlider(Qt.Horizontal)
 		self.lowerBoundSlider.setMinimum(int(self.minimum))
 		self.lowerBoundSlider.setMaximum(int(self.maximum))
 		self.lowerBoundSlider.setValue(int(self.lowerBound))
 		self.lowerBoundSlider.valueChanged.connect(self.valueChanged)
-		self.lowerBoundLabel = QLabel(str(self.lowerBoundSlider.value()))
+		self.lowerBoundLabel = QLabel(str(self.lowerBound))
 
 		self.upperBoundSlider = QSlider(Qt.Horizontal)
 		self.upperBoundSlider.setMinimum(int(self.minimum))
 		self.upperBoundSlider.setMaximum(int(self.maximum))
 		self.upperBoundSlider.setValue(int(self.upperBound))
 		self.upperBoundSlider.valueChanged.connect(self.valueChanged)
-		self.upperBoundLabel = QLabel(str(self.upperBoundSlider.value()))
+		self.upperBoundLabel = QLabel(str(self.upperBound))
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
@@ -100,7 +101,6 @@ class VolumeVisualizationMIDA(VolumeVisualization):
 
 	@overrides(VolumeVisualization)
 	def setImageData(self, imageData):
-		self.imageData = imageData
 		if imageData is None:
 			self.minimum = 0.0
 			self.maximum = 1.0
@@ -122,9 +122,17 @@ class VolumeVisualizationMIDA(VolumeVisualization):
 
 	@overrides(VolumeVisualization)
 	def updateTransferFunction(self):
-		self.colorFunction, self.opacityFunction = CreateRangeFunctions(self.imageData, self.window, self.level)
+		self.colorFunction, self.opacityFunction = CreateRangeFunctions(self.minimum, self.maximum, self.window, self.level)
 		self.volProp.SetColor(self.colorFunction)
 		self.volProp.SetScalarOpacity(self.opacityFunction)
+
+		if self.mapper:
+			lowerBound = (self.lowerBound - self.minimum) / (self.maximum - self.minimum)
+			upperBound = (self.upperBound - self.minimum) / (self.maximum - self.minimum)
+			self.mapper.SetLowerBound(lowerBound)
+			self.mapper.SetUpperBound(upperBound)
+			self.mapper.SetBrightness(self.brightness / 100.0)
+
 		self.updatedTransferFunction.emit()
 
 	@overrides(VolumeVisualization)
@@ -148,22 +156,15 @@ class VolumeVisualizationMIDA(VolumeVisualization):
 		self.windowLabel.setText(str(self.window))
 		self.brightnessLabel.setText(str(self.brightness / 100.0))
 
-		lowerBound = (self.lowerBound - self.minimum) / (self.maximum - self.minimum)
-		upperBound = (self.upperBound - self.minimum) / (self.maximum - self.minimum)
-		self.mapper.SetLowerBound(lowerBound)
-		self.mapper.SetUpperBound(upperBound)
-		self.mapper.SetBrightness(self.brightness / 100.0)
 		self.updateTransferFunction()
 
 
-def CreateRangeFunctions(imageData, window, level):
+def CreateRangeFunctions(minimum, maximum, window, level):
 	"""
 	:type imageData: vktImageData
 	:type color: array of length 3 (r, g, b)
 	:rtype: vtkColorTransferFunction, vtkPiecewiseFunction
 	"""
-	minimum, maximum = imageData.GetScalarRange()
-
 	minV = level - 0.5*window
 	maxV = level + 0.5*window
 
