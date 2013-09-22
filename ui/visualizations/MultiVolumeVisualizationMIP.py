@@ -1,12 +1,12 @@
 """
-MIPMultiVolumeVisualization
+MultiVolumeVisualizationMIP
 
 :Authors:
 	Berend Klein Haneveld
 """
-from multivolumevisualization import MultiVolumeVisualization
-from multivolumevisualization import CreateEmptyFunctions
-from multivolumevisualization import CreateRangeFunctions
+from MultiVolumeVisualization import MultiVolumeVisualization
+from MultiVolumeVisualization import CreateEmptyFunctions
+from MultiVolumeVisualization import CreateRangeFunctions
 from core.decorators import overrides
 from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
@@ -16,16 +16,16 @@ from PySide.QtCore import Qt
 from vtk import vtkVolumeProperty
 
 
-class MIPMultiVolumeVisualization(MultiVolumeVisualization):
+class MultiVolumeVisualizationMIP(MultiVolumeVisualization):
 	"""
-	MIPMultiVolumeVisualization is a visualization that shows
+	MultiVolumeVisualizationMIP is a visualization that shows
 	MIP visualizations of both datasets and adds them
 	together. It uses complementary colors for the datasets
 	so that the visualization is white in the spots where
 	they are the same.
 	"""
 	def __init__(self):
-		super(MIPMultiVolumeVisualization, self).__init__()
+		super(MultiVolumeVisualizationMIP, self).__init__()
 
 		self.fixedHue = 0
 

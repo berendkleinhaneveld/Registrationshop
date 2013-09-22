@@ -4,9 +4,9 @@ MultiVolumeVisualizationMix
 :Authors:
 	Berend Klein Haneveld
 """
-from multivolumevisualization import MultiVolumeVisualization
-from multivolumevisualization import CreateFunctionFromProperties
-from multivolumevisualization import CreateEmptyFunctions
+from MultiVolumeVisualization import MultiVolumeVisualization
+from MultiVolumeVisualization import CreateFunctionFromProperties
+from MultiVolumeVisualization import CreateEmptyFunctions
 from core.decorators import overrides
 from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout

@@ -1,3 +1,3 @@
-from exportprogressdialog import ExportProgressDialog
-from filetypedialog import FileTypeDialog
-from elastixmaindialog import ElastixMainDialog
+from ExportProgressDialog import ExportProgressDialog
+from FileTypeDialog import FileTypeDialog
+from ElastixMainDialog import ElastixMainDialog

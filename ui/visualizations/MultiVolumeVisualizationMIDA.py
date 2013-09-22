@@ -4,21 +4,21 @@ MIDAMultiVolumeVisualization
 :Authors:
 	Berend Klein Haneveld
 """
-from multivolumevisualization import MultiVolumeVisualization
-from multivolumevisualization import CreateEmptyFunctions
-from multivolumevisualization import CreateRangeFunctions
+from MultiVolumeVisualization import MultiVolumeVisualization
+from MultiVolumeVisualization import CreateEmptyFunctions
+from MultiVolumeVisualization import CreateRangeFunctions
 from core.decorators import overrides
 from PySide.QtGui import QWidget
 from vtk import vtkVolumeProperty
 
 
-class MIDAMultiVolumeVisualization(MultiVolumeVisualization):
+class MultiVolumeVisualizationMIDA(MultiVolumeVisualization):
 	"""
-	MIDAMultiVolumeVisualization is a visualization that shows
+	MultiVolumeVisualizationMIDA is a visualization that shows
 	two MIDA renders.
 	"""
 	def __init__(self):
-		super(MIDAMultiVolumeVisualization, self).__init__()
+		super(MultiVolumeVisualizationMIDA, self).__init__()
 
 	@overrides(MultiVolumeVisualization)
 	def getParameterWidget(self):

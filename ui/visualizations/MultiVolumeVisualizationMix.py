@@ -1,12 +1,12 @@
 """
-MixMultiVolumeVisualization
+MultiVolumeVisualizationMix
 
 :Authors:
 	Berend Klein Haneveld
 """
-from multivolumevisualization import MultiVolumeVisualization
-from multivolumevisualization import CreateFunctionFromProperties
-from multivolumevisualization import CreateEmptyFunctions
+from MultiVolumeVisualization import MultiVolumeVisualization
+from MultiVolumeVisualization import CreateFunctionFromProperties
+from MultiVolumeVisualization import CreateEmptyFunctions
 from core.decorators import overrides
 from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
@@ -16,13 +16,13 @@ from PySide.QtCore import Qt
 from vtk import vtkVolumeProperty
 
 
-class MixMultiVolumeVisualization(MultiVolumeVisualization):
+class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 	"""
-	MixMultiVolumeVisualization is a visualization that
+	MultiVolumeVisualizationMix is a visualization that
 	just mixes the two given volume properties together.
 	"""
 	def __init__(self):
-		super(MixMultiVolumeVisualization, self).__init__()
+		super(MultiVolumeVisualizationMix, self).__init__()
 
 		self.fixedOpacity = 1.0
 		self.movingOpacity = 1.0

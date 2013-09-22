@@ -1,11 +1,11 @@
 """
-VolumeVisualizationMIP
+VolumeVisualizationMIDA
 
 :Authors:
 	Berend Klein Haneveld
 """
 from VolumeVisualization import VolumeVisualization
-from VolumeVisualization import VisualizationTypeMIP
+from VolumeVisualization import VisualizationTypeMIDA
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
@@ -18,16 +18,16 @@ from PySide.QtCore import Qt
 from core.decorators import overrides
 
 
-class VolumeVisualizationMIP(VolumeVisualization):
+class VolumeVisualizationMIDA(VolumeVisualization):
 	"""
 	VolumeVisualization subclass for MIP visualization.
 	"""
 	def __init__(self):
-		super(VolumeVisualizationMIP, self).__init__()
+		super(VolumeVisualizationMIDA, self).__init__()
 
-		self.visualizationType = VisualizationTypeMIP
-		self.mapper = None
+		self.visualizationType = VisualizationTypeMIDA
 
+		# TODO: add two sliders with which to threshold the data
 		# Create property and attach the transfer function
 		self.volProp = vtkVolumeProperty()
 		self.volProp.SetIndependentComponents(True)
@@ -40,6 +40,12 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		volume property can be adjusted.
 		:rtype: QWidget
 		"""
+		self.brightnessSlider = QSlider(Qt.Horizontal)
+		self.brightnessSlider.setMinimum(0)
+		self.brightnessSlider.setMaximum(500)
+		self.brightnessSlider.setValue(100)
+		self.brightnessSlider.valueChanged.connect(self.valueChanged)
+
 		self.windowSlider = QSlider(Qt.Horizontal)
 		self.windowSlider.setMinimum(0)
 		self.windowSlider.setMaximum(int(abs(self.maximum - self.minimum)))
@@ -70,10 +76,12 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		layout.addWidget(self.windowSlider, 0, 1)
 		layout.addWidget(QLabel("Level"), 1, 0)
 		layout.addWidget(self.levelSlider, 1, 1)
-		layout.addWidget(QLabel("Lower bound"), 2, 0)
-		layout.addWidget(self.lowerBoundSlider, 2, 1)
-		layout.addWidget(QLabel("Upper bound"), 3, 0)
-		layout.addWidget(self.upperBoundSlider, 3, 1)
+		layout.addWidget(QLabel("Brightness"), 2, 0)
+		layout.addWidget(self.brightnessSlider, 2, 1)
+		layout.addWidget(QLabel("Lower bound"), 3, 0)
+		layout.addWidget(self.lowerBoundSlider, 3, 1)
+		layout.addWidget(QLabel("Upper bound"), 4, 0)
+		layout.addWidget(self.upperBoundSlider, 4, 1)
 
 		widget = QWidget()
 		widget.setLayout(layout)
@@ -86,23 +94,21 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		if imageData is None:
 			self.minimum = 0.0
 			self.maximum = 1.0
-			self.window = 1.0
-			self.level = 0.5
 			self.lowerBound = self.minimum
 			self.upperBound = self.maximum
 			return
-
+			
 		self.minimum, self.maximum = imageData.GetScalarRange()
 		self.lowerBound = self.minimum
 		self.upperBound = self.maximum
 		self.window = abs(self.maximum - self.minimum)
 		self.level = (self.maximum + self.minimum) / 2.0
+		self.brightness = 100
 
 	@overrides(VolumeVisualization)
 	def configureMapper(self, mapper):
 		self.mapper = mapper
-		self.mapper.SetShaderType(1)
-		# TODO: get the message to the multi render mapper
+		self.mapper.SetShaderType(2)
 
 	@overrides(VolumeVisualization)
 	def updateTransferFunction(self):
@@ -124,10 +130,12 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		self.upperBound = self.upperBoundSlider.value()
 		self.level = self.levelSlider.value()
 		self.window = self.windowSlider.value()
+		self.brightness = self.brightnessSlider.value()
 		lowerBound = (self.lowerBound - self.minimum) / (self.maximum - self.minimum)
 		upperBound = (self.upperBound - self.minimum) / (self.maximum - self.minimum)
 		self.mapper.SetLowerBound(lowerBound)
 		self.mapper.SetUpperBound(upperBound)
+		self.mapper.SetBrightness(self.brightness / 100.0)
 		self.updateTransferFunction()
 
 
