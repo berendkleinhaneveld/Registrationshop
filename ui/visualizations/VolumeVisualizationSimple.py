@@ -57,27 +57,33 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.lowerBoundSlider.setMaximum(int(self.maximum))
 		self.lowerBoundSlider.setValue(int(self.lowerBound))
 		self.lowerBoundSlider.valueChanged.connect(self.valueChanged)
+		self.lowerBoundLabel = QLabel(str(self.lowerBound))
 
 		self.upperBoundSlider = QSlider(Qt.Horizontal)
 		self.upperBoundSlider.setMinimum(int(self.minimum))
 		self.upperBoundSlider.setMaximum(int(self.maximum))
 		self.upperBoundSlider.setValue(int(self.upperBound))
 		self.upperBoundSlider.valueChanged.connect(self.valueChanged)
+		self.upperBoundLabel = QLabel(str(self.upperBound))
 
 		self.hueSlider = QSlider(Qt.Horizontal)
 		self.hueSlider.setMinimum(0)
 		self.hueSlider.setMaximum(360)
 		self.hueSlider.setValue(self.hue)
 		self.hueSlider.valueChanged.connect(self.valueChanged)
+		self.hueLabel = QLabel(str(self.hue))
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(QLabel("Lower boundary"), 0, 0)
+		layout.addWidget(QLabel("Lower bound"), 0, 0)
 		layout.addWidget(self.lowerBoundSlider, 0, 1)
-		layout.addWidget(QLabel("Upper boundary"), 1, 0)
+		layout.addWidget(self.lowerBoundLabel, 0, 2)
+		layout.addWidget(QLabel("Upper bound"), 1, 0)
 		layout.addWidget(self.upperBoundSlider, 1, 1)
+		layout.addWidget(self.upperBoundLabel, 1, 2)
 		layout.addWidget(QLabel("Hue"), 2, 0)
 		layout.addWidget(self.hueSlider, 2, 1)
+		layout.addWidget(self.hueLabel, 2, 2)
 
 		widget = QWidget()
 		widget.setLayout(layout)
@@ -99,8 +105,6 @@ class VolumeVisualizationSimple(VolumeVisualization):
 
 	@overrides(VolumeVisualization)
 	def configureMapper(self, mapper):
-		# if mapper is not None and mapper.GetBlendMode() != vtkVolumeMapper.COMPOSITE_BLEND:
-		# 	mapper.SetBlendModeToComposite()
 		mapper.SetShaderType(0)
 
 	@overrides(VolumeVisualization)
@@ -144,4 +148,9 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.lowerBound = min(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
 		self.upperBound = max(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
 		self.hue = self.hueSlider.value()
+
+		self.lowerBoundLabel.setText(str(self.lowerBound))
+		self.upperBoundLabel.setText(str(self.upperBound))
+		self.hueLabel.setText(str(self.hue))
+
 		self.updateTransferFunction()
