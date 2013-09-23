@@ -75,10 +75,10 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		layout.addWidget(QLabel("Level"), 1, 0)
 		layout.addWidget(self.levelSlider, 1, 1)
 		layout.addWidget(self.levelLabel, 1, 2)
-		layout.addWidget(QLabel("Lower bound"), 2, 0)
+		layout.addWidget(QLabel("Lower threshold"), 2, 0)
 		layout.addWidget(self.lowerBoundSlider, 2, 1)
 		layout.addWidget(self.lowerBoundLabel, 2, 2)
-		layout.addWidget(QLabel("Upper bound"), 3, 0)
+		layout.addWidget(QLabel("Upper threshold"), 3, 0)
 		layout.addWidget(self.upperBoundSlider, 3, 1)
 		layout.addWidget(self.upperBoundLabel, 3, 2)
 

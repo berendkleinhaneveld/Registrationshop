@@ -87,10 +87,10 @@ class VolumeVisualizationMIDA(VolumeVisualization):
 		layout.addWidget(QLabel("Brightness"), 2, 0)
 		layout.addWidget(self.brightnessSlider, 2, 1)
 		layout.addWidget(self.brightnessLabel, 2, 2)
-		layout.addWidget(QLabel("Lower bound"), 3, 0)
+		layout.addWidget(QLabel("Lower threshold"), 3, 0)
 		layout.addWidget(self.lowerBoundSlider, 3, 1)
 		layout.addWidget(self.lowerBoundLabel, 3, 2)
-		layout.addWidget(QLabel("Upper bound"), 4, 0)
+		layout.addWidget(QLabel("Upper threshold"), 4, 0)
 		layout.addWidget(self.upperBoundSlider, 4, 1)
 		layout.addWidget(self.upperBoundLabel, 4, 2)
 

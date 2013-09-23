@@ -9,7 +9,6 @@ from VolumeVisualization import VisualizationTypeSimple
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from vtk import vtkVolumeMapper
 from vtk import vtkMath
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSlider
@@ -75,10 +74,10 @@ class VolumeVisualizationSimple(VolumeVisualization):
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(QLabel("Lower bound"), 0, 0)
+		layout.addWidget(QLabel("Lower threshold"), 0, 0)
 		layout.addWidget(self.lowerBoundSlider, 0, 1)
 		layout.addWidget(self.lowerBoundLabel, 0, 2)
-		layout.addWidget(QLabel("Upper bound"), 1, 0)
+		layout.addWidget(QLabel("Upper threshold"), 1, 0)
 		layout.addWidget(self.upperBoundSlider, 1, 1)
 		layout.addWidget(self.upperBoundLabel, 1, 2)
 		layout.addWidget(QLabel("Hue"), 2, 0)
