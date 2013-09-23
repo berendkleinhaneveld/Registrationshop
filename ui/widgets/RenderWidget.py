@@ -75,6 +75,7 @@ class RenderWidget(QWidget):
 			self.renderer.ResetCamera()
 			self.shouldResetCamera = False
 		self.rwi.Render()
+		self.rwi.GetRenderWindow().Render()
 
 	@Slot(object)
 	def setData(self, imageData):
