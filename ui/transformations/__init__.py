@@ -3,6 +3,7 @@ from ParameterModel import ParameterModel
 from ParameterListView import ParameterListView
 from ParameterWidget import ParameterWidget
 from Picker import Picker
+from TwoStepPicker import TwoStepPicker
 from TransformBox import TransformBox
 from TransformationTool import TransformationTool
 from UserTransformationTool import UserTransformationTool

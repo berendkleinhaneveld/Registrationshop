@@ -7,7 +7,8 @@ LandmarkTransformationTool (TransformationTool)
 from TransformationTool import TransformationTool
 from core.decorators import overrides
 from ui.widgets import PointsWidget
-from ui.transformations import Picker
+# from ui.transformations import Picker
+from ui.transformations import TwoStepPicker as Picker
 from vtk import vtkSphereSource
 from vtk import vtkPolyDataMapper
 from vtk import vtkActor
