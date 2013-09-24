@@ -20,6 +20,8 @@ class DataTransformer(object):
 		"""
 		reslicer = vtkImageReslice()
 		reslicer.SetInterpolationModeToCubic()
+		range = imageData.GetScalarRange()
+		reslicer.SetBackgroundLevel(range[0])
 		# reslicer.SetAutoCropOutput(1)  # Not sure if this is what we want
 
 		reslicer.SetInputData(imageData)
