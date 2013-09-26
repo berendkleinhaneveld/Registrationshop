@@ -105,10 +105,12 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		self.level = (self.maximum + self.minimum) / 2.0
 
 	@overrides(VolumeVisualization)
-	def configureMapper(self, mapper):
+	def setMapper(self, mapper):
 		self.mapper = mapper
-		self.mapper.SetShaderType(1)
-		# TODO: get the message to the multi render mapper
+
+	@overrides(VolumeVisualization)
+	def shaderType(self):
+		return 1
 
 	@overrides(VolumeVisualization)
 	def updateTransferFunction(self):

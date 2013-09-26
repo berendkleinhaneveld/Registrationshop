@@ -169,7 +169,12 @@ class MultiRenderWidget(QWidget):
 		else:
 			self.fixedVolumeProperty = self.visualization.fixedVolProp
 			self.movingVolumeProperty = self.visualization.movingVolProp
-			self.visualization.configureMapper(self.mapper)
+			self.visualization.setMapper(self.mapper)
+			if self.visualization.fixedVisualization:
+				self.mapper.SetShaderTypeFixed(self.visualization.fixedVisualization.shaderType())
+			if self.visualization.movingVisualization:
+				self.mapper.SetShaderTypeMoving(self.visualization.movingVisualization.shaderType())
+
 		self.updateVolumeProperties()
 
 	def updateVolumeProperties(self):

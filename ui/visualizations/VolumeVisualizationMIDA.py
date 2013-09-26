@@ -9,7 +9,6 @@ from VolumeVisualization import VisualizationTypeMIDA
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from vtk import vtkVolumeMapper
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSlider
 from PySide.QtGui import QGridLayout
@@ -116,9 +115,13 @@ class VolumeVisualizationMIDA(VolumeVisualization):
 		self.brightness = 100
 
 	@overrides(VolumeVisualization)
-	def configureMapper(self, mapper):
+	def setMapper(self, mapper):
 		self.mapper = mapper
-		self.mapper.SetShaderType(2)
+		self.mapper.SetShaderType(self.shaderType())
+
+	@overrides(VolumeVisualization)
+	def shaderType(self):
+		return 2
 
 	@overrides(VolumeVisualization)
 	def updateTransferFunction(self):

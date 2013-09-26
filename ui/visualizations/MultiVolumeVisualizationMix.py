@@ -92,8 +92,8 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 		self.updatedTransferFunction.emit()
 
 	@overrides(MultiVolumeVisualization)
-	def configureMapper(self, mapper):
-		# Shader type 0 is normal 'mix' shader
+	def setMapper(self, mapper):
+		# TODO: change this to interpolation type
 		mapper.SetShaderType(0)
 
 	def _createVolPropFromVis(self, visualization, opacity):

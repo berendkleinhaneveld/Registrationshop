@@ -41,7 +41,7 @@ class MultiVolumeVisualizationMIDA(MultiVolumeVisualization):
 		self.updateTransferFunctions()
 
 	@overrides(MultiVolumeVisualization)
-	def configureMapper(self, mapper):
+	def setMapper(self, mapper):
 		mapper.SetShaderType(2)
 
 	def _createVolPropFromImageData(self, imageData, color):

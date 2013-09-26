@@ -52,7 +52,10 @@ class VolumeVisualization(QObject):
 		"""
 		raise NotImplementedError()
 
-	def configureMapper(self, mapper):
+	def setMapper(self, mapper):
+		raise NotImplementedError()
+
+	def shaderType(self):
 		raise NotImplementedError()
 
 	def updateTransferFunction(self):

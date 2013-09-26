@@ -8,8 +8,7 @@ RenderWidget
 from vtk import vtkRenderer
 from vtk import vtkVolume
 from vtk import vtkInteractorStyleTrackballCamera
-# from vtk import vtkOpenGLGPUVolumeRayCastMapper
-from libvtkVolumeRenderPython import vtkOpenGLGPUVolumeRayCastMapper2 as vtkOpenGLGPUVolumeRayCastMapper
+from libvtkGPUMultiVolumeRenderPython import vtkOpenGLGPUVolumeRayCastMapper2 as vtkOpenGLGPUVolumeRayCastMapper
 from vtk import vtkOrientationMarkerWidget
 from vtk import vtkAxesActor
 from vtk import vtkImagePlaneWidget
@@ -126,7 +125,8 @@ class RenderWidget(QWidget):
 			self.volume = vtkVolume()
 			self.renderer.AddViewProp(self.volume)
 
-		self.volumeVisualization.configureMapper(self.mapper)
+		self.volumeVisualization.setMapper(self.mapper)
+		self.mapper.SetShaderType(self.volumeVisualization.shaderType())
 		self.volume.SetProperty(self.volumeVisualization.volProp)
 		self.volume.SetMapper(self.mapper)
 

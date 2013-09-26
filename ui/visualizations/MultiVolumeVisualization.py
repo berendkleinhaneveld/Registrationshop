@@ -43,7 +43,7 @@ class MultiVolumeVisualization(QObject):
 	def valueChanged(self, value):
 		raise NotImplementedError()
 
-	def configureMapper(self, mapper):
+	def setMapper(self, mapper):
 		raise NotImplementedError()
 
 	def setFixedVisualization(self, visualization):

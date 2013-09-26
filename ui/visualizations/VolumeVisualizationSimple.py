@@ -103,8 +103,12 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.upperBound = self.maximum
 
 	@overrides(VolumeVisualization)
-	def configureMapper(self, mapper):
-		mapper.SetShaderType(0)
+	def setMapper(self, mapper):
+		pass
+
+	@overrides(VolumeVisualization)
+	def shaderType(self):
+		return 0
 
 	@overrides(VolumeVisualization)
 	def updateTransferFunction(self):

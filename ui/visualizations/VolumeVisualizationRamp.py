@@ -35,10 +35,12 @@ class VolumeVisualizationRamp(VolumeVisualization):
 		self.volProp.SetScalarOpacityUnitDistance(0.8919)
 
 	@overrides(VolumeVisualization)
-	def configureMapper(self, mapper):
-		# if mapper is not None and mapper.GetBlendMode() != vtkVolumeMapper.COMPOSITE_BLEND:
-		# 	mapper.SetBlendModeToComposite()
-		mapper.SetShaderType(0)
+	def setMapper(self, mapper):
+		pass
+
+	@overrides(VolumeVisualization)
+	def shaderType(self):
+		return 0
 
 	@overrides(VolumeVisualization)
 	def updateTransferFunction(self):
