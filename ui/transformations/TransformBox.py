@@ -42,6 +42,9 @@ class TransformBox(QObject, Interactor):
 		self.transformBox.GetSelectedFaceProperty().SetOpacity(0.3)
 		self.transformBox.EnabledOn()
 
+	def setTransform(self, transform):
+		self.transformBox.SetTransform(transform)
+
 	def transformCallback(self, arg1, arg2):
 		transform = vtkTransform()
 		arg1.GetTransform(transform)

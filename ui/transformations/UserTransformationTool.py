@@ -86,9 +86,6 @@ class UserTransformationTool(TransformationTool):
 		self.transformUpdated(self.renderWidget.getUserTransform())
 
 		return self.tabWidget
-		# widget = QWidget()
-		# widget.setLayout(layout)
-		# return widget
 	
 	@Slot(object)
 	def transformUpdated(self, transform):
@@ -155,6 +152,7 @@ class UserTransformationTool(TransformationTool):
 		transform.Modified()
 		transform.Update()
 		self.renderWidget.setUserTransform(transform)
+		self.transformBox.setTransform(transform)
 		self.renderWidget.render()
 
 	def _updateText(self, lineEdits, values):
