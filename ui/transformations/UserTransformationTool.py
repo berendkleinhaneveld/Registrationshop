@@ -130,7 +130,6 @@ class UserTransformationTool(TransformationTool):
 		transform = vtkTransform()
 
 		if self.tabWidget.currentIndex() == 0:
-			print "Yeah"
 			line1 = self._readArrayOfValues(self.m1Edits)
 			line2 = self._readArrayOfValues(self.m2Edits)
 			line3 = self._readArrayOfValues(self.m3Edits)
