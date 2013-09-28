@@ -94,8 +94,8 @@ class TwoStepPicker(QObject, Interactor):
 		self.assemblyFollower = vtkProp3DFollower()
 		self.assemblyFollower.SetProp3D(assembly)
 		self.assemblyFollower.SetCamera(self.widget.renderer.GetActiveCamera())
-		self.widget.renderer.AddViewProp(self.assemblyFollower)
-		self.props.append(self.assemblyFollower)
+		self.widget.rendererOverlay.AddViewProp(self.assemblyFollower)
+		self.overlayProps.append(self.assemblyFollower)
 		self.widget.render()
 
 	def closestPoints(self, p1, p2, q1, q2):

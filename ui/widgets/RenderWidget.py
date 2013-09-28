@@ -31,14 +31,24 @@ class RenderWidget(QWidget):
 	def __init__(self):
 		super(RenderWidget, self).__init__()
 
+		# Default volume renderer
 		self.renderer = vtkRenderer()
 		self.renderer.SetBackground2(0.4, 0.4, 0.4)
 		self.renderer.SetBackground(0.1, 0.1, 0.1)
 		self.renderer.SetGradientBackground(True)
+		self.renderer.SetLayer(0)
+
+		# Overlay renderer which is synced with the default renderer
+		self.rendererOverlay = vtkRenderer()
+		self.rendererOverlay.SetLayer(1)
+		self.rendererOverlay.SetInteractive(0)
+		self.renderer.GetActiveCamera().AddObserver("ModifiedEvent", self._syncCameras)
 
 		self.rwi = QVTKRenderWindowInteractor(parent=self)
 		self.rwi.SetInteractorStyle(vtkInteractorStyleTrackballCamera())
 		self.rwi.GetRenderWindow().AddRenderer(self.renderer)
+		self.rwi.GetRenderWindow().AddRenderer(self.rendererOverlay)
+		self.rwi.GetRenderWindow().SetNumberOfLayers(2)
 
 		self.imagePlaneWidgets = [vtkImagePlaneWidget() for i in range(3)]
 		for index in range(3):
@@ -139,3 +149,11 @@ class RenderWidget(QWidget):
 				self.imagePlaneWidgets[sliceIndex].On()
 			else:
 				self.imagePlaneWidgets[sliceIndex].Off()
+
+	def _syncCameras(self, camera, ev):
+		"""
+		Camera modified event callback. Copies the parameters of
+		the renderer camera into the camera of the overlay so they
+		stay synced at all times.
+		"""
+		self.rendererOverlay.GetActiveCamera().ShallowCopy(camera)
