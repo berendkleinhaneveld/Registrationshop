@@ -8,12 +8,15 @@ from TransformationTool import TransformationTool
 from core.decorators import overrides
 from ui.transformations import TransformBox
 from vtk import vtkTransform
+from vtk import vtkMatrix4x4
 from PySide.QtGui import QLabel
 from PySide.QtGui import QWidget
 from PySide.QtGui import QLineEdit
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QDoubleValidator
+from PySide.QtGui import QTabWidget
 from PySide.QtCore import Slot
+from PySide.QtCore import Qt
 
 
 class UserTransformationTool(TransformationTool):
@@ -43,25 +46,49 @@ class UserTransformationTool(TransformationTool):
 
 	@overrides(TransformationTool)
 	def getParameterWidget(self):
-		layout = QGridLayout()
-		layout.addWidget(QLabel("Translation"), 0, 0)
+		matrixWidget = QWidget()
+		matrixLayout = QGridLayout()
+		self.m1Edits = [QLineEdit() for x in range(4)]
+		self.m2Edits = [QLineEdit() for x in range(4)]
+		self.m3Edits = [QLineEdit() for x in range(4)]
+		self.m4Edits = [QLineEdit() for x in range(4)]
+		self.initLineEdits(self.m1Edits, matrixLayout, 0, 0)
+		self.initLineEdits(self.m2Edits, matrixLayout, 1, 0)
+		self.initLineEdits(self.m3Edits, matrixLayout, 2, 0)
+		self.initLineEdits(self.m4Edits, matrixLayout, 3, 0)
 
+		paramsWidget = QWidget()
+
+		paramsLayout = QGridLayout()
+		paramsLayout.addWidget(QLabel("x"), 0, 1)
+		paramsLayout.addWidget(QLabel("y"), 0, 2)
+		paramsLayout.addWidget(QLabel("z"), 0, 3)
+
+		paramsLayout.addWidget(QLabel("Translation"), 1, 0)
 		self.translateEdits = [QLineEdit() for x in range(3)]
-		self.initLineEdits(self.translateEdits, layout, 0, 1)
+		self.initLineEdits(self.translateEdits, paramsLayout, 1, 1)
 
-		layout.addWidget(QLabel("Rotation"), 1, 0)
+		paramsLayout.addWidget(QLabel("Rotation"), 2, 0)
 		self.rotationEdits = [QLineEdit() for x in range(3)]
-		self.initLineEdits(self.rotationEdits, layout, 1, 1)
+		self.initLineEdits(self.rotationEdits, paramsLayout, 2, 1)
 		
-		layout.addWidget(QLabel("Scale"), 2, 0)
+		paramsLayout.addWidget(QLabel("Scale"), 3, 0)
 		self.scaleEdits = [QLineEdit() for x in range(3)]
-		self.initLineEdits(self.scaleEdits, layout, 2, 1)
+		self.initLineEdits(self.scaleEdits, paramsLayout, 3, 1)
 		
+		matrixWidget.setLayout(matrixLayout)
+		paramsWidget.setLayout(paramsLayout)
+
+		self.tabWidget = QTabWidget()
+		self.tabWidget.addTab(matrixWidget, "Matrix")
+		self.tabWidget.addTab(paramsWidget, "Parameters")
+
 		self.transformUpdated(self.renderWidget.getUserTransform())
 
-		widget = QWidget()
-		widget.setLayout(layout)
-		return widget
+		return self.tabWidget
+		# widget = QWidget()
+		# widget.setLayout(layout)
+		# return widget
 	
 	@Slot(object)
 	def transformUpdated(self, transform):
@@ -70,6 +97,17 @@ class UserTransformationTool(TransformationTool):
 		"""
 		# TODO: get the transform from the multi render widget when
 		# transform is adjusted
+
+		matrix = transform.GetMatrix()
+		values = []
+		for x in range(4):
+			for y in range(4):
+				values.append(matrix.GetElement(x, y))
+		self._updateText(self.m1Edits, values[0:4])
+		self._updateText(self.m2Edits, values[4:8])
+		self._updateText(self.m3Edits, values[8:12])
+		self._updateText(self.m4Edits, values[12:16])
+	
 		orientation = transform.GetOrientation()
 		position = transform.GetPosition()
 		scale = transform.GetScale()
@@ -83,6 +121,7 @@ class UserTransformationTool(TransformationTool):
 		for lineEdit in lineEdits:
 			lineEdit.setValidator(QDoubleValidator())
 			lineEdit.setText("0.0")
+			lineEdit.setAlignment(Qt.AlignRight)
 			lineEdit.textEdited.connect(self.updateTransformFromText)
 			layout.addWidget(lineEdit, row, colOffset + colIndex)
 			colIndex += 1
@@ -90,18 +129,34 @@ class UserTransformationTool(TransformationTool):
 	def updateTransformFromText(self, text):
 		transform = vtkTransform()
 
-		translate = self._readArrayOfValues(self.translateEdits)
-		transform.Translate(translate)
-		rotate = self._readArrayOfValues(self.rotationEdits)
-		transform.RotateZ(rotate[2])
-		transform.RotateY(rotate[1])
-		transform.RotateX(rotate[0])
-		scale = self._readArrayOfValues(self.scaleEdits, 1.0)
-		transform.Scale(scale)
+		if self.tabWidget.currentIndex() == 0:
+			print "Yeah"
+			line1 = self._readArrayOfValues(self.m1Edits)
+			line2 = self._readArrayOfValues(self.m2Edits)
+			line3 = self._readArrayOfValues(self.m3Edits)
+			line4 = self._readArrayOfValues(self.m4Edits)
+			values = line1+line2+line3+line4
+			matrix = vtkMatrix4x4()
+			element = 0
+			for x in range(4):
+				for y in range(4):
+					matrix.SetElement(x, y, values[element])
+					element += 1
+			transform.SetMatrix(matrix)
+		elif self.tabWidget.currentIndex() == 1:
+			translate = self._readArrayOfValues(self.translateEdits)
+			transform.Translate(translate)
+			rotate = self._readArrayOfValues(self.rotationEdits)
+			transform.RotateZ(rotate[2])
+			transform.RotateY(rotate[1])
+			transform.RotateX(rotate[0])
+			scale = self._readArrayOfValues(self.scaleEdits, 1.0)
+			transform.Scale(scale)
+
 		transform.Modified()
 		transform.Update()
 		self.renderWidget.setUserTransform(transform)
-		# TODO: fix 'latency' of update...
+		self.renderWidget.render()
 
 	def _updateText(self, lineEdits, values):
 		"""
