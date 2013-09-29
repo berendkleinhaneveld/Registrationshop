@@ -7,7 +7,6 @@ TransformBox
 from ui.Interactor import Interactor
 from PySide.QtCore import QObject
 from vtk import vtkBoxWidget
-# TODO: check out vtkBoxWidget2
 from vtk import vtkTransform
 from PySide.QtCore import Signal
 
