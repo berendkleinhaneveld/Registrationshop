@@ -64,7 +64,7 @@ class MultiVolumeVisualizationMIP(MultiVolumeVisualization):
 
 	@overrides(MultiVolumeVisualization)
 	def setMapper(self, mapper):
-		mapper.SetShaderType(1)
+		self.mapper = mapper
 
 	def _createVolPropFromImageData(self, imageData):
 		volProp = vtkVolumeProperty()

@@ -42,7 +42,7 @@ class MultiVolumeVisualizationMIDA(MultiVolumeVisualization):
 
 	@overrides(MultiVolumeVisualization)
 	def setMapper(self, mapper):
-		mapper.SetShaderType(2)
+		self.mapper = mapper
 
 	def _createVolPropFromImageData(self, imageData, color):
 		volProp = vtkVolumeProperty()

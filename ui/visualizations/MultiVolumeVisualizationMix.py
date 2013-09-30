@@ -11,6 +11,7 @@ from core.decorators import overrides
 from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QSlider
+from PySide.QtGui import QComboBox
 from PySide.QtGui import QWidget
 from PySide.QtCore import Qt
 from vtk import vtkVolumeProperty
@@ -26,9 +27,10 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 
 		self.fixedOpacity = 1.0
 		self.movingOpacity = 1.0
-
+		self.blendType = 0  # Default blend type
 		self.fixedVisualization = None
 		self.movingVisualization = None
+		self.mapper = None
 
 	@overrides(MultiVolumeVisualization)
 	def setImageData(self, fixedImageData, movingImageData):
@@ -56,7 +58,12 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 		self.sliderMovingOpacity = QSlider(Qt.Horizontal)
 		self.sliderMovingOpacity.setValue(pow(self.movingOpacity, 1.0/3.0) * 100.0)
 
-		# Be sure not to connect before the values are set...
+		self.blendTypeComboBox = QComboBox()
+		self.blendTypeComboBox.addItem("Default blend")
+		self.blendTypeComboBox.addItem("Other blend type")
+		self.blendTypeComboBox.currentIndexChanged.connect(self.valueChanged)
+
+		# Be sure to connect after the values are set...
 		self.sliderFixedOpacity.valueChanged.connect(self.valueChanged)
 		self.sliderMovingOpacity.valueChanged.connect(self.valueChanged)
 
@@ -66,7 +73,8 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 		layout.addWidget(self.sliderFixedOpacity, 0, 1)
 		layout.addWidget(self.labelMovingOpacity, 1, 0)
 		layout.addWidget(self.sliderMovingOpacity, 1, 1)
-
+		layout.addWidget(QLabel("Blend type"), 2, 0)
+		layout.addWidget(self.blendTypeComboBox, 2, 1)
 		widget = QWidget()
 		widget.setLayout(layout)
 		return widget
@@ -82,6 +90,7 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 		"""
 		self.fixedOpacity = self._applyOpacityFunction(float(self.sliderFixedOpacity.value()) / 100.0)
 		self.movingOpacity = self._applyOpacityFunction(float(self.sliderMovingOpacity.value()) / 100.0)
+		self.blendType = self.blendTypeComboBox.currentIndex()
 		self.updateTransferFunctions()
 
 	@overrides(MultiVolumeVisualization)
@@ -89,12 +98,14 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 		self.fixedVolProp = self._createVolPropFromVis(self.fixedVisualization, self.fixedOpacity)
 		self.movingVolProp = self._createVolPropFromVis(self.movingVisualization, self.movingOpacity)
 
+		if self.mapper:
+			self.mapper.SetBlendType(self.blendType)
+
 		self.updatedTransferFunction.emit()
 
 	@overrides(MultiVolumeVisualization)
 	def setMapper(self, mapper):
-		# TODO: change this to interpolation type
-		mapper.SetShaderType(0)
+		self.mapper = mapper
 
 	def _createVolPropFromVis(self, visualization, opacity):
 		volProp = vtkVolumeProperty()
