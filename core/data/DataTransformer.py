@@ -18,12 +18,11 @@ class DataTransformer(object):
 		:type imageData: vtkImageData
 		:type transform: vtkTransform
 		"""
+		range = imageData.GetScalarRange()
 		reslicer = vtkImageReslice()
 		reslicer.SetInterpolationModeToCubic()
-		range = imageData.GetScalarRange()
 		reslicer.SetBackgroundLevel(range[0])
-		# reslicer.SetAutoCropOutput(1)  # Not sure if this is what we want
-
+		reslicer.AutoCropOutputOff()
 		reslicer.SetInputData(imageData)
 		reslicer.SetResliceTransform(transform.GetInverse())
 		reslicer.Update()
