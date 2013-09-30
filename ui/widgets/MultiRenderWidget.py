@@ -171,11 +171,40 @@ class MultiRenderWidget(QWidget):
 			self.movingVolumeProperty = self.visualization.movingVolProp
 			self.visualization.setMapper(self.mapper)
 			if self.visualization.fixedVisualization:
-				self.mapper.SetShaderType1(self.visualization.fixedVisualization.shaderType())
+				self.updateMapper(self.visualization.fixedVisualization, 1)
 			if self.visualization.movingVisualization:
-				self.mapper.SetShaderType2(self.visualization.movingVisualization.shaderType())
+				self.updateMapper(self.visualization.movingVisualization, 2)
 
 		self.updateVolumeProperties()
+
+	def updateMapper(self, volVis, volNr):
+		shaderType = volVis.shaderType()
+		if volNr == 1:
+			self.mapper.SetShaderType1(shaderType)
+			if shaderType == 2:  # MIDA
+				lowerBound = (volVis.lowerBound - volVis.minimum) / (volVis.maximum - volVis.minimum)
+				upperBound = (volVis.upperBound - volVis.minimum) / (volVis.maximum - volVis.minimum)
+				self.mapper.SetLowerBound1(lowerBound)
+				self.mapper.SetUpperBound1(upperBound)
+				self.mapper.SetBrightness1(volVis.brightness / 100.0)
+			if shaderType == 1:  # MIP
+				lowerBound = (volVis.lowerBound - volVis.minimum) / (volVis.maximum - volVis.minimum)
+				upperBound = (volVis.upperBound - volVis.minimum) / (volVis.maximum - volVis.minimum)
+				self.mapper.SetLowerBound1(lowerBound)
+				self.mapper.SetUpperBound1(upperBound)
+		else:
+			self.mapper.SetShaderType2(shaderType)
+			if shaderType == 2:  # MIDA
+				lowerBound = (volVis.lowerBound - volVis.minimum) / (volVis.maximum - volVis.minimum)
+				upperBound = (volVis.upperBound - volVis.minimum) / (volVis.maximum - volVis.minimum)
+				self.mapper.SetLowerBound2(lowerBound)
+				self.mapper.SetUpperBound2(upperBound)
+				self.mapper.SetBrightness2(volVis.brightness / 100.0)
+			if shaderType == 1:  # MIP
+				lowerBound = (volVis.lowerBound - volVis.minimum) / (volVis.maximum - volVis.minimum)
+				upperBound = (volVis.upperBound - volVis.minimum) / (volVis.maximum - volVis.minimum)
+				self.mapper.SetLowerBound2(lowerBound)
+				self.mapper.SetUpperBound2(upperBound)
 
 	def updateVolumeProperties(self):
 		"""
