@@ -13,8 +13,8 @@ class ParameterList(object):
 	"""
 	Object that manages a collection of parameters. By implementing some
 	simple methods it can be used as a kind of simple list.
-	So instead of calling transformation.parameters[i] you can call
-	transformation[i] to get the same result.
+	So instead of calling paramList.parameters[i] you can call
+	paramList[i] to get the same result.
 
 	Implements the following methods:
 	- __getitem__(index)
