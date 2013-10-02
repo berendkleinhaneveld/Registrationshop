@@ -10,6 +10,7 @@ from core.decorators import overrides
 from ParameterWidget import ParameterWidget
 from core.worker import Operator
 from core.elastix import ElastixCommand
+from core.elastix import TransformixTransformation
 from core.project import ProjectController
 from PySide.QtGui import QWidget
 from PySide.QtGui import QLabel
@@ -35,8 +36,6 @@ class DeformableTransformationTool(TransformationTool):
 		self.multiWidget = multi
 		self.movingWidget = moving
 
-		self.multiWidget.resetAllTransforms()
-
 	@overrides(TransformationTool)
 	def applyTransform(self):
 		"""
@@ -56,15 +55,23 @@ class DeformableTransformationTool(TransformationTool):
 
 		currentProject = ProjectController.Instance().currentProject
 		path = currentProject.folder
-		transformationPath = os.path.join(path, "/data/Transformation.txt")
-		outputFolder = os.path.join(path, "/data")
 		
+		transformationPath = os.path.join(path, "data/Transformation.txt")
+		initialTransformPath = os.path.join(path, "data/InitialTransformation.txt")
+		outputFolder = os.path.join(path, "data")
+
 		self.transformation.saveToFile(transformationPath)
+		transform = self.multiWidget.getFullTransform()
+		dataset = ProjectController.Instance().currentProject.movingData
+		initialTransform = TransformixTransformation(dataset, transform)
+		parameters = initialTransform.transformation()
+		parameters.saveToFile(initialTransformPath)
 
 		command = ElastixCommand(fixedData=currentProject.fixedData,
 			movingData=currentProject.movingData,
 			outputFolder=outputFolder,
-			transformation=transformationPath)
+			transformation=transformationPath,
+			initialTransformation=initialTransformPath)
 
 		self.operator = Operator()
 		self.operator.addCommand(command)
