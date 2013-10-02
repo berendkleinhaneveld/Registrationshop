@@ -19,6 +19,7 @@ class MainWindow(QMainWindow):
 	def __init__(self, args):
 		super(MainWindow, self).__init__()
 		self.args = args
+		self._storesSizeAndPosition = True
 
 	def restoreState(self):
 		"""
@@ -26,6 +27,9 @@ class MainWindow(QMainWindow):
 		application was run. If the application is started for the first time
 		it applies some 'sane' initial values.
 		"""
+		if not self._storesSizeAndPosition:
+			return
+			
 		xPosition = int(MainWindow.settings.value("ui/window/origin/x", 0))
 		yPosition = int(MainWindow.settings.value("ui/window/origin/y", 0))
 		width = int(MainWindow.settings.value("ui/window/width", 800))
@@ -43,6 +47,9 @@ class MainWindow(QMainWindow):
 		:param event: Resize event
 		:type event: QResizeEvent
 		"""
+		if not self._storesSizeAndPosition:
+			return
+
 		width = self.width()
 		height = self.height()
 
@@ -62,6 +69,9 @@ class MainWindow(QMainWindow):
 		:param event: Move event
 		:type event: QMoveEvent
 		"""
+		if not self._storesSizeAndPosition:
+			return
+
 		xPosition = self.geometry().x()
 		yPosition = self.geometry().y()
 
