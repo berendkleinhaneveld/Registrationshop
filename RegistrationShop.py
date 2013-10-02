@@ -32,7 +32,7 @@ from core.data import DataReader
 from core.data import DataTransformer
 from core.data import DataWriter
 from core.AppResources import AppResources
-from core.elastix import Transformation
+from core.elastix import ParameterList
 # Import ui elements
 from ui.MainWindow import MainWindow
 from ui.WindowDialog import WindowDialog
@@ -367,7 +367,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 			filename, other = QFileDialog.getOpenFileName(self, "Open custom parameter file", "", "(*.c)")
 			if len(filename) == 0:
 				return
-			transformation = Transformation()
+			transformation = ParameterList()
 			if not transformation.loadFromFile(filename):
 				transformation = None
 				print "Warning: could not load transformation file"

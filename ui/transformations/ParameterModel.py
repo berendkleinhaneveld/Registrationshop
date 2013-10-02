@@ -9,7 +9,7 @@ from PySide.QtCore import QModelIndex
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 from core.elastix import Parameter
-from core.elastix import Transformation
+from core.elastix import ParameterList
 
 
 class ParameterModel(QAbstractItemModel):
@@ -51,10 +51,10 @@ class ParameterModel(QAbstractItemModel):
 		del self.parameters[index]
 		self.removeRow(index, QModelIndex())
 
-	@Slot(Transformation)
+	@Slot(ParameterList)
 	def setTransformation(self, transformation):
 		"""
-		:type transformation: Transformation
+		:type transformation: ParameterList
 		"""
 		self.setParameters(transformation.parameters)
 

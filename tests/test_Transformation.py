@@ -1,10 +1,10 @@
 import unittest
 
-from core.elastix import Transformation
+from core.elastix import ParameterList
 from core.elastix import Parameter
 
 
-class TransformationTest(unittest.TestCase):
+class ParameterListTest(unittest.TestCase):
 
 	def testListMethods(self):
 		nonvalidValue = "hello world"
@@ -12,7 +12,7 @@ class TransformationTest(unittest.TestCase):
 		otherValue = Parameter("key", "goodbye world")
 		anotherValue = Parameter("key", 0)
 
-		parameters = Transformation()
+		parameters = ParameterList()
 		self.assertEquals(len(parameters), 0)
 		# Test adding a non Parameter value
 		self.assertRaises(TypeError, parameters.append, nonvalidValue)
@@ -33,12 +33,12 @@ class TransformationTest(unittest.TestCase):
 
 	def testInputOutputMethods(self):
 		import os
-		parameters = Transformation()
+		parameters = ParameterList()
 		path = os.path.dirname(os.path.abspath(__file__))
 		parameters.loadFromFile(unicode(path) + "/data/Sample.txt")
 		self.assertEquals(len(parameters), 28)
 		parameters.saveToFile(unicode(path) + "/SampleOutput.c")
-		otherParameters = Transformation()
+		otherParameters = ParameterList()
 		otherParameters.loadFromFile(unicode(path) + "/SampleOutput.c")
 		self.assertEquals(len(parameters), len(otherParameters))
 		self.assertTrue(Parameter("MovingInternalImagePixelType", "float") in parameters)

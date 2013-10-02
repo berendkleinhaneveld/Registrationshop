@@ -7,7 +7,7 @@ AppResources
 
 import os
 from AppVars import AppVars
-from core.elastix import Transformation
+from core.elastix import ParameterList
 
 
 class AppResources(object):
@@ -42,7 +42,7 @@ class AppResources(object):
 		fileNames = os.listdir(AppVars.transformationsPath())
 		for fileName in fileNames:
 			fullFileName = os.path.join(AppVars.transformationsPath(), fileName)
-			transformation = Transformation()
+			transformation = ParameterList()
 			if transformation.loadFromFile(fullFileName):
 				transformations.append(transformation)
 		return transformations

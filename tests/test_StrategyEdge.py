@@ -1,10 +1,10 @@
 import unittest
-import os
-import shutil
+# import os
+# import shutil
 
 from core.strategy.StrategyEdge import StrategyEdge
-from core.strategy.StrategyNode import StrategyNode
-from core.elastix import Transformation
+# from core.strategy.StrategyNode import StrategyNode
+from core.elastix import ParameterList
 
 
 class StrategyEdgeTest(unittest.TestCase):
@@ -20,12 +20,12 @@ class StrategyEdgeTest(unittest.TestCase):
 	# def testStrategyEdge(self):
 	# 	self.assertIsNotNone(self.edge)
 	# 	self.assertTrue(hasattr(self.edge, "parentNode"))
-	# 	self.assertTrue(hasattr(self.edge, "childNode"))
-	# 	self.assertTrue(hasattr(self.edge, "transformation"))
+		self.assertTrue(hasattr(self.edge, "childNode"))
+		self.assertTrue(hasattr(self.edge, "transformation"))
 
 	# def testExecutingStrategyEdge(self):
-	# 	# Load simple transformation from disk
-	# 	transformation = Transformation()
+		# Load simple transformation from disk
+		transformation = ParameterList()
 	# 	path = os.path.dirname(os.path.abspath(__file__))
 	# 	transformation.loadFromFile(unicode(path) + "/data/Sample.txt")
 

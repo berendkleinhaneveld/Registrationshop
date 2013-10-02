@@ -1,7 +1,7 @@
 import unittest
-import os
+# import os
 from core.strategy.Strategy import Strategy
-from core.elastix import Transformation
+from core.elastix import ParameterList
 
 
 class TestStrategy(unittest.TestCase):
@@ -31,7 +31,7 @@ class TestStrategy(unittest.TestCase):
 		self.assertIn("output", self.strategy.baseDir)
 
 	# def testAddingTransformation(self):
-	# 	self.strategy.addTransformation(Transformation())
+	# 	self.strategy.addTransformation(ParameterList())
 	# 	self.assertNotEqual(self.strategy.currentNode, self.strategy.rootNode)
 	# 	self.assertTrue(self.strategy.currentNode.dirty)
 	# 	self.assertEqual(self.strategy.currentNode.incomingEdge.parentNode, self.strategy.rootNode)
@@ -39,14 +39,14 @@ class TestStrategy(unittest.TestCase):
 	# 	self.assertIsNotNone(edge.transformation)
 
 	def testSettingCurrentNode(self):
-		self.strategy.addTransformation(Transformation())
+		self.strategy.addTransformation(ParameterList())
 		self.strategy.setCurrentNode(self.strategy.rootNode)
 		self.assertEqual(self.strategy.currentNode, self.strategy.rootNode)
-		self.strategy.addTransformation(Transformation())
+		self.strategy.addTransformation(ParameterList())
 		self.assertEqual(len(self.strategy.rootNode.outgoingEdges), 2)
 
 	# def testExecutingStrategy(self):
-	# 	transformation = Transformation()
+	# 	transformation = ParameterList()
 	# 	path = os.path.dirname(os.path.abspath(__file__))
 	# 	transformation.loadFromFile(unicode(path) + "/data/Sample.txt")
 	# 	self.strategy.addTransformation(transformation)

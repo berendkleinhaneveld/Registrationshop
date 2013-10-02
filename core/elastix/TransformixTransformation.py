@@ -4,7 +4,7 @@ TransformixTransformation
 :Authors:
 	Berend Klein Haneveld
 """
-from Transformation import Transformation
+from ParameterList import ParameterList
 from Parameter import Parameter
 from core.data import DataReader
 from vtk import vtkMatrix4x4
@@ -25,7 +25,7 @@ class TransformixTransformation(object):
 		self.transform = transform
 
 	def transformation(self):
-		transformation = Transformation()
+		transformation = ParameterList()
 		transformation.append(Parameter("Transform", "AffineTransform"))
 
 		transformMatrix = self.transform.GetMatrix()

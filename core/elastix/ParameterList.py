@@ -9,7 +9,7 @@ import os
 from Parameter import Parameter
 
 
-class Transformation(object):
+class ParameterList(object):
 	"""
 	Object that manages a collection of parameters. By implementing some
 	simple methods it can be used as a kind of simple list.
@@ -27,7 +27,7 @@ class Transformation(object):
 	"""
 
 	def __init__(self):
-		super(Transformation, self).__init__()
+		super(ParameterList, self).__init__()
 		self.parameters = []
 		self.name = None
 
@@ -101,7 +101,7 @@ class Transformation(object):
 		return value in self.parameters
 
 	def __eq__(self, other):
-		if not isinstance(other, Transformation):
+		if not isinstance(other, ParameterList):
 			return False
 
 		for x in self.parameters:
@@ -126,5 +126,5 @@ class Transformation(object):
 			self.parameters.append(value)
 		else:
 			raise TypeError("Only Parameter type objects \
-				can be added to a Transformation object. An object with \
+				can be added to a ParameterList object. An object with \
 				type %s was provided" % type(value))
