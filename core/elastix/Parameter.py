@@ -86,6 +86,10 @@ class Parameter(object):
 		if not self._key:
 			raise AttributeError("Can't set a value when the key is None")
 
+		if isinstance(value, list):
+			if len(value) == 0:
+				raise AttributeError("Can't set an empty list as value")
+
 		if isinstance(value, basestring):
 			# Try to convert to another type
 			value, success = Parameter.valueAsBool(value)
@@ -121,6 +125,12 @@ class Parameter(object):
 			return tmp
 		elif isinstance(value, basestring):
 			return '"%s"' % value
+		elif isinstance(value, list):
+			result = ''
+			for item in value[0:-1]:
+				result += Parameter.valueToString(item) + ' '
+			result += Parameter.valueToString(value[-1])
+			return result
 
 	@classmethod
 	def valueAsBool(cls, value):

@@ -88,6 +88,23 @@ class ParameterTest(unittest.TestCase):
 		param = Parameter("Key", "other")
 		self.assertIsInstance(param.value(), basestring)
 
+	def testListAsValue(self):
+		# Multiple values
+		ls = [0.5, 0.3, 5.2, 3, -2]
+		param = Parameter("key", ls)
+		self.assertEquals(param.__str__(), '(key 0.5 0.3 5.2 3 -2)')
+
+		# Empty list
+		ls = []
+		self.assertRaises(AttributeError, param.setValue, ls)
+
+		# Single item
+		ls = [0.3]
+		param.setValue(ls)
+		self.assertEquals(param.__str__(), '(key 0.3)')
+		param.setValue("value")
+		self.assertEquals(param.__str__(), '(key "value")')
+
 	def testStringRepresentations(self):
 		# Test the string representations
 		# String value
