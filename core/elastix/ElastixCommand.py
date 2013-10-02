@@ -21,7 +21,7 @@ class ElastixCommand(Command):
 	"""
 
 	def __init__(self, fixedData=None, movingData=None, outputFolder=None,
-		transformation=None):
+		transformation=None, initialTransformation=None):
 		"""
 		Constructs a simple object with the provided parameters.
 
@@ -36,6 +36,7 @@ class ElastixCommand(Command):
 		self.movingData = movingData
 		self.outputFolder = outputFolder
 		self.transformation = transformation
+		self.initialTransformation = initialTransformation  # not tested
 
 	def isValid(self):
 		"""

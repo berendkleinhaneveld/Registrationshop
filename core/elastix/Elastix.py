@@ -41,30 +41,26 @@ class Elastix(object):
 		numberOfCores = multiprocessing.cpu_count()
 
 		# Create Elastix command with the right parameters
-		# TODO: build some class or thing to actually call Elastix instead of
-		# calling directly from the StrategyEdge class
-		command = ["elastix",
+		commands = ["elastix",
 			"-m", command.movingData,
 			"-f", command.fixedData,
 			"-out", command.outputFolder,
 			"-p", command.transformation,
 			"-threads", str(numberOfCores)]
 
+		if command.initialTransformation:
+			commands.append("-t0")
+			commands.append(command.initialTransformation)
+
 		# Try and call elastix
 		try:
-			proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-			# TODO: Catching output prevents from Python from real multitasking
-			# This is fixed by processing Elastix and the command in a different
-			# thread.
+			proc = subprocess.Popen(commands, stdout=subprocess.PIPE)
 			for line in iter(proc.stdout.readline, ""):
 				# print line.rstrip()
 				pass
-			# TODO: call transformix if WriteResultImage parameter was set to false
-			# self.childNode.movingData = self.childNode.outputFolder + "/result.0.mhd"
-			# self.childNode.dirty = False
 		except Exception, e:
 			print "Image registration failed with command:"
-			print command
+			print commands
 			print "More detailed info:"
 			print sys.exc_info()
 			raise e
