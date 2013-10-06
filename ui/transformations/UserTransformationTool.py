@@ -5,6 +5,7 @@ UserTransformationTool (TransformationTool)
 	Berend Klein Haneveld
 """
 from TransformationTool import TransformationTool
+from TransformationList import TransformationList
 from core.decorators import overrides
 from ui.transformations import TransformBox
 from vtk import vtkTransform
@@ -28,6 +29,7 @@ class UserTransformationTool(TransformationTool):
 
 	@overrides(TransformationTool)
 	def setRenderWidgets(self, fixed=None, moving=None, multi=None):
+		self.movingWidget = moving
 		self.renderWidget = multi
 		self.transformBox.setWidget(self.renderWidget)
 		self.transformBox.setImageData(self.renderWidget.movingImageData)
@@ -94,6 +96,13 @@ class UserTransformationTool(TransformationTool):
 		"""
 		# TODO: get the transform from the multi render widget when
 		# transform is adjusted
+
+		completeTransform = self.renderWidget.getFullTransform()
+		transList = TransformationList()
+		transList.append(completeTransform)
+		shearTrans = transList.scalingTransform()
+		self.movingWidget.volume.SetUserTransform(shearTrans)
+		self.movingWidget.render()
 
 		matrix = transform.GetMatrix()
 		values = []
