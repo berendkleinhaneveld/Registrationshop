@@ -154,35 +154,3 @@ class ProjectController(QObject):
 
 		# Emit signal that data set file name has changed
 		self.movingFileChanged.emit(self.currentProject.movingData)
-
-	def register(self):
-		"""
-		Make an Elastix object.
-		Specify where this Elastix object should look for/write its files.
-		Set the fixed and moving data sets as parameters. (or the project?)
-		Then create a parameter file, argh, this is where the fault is...
-
-		First, there should be a tree, and for each step there should be parameters,
-		and eacht step has to run with its own parameters...
-
-		So, the tree is concern #1. After that, I have to figure out how I will process
-		the whole tree step by step.
-		"""
-		# self.queue = multiprocessing.Queue()
-		# reg = Elastix()
-		# reg.queue = self.queue
-		# params = reg.get_default_params('affine')
-		# params.MaximumNumberOfIterations = 200
-		# params.FinalGridSpacingInVoxels = 10
-		# im1 = self._currentProject.fixedDataSetName()
-		# im2 = self._currentProject.movingDataSetName()
-		# p = multiprocessing.Process(target=reg.register())
-		# p.start()
-		# job = multiprocessing.Process(reg.register(im1, im2, params))
-		# im1_deformed, field = reg.register(im1, im2, params, verbose=1)
-		# filename = 'registration_result'
-		# resultFile, succes = reg.writeImageData(im1_deformed, self._currentProject.name(), filename)
-		# if succes:
-		# 	self._currentProject.setResultDataSetName(resultFile)
-		# 	self.resultFileChanged.emit(resultFile)
-		return
