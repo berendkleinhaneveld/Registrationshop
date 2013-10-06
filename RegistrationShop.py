@@ -334,7 +334,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 			self.transformTool.cleanUp()
 
 		self.transformTool = UserTransformationTool()
-		self.transformTool.setRenderWidgets(multi=self.multiDataWidget)
+		self.transformTool.setRenderWidgets(moving=self.movingDataWidget, multi=self.multiDataWidget)
 		self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
 
 	@Slot()
