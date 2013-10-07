@@ -42,12 +42,15 @@ class UserTransformationTool(TransformationTool):
 		self.transformBox.cleanUp()
 
 		# Reset the transformation
+		self.movingWidget.resetUserTransform()
+		self.movingWidget.render()
 		self.renderWidget.resetUserTransform()
 		self.renderWidget.rwi.SetDesiredUpdateRate(self._originalUpdateRate)
 		self.renderWidget.render()
 
 	@overrides(TransformationTool)
 	def applyTransform(self):
+		self.movingWidget.applyUserTransform()
 		self.renderWidget.applyUserTransform()
 
 	@overrides(TransformationTool)
@@ -105,7 +108,7 @@ class UserTransformationTool(TransformationTool):
 		transList = TransformationList()
 		transList.append(completeTransform)
 		shearTrans = transList.scalingTransform()
-		self.movingWidget.volume.SetUserTransform(shearTrans)
+		self.movingWidget.setUserTransform(shearTrans)
 		self.movingWidget.render()
 
 		matrix = transform.GetMatrix()
