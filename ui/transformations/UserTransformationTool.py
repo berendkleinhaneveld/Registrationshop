@@ -26,11 +26,14 @@ class UserTransformationTool(TransformationTool):
 
 		self.transformBox = TransformBox()
 		self.transformBox.transformUpdated.connect(self.transformUpdated)
+		self._originalUpdateRate = 15  # Default
 
 	@overrides(TransformationTool)
 	def setRenderWidgets(self, fixed=None, moving=None, multi=None):
 		self.movingWidget = moving
 		self.renderWidget = multi
+		self._originalUpdateRate = self.renderWidget.rwi.GetDesiredUpdateRate()
+		self.renderWidget.rwi.SetDesiredUpdateRate(5)
 		self.transformBox.setWidget(self.renderWidget)
 		self.transformBox.setImageData(self.renderWidget.movingImageData)
 
@@ -40,6 +43,7 @@ class UserTransformationTool(TransformationTool):
 
 		# Reset the transformation
 		self.renderWidget.resetUserTransform()
+		self.renderWidget.rwi.SetDesiredUpdateRate(self._originalUpdateRate)
 		self.renderWidget.render()
 
 	@overrides(TransformationTool)
