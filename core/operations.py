@@ -73,10 +73,11 @@ def Mean(vectors):
 	return Multiply(reduce(lambda x, y: Add(x, y), vectors), 1.0 / len(vectors))
 
 
-def ClosestPoints(p1, p2, q1, q2):
+def ClosestPoints(p1, p2, q1, q2, clamp=False):
 	"""
 	Get the 3D minimum distance between 2 lines
-	input: two 3D lines p and q, defined by points p1, p2
+	input: two 3D lines p and q, defined by points p1, p2 and whether
+		to clamp the output between the two given points.
 	return: the two closest points on line p and q
 	"""
 	u = Subtract(p2, p1)
@@ -100,5 +101,11 @@ def ClosestPoints(p1, p2, q1, q2):
 	else:
 		sc = (b * e - c * d) / D
 		tc = (a * e - b * d) / D
+
+	if clamp:
+		sc = max(sc, 0)
+		tc = max(sc, 0)
+		sc = min(sc, 1)
+		tc = min(tc, 1)
 
 	return Add(Multiply(u, sc), p1), Add(Multiply(v, tc), q1)
