@@ -11,7 +11,9 @@ from vtk import vtkInteractorStyleTrackballCamera
 from libvtkGPUMultiVolumeRenderPython import vtkOpenGLGPUVolumeRayCastMapper2 as vtkOpenGLGPUVolumeRayCastMapper
 from vtk import vtkOrientationMarkerWidget
 from vtk import vtkAxesActor
+from vtk import vtkTransform
 from vtk import vtkImagePlaneWidget
+from vtk import vtkMatrix4x4
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
@@ -69,6 +71,10 @@ class RenderWidget(QWidget):
 		self.orientationWidget.SetInteractor(self.rwi)
 		self.orientationWidget.EnabledOn()
 		self.orientationWidget.InteractiveOff()
+
+		# Keep track of the base and user transforms
+		self.baseTransform = vtkTransform()
+		self.userTransform = vtkTransform()
 
 		self.setMinimumWidth(400)
 		self.setMinimumHeight(400)
@@ -157,3 +163,57 @@ class RenderWidget(QWidget):
 		stay synced at all times.
 		"""
 		self.rendererOverlay.GetActiveCamera().ShallowCopy(camera)
+
+	def getUserTransform(self):
+		return self.userTransform
+
+	def getFullTransform(self):
+		return self._getConcatenatedTransform()
+
+	def setUserTransform(self, transform):
+		self.userTransform = transform
+		self._updateTransform()
+
+	def resetUserTransform(self):
+		self.userTransform = vtkTransform()
+		self._updateTransform()
+
+	def resetAllTransforms(self):
+		self.baseTransform = vtkTransform()
+		self.userTransform = vtkTransform()
+		self._updateTransform()
+
+	def applyUserTransform(self):
+		"""
+		Concatenates the user transform with the base transform
+		into the new base transform. Resets the user transform.
+		"""
+		self.baseTransform = self._getConcatenatedTransform()
+		self.resetUserTransform()
+
+	def _updateTransform(self):
+		"""
+		Updates the transform of the second volume.
+		"""
+		transform = self._getConcatenatedTransform()
+		transform.Update()
+		self.volume.SetUserTransform(transform)
+
+	def _getConcatenatedTransform(self):
+		"""
+		Creates and returns a new vtkTransform that exists
+		of the base and user transforms concatenated.
+		"""
+		completeTransform = vtkTransform()
+		completeTransform.Concatenate(self.userTransform)
+		completeTransform.Concatenate(self.baseTransform)
+		completeTransform.Update()
+
+		return self._getCopyOfTransform(completeTransform)
+
+	def _getCopyOfTransform(self, transform):
+		newTransform = vtkTransform()
+		matrix = vtkMatrix4x4()
+		matrix.DeepCopy(transform.GetMatrix())
+		newTransform.SetMatrix(matrix)
+		return newTransform
