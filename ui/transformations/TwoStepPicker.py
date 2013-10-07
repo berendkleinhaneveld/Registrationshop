@@ -66,7 +66,7 @@ class TwoStepPicker(Picker):
 		x, y = iren.GetEventPosition()
 		lineSource = self.lineActor.GetMapper().GetInputConnection(0, 0).GetProducer()
 		q1, q2 = rayForMouse(self.widget.renderer, x, y)
-		a, b = ClosestPoints(lineSource.GetPoint1(), lineSource.GetPoint2(), q1, q2)
+		a, b = ClosestPoints(lineSource.GetPoint1(), lineSource.GetPoint2(), q1, q2, clamp=True)
 		if not hasattr(self, "sphereSource"):
 			self.sphereSource = vtkSphereSource()
 			self.sphereSource.SetRadius(20)
