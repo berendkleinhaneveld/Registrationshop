@@ -23,6 +23,7 @@ class Project(object):
 		self.fixedSettings = None
 		self.movingSettings = None
 		self.multiSettings = None
+		self.transformations = None
 
 	def __eq__(self, other):
 		if not isinstance(other, Project):
