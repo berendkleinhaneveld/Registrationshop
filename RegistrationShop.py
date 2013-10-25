@@ -282,6 +282,10 @@ class RegistrationShop(MainWindow, WindowDialog):
 		"""
 		# Add toolbar
 		self.toolbar = self.addToolBar('Main tools')
+		self.toolbar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+		self.toolbar.setAllowedAreas(Qt.TopToolBarArea)
+		self.toolbar.setFloatable(False)
+		self.toolbar.setMovable(False)
 
 		# Add the transform tool buttons to the toolbar
 		self.toolbar.addAction(self.actionFreeTransformTool)
