@@ -9,6 +9,8 @@ from core.decorators import overrides
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
 from vtk import vtkVolumeProperty
+from vtk import vtkTransform
+from vtk import vtkMatrix4x4
 
 
 class vtkObjectWrapper(object):
@@ -174,3 +176,29 @@ class vtkCameraWrapper(vtkObjectWrapper):
 		camera.SetViewUp(self.viewUp)
 		camera.SetDistance(self.distance)
 		camera.SetClippingRange(self.clippingRange)
+
+
+class vtkTransformWrapper(vtkObjectWrapper):
+	"""vtkTransformWrapper is a wrapper around a
+	vtkTransform object. It stores the matrix of
+	the transform as a list of values."""
+	def __init__(self, transform=None):
+		super(vtkTransformWrapper, self).__init__(transform)
+		
+	def setOriginalObject(self, transform):
+		matrix = transform.GetMatrix()
+		self.values = []
+		for i in range(4):
+			for j in range(4):
+				self.values.append(matrix.GetElement(i, j))
+
+	def originalObject(self):
+		matrix = vtkMatrix4x4()
+		index = 0
+		for i in range(4):
+			for j in range(4):
+				matrix.SetElement(i, j, self.values[index])
+				index += 1
+		transform = vtkTransform()
+		transform.SetMatrix(matrix)
+		return transform
