@@ -26,12 +26,12 @@ from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 
 # Import core stuff
-from core.AppVars import AppVars
+from core import AppVars
+from core import AppResources
 from core.project import ProjectController
 from core.data import DataReader
 from core.data import DataTransformer
 from core.data import DataWriter
-from core.AppResources import AppResources
 from core.elastix import ParameterList
 # Import ui elements
 from ui.MainWindow import MainWindow
