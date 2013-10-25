@@ -34,8 +34,10 @@ from core.data import DataTransformer
 from core.data import DataWriter
 from core.elastix import ParameterList
 # Import ui elements
-from ui.MainWindow import MainWindow
-from ui.WindowDialog import WindowDialog
+from ui import MainWindow
+from ui import WindowDialog
+from ui import RenderController
+from ui import MultiRenderController
 from ui.dialogs import FileTypeDialog
 from ui.dialogs import ElastixMainDialog
 from ui.widgets import RenderWidget
@@ -43,8 +45,6 @@ from ui.widgets import MultiRenderWidget
 from ui.widgets import TitleWidget
 from ui.widgets import RenderPropWidget
 from ui.widgets import MultiRenderPropWidget
-from ui.RenderController import RenderController
-from ui.MultiRenderController import MultiRenderController
 from ui.transformations import UserTransformationTool
 from ui.transformations import LandmarkTransformationTool
 from ui.transformations import DeformableTransformationTool
