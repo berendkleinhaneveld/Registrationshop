@@ -9,9 +9,9 @@ from MultiVolumeVisualization import CreateEmptyFunctions
 from MultiVolumeVisualization import CreateRangeFunctions
 from core.decorators import overrides
 from PySide.QtGui import QLabel
+from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QSlider
-from PySide.QtGui import QWidget
 from PySide.QtCore import Qt
 from vtk import vtkVolumeProperty
 

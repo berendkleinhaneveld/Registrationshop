@@ -8,11 +8,11 @@ from MultiVolumeVisualization import MultiVolumeVisualization
 from MultiVolumeVisualization import CreateFunctionFromProperties
 from MultiVolumeVisualization import CreateEmptyFunctions
 from core.decorators import overrides
+from PySide.QtGui import QWidget
 from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QSlider
 from PySide.QtGui import QComboBox
-from PySide.QtGui import QWidget
 from PySide.QtCore import Qt
 from vtk import vtkVolumeProperty
 
@@ -75,6 +75,7 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 		layout.addWidget(self.sliderMovingOpacity, 1, 1)
 		layout.addWidget(QLabel("Blend type"), 2, 0)
 		layout.addWidget(self.blendTypeComboBox, 2, 1)
+
 		widget = QWidget()
 		widget.setLayout(layout)
 		return widget
