@@ -54,8 +54,13 @@ class TransformationParameterWidget(QWidget):
 
 	@Slot()
 	def cancelButtonClicked(self):
+		"""
+		Cancels the transform and hides the apply / cancel buttons
+		"""
 		self.showControls(False)
 		self.cleanUpTransformWidget()
+
+		self.transformationTool.cancelTransform()
 		self.transformationTool.cleanUp()
 		self.transformationTool = None
 
@@ -64,10 +69,10 @@ class TransformationParameterWidget(QWidget):
 		"""
 		Applies the transform and hides the apply / cancel buttons
 		"""
-		self.transformationTool.applyTransform()
-
 		self.showControls(False)
 		self.cleanUpTransformWidget()
+
+		self.transformationTool.applyTransform()
 		self.transformationTool.cleanUp()
 		self.transformationTool = None
 

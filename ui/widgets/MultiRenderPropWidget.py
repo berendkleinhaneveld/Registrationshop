@@ -39,3 +39,5 @@ class MultiRenderPropWidget(QWidget):
 		layout = QVBoxLayout()
 		self.setLayout(layout)
 		layout.addWidget(self.tabWidget)
+
+		self.registrationHistoryWidget.setMultiRenderWidget(multiRenderController.multiRenderWidget)

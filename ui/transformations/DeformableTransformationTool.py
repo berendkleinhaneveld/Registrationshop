@@ -6,9 +6,9 @@ DeformableTransformationTool
 """
 import os
 from TransformationTool import TransformationTool
-from core.decorators import overrides
 from ParameterWidget import ParameterWidget
 from ui.widgets.StatusWidget import StatusWidget
+from core.decorators import overrides
 from core.worker import Operator
 from core.elastix import ElastixCommand
 from core.elastix import TransformixTransformation
@@ -70,11 +70,14 @@ class DeformableTransformationTool(TransformationTool):
 		outputFolder = os.path.join(path, "data")
 
 		self.transformation.saveToFile(transformationPath)
-		transform = self.multiWidget.getFullTransform()
+		transform = self.multiWidget.transformations.completeTransform()
 		dataset = ProjectController.Instance().currentProject.movingData
 		initialTransform = TransformixTransformation(dataset, transform)
 		parameters = initialTransform.transformation()
-		parameters.saveToFile(initialTransformPath)
+		if parameters:
+			parameters.saveToFile(initialTransformPath)
+		else:
+			initialTransform = None
 
 		command = ElastixCommand(fixedData=currentProject.fixedData,
 			movingData=currentProject.movingData,

@@ -6,16 +6,24 @@ TwoStepPicker
 """
 from Picker import Picker
 from core.decorators import overrides
-from core.operations import *
+from core.operations import Multiply
+from core.operations import Add
+from core.operations import ClosestPoints
+from core.operations import Subtract
+from core.operations import LineIntersectionWithTriangle
+from core.operations import Length
+from core.operations import Normalize
 from vtk import vtkLineSource
 from vtk import vtkSphereSource
 from vtk import vtkDataSetMapper
 from vtk import vtkActor
 from vtk import vtkAssembly
+from vtk import vtkTransform
 from vtk import vtkProp3DFollower
 from vtk import vtkMath
 from vtk import vtkImageInterpolator
 from PySide.QtCore import Signal
+from PySide.QtCore import Slot
 
 
 class TwoStepPicker(Picker):
@@ -27,12 +35,15 @@ class TwoStepPicker(Picker):
 
 	def __init__(self):
 		super(TwoStepPicker, self).__init__()
+
 		self.props = []
 		self.overlayProps = []
 		self.lineActor = None
+		self.sphereSource = None
 
 	def setPropertiesWidget(self, widget):
 		self.propertiesWidget = widget
+		self.propertiesWidget.histogramWidget.updatePosition.connect(self.histogramUpdatedPosition)
 
 	@overrides(Picker)
 	def setWidget(self, widget):
@@ -43,17 +54,27 @@ class TwoStepPicker(Picker):
 	@overrides(Picker)
 	def cleanUp(self):
 		super(TwoStepPicker, self).cleanUp()
-		if self.widget:
-			for prop in self.props:
-				self.widget.renderer.RemoveViewProp(prop)
-			for prop in self.overlayProps:
-				self.widget.rendererOverlay.RemoveViewProp(prop)
+		
+		for prop in self.props:
+			self.widget.renderer.RemoveViewProp(prop)
+		for prop in self.overlayProps:
+			self.widget.rendererOverlay.RemoveViewProp(prop)
 
 		self.props = []
 		self.overlayProps = []
 		self.lineActor = None
-		if hasattr(self, "sphereSource"):
-			del self.sphereSource
+		self.sphereSource = None
+
+	@Slot(float)
+	def histogramUpdatedPosition(self, position):
+		lineSource = self.lineActor.GetMapper().GetInputConnection(0, 0).GetProducer()
+		p1 = lineSource.GetPoint1()
+		p2 = lineSource.GetPoint2()
+		part = Add(p1, Multiply(Subtract(p2, p1), position))
+		if self.sphereSource:
+			self.sphereSource.SetCenter(part[0], part[1], part[2])
+		self.assemblyFollower.SetPosition(part[0], part[1], part[2])
+		self.widget.render()
 
 	def mouseMove(self, iren, event=""):
 		"""
@@ -67,7 +88,7 @@ class TwoStepPicker(Picker):
 		lineSource = self.lineActor.GetMapper().GetInputConnection(0, 0).GetProducer()
 		q1, q2 = rayForMouse(self.widget.renderer, x, y)
 		a, b = ClosestPoints(lineSource.GetPoint1(), lineSource.GetPoint2(), q1, q2, clamp=True)
-		if not hasattr(self, "sphereSource"):
+		if not self.sphereSource:
 			self.sphereSource = vtkSphereSource()
 			self.sphereSource.SetRadius(20)
 			sphereMapper = vtkDataSetMapper()
@@ -75,8 +96,7 @@ class TwoStepPicker(Picker):
 			sphereActor = vtkActor()
 			sphereActor.SetMapper(sphereMapper)
 			sphereActor.GetProperty().SetColor(0.2, 1, 0.5)
-			self.widget.renderer.AddViewProp(sphereActor)
-			self.props.append(sphereActor)
+			self._addToRender(sphereActor)
 			self._createLocator()
 		self.sphereSource.SetCenter(a[0], a[1], a[2])
 		self.assemblyFollower.SetPosition(a[0], a[1], a[2])
@@ -89,7 +109,7 @@ class TwoStepPicker(Picker):
 		key = iren.GetKeyCode()
 		if key != "a":
 			# if key == " ":
-			# 	print "Hallelujah!"
+			# 	print "Pressed space"
 			return
 		x, y = iren.GetEventPosition()
 		p1, p2 = rayForMouse(self.widget.renderer, x, y)
@@ -97,58 +117,79 @@ class TwoStepPicker(Picker):
 			self._setLine(p1, p2)
 		else:
 			point = list(self.sphereSource.GetCenter())
-			self.pickedLocation.emit(point)
+			matrix = self.widget.volume.GetMatrix()
+			transform = vtkTransform()
+			transform.SetMatrix(matrix)
+			transform.Inverse()
+			tranformedPoint = transform.TransformPoint(point)
+			point = list(tranformedPoint)
 			self.cleanUp()
+			self.pickedLocation.emit(point)
 			self.setWidget(self.widget)
 			self.widget.render()
 
 	def _setLine(self, point1, point2):
-		# TODO: transform the points from the bounds
-		bounds = self.widget.volume.GetBounds()
-		# Cube has 8 corners, 6 sides, 12 triangles
-		p0 = [bounds[0], bounds[2], bounds[4]]
-		p1 = [bounds[1], bounds[2], bounds[4]]
-		p2 = [bounds[0], bounds[3], bounds[4]]
-		p3 = [bounds[0], bounds[2], bounds[5]]
-		p4 = [bounds[1], bounds[3], bounds[4]]
-		p5 = [bounds[0], bounds[3], bounds[5]]
-		p6 = [bounds[1], bounds[2], bounds[5]]
-		p7 = [bounds[1], bounds[3], bounds[5]]
+		bounds = list(self.widget.volume.GetBounds())
+		matrix = self.widget.volume.GetMatrix()
+		transform = vtkTransform()
+		transform.SetMatrix(matrix)
+		transform.Inverse()
 
-		# For each triangle have to check intersection
+		# Create points for all of the corners of the bounds
+		p = [[0 for x in range(3)] for x in range(8)]
+		p[0] = [bounds[0], bounds[2], bounds[4]]
+		p[1] = [bounds[1], bounds[2], bounds[4]]
+		p[2] = [bounds[0], bounds[3], bounds[4]]
+		p[3] = [bounds[0], bounds[2], bounds[5]]
+		p[4] = [bounds[1], bounds[3], bounds[4]]
+		p[5] = [bounds[0], bounds[3], bounds[5]]
+		p[6] = [bounds[1], bounds[2], bounds[5]]
+		p[7] = [bounds[1], bounds[3], bounds[5]]
+
+		# Transform corner points
+		tp = map(lambda x: list(transform.TransformPoint(x[0], x[1], x[2])), p)
+
+		# Create triangles for each face of the cube
 		triangles = []
-		triangles.append([p0, p1, p4])
-		triangles.append([p0, p2, p4])
-		triangles.append([p0, p2, p5])
-		triangles.append([p0, p3, p5])
-		triangles.append([p0, p1, p6])
-		triangles.append([p0, p3, p6])
-		triangles.append([p7, p6, p3])
-		triangles.append([p7, p6, p3])
-		triangles.append([p7, p5, p2])
-		triangles.append([p7, p4, p2])
-		triangles.append([p7, p6, p1])
-		triangles.append([p7, p4, p1])
+		triangles.append([tp[0], tp[1], tp[4]])
+		triangles.append([tp[0], tp[2], tp[4]])
+		triangles.append([tp[0], tp[2], tp[5]])
+		triangles.append([tp[0], tp[3], tp[5]])
+		triangles.append([tp[0], tp[1], tp[6]])
+		triangles.append([tp[0], tp[3], tp[6]])
+		triangles.append([tp[7], tp[6], tp[3]])
+		triangles.append([tp[7], tp[5], tp[3]])
+		triangles.append([tp[7], tp[5], tp[2]])
+		triangles.append([tp[7], tp[4], tp[2]])
+		triangles.append([tp[7], tp[6], tp[1]])
+		triangles.append([tp[7], tp[4], tp[1]])
 
-		result = map(lambda x: lineIntersectionWithTriangle(point1, point2, x), triangles)
-		intersections = []
-		for x in result:
-			if x[0] is True:
-				intersections.append(x[1])
+		# Check intersection for each triangle
+		result = map(lambda x: LineIntersectionWithTriangle(point1, point2, x), triangles)
+		intersections = [x[1] for x in result if x[0]]
 		assert len(intersections) == 2 or len(intersections) == 0
+
 		if len(intersections) == 2:
 			self.lineActor = createLine(intersections[0], intersections[1])
-			self.widget.renderer.AddViewProp(self.lineActor)
-			self.props.append(self.lineActor)
+			self._addToRender(self.lineActor)
+
+			self.lineActorOverlay = createLine(intersections[0], intersections[1])
+			self.lineActorOverlay.GetProperty().SetColor(1.0, 1.0, 1.0)
+			self.lineActorOverlay.GetProperty().SetOpacity(0.5)
+			self.lineActorOverlay.GetProperty().SetLineStipplePattern(0xf0f0)
+			self.lineActorOverlay.GetProperty().SetLineStippleRepeatFactor(1)
+			self._addToOverlay(self.lineActorOverlay)
+
 			self.widget.render()
 
 			ab = Subtract(intersections[1], intersections[0])
 			abLength = Length(ab)
 			abNorm = Normalize(ab)
-			stepLength = abLength / 64.0
+			nrOfSteps = 128
+			stepLength = abLength / float(nrOfSteps)
 			abStep = Multiply(abNorm, stepLength)
 			sampleLocations = [intersections[0]]
-			for i in range(64):
+			for i in range(nrOfSteps):
 				sampleLocations.append(Add(sampleLocations[i], abStep))
 			interpolator = vtkImageInterpolator()
 			interpolator.Initialize(self.widget.imageData)
@@ -157,6 +198,14 @@ class TwoStepPicker(Picker):
 				loc = sampleLocations[i]
 				samples.append(interpolator.Interpolate(loc[0], loc[1], loc[2], 0))
 			self.propertiesWidget.setSamples(samples, self.widget.imageData.GetScalarRange())
+
+	def _addToRender(self, prop):
+		self.widget.renderer.AddViewProp(prop)
+		self.props.append(prop)
+
+	def _addToOverlay(self, prop):
+		self.widget.rendererOverlay.AddViewProp(prop)
+		self.overlayProps.append(prop)
 
 	def _createLocator(self):
 		halfSize = 25
@@ -176,59 +225,9 @@ class TwoStepPicker(Picker):
 		self.assemblyFollower = vtkProp3DFollower()
 		self.assemblyFollower.SetProp3D(assembly)
 		self.assemblyFollower.SetCamera(self.widget.renderer.GetActiveCamera())
-		self.widget.rendererOverlay.AddViewProp(self.assemblyFollower)
-		self.overlayProps.append(self.assemblyFollower)
+		self._addToOverlay(self.assemblyFollower)
+
 		self.widget.render()
-
-
-def lineIntersectionWithTriangle(pointA, pointB, triangle):
-	"""
-	Solve linear system for intersection with plane
-	defined by plane through 3 points. If the first
-	value of outVector is between 0 and 1, it is on the
-	line between the 2 given points. If the other values
-	of outVector are also between 0 and 1 and they add up
-	to a max of 1, then the intersection is within the
-	specified triangle.
-	:rtype: bool, list(3)
-	"""
-	A = pointA
-	B = pointB
-	P0 = triangle[0]
-	P1 = triangle[1]
-	P2 = triangle[2]
-
-	matrix = [[0 for x in range(3)] for x in range(3)]
-	matrix[0][0] = A[0]-B[0]
-	matrix[1][0] = A[1]-B[1]
-	matrix[2][0] = A[2]-B[2]
-	matrix[0][1] = P1[0]-P0[0]
-	matrix[1][1] = P1[1]-P0[1]
-	matrix[2][1] = P1[2]-P0[2]
-	matrix[0][2] = P2[0]-P0[0]
-	matrix[1][2] = P2[1]-P0[1]
-	matrix[2][2] = P2[2]-P0[2]
-
-	inVector = [0 for x in range(3)]
-	inVector[0] = A[0] - P0[0]
-	inVector[1] = A[1] - P0[1]
-	inVector[2] = A[2] - P0[2]
-
-	outVector = [0 for x in range(3)]
-	vtkMath.LinearSolve3x3(matrix, inVector, outVector)
-
-	intersectsTriangle = False
-	if (outVector[0] >= 0 and outVector[0] <= 1
-		and outVector[1] >= 0 and outVector[1] <= 1
-		and outVector[2] >= 0 and outVector[2] <= 1
-		and outVector[1] + outVector[2] <= 1):
-		intersectsTriangle = True
-
-	# intersection = Ia + (Ib - Ia)*t
-	vec = Subtract(pointB, pointA)
-	vec = Multiply(vec, outVector[0])
-	intersection = Add(pointA, vec)
-	return intersectsTriangle, intersection
 
 
 def createLine(p1, p2):

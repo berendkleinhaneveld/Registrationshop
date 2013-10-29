@@ -12,6 +12,7 @@ from PySide.QtGui import QWidget
 from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data import DataReader
 from core.data import DataResizer
+from ui.transformations import TransformationList
 from ui.visualizations import MultiVisualizationTypeMIDA
 from ui.visualizations import MultiVisualizationTypeMIP
 from ui.visualizations import MultiVisualizationTypeMix
@@ -107,6 +108,11 @@ class MultiRenderController(QObject):
 			self.multiRenderWidget.setSlices(self.slices)
 			cameraWrapper = renderSettings["camera"]
 			cameraWrapper.applyToObject(self.multiRenderWidget.renderer.GetActiveCamera())
+			transformationsWrapped = renderSettings["transformations"]
+			if transformationsWrapped is not None:
+				transformations = TransformationList()
+				transformations.setPythonVersion(transformationsWrapped)
+				self.multiRenderWidget.transformations = transformations
 			self.updateVisualization()
 			self.slicesChanged.emit(self.slices)
 		else:
@@ -117,6 +123,8 @@ class MultiRenderController(QObject):
 		settings["slices"] = self.slices
 		camera = self.multiRenderWidget.renderer.GetActiveCamera()
 		settings["camera"] = vtkCameraWrapper(camera)
+		transformations = self.multiRenderWidget.transformations.getPythonVersion()
+		settings["transformations"] = transformations
 		return settings
 
 	def setVisualizationType(self, visualizationType):

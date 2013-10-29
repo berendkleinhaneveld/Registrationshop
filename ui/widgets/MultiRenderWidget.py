@@ -15,14 +15,13 @@ from vtk import vtkAxesActor
 from vtk import vtkOrientationMarkerWidget
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from vtk import vtkTransform
 from vtk import vtkVolumeProperty
-from vtk import vtkMatrix4x4
 from vtk import VTK_FLOAT
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
 from PySide.QtCore import Signal
 from PySide.QtCore import Slot
+from ui.transformations import TransformationList
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 
@@ -60,14 +59,24 @@ class MultiRenderWidget(QWidget):
 	def __init__(self):
 		super(MultiRenderWidget, self).__init__()
 
+		# Default volume renderer
 		self.renderer = vtkRenderer()
 		self.renderer.SetBackground2(0.4, 0.4, 0.4)
 		self.renderer.SetBackground(0.1, 0.1, 0.1)
 		self.renderer.SetGradientBackground(True)
+		self.renderer.SetLayer(0)
+
+		# Overlay renderer which is synced with the default renderer
+		self.rendererOverlay = vtkRenderer()
+		self.rendererOverlay.SetLayer(1)
+		self.rendererOverlay.SetInteractive(0)
+		self.renderer.GetActiveCamera().AddObserver("ModifiedEvent", self._syncCameras)
 
 		self.rwi = QVTKRenderWindowInteractor(parent=self)
 		self.rwi.SetInteractorStyle(vtkInteractorStyleTrackballCamera())
 		self.rwi.GetRenderWindow().AddRenderer(self.renderer)
+		self.rwi.GetRenderWindow().AddRenderer(self.rendererOverlay)
+		self.rwi.GetRenderWindow().SetNumberOfLayers(2)
 
 		self._imagePlaneWidgets = [vtkImagePlaneWidget() for i in range(3)]
 		for index in range(3):
@@ -95,11 +104,9 @@ class MultiRenderWidget(QWidget):
 
 		self.mapper.SetInputData(0, self.fixedImageData)
 		self.mapper.SetInputData(1, self.movingImageData)
-
-		# Keep track of the base and user transforms
-		self.baseTransform = vtkTransform()
-		self.userTransform = vtkTransform()
-		# TODO: save the base transform in the project file
+		
+		self._transformations = TransformationList()
+		self._transformations.transformationChanged.connect(self.updateTransformation)
 		self._shouldResetCamera = False
 
 		axesActor = vtkAxesActor()
@@ -177,6 +184,33 @@ class MultiRenderWidget(QWidget):
 
 		self._updateVolumeProperties()
 
+	# Properties
+
+	@property
+	def transformations(self):
+		return self._transformations
+	
+	@transformations.setter
+	def transformations(self, value):
+		self._transformations.copyFromTransformations(value)
+	
+	# Slots
+
+	@Slot(object)
+	def setSlices(self, slices):
+		for sliceIndex in range(len(slices)):
+			if slices[sliceIndex]:
+				self._imagePlaneWidgets[sliceIndex].On()
+			else:
+				self._imagePlaneWidgets[sliceIndex].Off()
+
+	@Slot()
+	def updateTransformation(self):
+		transform = self._transformations.completeTransform()
+		self.mapper.SetSecondInputUserTransform(transform)
+		self.render()
+
+	# Private methods
 
 	def _updateMapper(self, volVis, volNr):
 		shaderType = volVis.shaderType()
@@ -215,68 +249,13 @@ class MultiRenderWidget(QWidget):
 		self.mapper.SetProperty2(self.movingVolumeProperty)
 		self.render()
 
-	@Slot(object)
-	def setSlices(self, slices):
-		for sliceIndex in range(len(slices)):
-			if slices[sliceIndex]:
-				self.imagePlaneWidgets[sliceIndex].On()
-			else:
-				self.imagePlaneWidgets[sliceIndex].Off()
-
-	def getUserTransform(self):
-		return self.userTransform
-
-	def getFullTransform(self):
-		return self._getConcatenatedTransform()
-
-	def setUserTransform(self, transform):
-		self.userTransform = transform
-
-		self._updateTransform()
-
-	def resetUserTransform(self):
-		self.userTransform = vtkTransform()
-		self._updateTransform()
-
-	def resetAllTransforms(self):
-		self.baseTransform = vtkTransform()
-		self.userTransform = vtkTransform()
-		self._updateTransform()
-
-	def applyUserTransform(self):
+	def _syncCameras(self, camera, ev):
 		"""
-		Concatenates the user transform with the base transform
-		into the new base transform. Resets the user transform.
+		Camera modified event callback. Copies the parameters of
+		the renderer camera into the camera of the overlay so they
+		stay synced at all times.
 		"""
-		self.baseTransform = self._getConcatenatedTransform()
-		self.resetUserTransform()
-
-	def _updateTransform(self):
-		"""
-		Updates the transform of the second volume.
-		"""
-		transform = self._getConcatenatedTransform()
-		transform.Update()
-		self.mapper.SetSecondInputUserTransform(transform)
-
-	def _getConcatenatedTransform(self):
-		"""
-		Creates and returns a new vtkTransform that exists
-		of the base and user transforms concatenated.
-		"""
-		completeTransform = vtkTransform()
-		completeTransform.Concatenate(self.userTransform)
-		completeTransform.Concatenate(self.baseTransform)
-		completeTransform.Update()
-
-		return self._getCopyOfTransform(completeTransform)
-
-	def _getCopyOfTransform(self, transform):
-		newTransform = vtkTransform()
-		matrix = vtkMatrix4x4()
-		matrix.DeepCopy(transform.GetMatrix())
-		newTransform.SetMatrix(matrix)
-		return newTransform
+		self.rendererOverlay.GetActiveCamera().ShallowCopy(camera)
 
 
 # Helper methods

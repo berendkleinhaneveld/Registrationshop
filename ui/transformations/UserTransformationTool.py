@@ -5,10 +5,10 @@ UserTransformationTool (TransformationTool)
 	Berend Klein Haneveld
 """
 from TransformationTool import TransformationTool
-from TransformationList import TransformationList
 from core.decorators import overrides
-from ui.widgets.StatusWidget import StatusWidget
 from ui.transformations import TransformBox
+from ui.transformations import Transformation
+from ui.widgets.StatusWidget import StatusWidget
 from vtk import vtkTransform
 from vtk import vtkMatrix4x4
 from PySide.QtGui import QLabel
@@ -26,7 +26,7 @@ class UserTransformationTool(TransformationTool):
 		super(UserTransformationTool, self).__init__()
 
 		self.transformBox = TransformBox()
-		self.transformBox.transformUpdated.connect(self.transformUpdated)
+		self.transformBox.transformUpdated.connect(self.transformBoxUpdated)
 		self._originalUpdateRate = 15  # Default
 
 	@overrides(TransformationTool)
@@ -37,6 +37,7 @@ class UserTransformationTool(TransformationTool):
 		self.renderWidget.rwi.SetDesiredUpdateRate(5)
 		self.transformBox.setWidget(self.renderWidget)
 		self.transformBox.setImageData(self.renderWidget.movingImageData)
+		self.renderWidget.transformations.append(Transformation(vtkTransform(), Transformation.TypeUser))
 
 		statusWidget = StatusWidget.Instance()
 		statusWidget.setText("Use the box widget to transform the volume.")
@@ -46,16 +47,20 @@ class UserTransformationTool(TransformationTool):
 		self.transformBox.cleanUp()
 
 		# Reset the transformation
-		self.movingWidget.resetUserTransform()
-		self.movingWidget.render()
-		self.renderWidget.resetUserTransform()
 		self.renderWidget.rwi.SetDesiredUpdateRate(self._originalUpdateRate)
 		self.renderWidget.render()
+		# Make sure the transform is properly set in the moving render widget
+		shearTrans = self.renderWidget.transformations.scalingTransform()
+		self.movingWidget.volume.SetUserTransform(shearTrans)
+		self.movingWidget.render()
+
+	def cancelTransform(self):
+		# Remove the last transformation
+		del self.renderWidget.transformations[-1]
 
 	@overrides(TransformationTool)
 	def applyTransform(self):
-		self.movingWidget.applyUserTransform()
-		self.renderWidget.applyUserTransform()
+		pass
 
 	@overrides(TransformationTool)
 	def getParameterWidget(self):
@@ -96,23 +101,22 @@ class UserTransformationTool(TransformationTool):
 		self.tabWidget.addTab(matrixWidget, "Matrix")
 		self.tabWidget.addTab(paramsWidget, "Parameters")
 
-		self.transformUpdated(self.renderWidget.getUserTransform())
+		self.transformUpdated(self.renderWidget.transformations.completeTransform())
 
 		return self.tabWidget
 	
+	@Slot()
+	def transformBoxUpdated(self, transform):
+		self.renderWidget.transformations[-1] = Transformation(transform, Transformation.TypeUser)
+		self.transformUpdated(transform)
+
 	@Slot(object)
 	def transformUpdated(self, transform):
 		"""
 		:type transform: vtkTransform
 		"""
-		# TODO: get the transform from the multi render widget when
-		# transform is adjusted
-
-		completeTransform = self.renderWidget.getFullTransform()
-		transList = TransformationList()
-		transList.append(completeTransform)
-		shearTrans = transList.scalingTransform()
-		self.movingWidget.setUserTransform(shearTrans)
+		shearTrans = self.renderWidget.transformations.scalingTransform()
+		self.movingWidget.volume.SetUserTransform(shearTrans)
 		self.movingWidget.render()
 
 		matrix = transform.GetMatrix()
@@ -171,7 +175,8 @@ class UserTransformationTool(TransformationTool):
 
 		transform.Modified()
 		transform.Update()
-		self.renderWidget.setUserTransform(transform)
+
+		self.renderWidget.transformations[-1] = transform
 		self.transformBox.setTransform(transform)
 		self.renderWidget.render()
 

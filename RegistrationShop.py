@@ -45,6 +45,7 @@ from ui.widgets import MultiRenderWidget
 from ui.widgets import TitleWidget
 from ui.widgets import RenderPropWidget
 from ui.widgets import MultiRenderPropWidget
+from ui.widgets import LandmarkWidget
 from ui.widgets import StatusWidget
 from ui.transformations import UserTransformationTool
 from ui.transformations import LandmarkTransformationTool
@@ -365,11 +366,20 @@ class RegistrationShop(MainWindow, WindowDialog):
 		if self.transformTool is not None:
 			self.transformTool.cleanUp()
 
+		fixedLandmarkWidget = LandmarkWidget()
+		self.fixedPropWidget.tabWidget.addTab(fixedLandmarkWidget, "Landmark")
+		self.fixedPropWidget.tabWidget.setCurrentWidget(fixedLandmarkWidget)
+		movingLandmarkWidget = LandmarkWidget()
+		self.movingPropWidget.tabWidget.addTab(movingLandmarkWidget, "Landmark")
+		self.movingPropWidget.tabWidget.setCurrentWidget(movingLandmarkWidget)
+
 		self.transformTool = LandmarkTransformationTool()
 		self.transformTool.setRenderWidgets(fixed=self.fixedDataWidget,
 			moving=self.movingDataWidget,
 			multi=self.multiDataWidget)
+		self.transformTool.setLandmarkWidgets(fixedLandmarkWidget, movingLandmarkWidget)
 		self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
+		self.transformTool.toolFinished.connect(self.transformToolFinished)
 
 	@Slot()
 	def addDeformableTransform(self):
@@ -408,6 +418,17 @@ class RegistrationShop(MainWindow, WindowDialog):
 			moving=self.movingDataWidget,
 			multi=self.multiDataWidget)
 		self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
+
+	@Slot()
+	def transformToolFinished(self):
+		for index in range(self.fixedPropWidget.tabWidget.count()):
+			if self.fixedPropWidget.tabWidget.tabText(index) == "Landmark":
+				self.fixedPropWidget.tabWidget.removeTab(index)
+				break
+		for index in range(self.movingPropWidget.tabWidget.count()):
+			if self.movingPropWidget.tabWidget.tabText(index) == "Landmark":
+				self.movingPropWidget.tabWidget.removeTab(index)
+				break
 
 	@Slot()
 	def loadFixedDataSetFile(self):

@@ -12,8 +12,11 @@ from libvtkGPUMultiVolumeRenderPython import vtkOpenGLGPUVolumeRayCastMapper2 as
 from vtk import vtkOrientationMarkerWidget
 from vtk import vtkAxesActor
 from vtk import vtkTransform
+from vtk import vtkAssembly
+from vtk import vtkLineSource
+from vtk import vtkDataSetMapper
+from vtk import vtkActor
 from vtk import vtkImagePlaneWidget
-from vtk import vtkMatrix4x4
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
@@ -57,9 +60,9 @@ class RenderWidget(QWidget):
 			self.imagePlaneWidgets[index].DisplayTextOn()
 			self.imagePlaneWidgets[index].SetInteractor(self.rwi)
 
-		self.volume = None
 		self.mapper = vtkOpenGLGPUVolumeRayCastMapper()
 		self.mapper.SetAutoAdjustSampleDistances(1)
+		self.volume = None
 		self.imageData = None
 		self.VolumeVisualization = None
 		self.shouldResetCamera = False
@@ -115,6 +118,7 @@ class RenderWidget(QWidget):
 			self.imagePlaneWidgets[index].SetInputData(self.imageData)
 			self.imagePlaneWidgets[index].SetPlaneOrientation(index)
 
+		self._createGrid()
 		self.shouldResetCamera = True
 		# Don't call render, because camera should only be reset
 		# when a volume property is loaded
@@ -164,56 +168,53 @@ class RenderWidget(QWidget):
 		"""
 		self.rendererOverlay.GetActiveCamera().ShallowCopy(camera)
 
-	def getUserTransform(self):
-		return self.userTransform
+	def _createGrid(self):
+		bounds = self.imageData.GetBounds()
+		self.grid = createGrid(bounds)
+		self.renderer.AddViewProp(self.grid)
 
-	def getFullTransform(self):
-		return self._getConcatenatedTransform()
-
-	def setUserTransform(self, transform):
-		self.userTransform = transform
-		self._updateTransform()
-
-	def resetUserTransform(self):
-		self.userTransform = vtkTransform()
-		self._updateTransform()
-
-	def resetAllTransforms(self):
-		self.baseTransform = vtkTransform()
-		self.userTransform = vtkTransform()
-		self._updateTransform()
-
-	def applyUserTransform(self):
-		"""
-		Concatenates the user transform with the base transform
-		into the new base transform. Resets the user transform.
-		"""
-		self.baseTransform = self._getConcatenatedTransform()
-		self.resetUserTransform()
-
-	def _updateTransform(self):
-		"""
-		Updates the transform of the second volume.
-		"""
-		transform = self._getConcatenatedTransform()
-		transform.Update()
+	@Slot(object)
+	def transformationsUpdated(self, transformations):
+		transform = transformations.completeTransform()
 		self.volume.SetUserTransform(transform)
 
-	def _getConcatenatedTransform(self):
-		"""
-		Creates and returns a new vtkTransform that exists
-		of the base and user transforms concatenated.
-		"""
-		completeTransform = vtkTransform()
-		completeTransform.Concatenate(self.userTransform)
-		completeTransform.Concatenate(self.baseTransform)
-		completeTransform.Update()
 
-		return self._getCopyOfTransform(completeTransform)
+def createGrid(bounds):
+	boundX = bounds[1]
+	boundY = bounds[3]
+	boundZ = bounds[5]
 
-	def _getCopyOfTransform(self, transform):
-		newTransform = vtkTransform()
-		matrix = vtkMatrix4x4()
-		matrix.DeepCopy(transform.GetMatrix())
-		newTransform.SetMatrix(matrix)
-		return newTransform
+	# subdivisions = 10
+
+	# stepSizeX = boundX / subdivisions
+	# stepSizeY = boundY / subdivisions
+	# stepSizeZ = boundZ / subdivisions
+
+	# if stepSizeX > 1000:
+	# 	stepSizeX = 1000
+	# elif stepSizeX > 100:
+	# 	stepSizeX = 100
+	# elif stepSizeX > 10:
+	# 	stepSizeX = 10
+
+	lineActorX = createLine([0, 0, 0], [boundX, 0, 0])
+	lineActorY = createLine([0, 0, 0], [0, boundY, 0])
+	lineActorZ = createLine([0, 0, 0], [0, 0, boundZ])
+
+	dataGrid = vtkAssembly()
+	dataGrid.AddPart(lineActorX)
+	dataGrid.AddPart(lineActorY)
+	dataGrid.AddPart(lineActorZ)
+
+
+def createLine(p1, p2):
+	lineSource = vtkLineSource()
+	lineSource.SetPoint1(p1[0], p1[1], p1[2])
+	lineSource.SetPoint2(p2[0], p2[1], p2[2])
+
+	lineMapper = vtkDataSetMapper()
+	lineMapper.SetInputConnection(lineSource.GetOutputPort())
+
+	lineActor = vtkActor()
+	lineActor.SetMapper(lineMapper)
+	return lineActor
