@@ -13,6 +13,9 @@ from PySide.QtGui import QLabel
 from PySide.QtCore import Slot
 from PySide.QtCore import Qt
 from core.data import DataReader
+from core.data.DataAnalyzer import DataAnalyzer
+from ui.widgets.histogram import Histogram
+from ui.widgets.histogram import HistogramWidget
 
 
 class RenderInfoWidget(QWidget):
@@ -42,6 +45,18 @@ class RenderInfoWidget(QWidget):
 		directory, name = os.path.split(fileName)
 		dimensions = imageData.GetDimensions()
 		minimum, maximum = imageData.GetScalarRange()
+
+		bins = DataAnalyzer.histogramForData(imageData, 256)
+
+		self.histogram = Histogram()
+		self.histogram.bins = bins
+		self.histogram.enabled = True
+
+		self.histogramWidget = HistogramWidget()
+		self.histogramWidget.setHistogram(self.histogram)
+		self.histogramWidget.setAxeMode(bottom=HistogramWidget.AxeClear,
+			left=HistogramWidget.AxeLog)
+		Style.styleWidgetForTab(self.histogramWidget)
 
 		nameText = name
 		dimsText = "(" + str(dimensions[0]) + ", " + str(dimensions[1]) + ", " + str(dimensions[2]) + ")"
@@ -80,6 +95,7 @@ class RenderInfoWidget(QWidget):
 			layout.addWidget(self.labelDimensions, 1, 1)
 			layout.addWidget(self.labelVoxels, 2, 1)
 			layout.addWidget(self.labelRange, 3, 1)
+			layout.addWidget(self.histogramWidget, 4, 0, 1, 2)
 			self.setLayout(layout)
 		else:
 			# Just update the text for the 'dynamic' labels
