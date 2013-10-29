@@ -69,10 +69,10 @@ class MultiRenderWidget(QWidget):
 		self.rwi.SetInteractorStyle(vtkInteractorStyleTrackballCamera())
 		self.rwi.GetRenderWindow().AddRenderer(self.renderer)
 
-		self.imagePlaneWidgets = [vtkImagePlaneWidget() for i in range(3)]
+		self._imagePlaneWidgets = [vtkImagePlaneWidget() for i in range(3)]
 		for index in range(3):
-			self.imagePlaneWidgets[index].DisplayTextOn()
-			self.imagePlaneWidgets[index].SetInteractor(self.rwi)
+			self._imagePlaneWidgets[index].DisplayTextOn()
+			self._imagePlaneWidgets[index].SetInteractor(self.rwi)
 
 		self.mapper = vtkOpenGLGPUMultiVolumeRayCastMapper()
 		self.mapper.SetBlendModeToComposite()
@@ -93,8 +93,6 @@ class MultiRenderWidget(QWidget):
 		self.movingVolumeProperty.SetScalarOpacity(opacityFunction)
 		self.visualization = None  # MultiVolumeVisualization
 
-		self.shouldResetCamera = False
-
 		self.mapper.SetInputData(0, self.fixedImageData)
 		self.mapper.SetInputData(1, self.movingImageData)
 
@@ -102,14 +100,15 @@ class MultiRenderWidget(QWidget):
 		self.baseTransform = vtkTransform()
 		self.userTransform = vtkTransform()
 		# TODO: save the base transform in the project file
+		self._shouldResetCamera = False
 
 		axesActor = vtkAxesActor()
-		self.orientationWidget = vtkOrientationMarkerWidget()
-		self.orientationWidget.SetViewport(0.05, 0.05, 0.3, 0.3)
-		self.orientationWidget.SetOrientationMarker(axesActor)
-		self.orientationWidget.SetInteractor(self.rwi)
-		self.orientationWidget.EnabledOn()
-		self.orientationWidget.InteractiveOff()
+		self._orientationWidget = vtkOrientationMarkerWidget()
+		self._orientationWidget.SetViewport(0.05, 0.05, 0.3, 0.3)
+		self._orientationWidget.SetOrientationMarker(axesActor)
+		self._orientationWidget.SetInteractor(self.rwi)
+		self._orientationWidget.EnabledOn()
+		self._orientationWidget.InteractiveOff()
 
 		self.setMinimumWidth(400)
 		self.setMinimumHeight(400)
@@ -121,9 +120,9 @@ class MultiRenderWidget(QWidget):
 		self.setLayout(layout)
 
 	def render(self):
-		if self.shouldResetCamera:
+		if self._shouldResetCamera:
 			self.renderer.ResetCamera()
-			self.shouldResetCamera = False
+			self._shouldResetCamera = False
 		self.rwi.Render()
 		self.rwi.GetRenderWindow().Render()
 
@@ -139,11 +138,12 @@ class MultiRenderWidget(QWidget):
 		self.mapper.SetInputData(1, self.movingImageData)
 
 		for index in range(3):
-			self.imagePlaneWidgets[index].SetInputData(self.fixedImageData)
-			self.imagePlaneWidgets[index].SetPlaneOrientation(index)
+			self._imagePlaneWidgets[index].SetInputData(self.fixedImageData)
+			self._imagePlaneWidgets[index].SetPlaneOrientation(index)
 
-		self.shouldResetCamera = True
+		self._shouldResetCamera = True
 
+	@Slot(object)
 	def setMovingData(self, imageData):
 		self.movingImageData = imageData
 		if self.movingImageData is None:
@@ -154,7 +154,7 @@ class MultiRenderWidget(QWidget):
 		self.mapper.SetInputData(0, self.fixedImageData)
 		self.mapper.SetInputData(1, self.movingImageData)
 
-		self.shouldResetCamera = True
+		self._shouldResetCamera = True
 
 	def setVolumeVisualization(self, visualization):
 		self.visualization = visualization
@@ -171,13 +171,14 @@ class MultiRenderWidget(QWidget):
 			self.movingVolumeProperty = self.visualization.movingVolProp
 			self.visualization.setMapper(self.mapper)
 			if self.visualization.fixedVisualization:
-				self.updateMapper(self.visualization.fixedVisualization, 1)
+				self._updateMapper(self.visualization.fixedVisualization, 1)
 			if self.visualization.movingVisualization:
-				self.updateMapper(self.visualization.movingVisualization, 2)
+				self._updateMapper(self.visualization.movingVisualization, 2)
 
-		self.updateVolumeProperties()
+		self._updateVolumeProperties()
 
-	def updateMapper(self, volVis, volNr):
+
+	def _updateMapper(self, volVis, volNr):
 		shaderType = volVis.shaderType()
 		if volNr == 1:
 			self.mapper.SetShaderType1(shaderType)
@@ -206,7 +207,7 @@ class MultiRenderWidget(QWidget):
 				self.mapper.SetLowerBound2(lowerBound)
 				self.mapper.SetUpperBound2(upperBound)
 
-	def updateVolumeProperties(self):
+	def _updateVolumeProperties(self):
 		"""
 		Private method to update the volume properties.
 		"""
