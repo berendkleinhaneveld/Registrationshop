@@ -5,3 +5,4 @@ from RenderPropWidget import RenderPropWidget
 from RenderWidget import RenderWidget
 from TitleWidget import TitleWidget
 from PointsWidget import PointsWidget
+from StatusWidget import StatusWidget

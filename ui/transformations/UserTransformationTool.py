@@ -7,6 +7,7 @@ UserTransformationTool (TransformationTool)
 from TransformationTool import TransformationTool
 from TransformationList import TransformationList
 from core.decorators import overrides
+from ui.widgets.StatusWidget import StatusWidget
 from ui.transformations import TransformBox
 from vtk import vtkTransform
 from vtk import vtkMatrix4x4
@@ -36,6 +37,9 @@ class UserTransformationTool(TransformationTool):
 		self.renderWidget.rwi.SetDesiredUpdateRate(5)
 		self.transformBox.setWidget(self.renderWidget)
 		self.transformBox.setImageData(self.renderWidget.movingImageData)
+
+		statusWidget = StatusWidget.Instance()
+		statusWidget.setText("Use the box widget to transform the volume.")
 
 	@overrides(TransformationTool)
 	def cleanUp(self):

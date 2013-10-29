@@ -45,6 +45,7 @@ from ui.widgets import MultiRenderWidget
 from ui.widgets import TitleWidget
 from ui.widgets import RenderPropWidget
 from ui.widgets import MultiRenderPropWidget
+from ui.widgets import StatusWidget
 from ui.transformations import UserTransformationTool
 from ui.transformations import LandmarkTransformationTool
 from ui.transformations import DeformableTransformationTool
@@ -224,6 +225,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		userTransformIconName = AppResources.imageNamed('UserTransformButton.png')
 		landmarkTransformIconName = AppResources.imageNamed('LandmarkTransformButton.png')
 		deformableTransformIconName = AppResources.imageNamed('DeformableTransformButton.png')
+		helpIconName = AppResources.imageNamed('HelpButton.png')
 
 		self.actionFreeTransformTool = QAction('Free transform', self, shortcut='Ctrl+1')
 		self.actionFreeTransformTool.setIcon(QIcon(userTransformIconName))
@@ -257,6 +259,10 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 		self.actionNewProject = QAction('New project', self, shortcut='Ctrl+N')
 		self.actionNewProject.triggered.connect(self.newProject)
+
+		self.actionHelp = QAction('Help', self, shortcut='Ctrl+H')
+		self.actionHelp.setIcon(QIcon(helpIconName))
+		self.actionHelp.triggered.connect(self.showHelp)
 
 	def createMenus(self):
 		"""
@@ -297,7 +303,19 @@ class RegistrationShop(MainWindow, WindowDialog):
 		spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.toolbar.addWidget(spacer)
 
-		# TODO: add "don't panic" button
+		statusWidget = StatusWidget.Instance()
+		statusWidget.setText("Welcome to RegistrationShop!\nStart your registration by loading two datasets. "
+			+ "After that you can use the transform tools to align your volume data.")
+		self.toolbar.addWidget(statusWidget)
+
+		# Insert 3 spacers so that the status widget lines out in the middle
+		for i in range(3):
+			spacer = QWidget()
+			spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+			self.toolbar.addWidget(spacer)
+
+		# Add help button
+		self.toolbar.addAction(self.actionHelp)
 
 	# Private Functions
 
@@ -360,6 +378,10 @@ class RegistrationShop(MainWindow, WindowDialog):
 		if self.transformTool is not None:
 			self.transformTool.cleanUp()
 
+		statusWidget = StatusWidget.Instance()
+		statusWidget.setText("Choose a template for a deformable transform. After choosing " +
+			"a template you will be able to review and adjust the parameters.")
+
 		dialog = ElastixMainDialog(self)
 		dialog.setModal(True)
 		result = dialog.exec_()
@@ -373,7 +395,8 @@ class RegistrationShop(MainWindow, WindowDialog):
 			transformation = ParameterList()
 			if not transformation.loadFromFile(filename):
 				transformation = None
-				print "Warning: could not load transformation file"
+				statusWidget = StatusWidget.Instance()
+				statusWidget.setText("Warning: could not load transformation file")
 		else:
 			transformation = dialog.transformation
 
@@ -506,6 +529,11 @@ class RegistrationShop(MainWindow, WindowDialog):
 		writer.WriteToFile(outputData, fileName, fileType)
 		
 		self.hideProgressBar()
+
+	@Slot()
+	def showHelp(self):
+		statusWidget = StatusWidget.Instance()
+		statusWidget.setText("Don't panic!")
 
 
 def main():

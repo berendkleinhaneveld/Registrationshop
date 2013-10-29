@@ -8,6 +8,7 @@ import os
 from TransformationTool import TransformationTool
 from core.decorators import overrides
 from ParameterWidget import ParameterWidget
+from ui.widgets.StatusWidget import StatusWidget
 from core.worker import Operator
 from core.elastix import ElastixCommand
 from core.elastix import TransformixTransformation
@@ -36,6 +37,10 @@ class DeformableTransformationTool(TransformationTool):
 		self.multiWidget = multi
 		self.movingWidget = moving
 
+		statusWidget = StatusWidget.Instance()
+		statusWidget.setText("Adjust the parameters for the transform. See the Elastix " +
+			"website for more details on the available parameters.")
+
 	@overrides(TransformationTool)
 	def applyTransform(self):
 		"""
@@ -52,6 +57,10 @@ class DeformableTransformationTool(TransformationTool):
 			data is not lost.
 		"""
 		self.startedElastix.emit("Transforming data...")
+
+		statusWidget = StatusWidget.Instance()
+		statusWidget.setText("Please grab a cup of coffee while Elastix " +
+			"performs the registration: this might take a while...")
 
 		currentProject = ProjectController.Instance().currentProject
 		path = currentProject.folder
@@ -79,10 +88,17 @@ class DeformableTransformationTool(TransformationTool):
 
 		self.endedElastix.emit()
 
+		statusWidget = StatusWidget.Instance()
+
 		outputData = os.path.join(outputFolder, "result.0.mhd")
 		if os.path.exists(outputData):
+			statusWidget.setText("Thanks for your patience. The " +
+				"transformed data will now be loaded. It can be found in the project folder.")
 			projectController = ProjectController.Instance()
 			projectController.loadMovingDataSet(outputData)
+		else:
+			statusWidget.setText("Something went wrong. Please see the project folder for the "
+				+ "elastix log to see what went wrong.")
 
 	@overrides(TransformationTool)
 	def cleanUp(self):
