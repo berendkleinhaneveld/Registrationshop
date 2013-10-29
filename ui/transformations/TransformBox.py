@@ -47,5 +47,4 @@ class TransformBox(QObject, Interactor):
 	def transformCallback(self, arg1, arg2):
 		transform = vtkTransform()
 		arg1.GetTransform(transform)
-		self.widget.setUserTransform(transform)
 		self.transformUpdated.emit(transform)
