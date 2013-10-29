@@ -5,7 +5,6 @@ RenderParameterWidget
 	Berend Klein Haneveld
 """
 
-import sys
 from PySide.QtGui import QLabel
 from PySide.QtGui import QComboBox
 from PySide.QtGui import QWidget
@@ -15,6 +14,7 @@ from PySide.QtGui import QFrame
 from PySide.QtCore import Slot
 from PySide.QtCore import SIGNAL
 from PySide.QtCore import Qt
+from ui.widgets import Style
 
 
 class RenderParameterWidget(QWidget):
@@ -69,9 +69,7 @@ class RenderParameterWidget(QWidget):
 
 		# Get a new parameter widget from the render widget
 		self.paramWidget = self.renderController.getParameterWidget()
-		if sys.platform.startswith("darwin"):
-			# default background of tabs on OSX is 237, 237, 237
-			self.paramWidget.setStyleSheet("background: rgb(229, 229, 229)")
+		Style.styleWidgetForTab(self.paramWidget)
 		self.scrollArea.setWidget(self.paramWidget)
 
 		if self.renderController.visualization is not None:

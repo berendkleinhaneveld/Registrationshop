@@ -7,6 +7,7 @@ RenderInfoWidget
 
 import os
 from PySide.QtGui import QWidget
+from ui.widgets import Style
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QLabel
 from PySide.QtCore import Slot
@@ -21,6 +22,8 @@ class RenderInfoWidget(QWidget):
 	"""
 	def __init__(self):
 		super(RenderInfoWidget, self).__init__()
+
+		Style.styleWidgetForTab(self)
 
 	@Slot(basestring)
 	def setFile(self, fileName):
