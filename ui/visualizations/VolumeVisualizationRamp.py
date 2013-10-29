@@ -9,7 +9,6 @@ from VolumeVisualization import VisualizationTypeRamp
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from vtk import vtkVolumeMapper
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
 from PySide.QtCore import Qt
@@ -74,6 +73,7 @@ class VolumeVisualizationRamp(VolumeVisualization):
 		"""
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
+
 		widget = QWidget()
 		widget.setLayout(layout)
 		return widget
