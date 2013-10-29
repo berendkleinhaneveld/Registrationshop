@@ -86,7 +86,6 @@ class VolumeVisualizationSimple(VolumeVisualization):
 
 		widget = QWidget()
 		widget.setLayout(layout)
-
 		return widget
 
 	@overrides(VolumeVisualization)
@@ -117,7 +116,6 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		value = 1.0
 		hue = self.hue / 360.0
 		r, g, b = vtkMath.HSVToRGB(hue, saturation, value)
-		# r,g,b = [self.hue / 360.0 for i in range(3)]
 
 		# Transfer functions and properties
 		self.colorFunction = vtkColorTransferFunction()
