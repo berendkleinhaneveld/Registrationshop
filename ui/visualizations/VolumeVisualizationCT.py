@@ -4,19 +4,18 @@ VolumeVisualizationCT
 :Authors:
 	Berend Klein Haneveld
 """
+import math
 from VolumeVisualization import VolumeVisualization
 from VolumeVisualization import VisualizationTypeCT
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from vtk import vtkVolumeMapper
 from PySide.QtGui import QWidget
 from PySide.QtGui import QSlider
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QLabel
 from PySide.QtCore import Qt
 from core.decorators import overrides
-import math
 
 
 class VolumeVisualizationCT(VolumeVisualization):

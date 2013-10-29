@@ -95,7 +95,6 @@ class VolumeVisualizationMIDA(VolumeVisualization):
 
 		widget = QWidget()
 		widget.setLayout(layout)
-
 		return widget
 
 	@overrides(VolumeVisualization)
