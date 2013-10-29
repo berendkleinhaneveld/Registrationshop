@@ -1,5 +1,6 @@
 import unittest
-from ui.transformations.TransformationList import TransformationList
+from ui.transformations import TransformationList
+from ui.transformations import Transformation
 from vtk import *
 
 
@@ -13,7 +14,8 @@ class TransformationListTest(unittest.TestCase):
 
 	def testTransformationList(self):
 		transform = vtkTransform()
-		self.transformList.append(transform)
+		transformation = Transformation(transform, Transformation.TypeDeformable)
+		self.transformList.append(transformation)
 		self.assertEquals(len(self.transformList._transformations), 1)
 
 		completeTransform = self.transformList.completeTransform()
@@ -29,8 +31,9 @@ class TransformationListTest(unittest.TestCase):
 
 		transform = vtkTransform()
 		transform.Scale(2.0, 2.0, 2.0)
+		transformation = Transformation(transform, Transformation.TypeDeformable)
 
-		self.transformList.append(transform)
+		self.transformList.append(transformation)
 		self.assertEquals(len(self.transformList._transformations), 2)
 		self.assertNotEquals(self.transformList[0], self.transformList[1])
 
@@ -44,8 +47,8 @@ class TransformationListTest(unittest.TestCase):
 
 		transform = vtkTransform()
 		transform.Translate(3.0, 3.0, 3.0)
-
-		self.transformList.append(transform)
+		transformation = Transformation(transform, Transformation.TypeDeformable)
+		self.transformList.append(transformation)
 		self.assertEquals(len(self.transformList._transformations), 3)
 		self.assertNotEquals(self.transformList[1], self.transformList[2])
 
@@ -62,10 +65,10 @@ class TransformationListTest(unittest.TestCase):
 
 		transform = vtkTransform()
 		transform.RotateX(90.0)
-		
-		self.transformList.append(transform)
+		transformation = Transformation(transform, Transformation.TypeDeformable)
+		self.transformList.append(transformation)
 
-		prevTransform = self.transformList[3]
+		prevTransform = self.transformList.transform(3)
 		prevMatrix = prevTransform.GetMatrix()
 
 		self.assertEquals(prevMatrix.GetElement(0, 0), 2)
@@ -76,44 +79,44 @@ class TransformationListTest(unittest.TestCase):
 		self.assertEquals(prevMatrix.GetElement(1, 3), 3)
 		self.assertEquals(prevMatrix.GetElement(2, 3), 3)
 
-	def testScaling(self):
-		transform = vtkTransform()
-		transform.Scale(3.0, 3.0, 3.0)
-		transform.RotateX(45.0)
-		transform.RotateY(45.0)
-		transform.Translate(30, 15, 10)
+	# def testScaling(self):
+	# 	transform = vtkTransform()
+	# 	transform.Scale(3.0, 3.0, 3.0)
+	# 	transform.RotateX(45.0)
+	# 	transform.RotateY(45.0)
+	# 	transform.Translate(30, 15, 10)
 
-		self.transformList.append(transform)
+	# 	self.transformList.append(Transformation(transform, None))
 
-		scaleTransform = self.transformList.scalingTransform()
-		scaleMatrix = scaleTransform.GetMatrix()
+	# 	scaleTransform = self.transformList.scalingTransform()
+	# 	scaleMatrix = scaleTransform.GetMatrix()
 
-		self.assertAlmostEqual(scaleMatrix.GetElement(0, 0), 3, delta=0.001)
-		self.assertAlmostEqual(scaleMatrix.GetElement(1, 1), 3, delta=0.001)
-		self.assertAlmostEqual(scaleMatrix.GetElement(2, 2), 3, delta=0.001)
-		self.assertAlmostEqual(scaleMatrix.GetElement(3, 3), 1, delta=0.001)
+	# 	self.assertAlmostEqual(scaleMatrix.GetElement(0, 0), 3, delta=0.001)
+	# 	self.assertAlmostEqual(scaleMatrix.GetElement(1, 1), 3, delta=0.001)
+	# 	self.assertAlmostEqual(scaleMatrix.GetElement(2, 2), 3, delta=0.001)
+	# 	self.assertAlmostEqual(scaleMatrix.GetElement(3, 3), 1, delta=0.001)
 
-		transform = vtkTransform()
-		transform.RotateX(45.0)
-		transform.Scale(2.0, 1.0, 4.0)
-		transform.Translate(30, 15, 10)
-		transform.RotateY(45.0)
+	# 	transform = vtkTransform()
+	# 	transform.RotateX(45.0)
+	# 	transform.Scale(2.0, 1.0, 4.0)
+	# 	transform.Translate(30, 15, 10)
+	# 	transform.RotateY(45.0)
 
-		self.transformList.append(transform)
+	# 	self.transformList.append(transform)
 
-		scaleTransform = self.transformList.scalingTransform()
-		scaleMatrix = scaleTransform.GetMatrix()
-		print scaleMatrix
+	# 	scaleTransform = self.transformList.scalingTransform()
+	# 	scaleMatrix = scaleTransform.GetMatrix()
+	# 	print scaleMatrix
 
-		self.assertAlmostEqual(scaleMatrix.GetElement(0, 0), 10.3891, delta=0.001)
-		self.assertAlmostEqual(scaleMatrix.GetElement(1, 1), 7.0356, delta=0.001)
-		self.assertAlmostEqual(scaleMatrix.GetElement(2, 2), 5.6183, delta=0.001)
-		self.assertAlmostEqual(scaleMatrix.GetElement(3, 3), 1.0000, delta=0.001)
+	# 	self.assertAlmostEqual(scaleMatrix.GetElement(0, 0), 10.3891, delta=0.001)
+	# 	self.assertAlmostEqual(scaleMatrix.GetElement(1, 1), 7.0356, delta=0.001)
+	# 	self.assertAlmostEqual(scaleMatrix.GetElement(2, 2), 5.6183, delta=0.001)
+	# 	self.assertAlmostEqual(scaleMatrix.GetElement(3, 3), 1.0000, delta=0.001)
 
-		comp = self.transformList.completeTransform()
-		print comp.GetMatrix()
+	# 	comp = self.transformList.completeTransform()
+	# 	print comp.GetMatrix()
 
-		self.assertFalse(True)
+	# 	self.assertFalse(True)
 
 		# ShearX: 3.99680288865e-15
 		# ShearY: -3.99680288865e-15
