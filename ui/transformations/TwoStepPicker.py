@@ -70,7 +70,7 @@ class TwoStepPicker(Picker):
 		lineSource = self.lineActor.GetMapper().GetInputConnection(0, 0).GetProducer()
 		p1 = lineSource.GetPoint1()
 		p2 = lineSource.GetPoint2()
-		part = Add(p1, Multiply(Subtract(p2, p1), position))
+		part = Add(p2, Multiply(Subtract(p1, p2), position))
 		if self.sphereSource:
 			self.sphereSource.SetCenter(part[0], part[1], part[2])
 		self.assemblyFollower.SetPosition(part[0], part[1], part[2])
@@ -194,13 +194,13 @@ class TwoStepPicker(Picker):
 			# have to be transformed again
 			transform.Inverse()
 			localIntersections = map(lambda x: list(transform.TransformPoint(x[0], x[1], x[2])), intersections)
-			ab = Subtract(localIntersections[1], localIntersections[0])
+			ab = Subtract(localIntersections[0], localIntersections[1])
 			abLength = Length(ab)
 			abNorm = Normalize(ab)
 			nrOfSteps = 128
 			stepLength = abLength / float(nrOfSteps)
 			abStep = Multiply(abNorm, stepLength)
-			sampleLocations = [localIntersections[0]]
+			sampleLocations = [localIntersections[1]]
 			for i in range(nrOfSteps):
 				sampleLocations.append(Add(sampleLocations[i], abStep))
 			interpolator = vtkImageInterpolator()
