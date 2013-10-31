@@ -112,15 +112,18 @@ class TwoStepPicker(Picker):
 			# 	print "Pressed space"
 			return
 		x, y = iren.GetEventPosition()
+		# p1 and p2 are in world coordination
 		p1, p2 = rayForMouse(self.widget.renderer, x, y)
 		if not self.lineActor:
 			self._setLine(p1, p2)
 		else:
+			# point in world coordinates
 			point = list(self.sphereSource.GetCenter())
 			matrix = self.widget.volume.GetMatrix()
 			transform = vtkTransform()
 			transform.SetMatrix(matrix)
 			transform.Inverse()
+			# transformedPoint in local coordinates
 			tranformedPoint = transform.TransformPoint(point)
 			point = list(tranformedPoint)
 			self.cleanUp()
@@ -129,11 +132,13 @@ class TwoStepPicker(Picker):
 			self.widget.render()
 
 	def _setLine(self, point1, point2):
-		bounds = list(self.widget.volume.GetBounds())
+		"""
+		Input points should be world coordinates.
+		"""
+		bounds = list(self.widget.imageData.GetBounds())
 		matrix = self.widget.volume.GetMatrix()
 		transform = vtkTransform()
 		transform.SetMatrix(matrix)
-		transform.Inverse()
 
 		# Create points for all of the corners of the bounds
 		p = [[0 for x in range(3)] for x in range(8)]
@@ -170,25 +175,32 @@ class TwoStepPicker(Picker):
 		assert len(intersections) == 2 or len(intersections) == 0
 
 		if len(intersections) == 2:
+			# Draw line in renderer and in overlay renderer in world coordinates
 			self.lineActor = createLine(intersections[0], intersections[1])
 			self._addToRender(self.lineActor)
-
 			self.lineActorOverlay = createLine(intersections[0], intersections[1])
 			self.lineActorOverlay.GetProperty().SetColor(1.0, 1.0, 1.0)
 			self.lineActorOverlay.GetProperty().SetOpacity(0.5)
 			self.lineActorOverlay.GetProperty().SetLineStipplePattern(0xf0f0)
 			self.lineActorOverlay.GetProperty().SetLineStippleRepeatFactor(1)
 			self._addToOverlay(self.lineActorOverlay)
+			# Note: the line has no transformation, so it will not update
+			# together with the transformation of the volume.
 
 			self.widget.render()
 
-			ab = Subtract(intersections[1], intersections[0])
+			# Sample volume for ray profile
+			# Should be done in local coordinates, so the intersections
+			# have to be transformed again
+			transform.Inverse()
+			localIntersections = map(lambda x: list(transform.TransformPoint(x[0], x[1], x[2])), intersections)
+			ab = Subtract(localIntersections[1], localIntersections[0])
 			abLength = Length(ab)
 			abNorm = Normalize(ab)
 			nrOfSteps = 128
 			stepLength = abLength / float(nrOfSteps)
 			abStep = Multiply(abNorm, stepLength)
-			sampleLocations = [intersections[0]]
+			sampleLocations = [localIntersections[0]]
 			for i in range(nrOfSteps):
 				sampleLocations.append(Add(sampleLocations[i], abStep))
 			interpolator = vtkImageInterpolator()
@@ -246,6 +258,7 @@ def createLine(p1, p2):
 def rayForMouse(renderer, selectionX, selectionY):
 	"""
 	Code taken from vtkPicker::Pick()
+	Returns two points in world coordination.
 	"""
 	# Get camera focal point and position. Convert to display (screen)
 	# coordinates. We need a depth value for z-buffer.

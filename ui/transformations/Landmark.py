@@ -11,13 +11,6 @@ class Landmark(object):
 	"""
 	Landmark is a container for vtkProps for easier
 	management of resources.
-
-	1. Landmark(renderer, overlay, volume)
-	2. set self.flag
-	3. set self.active
-	4. set self.id
-	5. set position
-
 	"""
 	def __init__(self, index, renderer, overlay, flag="Fixed"):
 		super(Landmark, self).__init__()
@@ -53,6 +46,9 @@ class Landmark(object):
 		self.overlay.RemoveViewProp(self.landmarkFollower)
 
 	def setPosition(self, position):
+		"""
+		Position should be in local coordinates.
+		"""
 		self.position = position
 		self.update()
 	
