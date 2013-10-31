@@ -180,7 +180,7 @@ class RenderWidget(QWidget):
 
 	@Slot(object)
 	def transformationsUpdated(self, transformations):
-		transform = transformations.completeTransform()
+		transform = transformations.scalingTransform()
 		self.volume.SetUserTransform(transform)
 		self.grid.SetUserTransform(transform)
 
