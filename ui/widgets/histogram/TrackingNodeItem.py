@@ -24,6 +24,7 @@ class TrackingNodeItem(NodeItem):
 		self._lineRatio = 0.0
 		self._position = 0.0
 		self._delegate = None
+		self.tracking = True
 
 	def setHistogramItem(self, histogramItem):
 		self._histItem = histogramItem
@@ -52,6 +53,9 @@ class TrackingNodeItem(NodeItem):
 
 	@overrides(NodeItem)
 	def mouseMoveEvent(self, event):
+		if not self.tracking:
+			return
+
 		self.setPos(event.scenePos())
 		if self._delegate:
 			self._delegate.updatePos(self._position)

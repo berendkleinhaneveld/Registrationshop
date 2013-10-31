@@ -46,6 +46,8 @@ class TwoStepPicker(Picker):
 		self.propertiesWidget = widget
 		self.propertiesWidget.histogramWidget.updatedPosition.connect(self.histogramUpdatedPosition)
 		self.locatorUpdated.connect(self.propertiesWidget.histogramWidget.locatorUpdated)
+		self.propertiesWidget.pickedPosition.connect(self.pickedPosition)
+		self.pickedLocation.connect(self.propertiesWidget.pickedLocation)
 
 	@overrides(Picker)
 	def setWidget(self, widget):
@@ -86,6 +88,7 @@ class TwoStepPicker(Picker):
 			# TODO: show crosshair or some other thing instead of cursor
 			self.widget.rwi.ShowCursor()
 			return
+
 		x, y = iren.GetEventPosition()
 		lineSource = self.lineActor.GetMapper().GetInputConnection(0, 0).GetProducer()
 		q1, q2 = rayForMouse(self.widget.renderer, x, y)
@@ -124,19 +127,28 @@ class TwoStepPicker(Picker):
 		if not self.lineActor:
 			self._setLine(p1, p2)
 		else:
-			# point in world coordinates
-			point = list(self.sphereSource.GetCenter())
-			matrix = self.widget.volume.GetMatrix()
-			transform = vtkTransform()
-			transform.SetMatrix(matrix)
-			transform.Inverse()
-			# transformedPoint in local coordinates
-			tranformedPoint = transform.TransformPoint(point)
-			point = list(tranformedPoint)
-			self.cleanUp()
-			self.pickedLocation.emit(point)
-			self.setWidget(self.widget)
-			self.widget.render()
+			self._pickPosition()
+
+	def _pickPosition(self):
+		# point in world coordinates
+		point = list(self.sphereSource.GetCenter())
+		matrix = self.widget.volume.GetMatrix()
+		transform = vtkTransform()
+		transform.SetMatrix(matrix)
+		transform.Inverse()
+		# transformedPoint in local coordinates
+		tranformedPoint = transform.TransformPoint(point)
+		point = list(tranformedPoint)
+		self.cleanUp()
+		self.pickedLocation.emit(point)
+		self.setWidget(self.widget)
+		self.widget.render()
+
+	def pickedPosition(self):
+		"""
+		Position is float between 0 and 1
+		"""
+		self._pickPosition()
 
 	def _setLine(self, point1, point2):
 		"""
