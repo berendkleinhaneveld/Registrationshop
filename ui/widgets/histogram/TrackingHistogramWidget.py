@@ -8,6 +8,7 @@ from PySide.QtGui import *
 from PySide.QtCore import *
 from HistogramWidget import HistogramWidget
 from TrackingNodeItem import TrackingNodeItem
+from ui.widgets import Style
 
 
 class TrackingHistogramWidget(HistogramWidget):
@@ -19,6 +20,7 @@ class TrackingHistogramWidget(HistogramWidget):
 	def __init__(self):
 		super(TrackingHistogramWidget, self).__init__()
 		self.nodeItem = None
+		Style.styleWidgetForTab(self)
 
 	def update(self):
 		super(TrackingHistogramWidget, self).update()
