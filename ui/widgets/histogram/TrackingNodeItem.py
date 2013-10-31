@@ -53,6 +53,8 @@ class TrackingNodeItem(NodeItem):
 	@overrides(NodeItem)
 	def mouseMoveEvent(self, event):
 		self.setPos(event.scenePos())
+		if self._delegate:
+			self._delegate.updatePos(self._position)
 		margins = self._histItem._margins
 		rect = self._histItem.rect()
 		pos = self.pos()
@@ -61,6 +63,23 @@ class TrackingNodeItem(NodeItem):
 		# print partOfLine
 		self._position = partOfLine
 		# self.updatePosition.emit(partOfLine)
+
+	def setPosition(self, position):
+		"""
+		Value between 0 and 1 that represent where in the histogram
+		ratio-wise the point should be drawn. So xPos = 0.5 should
+		draw the node item in the middle of the histogram.
+
+		:type xPos: float
+		"""
+		margins = self._histItem._margins
+		rect = self._histItem.rect()
+		width = rect.width() - (margins.left() + margins.right() + 1)
+		x = margins.left() + position * width
+		point = QPointF()
+		point.setX(x)
+		point.setY(0)
+		self.setPos(point)
 
 	@overrides(NodeItem)
 	def setPos(self, position):
@@ -93,8 +112,6 @@ class TrackingNodeItem(NodeItem):
 			actualPos.setY(actualY)
 			actualPos.setX(normX)
 			self._position = (normX - margins.left()) / width
-			if self._delegate:
-				self._delegate.updatePos(self._position)
 			self._lineIndex = index
 			self._lineRatio = ratio
 

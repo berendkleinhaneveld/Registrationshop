@@ -32,6 +32,7 @@ class TwoStepPicker(Picker):
 	"""
 
 	pickedLocation = Signal(list)
+	locatorUpdated = Signal(float)
 
 	def __init__(self):
 		super(TwoStepPicker, self).__init__()
@@ -43,7 +44,8 @@ class TwoStepPicker(Picker):
 
 	def setPropertiesWidget(self, widget):
 		self.propertiesWidget = widget
-		self.propertiesWidget.histogramWidget.updatePosition.connect(self.histogramUpdatedPosition)
+		self.propertiesWidget.histogramWidget.updatedPosition.connect(self.histogramUpdatedPosition)
+		self.locatorUpdated.connect(self.propertiesWidget.histogramWidget.locatorUpdated)
 
 	@overrides(Picker)
 	def setWidget(self, widget):
@@ -87,7 +89,9 @@ class TwoStepPicker(Picker):
 		x, y = iren.GetEventPosition()
 		lineSource = self.lineActor.GetMapper().GetInputConnection(0, 0).GetProducer()
 		q1, q2 = rayForMouse(self.widget.renderer, x, y)
-		a, b = ClosestPoints(lineSource.GetPoint1(), lineSource.GetPoint2(), q1, q2, clamp=True)
+		p1 = lineSource.GetPoint1()  # Volume entry point
+		p2 = lineSource.GetPoint2()  # Volume exit point
+		a, b = ClosestPoints(p1, p2, q1, q2, clamp=True)
 		if not self.sphereSource:
 			self.sphereSource = vtkSphereSource()
 			self.sphereSource.SetRadius(20)
@@ -100,6 +104,9 @@ class TwoStepPicker(Picker):
 			self._createLocator()
 		self.sphereSource.SetCenter(a[0], a[1], a[2])
 		self.assemblyFollower.SetPosition(a[0], a[1], a[2])
+		lengthA = Length(Subtract(a, p2))
+		lengthRay = Length(Subtract(p2, p1))
+		self.locatorUpdated.emit(lengthA / lengthRay)
 		self.widget.render()
 
 	def keyPress(self, iren, event=""):

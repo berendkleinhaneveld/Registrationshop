@@ -15,7 +15,7 @@ class TrackingHistogramWidget(HistogramWidget):
 	"""
 	TrackingHistogramWidget
 	"""
-	updatePosition = Signal(float)
+	updatedPosition = Signal(float)
 
 	def __init__(self):
 		super(TrackingHistogramWidget, self).__init__()
@@ -40,4 +40,10 @@ class TrackingHistogramWidget(HistogramWidget):
 		self.nodeItem.delegate = self
 
 	def updatePos(self, position):
-		self.updatePosition.emit(position)
+		self.updatedPosition.emit(position)
+
+	def locatorUpdated(self, position):
+		"""
+		Position is float between 0 and 1
+		"""
+		self.nodeItem.setPosition(position)
