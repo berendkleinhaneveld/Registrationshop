@@ -64,6 +64,7 @@ class RenderWidget(QWidget):
 		self.mapper.SetAutoAdjustSampleDistances(1)
 		self.volume = None
 		self.imageData = None
+		self.grid = None
 		self.VolumeVisualization = None
 		self.shouldResetCamera = False
 
@@ -106,9 +107,13 @@ class RenderWidget(QWidget):
 		if self.imageData is None:
 			if self.volume is not None:
 				self.renderer.RemoveViewProp(self.volume)
+				self.renderer.RemoveViewProp(self.grid)
 			print "Warning: image data is None"
 			self.render()
 			return
+		else:
+			if self.grid:
+				self.renderer.RemoveViewProp(self.grid)
 
 		# Set the image data for the mapper
 		self.mapper.SetInputData(self.imageData)
@@ -177,6 +182,7 @@ class RenderWidget(QWidget):
 	def transformationsUpdated(self, transformations):
 		transform = transformations.completeTransform()
 		self.volume.SetUserTransform(transform)
+		self.grid.SetUserTransform(transform)
 
 
 def createGrid(bounds):
@@ -184,27 +190,30 @@ def createGrid(bounds):
 	boundY = bounds[3]
 	boundZ = bounds[5]
 
-	# subdivisions = 10
+	lineActors = []
+	lineActors.append(createLine([0, 0, 0], [boundX, 0, 0]))
+	lineActors.append(createLine([0, 0, 0], [0, boundY, 0]))
+	lineActors.append(createLine([0, 0, 0], [0, 0, boundZ]))
 
-	# stepSizeX = boundX / subdivisions
-	# stepSizeY = boundY / subdivisions
-	# stepSizeZ = boundZ / subdivisions
+	lineActors.append(createLine([boundX, boundY, boundZ], [boundX, boundY, 0]))
+	lineActors.append(createLine([boundX, boundY, boundZ], [0, boundY, boundZ]))
+	lineActors.append(createLine([boundX, boundY, boundZ], [boundX, 0, boundZ]))
 
-	# if stepSizeX > 1000:
-	# 	stepSizeX = 1000
-	# elif stepSizeX > 100:
-	# 	stepSizeX = 100
-	# elif stepSizeX > 10:
-	# 	stepSizeX = 10
+	lineActors.append(createLine([boundX, 0, 0], [boundX, 0, boundZ]))
+	lineActors.append(createLine([boundX, 0, 0], [boundX, boundY, 0]))
+	lineActors.append(createLine([0, boundY, 0], [0, boundY, boundZ]))
+	lineActors.append(createLine([0, boundY, 0], [boundX, boundY, 0]))
+	lineActors.append(createLine([0, 0, boundZ], [0, boundY, boundZ]))
+	lineActors.append(createLine([0, 0, boundZ], [boundX, 0, boundZ]))
 
-	lineActorX = createLine([0, 0, 0], [boundX, 0, 0])
-	lineActorY = createLine([0, 0, 0], [0, boundY, 0])
-	lineActorZ = createLine([0, 0, 0], [0, 0, boundZ])
+	# TODO add subdivisions and dimensions to the lines
+	# Those have to be updated on every transform
 
 	dataGrid = vtkAssembly()
-	dataGrid.AddPart(lineActorX)
-	dataGrid.AddPart(lineActorY)
-	dataGrid.AddPart(lineActorZ)
+	for lineActor in lineActors:
+		dataGrid.AddPart(lineActor)
+
+	return dataGrid
 
 
 def createLine(p1, p2):
