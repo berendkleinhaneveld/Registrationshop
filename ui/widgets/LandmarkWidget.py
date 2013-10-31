@@ -4,7 +4,6 @@ LandmarkWidget
 :Authors:
 	Berend Klein Haneveld
 """
-import sys
 from PySide.QtGui import *
 from PySide.QtCore import *
 from histogram import TrackingHistogramWidget
@@ -21,8 +20,6 @@ class LandmarkWidget(QWidget):
 		super(LandmarkWidget, self).__init__()
 
 		self.histogramWidget = TrackingHistogramWidget()
-		# if sys.platform.startswith("darwin"):
-			# self.histogramWidget.setBackgroundBrush(QBrush(QColor(229, 229, 229)))
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
