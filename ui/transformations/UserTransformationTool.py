@@ -49,9 +49,6 @@ class UserTransformationTool(TransformationTool):
 		# Reset the transformation
 		self.renderWidget.rwi.SetDesiredUpdateRate(self._originalUpdateRate)
 		self.renderWidget.render()
-		# Make sure the transform is properly set in the moving render widget
-		shearTrans = self.renderWidget.transformations.scalingTransform()
-		self.movingWidget.volume.SetUserTransform(shearTrans)
 		self.movingWidget.render()
 
 	def cancelTransform(self):
@@ -115,8 +112,6 @@ class UserTransformationTool(TransformationTool):
 		"""
 		:type transform: vtkTransform
 		"""
-		shearTrans = self.renderWidget.transformations.scalingTransform()
-		self.movingWidget.volume.SetUserTransform(shearTrans)
 		self.movingWidget.render()
 
 		matrix = transform.GetMatrix()

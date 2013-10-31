@@ -219,6 +219,8 @@ class RegistrationShop(MainWindow, WindowDialog):
 		self.movingRenderController.visualizationChanged.connect(self.multiRenderController.setMovingVisualization)
 		self.movingRenderController.visualizationUpdated.connect(self.multiRenderController.setMovingVisualization)
 
+		self.multiDataWidget.transformations.transformationChanged.connect(self.movingDataWidget.transformationsUpdated)
+
 	def createActions(self):
 		"""
 		Create actions that can be attached to buttons and menus.
