@@ -14,7 +14,6 @@ class TrackingNodeItem(NodeItem):
 	"""
 	TrackingNodeItem
 	"""
-	# updatePosition = Signal(float)
 
 	def __init__(self):
 		super(TrackingNodeItem, self).__init__()
@@ -64,9 +63,7 @@ class TrackingNodeItem(NodeItem):
 		pos = self.pos()
 		width = rect.width() - (margins.left() + margins.right() + 1)
 		partOfLine = (pos.x() - margins.left()) / width
-		# print partOfLine
 		self._position = partOfLine
-		# self.updatePosition.emit(partOfLine)
 
 	def setPosition(self, position):
 		"""
