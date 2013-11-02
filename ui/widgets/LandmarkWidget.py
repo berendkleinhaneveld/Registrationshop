@@ -33,7 +33,7 @@ class LandmarkWidget(QWidget):
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(QLabel("Landmark widget"))
+		layout.addWidget(QLabel("Ray profile:"))
 		layout.addWidget(self.histogramWidget)
 		layout.addWidget(self.button)
 
@@ -42,6 +42,7 @@ class LandmarkWidget(QWidget):
 	def setSamples(self, samples, scope=None):
 		self.histogram = Histogram()
 		self.histogram.bins = samples
+		
 		if scope:
 			self.histogram.minY = scope[0]
 			self.histogram.maxY = scope[1]
