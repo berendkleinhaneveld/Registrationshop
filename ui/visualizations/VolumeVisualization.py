@@ -16,6 +16,7 @@ VisualizationTypeCT = "CT"
 VisualizationTypeMIP = "MIP"
 VisualizationTypeMIDA = "MIDA"
 VisualizationTypeRamp = "Ramp"
+VisualizationTypeTransferFunction = "Transfer function"
 
 VolumePropKey = "VolumeVisualization"
 VisualizationTypeKey = "VisualizationTypeKey"

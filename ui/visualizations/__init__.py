@@ -5,6 +5,7 @@ from VolumeVisualization import VisualizationTypeMIP
 from VolumeVisualization import VisualizationTypeMIDA
 from VolumeVisualization import VisualizationTypeGray
 from VolumeVisualization import VisualizationTypeRamp
+from VolumeVisualization import VisualizationTypeTransferFunction
 from VolumeVisualization import VisualizationTypeSimple
 from VolumeVisualizationCT import VolumeVisualizationCT
 from VolumeVisualizationMIP import VolumeVisualizationMIP
