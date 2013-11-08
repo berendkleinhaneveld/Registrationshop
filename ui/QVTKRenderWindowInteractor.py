@@ -197,7 +197,7 @@ class QVTKRenderWindowInteractor(MSWidget):
 		self.setSizePolicy(QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding))
 
 		self._Timer = QtCore.QTimer(self)
-		self.connect(self._Timer, QtCore.SIGNAL('timeout()'), self.TimerEvent)
+		self._Timer.timeout.connect(self.TimerEvent)
 
 		self._createTimerObserver = self._Iren.AddObserver('CreateTimerEvent', self.CreateTimer)
 		self._destroyTimerObserver = self._Iren.AddObserver('DestroyTimerEvent', self.DestroyTimer)
@@ -443,7 +443,7 @@ def QVTKRenderWidgetConeExample():
 	cone.SetResolution(8)
 
 	coneMapper = vtk.vtkPolyDataMapper()
-	coneMapper.SetInput(cone.GetOutput())
+	coneMapper.SetInputData(cone.GetOutput())
 
 	coneActor = vtk.vtkActor()
 	coneActor.SetMapper(coneMapper)
