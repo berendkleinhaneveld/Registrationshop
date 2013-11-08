@@ -41,15 +41,14 @@ class HistogramWidget(QGraphicsView):
 		self._gridItem = GridItem()
 		self._histogramItem = HistogramItem()
 
+		self._items = [self._backgroundItem, self._gridItem, self._histogramItem]
+		zValue = 0
 		self._scene = QGraphicsScene(self)
-		self._scene.addItem(self._backgroundItem)
-		self._scene.addItem(self._gridItem)
-		self._scene.addItem(self._histogramItem)
+		for item in self._items:
+			self._scene.addItem(item)
+			item.setZValue(zValue)
+			zValue += 100
 		self.setScene(self._scene)
-
-		self._backgroundItem.setZValue(0)
-		self._gridItem.setZValue(100)
-		self._histogramItem.setZValue(200)
 
 	def setAxeMode(self, left=None, bottom=None):
 		if left:
@@ -68,6 +67,11 @@ class HistogramWidget(QGraphicsView):
 		self._histogram = histogram
 		self._histogramItem.setHistogram(histogram)
 		self._updateAxis()
+
+	def addItem(self, item):
+		self._scene.addItem(item)
+		self._items.append(item)
+		self.update()
 
 	def resizeEvent(self, resizeEv):
 		"""
@@ -99,10 +103,6 @@ class HistogramWidget(QGraphicsView):
 		"""
 		rect = self.rect()
 
-		self._backgroundItem.setRect(rect)
-		self._gridItem.setRect(rect)
-		self._histogramItem.setRect(rect)
-
 		if len(self._gridItem._itemsLeft) > 0 and len(self._gridItem._itemsBottom) > 0:
 			# left, top, right, bottom
 			self._margin = QMargins(30, 9, 9, 30)
@@ -113,9 +113,11 @@ class HistogramWidget(QGraphicsView):
 		else:
 			self._margin = QMargins(9, 9, 9, 9)
 
-		self._backgroundItem.setMargins(self._margin)
-		self._gridItem.setMargins(self._margin)
-		self._histogramItem.setMargins(self._margin)
+		for item in self._items:
+			item.setRect(rect)
+			if hasattr(item, "setMargins"):
+				item.setMargins(self._margin)
+
 		self._histogramItem.update()
 
 	def _updateAxis(self):
