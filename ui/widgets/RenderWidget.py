@@ -155,8 +155,10 @@ class RenderWidget(QWidget):
 
 		self.volumeVisualization.setMapper(self.mapper)
 		self.mapper.SetShaderType(self.volumeVisualization.shaderType())
-		self.volume.SetProperty(self.volumeVisualization.volProp)
-		self.volume.SetMapper(self.mapper)
+		if self.volume.GetProperty() != self.volumeVisualization.volProp:
+			self.volume.SetProperty(self.volumeVisualization.volProp)
+		if self.volume.GetMapper() != self.mapper:
+			self.volume.SetMapper(self.mapper)
 
 		self.render()
 

@@ -248,8 +248,10 @@ class MultiRenderWidget(QWidget):
 		"""
 		Private method to update the volume properties.
 		"""
-		self.volume.SetProperty(self.fixedVolumeProperty)
-		self.mapper.SetProperty2(self.movingVolumeProperty)
+		if self.volume.GetProperty() != self.fixedVolumeProperty:
+			self.volume.SetProperty(self.fixedVolumeProperty)
+		if self.mapper.GetProperty2() != self.movingVolumeProperty:
+			self.mapper.SetProperty2(self.movingVolumeProperty)
 		self.render()
 
 	def _syncCameras(self, camera, ev):
