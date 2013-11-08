@@ -131,7 +131,10 @@ class MultiRenderWidget(QWidget):
 			self.renderer.ResetCamera()
 			self._shouldResetCamera = False
 		self.rwi.Render()
-		self.rwi.GetRenderWindow().Render()
+		# Prevent warning messages on OSX by not asking to render
+		# when the render window has never rendered before
+		if self.rwi.GetRenderWindow().GetNeverRendered() == 0:
+			self.rwi.GetRenderWindow().Render()
 
 	@Slot(object)
 	def setFixedData(self, imageData):
