@@ -68,7 +68,6 @@ class TransferFunctionWidget(QWidget):
 		self.setLayout(layout)
 
 	def setImageData(self, imageData):
-		print "Set image data"
 		# Clear any previous nodes
 		for node in self.nodes:
 			self.histogramWidget.scene().removeItem(node)
