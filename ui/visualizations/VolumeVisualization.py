@@ -10,7 +10,9 @@ from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
 
 # Define Render Types
-VisualizationTypeSimple = "Simple"
+# TODO: Render types are not suited for visualization names
+# If name is changed, then the visualization of older projec
+VisualizationTypeSimple = "Threshold"
 VisualizationTypeGray = "Gray scale"
 VisualizationTypeCT = "CT"
 VisualizationTypeMIP = "MIP"
