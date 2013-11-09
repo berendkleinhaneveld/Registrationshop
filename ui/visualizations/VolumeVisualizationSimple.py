@@ -56,21 +56,21 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.lowerBoundSlider.setMaximum(int(self.maximum))
 		self.lowerBoundSlider.setValue(int(self.lowerBound))
 		self.lowerBoundSlider.valueChanged.connect(self.valueChanged)
-		self.lowerBoundLabel = QLabel(str(self.lowerBound))
+		self.lowerBoundLabel = QLabel("%.0f" % self.lowerBound)
 
 		self.upperBoundSlider = QSlider(Qt.Horizontal)
 		self.upperBoundSlider.setMinimum(int(self.minimum))
 		self.upperBoundSlider.setMaximum(int(self.maximum))
 		self.upperBoundSlider.setValue(int(self.upperBound))
 		self.upperBoundSlider.valueChanged.connect(self.valueChanged)
-		self.upperBoundLabel = QLabel(str(self.upperBound))
+		self.upperBoundLabel = QLabel("%.0f" % self.upperBound)
 
 		self.hueSlider = QSlider(Qt.Horizontal)
 		self.hueSlider.setMinimum(0)
 		self.hueSlider.setMaximum(360)
 		self.hueSlider.setValue(self.hue)
 		self.hueSlider.valueChanged.connect(self.valueChanged)
-		self.hueLabel = QLabel(str(self.hue))
+		self.hueLabel = QLabel("%.0f" % self.hue)
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
@@ -150,8 +150,8 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.upperBound = max(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
 		self.hue = self.hueSlider.value()
 
-		self.lowerBoundLabel.setText(str(self.lowerBound))
-		self.upperBoundLabel.setText(str(self.upperBound))
-		self.hueLabel.setText(str(self.hue))
+		self.lowerBoundLabel.setText("%.0f" % self.lowerBound)
+		self.upperBoundLabel.setText("%.0f" % self.upperBound)
+		self.hueLabel.setText("%.0f" % self.hue)
 
 		self.updateTransferFunction()
