@@ -21,7 +21,6 @@ from ui.visualizations import VisualizationTypeCT
 from ui.visualizations import VisualizationTypeSimple
 from ui.visualizations import VisualizationTypeMIP
 from ui.visualizations import VisualizationTypeMIDA
-from ui.visualizations import VisualizationTypeRamp
 from ui.visualizations import VisualizationTypeTransferFunction
 from ui.visualizations import VolumeVisualizationFactory
 from ui.visualizations import VolumeVisualizationWrapper
