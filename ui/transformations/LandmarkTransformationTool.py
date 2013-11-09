@@ -116,12 +116,6 @@ class LandmarkTransformationTool(TransformationTool):
 		for landmarkIndicator in self.landmarkIndicators:
 			landmarkIndicator.cleanUp()
 
-		self.updatedLandmarks.disconnect()
-		self.landmarkComboBox.currentIndexChanged.disconnect()
-		self.pointsWidget.activeLandmarkChanged.disconnect()
-		self.fixedPicker.pickedLocation.disconnect()
-		self.movingPicker.pickedLocation.disconnect()
-
 		self.landmarkPointSets = []
 
 		self.fixedPicker = Picker()
