@@ -19,6 +19,7 @@ from vtk import vtkDataSetMapper
 from vtk import vtkActor
 from vtk import vtkAssembly
 from vtk import vtkTransform
+from vtk import vtkMatrix4x4
 from vtk import vtkProp3DFollower
 from vtk import vtkMath
 from vtk import vtkImageInterpolator
@@ -41,6 +42,8 @@ class TwoStepPicker(Picker):
 		self.overlayProps = []
 		self.lineActor = None
 		self.sphereSource = None
+		self.samples = None
+		self.sampleDiffs = None
 
 	def setPropertiesWidget(self, widget):
 		self.propertiesWidget = widget
@@ -52,13 +55,16 @@ class TwoStepPicker(Picker):
 	@overrides(Picker)
 	def setWidget(self, widget):
 		self.widget = widget
-		self.AddObserver(self.widget.rwi, "KeyPressEvent", self.keyPress)
 		self.AddObserver(self.widget.rwi, "MouseMoveEvent", self.mouseMove)
+		self.AddObserver(self.widget.rwi, "KeyPressEvent", self.keyPress)
 
 	@overrides(Picker)
 	def cleanUp(self):
 		super(TwoStepPicker, self).cleanUp()
 		
+		self.cleanUpProps()
+
+	def cleanUpProps(self):
 		for prop in self.props:
 			self.widget.renderer.RemoveViewProp(prop)
 		for prop in self.overlayProps:
@@ -71,14 +77,19 @@ class TwoStepPicker(Picker):
 
 	@Slot(float)
 	def histogramUpdatedPosition(self, position):
+		if not self.lineActor:
+			return
 		lineSource = self.lineActor.GetMapper().GetInputConnection(0, 0).GetProducer()
 		p1 = lineSource.GetPoint1()
 		p2 = lineSource.GetPoint2()
-		part = Add(p2, Multiply(Subtract(p1, p2), position))
+		part = Add(p1, Multiply(Subtract(p2, p1), position))
 		if self.sphereSource:
 			self.sphereSource.SetCenter(part[0], part[1], part[2])
 		self.assemblyFollower.SetPosition(part[0], part[1], part[2])
 		self.widget.render()
+
+	def camPosition(self):
+		return self.widget.renderer.GetActiveCamera().GetPosition()
 
 	def mouseMove(self, iren, event=""):
 		"""
@@ -90,14 +101,16 @@ class TwoStepPicker(Picker):
 			return
 
 		x, y = iren.GetEventPosition()
-		lineSource = self.lineActor.GetMapper().GetInputConnection(0, 0).GetProducer()
 		q1, q2 = rayForMouse(self.widget.renderer, x, y)
+		lineSource = self.lineActor.GetMapper().GetInputConnection(0, 0).GetProducer()
 		p1 = lineSource.GetPoint1()  # Volume entry point
 		p2 = lineSource.GetPoint2()  # Volume exit point
-		a, b = ClosestPoints(p1, p2, q1, q2, clamp=True)
+		# location is the closest point on the drawn line
+		location, other = ClosestPoints(p1, p2, q1, q2, clamp=True)
+
 		if not self.sphereSource:
 			self.sphereSource = vtkSphereSource()
-			self.sphereSource.SetRadius(20)
+			self.sphereSource.SetRadius(20)  # TODO: make relative to volume size
 			sphereMapper = vtkDataSetMapper()
 			sphereMapper.SetInputConnection(self.sphereSource.GetOutputPort())
 			sphereActor = vtkActor()
@@ -105,11 +118,12 @@ class TwoStepPicker(Picker):
 			sphereActor.GetProperty().SetColor(0.2, 1, 0.5)
 			self._addToRender(sphereActor)
 			self._createLocator()
-		self.sphereSource.SetCenter(a[0], a[1], a[2])
-		self.assemblyFollower.SetPosition(a[0], a[1], a[2])
-		lengthA = Length(Subtract(a, p2))
+		self.sphereSource.SetCenter(location[0], location[1], location[2])
+		self.assemblyFollower.SetPosition(location[0], location[1], location[2])
+		lengthToLocation = Length(Subtract(location, p1))
 		lengthRay = Length(Subtract(p2, p1))
-		self.locatorUpdated.emit(lengthA / lengthRay)
+		locationRatio = lengthToLocation / lengthRay
+		self.locatorUpdated.emit(locationRatio)
 		self.widget.render()
 
 	def keyPress(self, iren, event=""):
@@ -124,8 +138,10 @@ class TwoStepPicker(Picker):
 		x, y = iren.GetEventPosition()
 		# p1 and p2 are in world coordination
 		p1, p2 = rayForMouse(self.widget.renderer, x, y)
+		camPos = self.camPosition()
+		q1, q2 = sortedLocations(p1, p2, camPos)
 		if not self.lineActor:
-			self._setLine(p1, p2)
+			self._setLine(q1, q2)
 		else:
 			self._pickPosition()
 
@@ -139,9 +155,8 @@ class TwoStepPicker(Picker):
 		# transformedPoint in local coordinates
 		tranformedPoint = transform.TransformPoint(point)
 		point = list(tranformedPoint)
-		self.cleanUp()
+		self.cleanUpProps()
 		self.pickedLocation.emit(point)
-		self.setWidget(self.widget)
 		self.widget.render()
 
 	def pickedPosition(self):
@@ -155,80 +170,56 @@ class TwoStepPicker(Picker):
 		Input points should be world coordinates.
 		"""
 		bounds = list(self.widget.imageData.GetBounds())
-		matrix = self.widget.volume.GetMatrix()
+		matrix = vtkMatrix4x4()
+		matrix.DeepCopy(self.widget.volume.GetMatrix())
 		transform = vtkTransform()
 		transform.SetMatrix(matrix)
 
-		# Create points for all of the corners of the bounds
-		p = [[0 for x in range(3)] for x in range(8)]
-		p[0] = [bounds[0], bounds[2], bounds[4]]
-		p[1] = [bounds[1], bounds[2], bounds[4]]
-		p[2] = [bounds[0], bounds[3], bounds[4]]
-		p[3] = [bounds[0], bounds[2], bounds[5]]
-		p[4] = [bounds[1], bounds[3], bounds[4]]
-		p[5] = [bounds[0], bounds[3], bounds[5]]
-		p[6] = [bounds[1], bounds[2], bounds[5]]
-		p[7] = [bounds[1], bounds[3], bounds[5]]
+		intersections = intersectionsWithBounds(bounds, transform, point1, point2)
 
-		# Transform corner points
-		tp = map(lambda x: list(transform.TransformPoint(x[0], x[1], x[2])), p)
+		if not intersections:
+			return
 
-		# Create triangles for each face of the cube
-		triangles = []
-		triangles.append([tp[0], tp[1], tp[4]])
-		triangles.append([tp[0], tp[2], tp[4]])
-		triangles.append([tp[0], tp[2], tp[5]])
-		triangles.append([tp[0], tp[3], tp[5]])
-		triangles.append([tp[0], tp[1], tp[6]])
-		triangles.append([tp[0], tp[3], tp[6]])
-		triangles.append([tp[7], tp[6], tp[3]])
-		triangles.append([tp[7], tp[5], tp[3]])
-		triangles.append([tp[7], tp[5], tp[2]])
-		triangles.append([tp[7], tp[4], tp[2]])
-		triangles.append([tp[7], tp[6], tp[1]])
-		triangles.append([tp[7], tp[4], tp[1]])
+		sortedIntersections = sortedLocations(intersections[0], intersections[1], self.camPosition())
 
-		# Check intersection for each triangle
-		result = map(lambda x: LineIntersectionWithTriangle(point1, point2, x), triangles)
-		intersections = [x[1] for x in result if x[0]]
-		assert len(intersections) == 2 or len(intersections) == 0
+		# Draw line in renderer and in overlay renderer in world coordinates
+		self.lineActor = createLine(sortedIntersections[0], sortedIntersections[1])
+		self._addToRender(self.lineActor)
+		self.lineActorOverlay = createLine(sortedIntersections[0], sortedIntersections[1])
+		self.lineActorOverlay.GetProperty().SetColor(1.0, 1.0, 1.0)
+		self.lineActorOverlay.GetProperty().SetOpacity(0.5)
+		self.lineActorOverlay.GetProperty().SetLineStipplePattern(0xf0f0)
+		self.lineActorOverlay.GetProperty().SetLineStippleRepeatFactor(1)
+		self._addToOverlay(self.lineActorOverlay)
+		# Note: the line has no transformation, so it will not update
+		# together with the transformation of the volume.
+		self.widget.render()
 
-		if len(intersections) == 2:
-			# Draw line in renderer and in overlay renderer in world coordinates
-			self.lineActor = createLine(intersections[0], intersections[1])
-			self._addToRender(self.lineActor)
-			self.lineActorOverlay = createLine(intersections[0], intersections[1])
-			self.lineActorOverlay.GetProperty().SetColor(1.0, 1.0, 1.0)
-			self.lineActorOverlay.GetProperty().SetOpacity(0.5)
-			self.lineActorOverlay.GetProperty().SetLineStipplePattern(0xf0f0)
-			self.lineActorOverlay.GetProperty().SetLineStippleRepeatFactor(1)
-			self._addToOverlay(self.lineActorOverlay)
-			# Note: the line has no transformation, so it will not update
-			# together with the transformation of the volume.
+		# Sample volume for ray profile
+		# Should be done in local coordinates, so the intersections
+		# have to be transformed again
+		transform.Inverse()
+		localIntersects = map(lambda x: list(transform.TransformPoint(x[0], x[1], x[2])), sortedIntersections)
+		# ab is vector pointing from localIntersects[0] to localIntersects[1]
+		ab = Subtract(localIntersects[1], localIntersects[0])
+		abLength = Length(ab)
+		nrOfSteps = 256  # TODO: make this number dependent on data size and length of vector
+		stepLength = abLength / float(nrOfSteps)
+		abNorm = Normalize(ab)
+		abStep = Multiply(abNorm, stepLength)
+		sampleLoc = localIntersects[0]
 
-			self.widget.render()
+		interpolator = vtkImageInterpolator()
+		interpolator.Initialize(self.widget.imageData)
+		self.samples = []
+		for i in range(nrOfSteps + 1):
+			# Get sample from volume
+			self.samples.append(interpolator.Interpolate(sampleLoc[0], sampleLoc[1], sampleLoc[2], 0))
+			# Update the sampling position
+			sampleLoc = Add(sampleLoc, abStep)
 
-			# Sample volume for ray profile
-			# Should be done in local coordinates, so the intersections
-			# have to be transformed again
-			transform.Inverse()
-			localIntersections = map(lambda x: list(transform.TransformPoint(x[0], x[1], x[2])), intersections)
-			ab = Subtract(localIntersections[0], localIntersections[1])
-			abLength = Length(ab)
-			abNorm = Normalize(ab)
-			nrOfSteps = 128
-			stepLength = abLength / float(nrOfSteps)
-			abStep = Multiply(abNorm, stepLength)
-			sampleLocations = [localIntersections[1]]
-			for i in range(nrOfSteps):
-				sampleLocations.append(Add(sampleLocations[i], abStep))
-			interpolator = vtkImageInterpolator()
-			interpolator.Initialize(self.widget.imageData)
-			samples = []
-			for i in range(len(sampleLocations)):
-				loc = sampleLocations[i]
-				samples.append(interpolator.Interpolate(loc[0], loc[1], loc[2], 0))
-			self.propertiesWidget.setSamples(samples, self.widget.imageData.GetScalarRange())
+		self.propertiesWidget.setSamples(self.samples, self.widget.imageData.GetScalarRange())
+		self._analyzeSamples(self.samples)
 
 	def _addToRender(self, prop):
 		self.widget.renderer.AddViewProp(prop)
@@ -259,6 +250,13 @@ class TwoStepPicker(Picker):
 		self._addToOverlay(self.assemblyFollower)
 
 		self.widget.render()
+
+	def _analyzeSamples(self, samples):
+		self.sampleDiffs = []
+		for index in range(len(samples)-1):
+			sample = samples[index]
+			nextSample = samples[index+1]
+			self.sampleDiffs.append(abs(nextSample - sample))
 
 
 def createLine(p1, p2):
@@ -324,3 +322,58 @@ def rayForMouse(renderer, selectionX, selectionY):
 
 	# TODO: clip the line just outside the volume
 	return p1World, p2World
+
+
+def sortedLocations(p1, p2, camPos):
+	# Sort q1 and q2 based on camera position
+	# Calculate distance between the two points and the camera
+	diff1 = Subtract(p1, camPos)
+	diff2 = Subtract(p2, camPos)
+	len1 = Length(diff1)
+	len2 = Length(diff2)
+
+	if len1 < len2:
+		return p1, p2
+	else:
+		return p2, p1
+
+
+def intersectionsWithBounds(bounds, transform, point1, point2):
+	# Create points for all of the corners of the bounds
+	p = [[0 for x in range(3)] for x in range(8)]
+	p[0] = [bounds[0], bounds[2], bounds[4]]
+	p[1] = [bounds[1], bounds[2], bounds[4]]
+	p[2] = [bounds[0], bounds[3], bounds[4]]
+	p[3] = [bounds[0], bounds[2], bounds[5]]
+	p[4] = [bounds[1], bounds[3], bounds[4]]
+	p[5] = [bounds[0], bounds[3], bounds[5]]
+	p[6] = [bounds[1], bounds[2], bounds[5]]
+	p[7] = [bounds[1], bounds[3], bounds[5]]
+
+	# Transform corner points
+	tp = map(lambda x: list(transform.TransformPoint(x[0], x[1], x[2])), p)
+
+	# Create triangles for each face of the cube
+	triangles = []
+	triangles.append([tp[0], tp[1], tp[4]])
+	triangles.append([tp[0], tp[2], tp[4]])
+	triangles.append([tp[0], tp[2], tp[5]])
+	triangles.append([tp[0], tp[3], tp[5]])
+	triangles.append([tp[0], tp[1], tp[6]])
+	triangles.append([tp[0], tp[3], tp[6]])
+	triangles.append([tp[7], tp[6], tp[3]])
+	triangles.append([tp[7], tp[5], tp[3]])
+	triangles.append([tp[7], tp[5], tp[2]])
+	triangles.append([tp[7], tp[4], tp[2]])
+	triangles.append([tp[7], tp[6], tp[1]])
+	triangles.append([tp[7], tp[4], tp[1]])
+
+	# Check intersection for each triangle
+	result = map(lambda x: LineIntersectionWithTriangle(point1, point2, x), triangles)
+	intersections = [x[1] for x in result if x[0]]
+	assert len(intersections) == 2 or len(intersections) == 0
+
+	if len(intersections) == 2:
+		return intersections
+	else:
+		return None

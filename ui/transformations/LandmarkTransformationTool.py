@@ -4,13 +4,13 @@ LandmarkTransformationTool (TransformationTool)
 :Authors:
 	Berend Klein Haneveld
 """
-from TransformationTool import TransformationTool
 from Landmark import Landmark
-from core.decorators import overrides
+from TransformationTool import TransformationTool
 from ui.widgets.PointsWidget import PointsWidget
+from ui.widgets.StatusWidget import StatusWidget
 from ui.transformations import TwoStepPicker as Picker
 from ui.transformations import Transformation
-from ui.widgets.StatusWidget import StatusWidget
+from core.decorators import overrides
 from vtk import vtkPoints
 from vtk import vtkLandmarkTransform
 from vtk import vtkTransform
@@ -28,7 +28,7 @@ class LandmarkTransformationTool(TransformationTool):
 	"""
 	LandmarkTransformationTool
 	"""
-	updatedLandmarks = Signal(list, list)
+	updatedLandmarks = Signal(list)
 
 	def __init__(self):
 		super(LandmarkTransformationTool, self).__init__()
@@ -36,10 +36,9 @@ class LandmarkTransformationTool(TransformationTool):
 		self.fixedPicker = Picker()
 		self.movingPicker = Picker()
 
-		self.fixedPoints = []  # Locations
-		self.movingPoints = []  # Locations
+		self.landmarkPointSets = []  # Sets of points
+		self.landmarkIndicators = []  # All the landmark indicator objects
 
-		self.landmarks = []  # All the landmark objects
 		self.originalTransform = None
 		self.originalScalingTransform = None
 
@@ -48,7 +47,7 @@ class LandmarkTransformationTool(TransformationTool):
 
 	@overrides(TransformationTool)
 	def getParameterWidget(self):
-		pointsWidget = PointsWidget()
+		self.pointsWidget = PointsWidget()
 
 		self.landmarkComboBox = QComboBox()
 		self.landmarkComboBox.addItem("Rigid body")
@@ -59,11 +58,11 @@ class LandmarkTransformationTool(TransformationTool):
 		layout.setAlignment(Qt.AlignTop)
 		layout.addWidget(QLabel("Transform type"), 0, 0)
 		layout.addWidget(self.landmarkComboBox, 0, 1)
-		layout.addWidget(pointsWidget, 1, 0, 1, 2)
+		layout.addWidget(self.pointsWidget, 1, 0, 1, 2)
 		
-		self.updatedLandmarks.connect(pointsWidget.setPoints)
+		self.updatedLandmarks.connect(self.pointsWidget.setPoints)
 		self.landmarkComboBox.currentIndexChanged.connect(self.landmarkTypeChanged)
-		pointsWidget.activeLandmarkChanged.connect(self.setActiveLandmark)
+		self.pointsWidget.activeLandmarkChanged.connect(self.setActiveLandmark)
 
 		widget = QWidget()
 		widget.setLayout(layout)
@@ -84,6 +83,8 @@ class LandmarkTransformationTool(TransformationTool):
 		# Save the original complete transform
 		self.originalTransform = self.multiWidget.transformations.completeTransform()
 		self.originalScalingTransform = self.multiWidget.transformations.scalingTransform()
+
+		# Add a new transform on top of the others
 		transform = Transformation(vtkTransform(), Transformation.TypeLandmark)
 		self.multiWidget.transformations.append(transform)
 
@@ -112,11 +113,16 @@ class LandmarkTransformationTool(TransformationTool):
 		self.fixedPicker.cleanUp()
 		self.movingPicker.cleanUp()
 
-		for landmark in self.landmarks:
-			landmark.cleanUp()
+		for landmarkIndicator in self.landmarkIndicators:
+			landmarkIndicator.cleanUp()
 
-		self.fixedPoints = []
-		self.movingPoints = []
+		self.updatedLandmarks.disconnect()
+		self.landmarkComboBox.currentIndexChanged.disconnect()
+		self.pointsWidget.activeLandmarkChanged.disconnect()
+		self.fixedPicker.pickedLocation.disconnect()
+		self.movingPicker.pickedLocation.disconnect()
+
+		self.landmarkPointSets = []
 
 		self.fixedPicker = Picker()
 		self.movingPicker = Picker()
@@ -152,23 +158,26 @@ class LandmarkTransformationTool(TransformationTool):
 		"""
 		Update the landmark transform
 		"""
-		if len(self.fixedPoints) == 0 or len(self.movingPoints) == 0:
+		if self._pointsEmpty(self.landmarkPointSets):
 			return
 
+		numberOfSets = self._numberOfSets(self.landmarkPointSets)
 		fixedPoints = vtkPoints()
 		movingPoints = vtkPoints()
-		numberOfSets = min(len(self.fixedPoints), len(self.movingPoints))
 		fixedPoints.SetNumberOfPoints(numberOfSets)
 		movingPoints.SetNumberOfPoints(numberOfSets)
 
-		for index in range(numberOfSets):
-			fixedPoint = self.fixedPoints[index]
-			movingPoint = self.movingPoints[index]
-			# Transform the point from the moving landmark with the original transform
-			transPoint = self.originalTransform.TransformPoint(movingPoint)
-			print str(movingPoint) + " -> " + str(transPoint)
-			fixedPoints.SetPoint(index, fixedPoint)
-			movingPoints.SetPoint(index, transPoint)
+		pointsetIndex = 0
+		for index in range(len(self.landmarkPointSets)):
+			pointset = self.landmarkPointSets[index]
+			if pointset[0] and pointset[1]:
+				fixedPoint = pointset[0]
+				movingPoint = pointset[1]
+				# Transform the point from the moving landmark with the original transform
+				transPoint = self.originalTransform.TransformPoint(movingPoint)
+				fixedPoints.SetPoint(pointsetIndex, fixedPoint)
+				movingPoints.SetPoint(pointsetIndex, transPoint)
+				pointsetIndex += 1
 
 		landmarkTransform = vtkLandmarkTransform()
 		if self.landmarkTransformType == 0:
@@ -190,95 +199,93 @@ class LandmarkTransformationTool(TransformationTool):
 		
 		self.multiWidget.transformations[-1] = Transformation(transform, Transformation.TypeLandmark)
 		self._updateLandmarkTransforms()
-		self.movingWidget.render()
 
 	def _updateLandmarkTransforms(self):
 		# Update the transforms
-		for landmark in self.landmarks:
-			if landmark.flag == "moving" and landmark.renderer == self.movingWidget.renderer:
-				landmark.transform = self.multiWidget.transformations.scalingTransform()
-				landmark.update()
-			elif landmark.flag == "moving" and landmark.renderer == self.multiWidget.renderer:
-				landmark.transform = self.multiWidget.transformations.completeTransform()
-				landmark.update()
+		for landmarkIndicator in self.landmarkIndicators:
+			if landmarkIndicator.flag == "moving" and landmarkIndicator.renderer == self.movingWidget.renderer:
+				landmarkIndicator.transform = self.multiWidget.transformations.scalingTransform()
+				landmarkIndicator.update()
+			elif landmarkIndicator.flag == "moving" and landmarkIndicator.renderer == self.multiWidget.renderer:
+				landmarkIndicator.transform = self.multiWidget.transformations.completeTransform()
+				landmarkIndicator.update()
 
 	def pickedFixedLocation(self, location):
 		"""
 		Place spheres in fixed widget and in multi-widget.
 		The input location should be in local data coordinates.
 		"""
-		if self.activeIndex >= len(self.fixedPoints):
-			# Add the location to the fixed points
-			self.fixedPoints.append(location)
-			# Create landmark for fixed widget
-			landmark = Landmark(index=self.activeIndex,
-				renderer=self.fixedWidget.renderer,
-				overlay=self.fixedWidget.rendererOverlay,
-				flag="fixed")
-			landmark.id = self.activeIndex
-			landmark.setPosition(location)
-
-			# Create landmark for multi widget
-			landmarkMulti = Landmark(index=self.activeIndex,
-				renderer=self.multiWidget.renderer,
-				overlay=self.multiWidget.rendererOverlay,
-				flag="fixed")
-			landmarkMulti.id = self.activeIndex
-			landmarkMulti.setPosition(location)
-
-			self.landmarks.append(landmark)
-			self.landmarks.append(landmarkMulti)
-		else:
-			landmarks = [x for x in self.landmarks if (x.id == self.activeIndex and x.flag == "fixed")]
-			for landmark in landmarks:
-				landmark.setPosition(location)
-			self.fixedPoints[self.activeIndex] = location
-
-		self.updateTransform()
-		self.updatedLandmarks.emit(self.fixedPoints, self.movingPoints)
-		self._update()
-		self.multiWidget.render()
+		self.pickedLocation(location, "fixed")
 
 	def pickedMovingLocation(self, location):
 		"""
-		Place spheres in moving widget and in multi-widget
-		Location is in local coordinates.
+		Place spheres in moving widget and in multi-widget.
+		The input location should be in local data coordinates.
 		"""
-		# Create a new landmark
-		if self.activeIndex >= len(self.movingPoints):
-			# Add the location to the moving points
-			self.movingPoints.append(location)
-			# Create landmark for moving widget
-			landmark = Landmark(index=self.activeIndex,
-				renderer=self.movingWidget.renderer,
-				overlay=self.movingWidget.rendererOverlay,
-				flag="moving")
-			landmark.setPosition(location)
+		self.pickedLocation(location, "moving")
 
-			# Create landmark for multi widget
-			landmarkMulti = Landmark(index=self.activeIndex,
-				renderer=self.multiWidget.renderer,
-				overlay=self.multiWidget.rendererOverlay,
-				flag="moving")
-			landmarkMulti.id = self.activeIndex
-			landmarkMulti.setPosition(location)
-			
-			self.landmarks.append(landmark)
-			self.landmarks.append(landmarkMulti)
-		else:
-			# Just update the location of the current active landmark
-			landmarks = [x for x in self.landmarks if (x.id == self.activeIndex and x.flag == "moving")]
+	def pickedLocation(self, location, landmarkType):
+		if self.activeIndex < len(self.landmarkPointSets):
+			# Just update the landmark
+			landmarks = [x for x in self.landmarkIndicators if (x.id == self.activeIndex and x.flag == landmarkType)]
 			for landmark in landmarks:
-				landmark.setPosition(location)
-			self.movingPoints[self.activeIndex] = location
+				landmark.position = location
+
+			index = 0 if landmarkType == "fixed" else 1
+			if not self.landmarkPointSets[self.activeIndex][index]:
+				# Add another landmark indicator if there was no landmark
+				self.addLandmarkIndicator(location, landmarkType)
+
+			self.landmarkPointSets[self.activeIndex][index] = location
+		else:
+			# Add the location to the landmark points as a set
+			landmarkSet = [location, None] if (landmarkType == "fixed") else [None, location]
+			self.landmarkPointSets.append(landmarkSet)
+			self.addLandmarkIndicator(location, landmarkType)
 
 		self.updateTransform()
-		self.updatedLandmarks.emit(self.fixedPoints, self.movingPoints)
+		self.updatedLandmarks.emit(self.landmarkPointSets)
 		self._update()
 		self.multiWidget.render()
+		self.movingWidget.render()
 
 	def _update(self):
-		for landmark in self.landmarks:
+		for landmark in self.landmarkIndicators:
 			landmark.active = landmark.id == self.activeIndex
 			landmark.update()
 		self._updateLandmarkTransforms()
+
+	def addLandmarkIndicator(self, location, landmarkType):
+		# Create landmark for the correct widget
+		widget = self.fixedWidget if landmarkType == "fixed" else self.movingWidget
+		landmark = self._landmarkForWidget(widget, landmarkType)
+		landmark.id = self.activeIndex
+		landmark.position = location
+
+		# Create landmark for multi widget
+		landmarkMulti = self._landmarkForWidget(self.multiWidget, landmarkType)
+		landmarkMulti.id = self.activeIndex
+		landmarkMulti.position = location
+
+		self.landmarkIndicators.append(landmark)
+		self.landmarkIndicators.append(landmarkMulti)
+
+	def _landmarkForWidget(self, widget, landmarkType):
+		return Landmark(index=self.activeIndex,
+			renderer=widget.renderer,
+			overlay=widget.rendererOverlay,
+			flag=landmarkType)
+
+	def _pointsEmpty(self, points):
+		for pointset in points:
+			if pointset[0] and pointset[1]:
+				return False
+		return True
+
+	def _numberOfSets(self, points):
+		count = 0
+		for pointset in points:
+			if pointset[0] is not None and pointset[1] is not None:
+				count += 1
+
+		return count

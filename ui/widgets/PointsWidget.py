@@ -34,24 +34,22 @@ class PointsWidget(QWidget):
 		self.setLayout(layout)
 
 	@Slot(list, list)
-	def setPoints(self, fixed, moving):
+	def setPoints(self, points):
 		self._clearLandmarkWidgets()
 		layout = self.layout()
-		for index in range(max(len(fixed), len(moving))):
-			landmarkWidget = LandmarkWidget()
+		for index in range(len(points)):
+			landmarkWidget = LandmarkLocationWidget()
 			landmarkWidget.setIndex(index)
 			landmarkWidget.active = (index == self.activeIndex)
 			landmarkWidget.activated.connect(self.landmarkIsActived)
-			if index < len(fixed):
-				landmarkWidget.setFixedLandmark(fixed[index])
-			if index < len(moving):
-				landmarkWidget.setMovingLandmark(moving[index])
+			landmarkWidget.setLandmarkSet(points[index])
 			layout.addWidget(landmarkWidget, index, 0)
 			self.landmarkWidgets.append(landmarkWidget)
 
 	def _clearLandmarkWidgets(self):
 		layout = self.layout()
 		for widget in self.landmarkWidgets:
+			widget.activated.disconnect()
 			layout.removeWidget(widget)
 			widget.deleteLater()
 		self.landmarkWidgets = []
@@ -64,13 +62,13 @@ class PointsWidget(QWidget):
 		self.activeLandmarkChanged.emit(self.activeIndex)
 
 
-class LandmarkWidget(QWidget):
+class LandmarkLocationWidget(QWidget):
 	# Signals
 	activated = Signal(int, bool)
 	removed = Signal(int)
 
 	def __init__(self):
-		super(LandmarkWidget, self).__init__()
+		super(LandmarkLocationWidget, self).__init__()
 		self._active = False
 
 		self.indexLabel = QLabel()
@@ -111,13 +109,21 @@ class LandmarkWidget(QWidget):
 		self._active = value
 		self._updateState()
 
+	def setLandmarkSet(self, points):
+		self.setFixedLandmark(points[0])
+		self.setMovingLandmark(points[1])
+
 	def setFixedLandmark(self, landmark):
+		if not landmark:
+			return
 		labelX = "%2.0f" % landmark[0]
 		labelY = "%2.0f" % landmark[1]
 		labelZ = "%2.0f" % landmark[2]
 		self.fixedButton.setText(labelX + ", " + labelY + ", " + labelZ)
 
 	def setMovingLandmark(self, landmark):
+		if not landmark:
+			return
 		labelX = "%2.0f" % landmark[0]
 		labelY = "%2.0f" % landmark[1]
 		labelZ = "%2.0f" % landmark[2]
