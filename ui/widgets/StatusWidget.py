@@ -83,13 +83,3 @@ class StatusWidget(QFrame):
 		painter.setRenderHint(QPainter.Antialiasing)
 		painter.setRenderHint(QPainter.HighQualityAntialiasing)
 		painter.drawRoundedRect(rect, 4, 4)
-
-	def moveEvent(self, ev):
-		pass
-
-	def resizeEvent(self, ev):
-		# print "Resize!"
-		pass
-
-	# def event(self, ev):
-	# 	print "Event!"
