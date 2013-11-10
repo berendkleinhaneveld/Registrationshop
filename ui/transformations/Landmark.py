@@ -1,10 +1,9 @@
 
 from vtk import vtkProp3DFollower
-from vtk import vtkRegularPolygonSource
-from vtk import vtkSphereSource
-from vtk import vtkPolyDataMapper
-from vtk import vtkActor
 from vtk import vtkTransform
+from core.vtkDrawing import CreateSphere
+from core.vtkDrawing import ColorActor
+from core.vtkDrawing import CreateCircle
 
 
 class Landmark(object):
@@ -23,13 +22,14 @@ class Landmark(object):
 		self.colorInactive = [1.0, 1.0, 0.6]
 
 		self._position = [0.0, 0.0, 0.0]  # coordinates in volume
+		self._scale = 1.0
 		self.transform = vtkTransform()
 		self.active = True
 		self.id = index
 
-		self.landmark = CreateSphere()
+		self.landmark = CreateSphere(1.0, [1, 1, 0.6])
 
-		self.landmarkIndicator = CreateCircle()
+		self.landmarkIndicator = CreateCircle(1.2)
 		self.landmarkIndicator.GetProperty().SetLineWidth(2)
 		self.landmarkIndicator.GetProperty().SetOpacity(0.7)
 
@@ -55,6 +55,16 @@ class Landmark(object):
 		"""
 		self._position = position
 		self.update()
+
+	@property
+	def scale(self):
+		return self._scale
+
+	@scale.setter
+	def scale(self, value):
+		self._scale = value
+		self.landmark.SetScale(value)
+		self.landmarkIndicator.SetScale(value)
 	
 	def update(self):
 		# Update color for landmark and landmarkIndicator
@@ -64,45 +74,10 @@ class Landmark(object):
 		else:
 			color = self.colorInactive
 			opacity = 0.4
-		self.landmark.GetProperty().SetColor(color[0], color[1], color[2])
-		self.landmarkIndicator.GetProperty().SetColor(color[0], color[1], color[2])
-		self.landmarkIndicator.GetProperty().SetOpacity(opacity)
+		ColorActor(self.landmark, color)
+		ColorActor(self.landmarkIndicator, color, opacity)
 
 		# Update position of landmark and landmarkFollower with the latest transform
 		location = list(self.transform.TransformPoint(self._position[0], self._position[1], self._position[2]))
 		self.landmark.SetPosition(location[0], location[1], location[2])
 		self.landmarkFollower.SetPosition(location[0], location[1], location[2])
-
-
-def CreateSphere():
-	sphereSource = vtkSphereSource()
-	sphereSource.SetRadius(20)
-	sphereSource.SetThetaResolution(6)
-	sphereSource.SetPhiResolution(6)
-
-	sphereMapper = vtkPolyDataMapper()
-	sphereMapper.SetInputConnection(sphereSource.GetOutputPort())
-
-	sphere = vtkActor()
-	sphere.PickableOff()
-	sphere.SetMapper(sphereMapper)
-	sphere.GetProperty().SetColor(1.0, 1.0, 0.6)
-
-	return sphere
-
-
-def CreateCircle():
-	circleSource = vtkRegularPolygonSource()
-	circleSource.SetNumberOfSides(30)
-	circleSource.SetRadius(28)
-	circleSource.SetGeneratePolygon(False)
-
-	circleMapper = vtkPolyDataMapper()
-	circleMapper.SetInputConnection(circleSource.GetOutputPort())
-
-	circle = vtkActor()
-	circle.PickableOff()
-	circle.SetMapper(circleMapper)
-	circle.GetProperty().SetColor(1.0, 0.5, 0.5)
-
-	return circle
