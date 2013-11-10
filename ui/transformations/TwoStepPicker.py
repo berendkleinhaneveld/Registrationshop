@@ -13,10 +13,8 @@ from core.operations import Subtract
 from core.operations import LineIntersectionWithTriangle
 from core.operations import Length
 from core.operations import Normalize
-from vtk import vtkLineSource
-from vtk import vtkSphereSource
-from vtk import vtkDataSetMapper
-from vtk import vtkActor
+from core.vtkDrawing import CreateSphere
+from core.vtkDrawing import CreateLine
 from vtk import vtkAssembly
 from vtk import vtkTransform
 from vtk import vtkMatrix4x4
@@ -109,15 +107,12 @@ class TwoStepPicker(Picker):
 		location, other = ClosestPoints(p1, p2, q1, q2, clamp=True)
 
 		if not self.sphereSource:
-			self.sphereSource = vtkSphereSource()
-			self.sphereSource.SetRadius(20)  # TODO: make relative to volume size
-			sphereMapper = vtkDataSetMapper()
-			sphereMapper.SetInputConnection(self.sphereSource.GetOutputPort())
-			sphereActor = vtkActor()
-			sphereActor.SetMapper(sphereMapper)
-			sphereActor.GetProperty().SetColor(0.2, 1, 0.5)
-			self._addToRender(sphereActor)
+			bounds = self.widget.imageData.GetBounds()
+			mean = reduce(lambda x, y: x + y, bounds) / 3.0
+			self.sphereSource = CreateSphere(mean / 50.0, [0.2, 1, 0.5])
+			self._addToRender(self.sphereSource)
 			self._createLocator()
+
 		self.sphereSource.SetCenter(location[0], location[1], location[2])
 		self.assemblyFollower.SetPosition(location[0], location[1], location[2])
 		lengthToLocation = Length(Subtract(location, p1))
@@ -183,9 +178,9 @@ class TwoStepPicker(Picker):
 		sortedIntersections = sortedLocations(intersections[0], intersections[1], self.camPosition())
 
 		# Draw line in renderer and in overlay renderer in world coordinates
-		self.lineActor = createLine(sortedIntersections[0], sortedIntersections[1])
+		self.lineActor = CreateLine(sortedIntersections[0], sortedIntersections[1])
 		self._addToRender(self.lineActor)
-		self.lineActorOverlay = createLine(sortedIntersections[0], sortedIntersections[1])
+		self.lineActorOverlay = CreateLine(sortedIntersections[0], sortedIntersections[1])
 		self.lineActorOverlay.GetProperty().SetColor(1.0, 1.0, 1.0)
 		self.lineActorOverlay.GetProperty().SetOpacity(0.5)
 		self.lineActorOverlay.GetProperty().SetLineStipplePattern(0xf0f0)
@@ -233,10 +228,10 @@ class TwoStepPicker(Picker):
 		halfSize = 25
 		gapSize = 15
 
-		upLine = createLine([0, gapSize, 0], [0, gapSize+halfSize, 0])
-		downLine = createLine([0, -gapSize, 0], [0, -(gapSize+halfSize), 0])
-		rightLine = createLine([gapSize, 0, 0], [gapSize+halfSize, 0, 0])
-		leftLine = createLine([-gapSize, 0, 0], [-(gapSize+halfSize), 0, 0])
+		upLine = CreateLine([0, gapSize, 0], [0, gapSize+halfSize, 0])
+		downLine = CreateLine([0, -gapSize, 0], [0, -(gapSize+halfSize), 0])
+		rightLine = CreateLine([gapSize, 0, 0], [gapSize+halfSize, 0, 0])
+		leftLine = CreateLine([-gapSize, 0, 0], [-(gapSize+halfSize), 0, 0])
 
 		assembly = vtkAssembly()
 		assembly.AddPart(upLine)
@@ -257,19 +252,6 @@ class TwoStepPicker(Picker):
 			sample = samples[index]
 			nextSample = samples[index+1]
 			self.sampleDiffs.append(abs(nextSample - sample))
-
-
-def createLine(p1, p2):
-	lineSource = vtkLineSource()
-	lineSource.SetPoint1(p1[0], p1[1], p1[2])
-	lineSource.SetPoint2(p2[0], p2[1], p2[2])
-
-	lineMapper = vtkDataSetMapper()
-	lineMapper.SetInputConnection(lineSource.GetOutputPort())
-
-	lineActor = vtkActor()
-	lineActor.SetMapper(lineMapper)
-	return lineActor
 
 
 def rayForMouse(renderer, selectionX, selectionY):
