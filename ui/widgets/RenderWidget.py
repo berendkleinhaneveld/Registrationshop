@@ -23,6 +23,10 @@ from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
 from PySide.QtCore import Slot
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from core.operations import Multiply
+from core.operations import Subtract
+from core.operations import Add
+from core.operations import Length
 
 # gridNudges describes the possible values for indicator intervals for the grid
 gridNudges = [1, 5, 10, 50, 100, 500, 1000]
@@ -216,7 +220,7 @@ class RenderWidget(QWidget):
 
 
 def CreateOrientationGridItems(bounds, camera):
-	# TODO: instead of line, spheres or other shapes could be used as nudges
+	# TODO: instead of lines, spheres or other shapes could be used as nudges
 	boundX = bounds[1] * 1.2
 	boundY = bounds[3] * 1.2
 	boundZ = bounds[5] * 1.2
@@ -224,7 +228,7 @@ def CreateOrientationGridItems(bounds, camera):
 	lineActorsX = []
 	lineActorsY = []
 	lineActorsZ = []
-	
+
 	# Create the main axes
 	lineActorsX.append(CreateLine([0, 0, 0], [boundX, 0, 0]))
 	lineActorsY.append(CreateLine([0, 0, 0], [0, boundY, 0]))
@@ -301,23 +305,23 @@ def CreateGridItems(bounds):
 	boundY = bounds[3]
 	boundZ = bounds[5]
 
+	linePartLength = 0.2
+
 	lineActors = []
-	lineActors.append(CreateLine([0, 0, 0], [boundX, 0, 0]))
-	lineActors.append(CreateLine([0, 0, 0], [0, boundY, 0]))
-	lineActors.append(CreateLine([0, 0, 0], [0, 0, boundZ]))
+	lineActors += CreateLineBeginAndEnd([0, 0, 0], [boundX, 0, 0], linePartLength)
+	lineActors += CreateLineBeginAndEnd([0, 0, 0], [0, boundY, 0], linePartLength)
+	lineActors += CreateLineBeginAndEnd([0, 0, 0], [0, 0, boundZ], linePartLength)
 
-	lineActors.append(CreateLine([boundX, boundY, boundZ], [boundX, boundY, 0]))
-	lineActors.append(CreateLine([boundX, boundY, boundZ], [0, boundY, boundZ]))
-	lineActors.append(CreateLine([boundX, boundY, boundZ], [boundX, 0, boundZ]))
+	lineActors += CreateLineBeginAndEnd([boundX, boundY, boundZ], [boundX, boundY, 0], linePartLength)
+	lineActors += CreateLineBeginAndEnd([boundX, boundY, boundZ], [0, boundY, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([boundX, boundY, boundZ], [boundX, 0, boundZ], linePartLength)
 
-	lineActors.append(CreateLine([boundX, 0, 0], [boundX, 0, boundZ]))
-	lineActors.append(CreateLine([boundX, 0, 0], [boundX, boundY, 0]))
-	lineActors.append(CreateLine([0, boundY, 0], [0, boundY, boundZ]))
-	lineActors.append(CreateLine([0, boundY, 0], [boundX, boundY, 0]))
-	lineActors.append(CreateLine([0, 0, boundZ], [0, boundY, boundZ]))
-	lineActors.append(CreateLine([0, 0, boundZ], [boundX, 0, boundZ]))
-
-	# TODO: only show the corners instead of full box
+	lineActors += CreateLineBeginAndEnd([boundX, 0, 0], [boundX, 0, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([boundX, 0, 0], [boundX, boundY, 0], linePartLength)
+	lineActors += CreateLineBeginAndEnd([0, boundY, 0], [0, boundY, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([0, boundY, 0], [boundX, boundY, 0], linePartLength)
+	lineActors += CreateLineBeginAndEnd([0, 0, boundZ], [0, boundY, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([0, 0, boundZ], [boundX, 0, boundZ], linePartLength)
 
 	dataGrid = vtkAssembly()
 	for lineActor in lineActors:
@@ -344,3 +348,19 @@ def CreateLine(p1, p2):
 	lineActor = vtkActor()
 	lineActor.SetMapper(lineMapper)
 	return lineActor
+
+
+def CreateLineBeginAndEnd(p1, p2, length):
+	"""
+	Length is value between 0 and 0.5 to specify how long
+	each begin and end part is compared to the complete line.
+	"""
+	point1 = p1
+	point2 = Add(p1, Multiply(Subtract(p2, p1), length))
+	point3 = p2
+	point4 = Add(p2, Multiply(Subtract(p1, p2), length))
+
+	line1 = CreateLine(point1, point2)
+	line2 = CreateLine(point3, point4)
+	
+	return [line1, line2]
