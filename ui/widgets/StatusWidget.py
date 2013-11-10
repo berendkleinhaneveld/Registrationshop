@@ -34,6 +34,9 @@ class StatusWidget(QFrame):
 		self._font = QFont()
 		self._font.setPointSize(10)
 
+		self._pen = QPen(QColor(100, 100, 100, 255))
+		self._pen.setWidth(.1)
+
 		self.label = QLabel()
 		self.label.setWordWrap(True)
 		self.label.setFont(self._font)
@@ -76,9 +79,8 @@ class StatusWidget(QFrame):
 		offset = 0.5
 		rect = QRectF(2.0+offset, 2.0+offset, width+offset, height+offset)
 		painter = QPainter(self)
-		pen = QPen(QColor(100, 100, 100, 255))
-		pen.setWidth(.1)
-		painter.setPen(pen)
+		
+		painter.setPen(self._pen)
 		painter.setBrush(QColor(self._color[0], self._color[1], self._color[2]))
 		painter.setRenderHint(QPainter.Antialiasing)
 		painter.setRenderHint(QPainter.HighQualityAntialiasing)
