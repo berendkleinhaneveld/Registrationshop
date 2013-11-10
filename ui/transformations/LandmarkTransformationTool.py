@@ -250,16 +250,23 @@ class LandmarkTransformationTool(TransformationTool):
 		self._updateLandmarkTransforms()
 
 	def addLandmarkIndicator(self, location, landmarkType):
+		imageData = self.fixedWidget.imageData if landmarkType == "fixed" else self.movingWidget.imageData
+		bounds = imageData.GetBounds()
+		mean = reduce(lambda x, y: x + y, bounds) / 3.0
+		scale = mean / 50.0
+
 		# Create landmark for the correct widget
 		widget = self.fixedWidget if landmarkType == "fixed" else self.movingWidget
 		landmark = self._landmarkForWidget(widget, landmarkType)
 		landmark.id = self.activeIndex
 		landmark.position = location
+		landmark.scale = scale
 
 		# Create landmark for multi widget
 		landmarkMulti = self._landmarkForWidget(self.multiWidget, landmarkType)
 		landmarkMulti.id = self.activeIndex
 		landmarkMulti.position = location
+		landmarkMulti.scale = scale
 
 		self.landmarkIndicators.append(landmark)
 		self.landmarkIndicators.append(landmarkMulti)
