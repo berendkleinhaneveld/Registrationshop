@@ -6,10 +6,8 @@ TransformationParameterWidget
 """
 
 from PySide.QtGui import QWidget
-# from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QPushButton
-from PySide.QtGui import QScrollArea
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 
@@ -24,21 +22,23 @@ class TransformationParameterWidget(QWidget):
 
 		self.cancelButton = QPushButton("Cancel")
 		self.cancelButton.clicked.connect(self.cancelButtonClicked)
+
 		self.applyButton = QPushButton("Apply")
 		self.applyButton.clicked.connect(self.applyButtonClicked)
 
-		self.scrollLayout = QGridLayout()
-		self.scrollLayout.setAlignment(Qt.AlignTop)
+		self.mainLayout = QGridLayout()
+		self.mainLayout.setSpacing(0)
+		self.mainLayout.setContentsMargins(0, 0, 0, 0)
 
-		self.scrollArea = QScrollArea()
-		self.scrollArea.setLayout(self.scrollLayout)
+		self.widget = QWidget()
+		self.widget.setLayout(self.mainLayout)
 
 		self.showControls(False)
 
 		self.transformationWidget = None
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(self.scrollArea, 0, 0, 1, 2)
+		layout.addWidget(self.widget, 0, 0, 1, 2)
 		layout.addWidget(self.cancelButton, 1, 0)
 		layout.addWidget(self.applyButton, 1, 1)
 		self.setLayout(layout)
@@ -49,7 +49,7 @@ class TransformationParameterWidget(QWidget):
 		self.cleanUpTransformWidget()
 
 		self.transformationWidget = self.transformationTool.getParameterWidget()
-		self.scrollLayout.addWidget(self.transformationWidget)
+		self.mainLayout.addWidget(self.transformationWidget)
 		self.showControls(True)
 
 	@Slot()
@@ -77,11 +77,11 @@ class TransformationParameterWidget(QWidget):
 		self.transformationTool = None
 
 	def showControls(self, show):
-		self.scrollArea.setVisible(show)
+		self.widget.setVisible(show)
 		self.applyButton.setVisible(show)
 		self.cancelButton.setVisible(show)
 
 	def cleanUpTransformWidget(self):
-		item = self.scrollLayout.takeAt(0)
+		item = self.mainLayout.takeAt(0)
 		if item:
 			item.widget().deleteLater()

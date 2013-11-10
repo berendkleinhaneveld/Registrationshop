@@ -56,6 +56,7 @@ class LandmarkTransformationTool(TransformationTool):
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
+		layout.setContentsMargins(0, 0, 0, 0)
 		layout.addWidget(QLabel("Transform type"), 0, 0)
 		layout.addWidget(self.landmarkComboBox, 0, 1)
 		layout.addWidget(self.pointsWidget, 1, 0, 1, 2)

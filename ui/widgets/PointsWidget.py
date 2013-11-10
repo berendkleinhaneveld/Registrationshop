@@ -8,9 +8,14 @@ from PySide.QtGui import QWidget
 from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QPushButton
+from PySide.QtGui import QScrollArea
+from PySide.QtGui import QSpacerItem
+from PySide.QtGui import QFont
+from PySide.QtGui import QFrame
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 from PySide.QtCore import Signal
+from ui.widgets import Style
 
 
 class PointsWidget(QWidget):
@@ -26,17 +31,31 @@ class PointsWidget(QWidget):
 		self.landmarkWidgets = []
 		self.activeIndex = 0
 
+		self.scrollArea = QScrollArea(self)
+		self.scrollArea.setFrameShape(QFrame.NoFrame)
+		self.scrollArea.setAutoFillBackground(False)
+		self.scrollArea.setAttribute(Qt.WA_TranslucentBackground)
+		self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+		self.scrollArea.setWidgetResizable(True)
+
+		self.landmarkLocationsWidget = QWidget()
+		Style.styleWidgetForTab(self.landmarkLocationsWidget)
+		landmarkLocationsLayout = QGridLayout()
+		landmarkLocationsLayout.setAlignment(Qt.AlignTop)
+		landmarkLocationsLayout.setContentsMargins(0, 0, 0, 0)
+		landmarkLocationsLayout.setSpacing(0)
+		self.landmarkLocationsWidget.setLayout(landmarkLocationsLayout)
+		self.scrollArea.setWidget(self.landmarkLocationsWidget)
+
 		layout = QGridLayout()
-		layout.setAlignment(Qt.AlignTop)
 		layout.setContentsMargins(0, 0, 0, 0)
-		layout.setVerticalSpacing(0)
-		layout.setHorizontalSpacing(0)
+		layout.addWidget(self.scrollArea)
 		self.setLayout(layout)
 
 	@Slot(list, list)
 	def setPoints(self, points):
 		self._clearLandmarkWidgets()
-		layout = self.layout()
+		layout = self.landmarkLocationsWidget.layout()
 		for index in range(len(points)):
 			landmarkWidget = LandmarkLocationWidget()
 			landmarkWidget.setIndex(index)
@@ -47,7 +66,7 @@ class PointsWidget(QWidget):
 			self.landmarkWidgets.append(landmarkWidget)
 
 	def _clearLandmarkWidgets(self):
-		layout = self.layout()
+		layout = self.landmarkLocationsWidget.layout()
 		for widget in self.landmarkWidgets:
 			widget.activated.disconnect()
 			layout.removeWidget(widget)
@@ -70,25 +89,28 @@ class LandmarkLocationWidget(QWidget):
 	def __init__(self):
 		super(LandmarkLocationWidget, self).__init__()
 		self._active = False
+		self._font = QFont()
+		self._font.setPointSize(10)
 
 		self.indexLabel = QLabel()
-		self.indexLabel.setMaximumWidth(15)
-		self.indexLabel.setMinimumWidth(15)
+		self.indexLabel.setMaximumWidth(8)
+		self.indexLabel.setMinimumWidth(8)
 
 		self.doneButton = QPushButton("Done")
-		self.doneButton.setMaximumWidth(80)
-		self.doneButton.setMinimumWidth(80)
+		self.doneButton.setMaximumWidth(50)
+		self.doneButton.setFont(self._font)
 		self.doneButton.clicked.connect(self.doneButtonClicked)
 
 		self.fixedButton = QPushButton("")
+		self.fixedButton.setFont(self._font)
 		self.movingButton = QPushButton("")
+		self.movingButton.setFont(self._font)
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
 		layout.setContentsMargins(0, 0, 0, 0)
+		layout.setHorizontalSpacing(4)
 		layout.setVerticalSpacing(0)
-		layout.setColumnStretch(1, 1)
-		layout.setColumnStretch(2, 1)
 		layout.addWidget(self.indexLabel, 0, 0)
 		layout.addWidget(self.fixedButton, 0, 1)
 		layout.addWidget(self.movingButton, 0, 2)
