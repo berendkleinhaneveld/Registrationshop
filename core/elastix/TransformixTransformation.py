@@ -32,6 +32,9 @@ class TransformixTransformation(object):
 		matrix = vtkMatrix4x4()
 		matrix.DeepCopy(transformMatrix)
 		matrix.Invert()
+		if isIdentity(matrix):
+			return None
+
 		elemList = listFromMatrix(matrix)
 		imageReader = DataReader()
 		imageData = imageReader.GetImageData(self.dataset)
@@ -62,6 +65,20 @@ class TransformixTransformation(object):
 		return transformation
 
 
+def isIdentity(matrix):
+	for i in range(4):
+		for j in range(4):
+			element = matrix.GetElement(i, j)
+			if i == j:
+				if not numberEquals(element, 1.0):
+					return False
+			else:
+				if not numberEquals(element, 0.0):
+					return False
+
+	return True
+
+
 def listFromMatrix(matrix):
 	"""
 	Returns list of the elements of a vtkMatrix4x4 object.
@@ -76,3 +93,10 @@ def listFromMatrix(matrix):
 			element = matrix.GetElement(k, 3)
 			result.append(element)
 	return result
+
+
+def numberEquals(number, otherNumber):
+	eps = 0.00001
+	if abs(number - otherNumber) < eps:
+		return True
+	return False

@@ -77,7 +77,7 @@ class DeformableTransformationTool(TransformationTool):
 		if parameters:
 			parameters.saveToFile(initialTransformPath)
 		else:
-			initialTransform = None
+			initialTransformPath = None
 
 		command = ElastixCommand(fixedData=currentProject.fixedData,
 			movingData=currentProject.movingData,
