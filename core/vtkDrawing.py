@@ -27,12 +27,10 @@ from core.operations import Multiply
 
 def ColorActor(actor, color, opacity=None):
 	"""
-	Give the actor a custom color is one is provided.
+	Give the actor a custom color and / or opacity.
 	"""
-	if not color:
-		return
-	
-	actor.GetProperty().SetColor(color[0], color[1], color[2])
+	if color:
+		actor.GetProperty().SetColor(color[0], color[1], color[2])
 	if opacity:
 		actor.GetProperty().SetOpacity(opacity)
 
@@ -171,6 +169,9 @@ def CreateBounds(bounds):
 	lineActors += CreateLineBeginAndEnd([0, 0, boundZ], [0, boundY, boundZ], linePartLength)
 	lineActors += CreateLineBeginAndEnd([0, 0, boundZ], [boundX, 0, boundZ], linePartLength)
 
+	for lineActor in lineActors:
+		ColorActor(lineActor, color=None, opacity=0.5)
+
 	mean = reduce(lambda x, y: x + y, bounds) / 3.0
 	sphereActor = CreateSphere(mean / 25.0)
 	sphereActor.SetPosition(0, 0, 0)
@@ -192,6 +193,8 @@ def CreateOrientationGrid(bounds, camera):
 	lineActorsY = []
 	lineActorsZ = []
 
+	lineText = []
+
 	# Create the main axes
 	lineActorsX.append(CreateLine([0, 0, 0], [boundX, 0, 0]))
 	lineActorsY.append(CreateLine([0, 0, 0], [0, boundY, 0]))
@@ -200,11 +203,18 @@ def CreateOrientationGrid(bounds, camera):
 	# Create the nudges on the X axis
 	subdivSize = boundX / 10
 	subdivSize = ClosestToMeasurement(subdivSize)
-	handleSize = subdivSize / 5.0
+	smallHandleSize = subdivSize / 5.0
+	bigHandleSize = 2 * smallHandleSize
 
 	for index in range(1, int(boundX / subdivSize)):
+		handleSize = smallHandleSize if index % 5 != 0 else bigHandleSize
 		lineActorsX.append(CreateLine([index * subdivSize, 0, 0], [index * subdivSize, handleSize, 0]))
 		lineActorsX.append(CreateLine([index * subdivSize, 0, 0], [index * subdivSize, 0, handleSize]))
+		if index > 0 and index % 5 == 0:
+			textItem = CreateTextItem(str(index * subdivSize), 0.4 * subdivSize, camera)
+			textItem.SetPosition([index * subdivSize, -handleSize, -handleSize])
+			ColorActor(textItem, color=[0.6, 0.6, 0.6])
+			lineText.append(textItem)
 
 	textItemX = CreateTextItem("X", 0.5 * subdivSize, camera)
 	textItemX.SetPosition([boundX, 0, 0])
@@ -212,11 +222,17 @@ def CreateOrientationGrid(bounds, camera):
 	# Create the nudges on the Y axis
 	subdivSize = boundY / 10
 	subdivSize = ClosestToMeasurement(subdivSize)
-	handleSize = subdivSize / 5.0
+	smallHandleSize = subdivSize / 5.0
 
 	for index in range(1, int(boundY / subdivSize)):
+		handleSize = smallHandleSize if index % 5 != 0 else bigHandleSize
 		lineActorsY.append(CreateLine([0, index * subdivSize, 0], [handleSize, index * subdivSize, 0]))
 		lineActorsY.append(CreateLine([0, index * subdivSize, 0], [0, index * subdivSize, handleSize]))
+		if index > 0 and index % 5 == 0:
+			textItem = CreateTextItem(str(index * subdivSize), 0.4 * subdivSize, camera)
+			textItem.SetPosition([-smallHandleSize, index * subdivSize, -smallHandleSize])
+			ColorActor(textItem, color=[0.6, 0.6, 0.6])
+			lineText.append(textItem)
 
 	textItemY = CreateTextItem("Y", 0.5 * subdivSize, camera)
 	textItemY.SetPosition([0, boundY, 0])
@@ -224,11 +240,17 @@ def CreateOrientationGrid(bounds, camera):
 	# Create the nudges on the Z axis
 	subdivSize = boundZ / 10
 	subdivSize = ClosestToMeasurement(subdivSize)
-	handleSize = subdivSize / 5.0
+	smallHandleSize = subdivSize / 5.0
 
 	for index in range(1, int(boundZ / subdivSize)):
+		handleSize = smallHandleSize if index % 5 != 0 else bigHandleSize
 		lineActorsZ.append(CreateLine([0, 0, index * subdivSize], [handleSize, 0, index * subdivSize]))
 		lineActorsZ.append(CreateLine([0, 0, index * subdivSize], [0, handleSize, index * subdivSize]))
+		if index > 0 and index % 5 == 0:
+			textItem = CreateTextItem(str(index * subdivSize), 0.4 * subdivSize, camera)
+			textItem.SetPosition([-handleSize, -handleSize, index * subdivSize])
+			ColorActor(textItem, color=[0.6, 0.6, 0.6])
+			lineText.append(textItem)
 
 	textItemZ = CreateTextItem("Z", 0.5 * subdivSize, camera)
 	textItemZ.SetPosition([0, 0, boundZ])
@@ -246,12 +268,12 @@ def CreateOrientationGrid(bounds, camera):
 	for lineActor in (lineActorsX + lineActorsY + lineActorsZ):
 		dataGrid.AddPart(lineActor)
 
-	return [dataGrid, textItemX, textItemY, textItemZ]
+	return [dataGrid, textItemX, textItemY, textItemZ] + lineText
 
 
 def ClosestToMeasurement(number):
 	# gridNudges describes the possible values for indicator intervals for the grid
-	gridNudges = [1, 5, 10, 50, 100, 500, 1000]
+	gridNudges = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000]
 
 	# Calculate diff
 	diff = map(lambda x: abs(x - number), gridNudges)
