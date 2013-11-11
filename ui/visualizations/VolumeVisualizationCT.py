@@ -99,6 +99,7 @@ class VolumeVisualizationCT(VolumeVisualization):
 		:rtype: QWidget
 		"""
 		layout = QGridLayout()
+		layout.setContentsMargins(0, 0, 0, 0)
 		layout.setAlignment(Qt.AlignTop)
 
 		self.sliders = []

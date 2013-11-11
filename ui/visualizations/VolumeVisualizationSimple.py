@@ -74,6 +74,7 @@ class VolumeVisualizationSimple(VolumeVisualization):
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
+		layout.setContentsMargins(0, 0, 0, 0)
 		layout.addWidget(QLabel("Lower threshold"), 0, 0)
 		layout.addWidget(self.lowerBoundSlider, 0, 1)
 		layout.addWidget(self.lowerBoundLabel, 0, 2)

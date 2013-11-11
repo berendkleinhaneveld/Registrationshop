@@ -56,6 +56,7 @@ class VolumeVisualizationTransferFunction(VolumeVisualization):
 			self.histogramWidget.setImageData(self.imageData)
 
 		layout = QGridLayout()
+		layout.setContentsMargins(0, 0, 0, 0)
 		layout.addWidget(self.histogramWidget, 0, 0, 1, 3)
 
 		widget = QWidget()

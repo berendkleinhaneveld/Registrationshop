@@ -77,6 +77,7 @@ class VolumeVisualizationMIDA(VolumeVisualization):
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
+		layout.setContentsMargins(0, 0, 0, 0)
 		layout.addWidget(QLabel("Window"), 0, 0)
 		layout.addWidget(self.windowSlider, 0, 1)
 		layout.addWidget(self.windowLabel, 0, 2)
