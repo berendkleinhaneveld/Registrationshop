@@ -23,6 +23,8 @@ from PySide.QtCore import Signal
 from PySide.QtCore import Slot
 from ui.transformations import TransformationList
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from core.vtkDrawing import CreateBounds
+from core.vtkDrawing import CreateOrientationGrid
 
 
 class MultiRenderWidget(QWidget):
@@ -89,6 +91,10 @@ class MultiRenderWidget(QWidget):
 		self.volume.SetMapper(self.mapper)
 		self.renderer.AddViewProp(self.volume)
 
+		self.fixedGridItems = []
+		self.movingGridItems = []
+		self.orientationGridItems = []
+
 		# Create two empty datasets
 		self.fixedImageData = CreateEmptyImageData()
 		self.movingImageData = CreateEmptyImageData()
@@ -108,14 +114,6 @@ class MultiRenderWidget(QWidget):
 		self._transformations = TransformationList()
 		self._transformations.transformationChanged.connect(self.updateTransformation)
 		self._shouldResetCamera = False
-
-		axesActor = vtkAxesActor()
-		self._orientationWidget = vtkOrientationMarkerWidget()
-		self._orientationWidget.SetViewport(0.05, 0.05, 0.3, 0.3)
-		self._orientationWidget.SetOrientationMarker(axesActor)
-		self._orientationWidget.SetInteractor(self.rwi)
-		self._orientationWidget.EnabledOn()
-		self._orientationWidget.InteractiveOff()
 
 		self.setMinimumWidth(400)
 		self.setMinimumHeight(400)
@@ -155,6 +153,8 @@ class MultiRenderWidget(QWidget):
 
 	@Slot(object)
 	def setMovingData(self, imageData):
+		self._cleanUpGrids()
+
 		self.movingImageData = imageData
 		if self.movingImageData is None:
 			self.movingImageData = CreateEmptyImageData()
@@ -164,6 +164,7 @@ class MultiRenderWidget(QWidget):
 		self.mapper.SetInputData(0, self.fixedImageData)
 		self.mapper.SetInputData(1, self.movingImageData)
 
+		self._updateGrids()
 		self._shouldResetCamera = True
 
 	def setVolumeVisualization(self, visualization):
@@ -186,6 +187,28 @@ class MultiRenderWidget(QWidget):
 				self._updateMapper(self.visualization.movingVisualization, 2)
 
 		self._updateVolumeProperties()
+
+	def _updateGrids(self):
+		if self.movingImageData and self.movingImageData.GetDimensions() != (3, 3, 3):
+			self.movingGridItems = CreateBounds(self.movingImageData.GetBounds())
+
+		boundsFixed = self.fixedImageData.GetBounds()
+		boundsMoving = self.movingImageData.GetBounds()
+		maxBounds = map(lambda x, y: max(x, y), boundsFixed, boundsMoving)
+		self.orientationGridItems = CreateOrientationGrid(maxBounds, self.renderer.GetActiveCamera())
+		for item in (self.movingGridItems + self.fixedGridItems + self.orientationGridItems):
+			self.renderer.AddViewProp(item)
+
+	def _cleanUpGrids(self):
+		for item in self.fixedGridItems:
+			self.renderer.RemoveViewProp(item)
+		for item in self.movingGridItems:
+			self.renderer.RemoveViewProp(item)
+		for item in self.orientationGridItems:
+			self.renderer.RemoveViewProp(item)
+		self.fixedGridItems = []
+		self.movingGridItems = []
+		self.orientationGridItems = []
 
 	# Properties
 
@@ -211,6 +234,8 @@ class MultiRenderWidget(QWidget):
 	def updateTransformation(self):
 		transform = self._transformations.completeTransform()
 		self.mapper.SetSecondInputUserTransform(transform)
+		for item in self.movingGridItems:
+			item.SetUserTransform(transform)
 		self.render()
 
 	# Private methods
