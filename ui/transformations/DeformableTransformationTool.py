@@ -56,11 +56,11 @@ class DeformableTransformationTool(TransformationTool):
 			the transformed data. So that the reference to the old
 			data is not lost.
 		"""
-		self.startedElastix.emit("Transforming data...")
-
 		statusWidget = StatusWidget.Instance()
 		statusWidget.setText("Please grab a cup of coffee while Elastix " +
 			"performs the registration: this might take a while...")
+
+		self.startedElastix.emit("Transforming data...")
 
 		currentProject = ProjectController.Instance().currentProject
 		path = currentProject.folder
