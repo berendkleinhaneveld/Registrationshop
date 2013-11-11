@@ -81,8 +81,7 @@ class TwoStepPicker(Picker):
 		p1 = lineSource.GetPoint1()
 		p2 = lineSource.GetPoint2()
 		part = Add(p1, Multiply(Subtract(p2, p1), position))
-		if self.sphereSource:
-			self.sphereSource.SetCenter(part[0], part[1], part[2])
+		self.sphereSource.SetCenter(part[0], part[1], part[2])
 		self.assemblyFollower.SetPosition(part[0], part[1], part[2])
 		self.widget.render()
 
@@ -106,6 +105,36 @@ class TwoStepPicker(Picker):
 		# location is the closest point on the drawn line
 		location, other = ClosestPoints(p1, p2, q1, q2, clamp=True)
 
+		lengthToLocation = Length(Subtract(location, p1))
+		lengthRay = Length(Subtract(p2, p1))
+		locationRatio = lengthToLocation / lengthRay
+
+		# If shift key is pushed in, try to snap to logical points along the ray
+		if iren.GetShiftKey() != 0:
+			# Get the index of the sample that is closest to the point on the ray
+			sampleIndex = int(len(self.sampleDiffs) * locationRatio)
+			# Sample size is the amount of samples before and after the sample index
+			# that are going to be analyzed
+			sampleSize = 10
+			# Calculate the lower and upper bound index
+			lowerBoundIndex = max(0, sampleIndex-sampleSize)
+			upperBoundIndex = min(len(self.sampleDiffs), sampleIndex+sampleSize)
+			samples = self.sampleDiffs[lowerBoundIndex:upperBoundIndex]
+			# Create a penalty for the local samples that gives penalties to samples
+			# that lay further away from the mouse
+			penalty = [(sampleSize + 1) / float(1 + abs(i-sampleSize)) for i in range(2*sampleSize+1)]
+			offset = lowerBoundIndex - (sampleIndex - sampleSize)
+			resamples = []
+			for i in range(len(samples)):
+				resamples.append(samples[i] * penalty[i+offset])
+			maxIndex = resamples.index(max(resamples))
+
+			# lowerBoundIndex is the index of where the sampling starts
+			# maxIndex is number that counts from the lowerBoundIndex
+			locationIndex = lowerBoundIndex + maxIndex
+			locationRatio = locationIndex / float(len(self.sampleDiffs))
+			location = Add(p1, Multiply(Subtract(p2, p1), locationRatio))
+
 		if not self.sphereSource:
 			bounds = self.widget.imageData.GetBounds()
 			mean = reduce(lambda x, y: x + y, bounds) / 3.0
@@ -115,9 +144,6 @@ class TwoStepPicker(Picker):
 
 		self.sphereSource.SetCenter(location[0], location[1], location[2])
 		self.assemblyFollower.SetPosition(location[0], location[1], location[2])
-		lengthToLocation = Length(Subtract(location, p1))
-		lengthRay = Length(Subtract(p2, p1))
-		locationRatio = lengthToLocation / lengthRay
 		self.locatorUpdated.emit(locationRatio)
 		self.widget.render()
 
@@ -143,7 +169,8 @@ class TwoStepPicker(Picker):
 	def _pickPosition(self):
 		# point in world coordinates
 		point = list(self.sphereSource.GetCenter())
-		matrix = self.widget.volume.GetMatrix()
+		matrix = vtkMatrix4x4()
+		matrix.DeepCopy(self.widget.volume.GetMatrix())
 		transform = vtkTransform()
 		transform.SetMatrix(matrix)
 		transform.Inverse()
@@ -171,7 +198,6 @@ class TwoStepPicker(Picker):
 		transform.SetMatrix(matrix)
 
 		intersections = intersectionsWithBounds(bounds, transform, point1, point2)
-
 		if not intersections:
 			return
 
@@ -186,12 +212,9 @@ class TwoStepPicker(Picker):
 		self.lineActorOverlay.GetProperty().SetLineStipplePattern(0xf0f0)
 		self.lineActorOverlay.GetProperty().SetLineStippleRepeatFactor(1)
 		self._addToOverlay(self.lineActorOverlay)
-		# Note: the line has no transformation, so it will not update
-		# together with the transformation of the volume.
 		self.widget.render()
 
-		# Sample volume for ray profile
-		# Should be done in local coordinates, so the intersections
+		# Sample volume for ray profile: should be done in local coordinates, so the intersections
 		# have to be transformed again
 		transform.Inverse()
 		localIntersects = map(lambda x: list(transform.TransformPoint(x[0], x[1], x[2])), sortedIntersections)
