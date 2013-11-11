@@ -22,7 +22,7 @@ def styleWidgetForTab(widget):
 	should only be set for that object, so by naming it and setting
 	the style only for objects with that name the bug can be worked
 	around.
-	
+
 	Use this function whenever a (container) widget is needed inside a
 	QScrollArea in a QTabWidget.
 	:type widget: QWidget
@@ -30,3 +30,7 @@ def styleWidgetForTab(widget):
 	if sys.platform.startswith("darwin"):
 		widget.setObjectName("tabWidget")
 		widget.setStyleSheet("#tabWidget {background: rgb(229, 229, 229);}")
+	elif sys.platform.startswith("linux"):
+		# This makes it look pretty on Elementary theme
+		widget.setObjectName("tabWidget")
+		widget.setStyleSheet("#tabWidget {background: rgb(236, 236, 236);}")
