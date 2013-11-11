@@ -120,14 +120,6 @@ class RenderWidget(QWidget):
 		# Don't call render, because camera should only be reset
 		# when a volume property is loaded
 
-	def _cleanUpGrids(self):
-		for item in self.gridItems:
-			self.renderer.RemoveViewProp(item)
-		for item in self.orientationGridItems:
-			self.renderer.RemoveViewProp(item)
-		self.gridItems = []
-		self.orientationGridItems = []
-
 	@Slot(object)
 	def setVolumeVisualization(self, volumeVisualization):
 		"""
@@ -193,6 +185,14 @@ class RenderWidget(QWidget):
 		self.orientationGridItems = CreateOrientationGrid(bounds, self.renderer.GetActiveCamera())
 		for item in self.orientationGridItems:
 			self.renderer.AddViewProp(item)
+
+	def _cleanUpGrids(self):
+		for item in self.gridItems:
+			self.renderer.RemoveViewProp(item)
+		for item in self.orientationGridItems:
+			self.renderer.RemoveViewProp(item)
+		self.gridItems = []
+		self.orientationGridItems = []
 
 	@Slot(object)
 	def transformationsUpdated(self, transformations):
