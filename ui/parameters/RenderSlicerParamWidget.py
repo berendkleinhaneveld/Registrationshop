@@ -12,9 +12,10 @@ from PySide.QtGui import QCheckBox
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 
+
 class RenderSlicerParamWidget(QWidget):
 	"""
-	RenderSlicerParamWidget shows parameters with which slicers can be 
+	RenderSlicerParamWidget shows parameters with which slicers can be
 	manipulated.
 	"""
 	def __init__(self, renderController, parent=None):
@@ -24,12 +25,12 @@ class RenderSlicerParamWidget(QWidget):
 		self.renderController.slicesChanged.connect(self.setSlices)
 
 		self.slicesLabel = QLabel("Show slices for directions:")
-		self.sliceLabelTexts = ["x", "y", "z"]
+		self.sliceLabelTexts = ["x:", "y:", "z:"]
 		self.sliceLabels = [QLabel(text) for text in self.sliceLabelTexts]
 		self.sliceCheckBoxes = [QCheckBox() for i in range(3)]
 		for index in range(3):
 			self.sliceCheckBoxes[index].clicked.connect(self.checkBoxChanged)
-			self.sliceLabels[index].setAlignment(Qt.AlignRight)
+			self.sliceLabels[index].setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 			self.sliceCheckBoxes[index].setEnabled(True)
 
 		# Create a nice layout for the labels

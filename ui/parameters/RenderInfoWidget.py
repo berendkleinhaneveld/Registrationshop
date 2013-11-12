@@ -75,10 +75,10 @@ class RenderInfoWidget(QWidget):
 			voxsField = QLabel("Voxels:")
 			rangField = QLabel("Range:")
 
-			nameField.setAlignment(Qt.AlignRight)
-			dimsField.setAlignment(Qt.AlignRight)
-			voxsField.setAlignment(Qt.AlignRight)
-			rangField.setAlignment(Qt.AlignRight)
+			nameField.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+			dimsField.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+			voxsField.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+			rangField.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
 			# Create 'dynamic' labels
 			self.labelTitle = QLabel(nameText)
