@@ -11,6 +11,10 @@ Registrationshop
 import sys
 import os.path
 
+# Add external folders to sys path
+resizerPath = "./external/columnresizer/src/"
+sys.path.append(os.path.abspath(resizerPath))
+
 # PySide stuff
 from PySide.QtGui import QMainWindow
 from PySide.QtGui import QApplication
