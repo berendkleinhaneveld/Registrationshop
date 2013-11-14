@@ -8,6 +8,7 @@ from ui.widgets.histogram import Histogram
 from ui.widgets.histogram import HistogramWidget
 from ui.widgets.transferfunction import TransferFunctionNodeItem
 from ui.widgets.transferfunction import TransferFunctionItem
+from ui.widgets.ColorWidget import ColorButton
 from core.data.DataAnalyzer import DataAnalyzer
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
@@ -16,7 +17,6 @@ from PySide.QtGui import QPen
 from PySide.QtGui import QLabel
 from PySide.QtGui import QLineEdit
 from PySide.QtGui import QPushButton
-from PySide.QtGui import QPainter
 from PySide.QtGui import QColorDialog
 from PySide.QtGui import QColor
 from PySide.QtCore import QLineF
@@ -216,6 +216,7 @@ class NodeItemWidget(QWidget):
 		self.valueEdit = QLineEdit()
 		self.opacityEdit = QLineEdit()
 		self.colorButton = ColorButton()
+		self.colorButton.setMaximumWidth(100)
 		self.deleteButton = QPushButton("x")
 
 		layout = QGridLayout()
@@ -257,33 +258,3 @@ class NodeItemWidget(QWidget):
 		self.node.color = [rgba[0], rgba[1], rgba[2]]
 		self.colorButton.setColor(self.node.color)
 		self.nodeUpdated.emit(self.node)
-
-
-class ColorButton(QPushButton):
-	def __init__(self):
-		super(ColorButton, self).__init__()
-		self.color = [0.8, 0.8, 0.8]
-	
-	def setColor(self, color):
-		self.color = color
-		self.update(self.rect())
-
-	def paintEvent(self, ev):
-		size = self.size()
-		height = size.height()-1
-		width = size.width()-1
-
-		if self.isEnabled():
-			color = self.color
-			# colorBorder = map(lambda x: x*0.7, self.color)
-			colorBorder = [0.3, 0.3, 0.3]
-		else:
-			color = [0.8, 0.8, 0.8]
-			colorBorder = [0.7, 0.7, 0.7]
-
-		painter = QPainter(self)
-		painter.setPen(QColor.fromRgbF(colorBorder[0], colorBorder[1], colorBorder[2]))
-		painter.setBrush(QColor.fromRgbF(color[0], color[1], color[2]))
-		painter.setRenderHint(QPainter.Antialiasing)
-		painter.setRenderHint(QPainter.HighQualityAntialiasing)
-		painter.drawRoundedRect(3, 3, width-9, height-9, 5, 5)
