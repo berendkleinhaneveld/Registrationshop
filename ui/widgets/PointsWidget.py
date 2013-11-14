@@ -9,7 +9,6 @@ from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QPushButton
 from PySide.QtGui import QScrollArea
-from PySide.QtGui import QSpacerItem
 from PySide.QtGui import QFont
 from PySide.QtGui import QFrame
 from PySide.QtCore import Qt
