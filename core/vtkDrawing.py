@@ -20,9 +20,24 @@ from vtk import vtkDataSetMapper
 from vtk import vtkPolyDataMapper
 from vtk import vtkFollower
 from vtk import vtkAssembly
+from vtk import vtkMatrix4x4
+from vtk import vtkTransform
 from core.operations import Add
 from core.operations import Subtract
 from core.operations import Multiply
+
+
+def TransformWithMatrix(matrix):
+	"""
+	Return matrix with a copy of the given matrix.
+	"""
+	matrixCopy = vtkMatrix4x4()
+	matrixCopy.DeepCopy(matrix)
+
+	transform = vtkTransform()
+	transform.SetMatrix(matrixCopy)
+
+	return transform
 
 
 def ColorActor(actor, color, opacity=None):

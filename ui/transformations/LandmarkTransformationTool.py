@@ -11,6 +11,7 @@ from ui.widgets.StatusWidget import StatusWidget
 from ui.transformations import TwoStepPicker as Picker
 from ui.transformations import Transformation
 from core.decorators import overrides
+from core.vtkDrawing import TransformWithMatrix
 from vtk import vtkPoints
 from vtk import vtkLandmarkTransform
 from vtk import vtkTransform
@@ -226,11 +227,7 @@ class LandmarkTransformationTool(TransformationTool):
 		landmarkTransform.SetTargetLandmarks(movingPoints)
 		landmarkTransform.Update()
 
-		matrix = vtkMatrix4x4()
-		matrix.DeepCopy(landmarkTransform.GetMatrix())
-
-		transform = vtkTransform()
-		transform.SetMatrix(matrix)
+		transform = TransformWithMatrix(landmarkTransform.GetMatrix())
 		transform.Inverse()
 		
 		self.multiWidget.transformations[-1] = Transformation(transform, Transformation.TypeLandmark)

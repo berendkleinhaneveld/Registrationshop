@@ -15,6 +15,7 @@ from core.operations import Length
 from core.operations import Normalize
 from core.vtkDrawing import CreateSphere
 from core.vtkDrawing import CreateLine
+from core.vtkDrawing import TransformWithMatrix
 from vtk import vtkAssembly
 from vtk import vtkTransform
 from vtk import vtkMatrix4x4
@@ -169,10 +170,7 @@ class TwoStepPicker(Picker):
 	def _pickPosition(self):
 		# point in world coordinates
 		point = list(self.sphereSource.GetCenter())
-		matrix = vtkMatrix4x4()
-		matrix.DeepCopy(self.widget.volume.GetMatrix())
-		transform = vtkTransform()
-		transform.SetMatrix(matrix)
+		transform = TransformWithMatrix(self.widget.volume.GetMatrix())
 		transform.Inverse()
 		# transformedPoint in local coordinates
 		tranformedPoint = transform.TransformPoint(point)
@@ -192,10 +190,7 @@ class TwoStepPicker(Picker):
 		Input points should be world coordinates.
 		"""
 		bounds = list(self.widget.imageData.GetBounds())
-		matrix = vtkMatrix4x4()
-		matrix.DeepCopy(self.widget.volume.GetMatrix())
-		transform = vtkTransform()
-		transform.SetMatrix(matrix)
+		transform = TransformWithMatrix(self.widget.volume.GetMatrix())
 
 		intersections = intersectionsWithBounds(bounds, transform, point1, point2)
 		if not intersections:

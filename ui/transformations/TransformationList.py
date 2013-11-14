@@ -10,6 +10,7 @@ from PySide.QtCore import QObject
 from PySide.QtCore import Signal
 from Transformation import Transformation
 from core.vtkObjectWrapper import vtkTransformWrapper
+from core.vtkDrawing import TransformWithMatrix
 
 
 class TransformationList(QObject):
@@ -60,12 +61,8 @@ class TransformationList(QObject):
 		for transformation in self._transformations[0:index]:
 			tempTransform.Concatenate(transformation.transform)
 
-		matrix = vtkMatrix4x4()
-		matrix.DeepCopy(tempTransform.GetMatrix())
-		
-		result = vtkTransform()
-		result.SetMatrix(matrix)
-		return result
+		transform = TransformWithMatrix(tempTransform.GetMatrix())
+		return transform
 
 	# Methods for loading and saving to file
 
