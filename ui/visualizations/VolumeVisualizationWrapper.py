@@ -18,6 +18,7 @@ class VolumeVisualizationWrapper(object):
 		"hue",
 		"brightness",
 		"window",
+		"color",
 		"level"]
 
 	def __init__(self, volumeVisualization=None):

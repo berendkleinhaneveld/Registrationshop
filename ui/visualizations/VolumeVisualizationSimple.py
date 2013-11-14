@@ -9,13 +9,13 @@ from VolumeVisualization import VisualizationTypeSimple
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from vtk import vtkMath
-from PySide.QtGui import QWidget
-from PySide.QtGui import QSlider
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
-from PySide.QtCore import Qt
+from ui.widgets.SliderFloatWidget import SliderFloatWidget
+from ui.widgets.ColorWidget import ColorChoiceWidget
 from core.decorators import overrides
+from PySide.QtGui import QWidget
+from PySide.QtGui import QGridLayout
+from PySide.QtCore import Qt
+from ColumnResizer import ColumnResizer
 
 
 class VolumeVisualizationSimple(VolumeVisualization):
@@ -42,7 +42,9 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.maximum = 1
 		self.lowerBound = 0
 		self.upperBound = 1
-		self.hue = 0  # 0-360
+		colors = [[255, 139, 0], [0, 147, 255], [0, 255, 147], [213, 100, 255], [255, 75, 75]]
+		self.colors = map(lambda x: [x[0] / 255.0, x[1] / 255.0, x[2] / 255.0], colors)
+		self.color = self.colors[0]
 
 	@overrides(VolumeVisualization)
 	def getParameterWidget(self):
@@ -51,42 +53,48 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		volume property can be adjusted.
 		:rtype: QWidget
 		"""
-		self.lowerBoundSlider = QSlider(Qt.Horizontal)
-		self.lowerBoundSlider.setMinimum(int(self.minimum))
-		self.lowerBoundSlider.setMaximum(int(self.maximum))
-		self.lowerBoundSlider.setValue(int(self.lowerBound))
+		self.lowerBoundSlider = SliderFloatWidget()
+		self.lowerBoundSlider.setName("Lower:")
+		self.lowerBoundSlider.setRange([self.minimum, self.maximum])
+		self.lowerBoundSlider.setValue(self.lowerBound)
+		self.lowerBoundSlider.label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 		self.lowerBoundSlider.valueChanged.connect(self.valueChanged)
-		self.lowerBoundLabel = QLabel("%.0f" % self.lowerBound)
 
-		self.upperBoundSlider = QSlider(Qt.Horizontal)
-		self.upperBoundSlider.setMinimum(int(self.minimum))
-		self.upperBoundSlider.setMaximum(int(self.maximum))
-		self.upperBoundSlider.setValue(int(self.upperBound))
+		self.upperBoundSlider = SliderFloatWidget()
+		self.upperBoundSlider.setName("Upper:")
+		self.upperBoundSlider.setRange([self.minimum, self.maximum])
+		self.upperBoundSlider.setValue(self.upperBound)
+		self.upperBoundSlider.label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 		self.upperBoundSlider.valueChanged.connect(self.valueChanged)
-		self.upperBoundLabel = QLabel("%.0f" % self.upperBound)
 
-		self.hueSlider = QSlider(Qt.Horizontal)
-		self.hueSlider.setMinimum(0)
-		self.hueSlider.setMaximum(360)
-		self.hueSlider.setValue(self.hue)
-		self.hueSlider.valueChanged.connect(self.valueChanged)
-		self.hueLabel = QLabel("%.0f" % self.hue)
+		self.colorChooser = ColorChoiceWidget()
+		self.colorChooser.setName("Color:")
+		self.colorChooser.setColors(self.colors)
+		self.colorChooser.setColor(self.color)
+		self.colorChooser.setMinimumHeight(self.upperBoundSlider.sizeHint().height())
+		self.colorChooser.label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+		self.colorChooser.valueChanged.connect(self.valueChanged)
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
 		layout.setContentsMargins(0, 0, 0, 0)
-		layout.addWidget(QLabel("Lower threshold"), 0, 0)
-		layout.addWidget(self.lowerBoundSlider, 0, 1)
-		layout.addWidget(self.lowerBoundLabel, 0, 2)
-		layout.addWidget(QLabel("Upper threshold"), 1, 0)
-		layout.addWidget(self.upperBoundSlider, 1, 1)
-		layout.addWidget(self.upperBoundLabel, 1, 2)
-		layout.addWidget(QLabel("Hue"), 2, 0)
-		layout.addWidget(self.hueSlider, 2, 1)
-		layout.addWidget(self.hueLabel, 2, 2)
+		layout.setSpacing(0)
+		layout.addWidget(self.lowerBoundSlider)
+		layout.addWidget(self.upperBoundSlider)
+		layout.addWidget(self.colorChooser)
 
 		widget = QWidget()
 		widget.setLayout(layout)
+
+		self.columnResizer = ColumnResizer()
+		self.columnResizer.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 0)
+		self.columnResizer.addWidgetsFromLayout(self.upperBoundSlider.layout(), 0)
+		self.columnResizer.addWidgetsFromLayout(self.colorChooser.layout(), 0)
+
+		self.otherColRes = ColumnResizer()
+		self.otherColRes.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 2)
+		self.otherColRes.addWidgetsFromLayout(self.upperBoundSlider.layout(), 2)
+
 		return widget
 
 	@overrides(VolumeVisualization)
@@ -112,11 +120,7 @@ class VolumeVisualizationSimple(VolumeVisualization):
 
 	@overrides(VolumeVisualization)
 	def updateTransferFunction(self):
-		r = g = b = 0.0
-		saturation = 1.0
-		value = 1.0
-		hue = self.hue / 360.0
-		r, g, b = vtkMath.HSVToRGB(hue, saturation, value)
+		r, g, b = self.color
 
 		# Transfer functions and properties
 		self.colorFunction = vtkColorTransferFunction()
@@ -149,10 +153,6 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		"""
 		self.lowerBound = min(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
 		self.upperBound = max(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
-		self.hue = self.hueSlider.value()
-
-		self.lowerBoundLabel.setText("%.0f" % self.lowerBound)
-		self.upperBoundLabel.setText("%.0f" % self.upperBound)
-		self.hueLabel.setText("%.0f" % self.hue)
+		self.color = self.colorChooser.color
 
 		self.updateTransferFunction()
