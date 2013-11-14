@@ -136,6 +136,12 @@ class LandmarkTransformationTool(TransformationTool):
 	def setActiveLandmark(self, index):
 		self.activeIndex = index
 		self._update()
+
+		if self.activeIndex < len(self.landmarkPointSets):
+			landmarkSet = self.landmarkPointSets[self.activeIndex]
+			self._focusCamera(self.fixedWidget, landmarkSet[0])
+			self._focusCamera(self.movingWidget, landmarkSet[1])
+
 		self.fixedWidget.render()
 		self.movingWidget.render()
 		self.multiWidget.render()
@@ -270,6 +276,16 @@ class LandmarkTransformationTool(TransformationTool):
 
 		self.landmarkIndicators.append(landmark)
 		self.landmarkIndicators.append(landmarkMulti)
+
+	def _focusCamera(self, widget, location):
+		if not location:
+			return
+
+		transform = TransformWithMatrix(widget.volume.GetMatrix())
+		worldPoint = transform.TransformPoint(location)
+
+		camera = widget.renderer.GetActiveCamera()
+		camera.SetFocalPoint(worldPoint)
 
 	def _landmarkForWidget(self, widget, landmarkType):
 		return Landmark(index=self.activeIndex,
