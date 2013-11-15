@@ -134,6 +134,8 @@ class MultiRenderWidget(QWidget):
 
 	@Slot(object)
 	def setFixedData(self, imageData):
+		self._cleanUpGrids()
+
 		self.fixedImageData = imageData
 		if self.fixedImageData is None:
 			self.fixedImageData = CreateEmptyImageData()
@@ -147,6 +149,7 @@ class MultiRenderWidget(QWidget):
 			self._imagePlaneWidgets[index].SetInputData(self.fixedImageData)
 			self._imagePlaneWidgets[index].SetPlaneOrientation(index)
 
+		self._updateGrids()
 		self._shouldResetCamera = True
 
 	@Slot(object)
