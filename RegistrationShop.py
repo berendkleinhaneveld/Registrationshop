@@ -351,6 +351,11 @@ class RegistrationShop(MainWindow, WindowDialog):
 		* Read in the new data and update this in the multi render widget
 		* this would mean a new data model for the multi render widget
 		"""
+		if not self.movingDataWidget.imageData:
+			statusWidget = StatusWidget.Instance()
+			statusWidget.setText("Please load a moving dataset before starting a free transform.")
+			return
+
 		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)
 
 		if self.transformTool is not None:
@@ -362,6 +367,11 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 	@Slot()
 	def addLandmarkTransform(self):
+		if not self.fixedDataWidget.imageData or not self.movingDataWidget.imageData:
+			statusWidget = StatusWidget.Instance()
+			statusWidget.setText("Please load a fixed and a moving dataset before starting a landmark transform.")
+			return
+
 		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)
 
 		if self.transformTool is not None:
@@ -384,6 +394,11 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 	@Slot()
 	def addDeformableTransform(self):
+		if not self.fixedDataWidget.imageData or not self.movingDataWidget.imageData:
+			statusWidget = StatusWidget.Instance()
+			statusWidget.setText("Please load a fixed and a moving dataset before starting a deformable transform.")
+			return
+
 		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)
 
 		if self.transformTool is not None:
