@@ -11,8 +11,6 @@ from vtk import vtkInteractorStyleTrackballCamera
 from vtk import vtkImagePlaneWidget
 from vtk import vtkVolume
 from vtk import vtkImageData
-from vtk import vtkAxesActor
-from vtk import vtkOrientationMarkerWidget
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
 from vtk import vtkVolumeProperty
@@ -301,6 +299,7 @@ def CreateEmptyImageData():
 	"""
 	dimensions = [3, 3, 3]
 	imageData = vtkImageData()
+	imageData.Initialize()
 	imageData.SetDimensions(dimensions)
 	imageData.SetSpacing(1, 1, 1)
 	imageData.SetOrigin(10, 10, 0)
