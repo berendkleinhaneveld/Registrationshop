@@ -95,6 +95,7 @@ class ColorChoiceWidget(ColorWidget):
 		layout.addStretch(10)
 
 	def setColor(self, color):
+		self.color = color
 		for button in self.buttonGroup.buttons():
 			diffs = map(lambda x, y: abs(x - y), button.color, color)
 			if sum(diffs) < 0.0001:
