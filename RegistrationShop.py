@@ -54,6 +54,7 @@ from ui.widgets import RenderPropWidget
 from ui.widgets import MultiRenderPropWidget
 from ui.widgets import LandmarkWidget
 from ui.widgets import StatusWidget
+from ui.widgets.ToolbarWidget import ToolbarWidget
 from ui.transformations import UserTransformationTool
 from ui.transformations import LandmarkTransformationTool
 from ui.transformations import DeformableTransformationTool
@@ -77,7 +78,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		Initializes the UI.
 		"""
 		super(RegistrationShop, self).__init__(args)
-		
+
 		self.setApplicationPath()
 		# Instantiate the project controller
 		ProjectController.Instance()
@@ -303,29 +304,20 @@ class RegistrationShop(MainWindow, WindowDialog):
 		self.toolbar.setFloatable(False)
 		self.toolbar.setMovable(False)
 
-		# Add the transform tool buttons to the toolbar
-		self.toolbar.addAction(self.actionFreeTransformTool)
-		self.toolbar.addAction(self.actionLandmarkTransformTool)
-		self.toolbar.addAction(self.actionDeformableTransformTool)
-
-		# Insert widget so that other toolbar items will be pushed to the right
-		spacer = QWidget()
-		spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-		self.toolbar.addWidget(spacer)
+		# Create custom toolbar widget that can align items left, center and right
+		self.toolbarWidget = ToolbarWidget()
+		self.toolbarWidget.addActionLeft(self.actionFreeTransformTool)
+		self.toolbarWidget.addActionLeft(self.actionLandmarkTransformTool)
+		self.toolbarWidget.addActionLeft(self.actionDeformableTransformTool)
 
 		statusWidget = StatusWidget.Instance()
 		statusWidget.setText("Welcome to RegistrationShop!\nStart your registration by loading two datasets. "
 			+ "After that you can use the transform tools to align your volume data.")
-		self.toolbar.addWidget(statusWidget)
-
-		# Insert 3 spacers so that the status widget lines out in the middle
-		for i in range(3):
-			spacer = QWidget()
-			spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-			self.toolbar.addWidget(spacer)
+		self.toolbarWidget.addCenterItem(statusWidget)
 
 		# Add help button
-		self.toolbar.addAction(self.actionHelp)
+		self.toolbarWidget.addActionRight(self.actionHelp)
+		self.toolbar.addWidget(self.toolbarWidget)
 
 	# Private Functions
 
@@ -360,7 +352,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		* this would mean a new data model for the multi render widget
 		"""
 		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)
-		
+
 		if self.transformTool is not None:
 			self.transformTool.cleanUp()
 
@@ -520,6 +512,8 @@ class RegistrationShop(MainWindow, WindowDialog):
 				loaded = ProjectController.Instance().loadProject(fileName)
 				if loaded:
 					RegistrationShop.settings.setValue("project/lastProject", fileName)
+				else:
+					print "Couldn't load project:", folderName
 			else:
 				print "Warning: Project file does not exist"
 				RegistrationShop.settings.remove("project/lastProject")
@@ -557,7 +551,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		outputData = transformer.TransformImageData(imageData, transform)
 		writer = DataWriter()
 		writer.WriteToFile(outputData, fileName, fileType)
-		
+
 		self.hideProgressBar()
 
 	@Slot()
