@@ -67,6 +67,10 @@ class ProjectController(QObject):
 			print e
 			return False
 
+		if not self.currentProject.isValid():
+			self.currentProject = Project()
+			return False
+
 		self.projectChanged.emit(self.currentProject)
 		self.fixedFileChanged.emit(self.currentProject.fixedData)
 		self.movingFileChanged.emit(self.currentProject.movingData)

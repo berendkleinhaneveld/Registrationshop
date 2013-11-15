@@ -35,3 +35,16 @@ class Project(object):
 
 	def __ne__(self, other):
 		return not self.__eq__(other)
+
+	def isValid(self):
+		"""
+		Project is valid when the fixed and moving image data actually
+		exits on disk. If this is not the case, then the project is
+		invalid.
+		"""
+		import os
+		if self.fixedData and not os.path.isfile(self.fixedData):
+			return False
+		if self.movingData and not os.path.isfile(self.movingData):
+			return False
+		return True
