@@ -16,6 +16,7 @@ from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
 from PySide.QtCore import Slot
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from ui.transformations import ClippingBox
 from core.vtkDrawing import CreateBounds
 from core.vtkDrawing import CreateOrientationGrid
 
@@ -65,6 +66,9 @@ class RenderWidget(QWidget):
 		self.shouldResetCamera = False
 		self.gridItems = []
 		self.orientationGridItems = []
+
+		self.clippingBox = ClippingBox()
+		self.clippingBox.setWidget(self)
 
 		# Keep track of the base and user transforms
 		self.baseTransform = vtkTransform()
@@ -117,9 +121,13 @@ class RenderWidget(QWidget):
 
 		self._createGrid()
 		self._createOrientationGrid()
+		self._createClippingBox()
 		self.shouldResetCamera = True
 		# Don't call render, because camera should only be reset
 		# when a volume property is loaded
+
+	def showClippingBox(self, show):
+		self.clippingBox.enable(show)
 
 	@Slot(object)
 	def setVolumeVisualization(self, volumeVisualization):
@@ -194,6 +202,14 @@ class RenderWidget(QWidget):
 			self.renderer.RemoveViewProp(item)
 		self.gridItems = []
 		self.orientationGridItems = []
+
+	def _createClippingBox(self):
+		self.clippingBox = ClippingBox()
+		self.clippingBox.setWidget(self)
+		if not self.imageData:
+			self.clippingBox.enable(False)
+		else:
+			self.clippingBox.setImageData(self.imageData)
 
 	@Slot(object)
 	def transformationsUpdated(self, transformations):

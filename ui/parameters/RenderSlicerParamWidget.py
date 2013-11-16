@@ -23,6 +23,7 @@ class RenderSlicerParamWidget(QWidget):
 
 		self.renderController = renderController
 		self.renderController.slicesChanged.connect(self.setSlices)
+		self.renderController.clippingBoxChanged.connect(self.showsClippingBox)
 
 		self.slicesLabel = QLabel("Show slices for directions:")
 		self.sliceLabelTexts = ["x:", "y:", "z:"]
@@ -42,6 +43,15 @@ class RenderSlicerParamWidget(QWidget):
 		for index in range(3):
 			layout.addWidget(self.sliceLabels[index], index+1, 0)
 			layout.addWidget(self.sliceCheckBoxes[index], index+1, 1)
+
+		# Create option to show clipping box
+		self.clippingCheckBox = QCheckBox()
+		self.clippingCheckBox.clicked.connect(self.clippingCheckBoxChanged)
+		self.clippingLabel = QLabel("Clipping box:")
+		self.clippingLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+		layout.addWidget(self.clippingLabel, 5, 0)
+		layout.addWidget(self.clippingCheckBox, 5, 1)
 		self.setLayout(layout)
 
 	@Slot()
@@ -58,3 +68,14 @@ class RenderSlicerParamWidget(QWidget):
 		for index in range(len(slices)):
 			checkBox = self.sliceCheckBoxes[index]
 			checkBox.setChecked(slices[index])
+
+	@Slot()
+	def clippingCheckBoxChanged(self):
+		"""
+		Callback function for the clipping check box.
+		"""
+		self.renderController.showClippingBox(self.clippingCheckBox.checkState() == Qt.Checked)
+
+	@Slot(bool)
+	def showsClippingBox(self, show):
+		self.clippingCheckBox.setChecked(show)

@@ -45,9 +45,9 @@ class RenderController(QObject):
 	# Emitted when the slices are loaded by the project controller.
 	# RenderWidget, RenderParameterWidget(Slices) should connect
 	slicesChanged = Signal(object)
-	# Emitted when the visibility of the slices is changed by the slice parameter widget.
-	# RenderWidget should connect
-	slicesUpdated = Signal(object)
+	# Emitted when the clipping box is loaded by the project controller.
+	# RenderWidget, RenderParameterWidget(Slices) should connect
+	clippingBoxChanged = Signal(bool)
 
 	def __init__(self, renderWidget):
 		"""
@@ -63,6 +63,7 @@ class RenderController(QObject):
 		self.visualization = None
 		self.visualizations = dict()  # Keep track of used volume properties
 		self.slices = [False, False, False]
+		self.clippingBox = False
 
 	@Slot(basestring)
 	def setFile(self, fileName):
@@ -106,19 +107,27 @@ class RenderController(QObject):
 				self.visualizations[key] = visualizations[key].getVolumeVisualization()
 			self.visualizationType = renderSettings["visualizationType"]
 			self.slices = renderSettings["slices"]
+			try:
+				self.clippingBox = renderSettings["clippingBox"]
+			except:
+				self.clippingBox = False
+
 			cameraWrapped = renderSettings["camera"]
 			cameraWrapped.applyToObject(self.renderWidget.renderer.GetActiveCamera())
 		else:
 			self.visualizations = dict()
 			self.visualizationType = None
 			self.slices = [False, False, False]
+			self.clippingBox = False
 
 		self.setVisualizationType(self.visualizationType)
 		self.renderWidget.setSlices(self.slices)
 		self.renderWidget.setVolumeVisualization(self.visualization)
+		self.renderWidget.showClippingBox(self.clippingBox)
 
 		self.visualizationChanged.emit(self.visualization)
 		self.slicesChanged.emit(self.slices)
+		self.clippingBoxChanged.emit(self.clippingBox)
 
 	def getRenderSettings(self):
 		"""
@@ -134,6 +143,7 @@ class RenderController(QObject):
 		settings["visualizations"] = visualizations
 		settings["visualizationType"] = self.visualizationType
 		settings["slices"] = self.slices
+		settings["clippingBox"] = self.clippingBox
 
 		camera = self.renderWidget.renderer.GetActiveCamera()
 		settings["camera"] = vtkCameraWrapper(camera)
@@ -183,7 +193,13 @@ class RenderController(QObject):
 		"""
 		self.slices[sliceIndex] = visibility
 		self.renderWidget.setSlices(self.slices)
-		self.slicesUpdated.emit(self.slices)
+
+	def showClippingBox(self, visibility):
+		"""
+		:type visibility: bool
+		"""
+		self.clippingBox = visibility
+		self.renderWidget.showClippingBox(self.clippingBox)
 
 	def updateVisualization(self):
 		"""

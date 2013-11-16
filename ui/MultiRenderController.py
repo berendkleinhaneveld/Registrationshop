@@ -29,7 +29,7 @@ class MultiRenderController(QObject):
 	visualizationChanged = Signal(object)
 	visualizationUpdated = Signal(object)
 	slicesChanged = Signal(object)
-	slicesUpdated = Signal(object)
+	clippingBoxChanged = Signal(object)
 
 	maxVoxelSize = 9000000
 
@@ -46,6 +46,7 @@ class MultiRenderController(QObject):
 		self.visualization = None  # MultiVolumeVisualization
 		self.visualizations = dict()  # Dict of MultiVolumeVisualizations, visType as keys
 		self.slices = [False, False, False]
+		self.clippingBox = False
 
 	@Slot(basestring)
 	def setFixedFile(self, fileName):
@@ -113,10 +114,16 @@ class MultiRenderController(QObject):
 				transformations = TransformationList()
 				transformations.setPythonVersion(transformationsWrapped)
 				self.multiRenderWidget.transformations = transformations
+			try:
+				self.clippingBox = renderSettings["clippingBox"]
+			except:
+				self.clippingBox = False
 			self.updateVisualization()
 			self.slicesChanged.emit(self.slices)
+			self.clippingBoxChanged.emit(self.clippingBox)
 		else:
 			self.slices = [False, False, False]
+			self.clippingBox = False
 
 	def getRenderSettings(self):
 		settings = dict()
@@ -125,6 +132,7 @@ class MultiRenderController(QObject):
 		settings["camera"] = vtkCameraWrapper(camera)
 		transformations = self.multiRenderWidget.transformations.getPythonVersion()
 		settings["transformations"] = transformations
+		settings["clippingBox"] = self.clippingBox
 		return settings
 
 	def setVisualizationType(self, visualizationType):
@@ -171,7 +179,13 @@ class MultiRenderController(QObject):
 		"""
 		self.slices[sliceIndex] = visibility
 		self.multiRenderWidget.setSlices(self.slices)
-		self.slicesUpdated.emit(self.slices)
+
+	def showClippingBox(self, visibility):
+		"""
+		:type visibility: bool
+		"""
+		self.clippingBox = visibility
+		self.multiRenderWidget.showClippingBox(self.clippingBox)
 
 	def updateVisualization(self):
 		"""

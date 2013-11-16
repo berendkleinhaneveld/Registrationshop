@@ -20,6 +20,7 @@ from PySide.QtGui import QGridLayout
 from PySide.QtCore import Signal
 from PySide.QtCore import Slot
 from ui.transformations import TransformationList
+from ui.transformations import ClippingBox
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from core.vtkDrawing import CreateBounds
 from core.vtkDrawing import CreateOrientationGrid
@@ -107,6 +108,9 @@ class MultiRenderWidget(QWidget):
 		self.movingVolumeProperty.SetScalarOpacity(opacityFunction)
 		self.visualization = None  # MultiVolumeVisualization
 
+		self.clippingBox = ClippingBox()
+		self.clippingBox.setWidget(self)
+
 		self.mapper.SetInputData(0, self.fixedImageData)
 		self.mapper.SetInputData(1, self.movingImageData)
 		
@@ -151,6 +155,7 @@ class MultiRenderWidget(QWidget):
 			self._imagePlaneWidgets[index].SetPlaneOrientation(index)
 
 		self._updateGrids()
+		self._createClippingBox()
 		self._shouldResetCamera = True
 
 	@Slot(object)
@@ -191,9 +196,12 @@ class MultiRenderWidget(QWidget):
 		self._updateVolumeProperties()
 
 	def _updateGrids(self):
-		if self.movingImageData and self.movingImageData.GetDimensions() != (3, 3, 3):
+		if not self._hasImageData():
+			return
+			
+		if self._hasMovingImageData:
 			self.movingGridItems = CreateBounds(self.movingImageData.GetBounds())
-
+			
 		boundsFixed = self.fixedImageData.GetBounds()
 		boundsMoving = self.movingImageData.GetBounds()
 		maxBounds = map(lambda x, y: max(x, y), boundsFixed, boundsMoving)
@@ -211,6 +219,28 @@ class MultiRenderWidget(QWidget):
 		self.fixedGridItems = []
 		self.movingGridItems = []
 		self.orientationGridItems = []
+
+	def _createClippingBox(self):
+		if not self._hasImageData():
+			self.clippingBox.enable(False)
+		else:
+			if self._hasFixedImageData():
+				self.clippingBox.setImageData(self.fixedImageData)
+			else:
+				self.clippingBox.setImageData(self.movingImageData)
+
+	def _hasImageData(self):
+		return self._hasFixedImageData() or self._hasMovingImageData()
+
+	def _hasFixedImageData(self):
+		return self._isActualImageData(self.fixedImageData)
+
+	def _hasMovingImageData(self):
+		return self._isActualImageData(self.movingImageData)
+
+	def _isActualImageData(self, imageData):
+		dimensions = imageData.GetDimensions()
+		return dimensions != (3, 3, 3)
 
 	# Properties
 
@@ -231,6 +261,9 @@ class MultiRenderWidget(QWidget):
 				self._imagePlaneWidgets[sliceIndex].On()
 			else:
 				self._imagePlaneWidgets[sliceIndex].Off()
+
+	def showClippingBox(self, show):
+		self.clippingBox.enable(show)
 
 	@Slot()
 	def updateTransformation(self):
