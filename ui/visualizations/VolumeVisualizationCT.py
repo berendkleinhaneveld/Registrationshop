@@ -16,6 +16,7 @@ from PySide.QtGui import QGridLayout
 from PySide.QtGui import QLabel
 from PySide.QtCore import Qt
 from core.decorators import overrides
+from ColumnResizer import ColumnResizer
 
 
 class VolumeVisualizationCT(VolumeVisualization):
@@ -30,7 +31,7 @@ class VolumeVisualizationCT(VolumeVisualization):
 		# Cloth, Skin, Muscle, Vascular stuff, Cartilage, Bones
 		self.sections = [-3000.0, -964.384, -656.56, 20.144, 137.168, 233.84, 394.112, 6000.0]
 		self.sectionsOpacity = [0.0, 0.0, 0.0, 0.0, 0.07, 0.1, 0.2]
-		self.sectionNames = ["Air", "Cloth", "Skin", "Muscle", "Blood vessels", "Cartilage", "Bones"]
+		self.sectionNames = ["Air:", "Cloth:", "Skin:", "Muscle:", "Blood vessels:", "Cartilage:", "Bones:"]
 
 		# sectionColors should be specified for each boundary
 		# Just like opacity should be tweaked. A section can have any slope / configuration
@@ -110,8 +111,13 @@ class VolumeVisualizationCT(VolumeVisualization):
 			slider.setValue(int(math.pow(self.sectionsOpacity[index], 1.0/3.0) * slider.maximum()))
 			slider.valueChanged.connect(self.valueChanged)
 			self.sliders.append(slider)
-			layout.addWidget(QLabel(self.sectionNames[index]), index, 0)
+			label = QLabel(self.sectionNames[index])
+			label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+			layout.addWidget(label, index, 0)
 			layout.addWidget(slider, index, 1)
+
+		columnResizer = ColumnResizer()
+		columnResizer.addWidgetsFromLayout(layout, 0)
 
 		widget = QWidget()
 		widget.setLayout(layout)
