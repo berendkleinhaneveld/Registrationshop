@@ -41,6 +41,7 @@ class VolumeVisualizationTransferFunction(VolumeVisualization):
 		self.minimum = 0
 		self.maximum = 1
 		self.histogramWidget = None
+		self.imageData = None
 
 	@overrides(VolumeVisualization)
 	def getParameterWidget(self):
