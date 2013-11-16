@@ -40,7 +40,8 @@ class UserTransformationTool(TransformationTool):
 		self.renderWidget.transformations.append(Transformation(vtkTransform(), Transformation.TypeUser))
 
 		statusWidget = StatusWidget.Instance()
-		statusWidget.setText("Use the box widget to transform the volume.")
+		statusWidget.setText("Use the box widget to transform the volume. "
+			"For more specific control of the transformation, use the matrix values to specify the transform.")
 
 	@overrides(TransformationTool)
 	def cleanUp(self):
