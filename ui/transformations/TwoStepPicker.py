@@ -241,8 +241,11 @@ class TwoStepPicker(Picker):
 		self.overlayProps.append(prop)
 
 	def _createLocator(self):
-		halfSize = 25
-		gapSize = 15
+		bounds = self.widget.imageData.GetBounds()
+		mean = reduce(lambda x, y: x + y, bounds) / 3.0
+		multiplier = mean / 100.0
+		halfSize = 5 * multiplier
+		gapSize = 3 * multiplier
 
 		upLine = CreateLine([0, gapSize, 0], [0, gapSize+halfSize, 0])
 		downLine = CreateLine([0, -gapSize, 0], [0, -(gapSize+halfSize), 0])
