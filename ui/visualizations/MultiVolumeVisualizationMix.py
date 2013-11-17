@@ -59,8 +59,8 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 		self.sliderMovingOpacity.setValue(pow(self.movingOpacity, 1.0/3.0) * 100.0)
 
 		self.blendTypeComboBox = QComboBox()
-		self.blendTypeComboBox.addItem("Default blend")
-		self.blendTypeComboBox.addItem("Other blend type")
+		self.blendTypeComboBox.addItem("Default additive blend")
+		self.blendTypeComboBox.addItem("Difference blend")
 		self.blendTypeComboBox.currentIndexChanged.connect(self.valueChanged)
 
 		# Be sure to connect after the values are set...
