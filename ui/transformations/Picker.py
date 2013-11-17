@@ -24,6 +24,9 @@ class Picker(QObject, Interactor):
 	def setWidget(self, widget):
 		raise NotImplementedError()
 
+	def setPropertiesWidget(self, widget):
+		pass
+
 	def cleanUp(self):
 		self.cleanUpCallbacks()
 
