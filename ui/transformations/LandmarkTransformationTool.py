@@ -134,8 +134,9 @@ class LandmarkTransformationTool(TransformationTool):
 		self.movingWidget.render()
 		self.multiWidget.render()
 
-		self.fixedLandmarkWidget.setVisible(False)
-		self.movingLandmarkWidget.setVisible(False)
+		if self.pickerType == TwoStepType:
+			self.fixedLandmarkWidget.setVisible(False)
+			self.movingLandmarkWidget.setVisible(False)
 
 		self.toolFinished.emit()
 
