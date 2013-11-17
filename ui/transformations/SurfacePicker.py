@@ -12,6 +12,7 @@ from vtk import vtkActor
 from vtk import vtkConeSource
 from vtk import vtkDataSetMapper
 from PySide.QtCore import Signal
+from core.vtkDrawing import TransformWithMatrix
 
 
 class SurfacePicker(Picker, Interactor):
@@ -89,6 +90,12 @@ class SurfacePicker(Picker, Interactor):
 		if key != "a":
 			return
 		point, normal = PickPoint(iren, self.widget.renderer, self.picker)
+		# point in world coordinates
+		transform = TransformWithMatrix(self.widget.volume.GetMatrix())
+		transform.Inverse()
+		# transformedPoint in local coordinates
+		tranformedPoint = transform.TransformPoint(point)
+		point = list(tranformedPoint)
 		self.pickedLocation.emit(point)
 
 
