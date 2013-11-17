@@ -5,17 +5,16 @@ SurfacePicker
 	Berend Klein Haneveld
 """
 import math
+from Picker import Picker
 from ui.Interactor import Interactor
-from core.decorators import overrides
 from vtk import vtkVolumePicker
 from vtk import vtkActor
 from vtk import vtkConeSource
 from vtk import vtkDataSetMapper
 from PySide.QtCore import Signal
-from PySide.QtCore import QObject
 
 
-class SurfacePicker(QObject, Interactor):
+class SurfacePicker(Picker, Interactor):
 	"""
 	SurfacePicker is a dedicated picker for points in 3D datasets.
 	"""
