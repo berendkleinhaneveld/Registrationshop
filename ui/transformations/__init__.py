@@ -8,7 +8,7 @@ from ParameterModel import ParameterModel
 from ParameterListView import ParameterListView
 from ParameterWidget import ParameterWidget
 
-from Picker import Picker
+from SurfacePicker import SurfacePicker
 from TwoStepPicker import TwoStepPicker
 
 from TransformBox import TransformBox
