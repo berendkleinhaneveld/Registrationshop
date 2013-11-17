@@ -17,8 +17,6 @@ from core.vtkDrawing import CreateSphere
 from core.vtkDrawing import CreateLine
 from core.vtkDrawing import TransformWithMatrix
 from vtk import vtkAssembly
-from vtk import vtkTransform
-from vtk import vtkMatrix4x4
 from vtk import vtkProp3DFollower
 from vtk import vtkMath
 from vtk import vtkImageInterpolator

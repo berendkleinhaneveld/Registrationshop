@@ -15,7 +15,6 @@ from core.vtkDrawing import TransformWithMatrix
 from vtk import vtkPoints
 from vtk import vtkLandmarkTransform
 from vtk import vtkTransform
-from vtk import vtkMatrix4x4
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QComboBox
