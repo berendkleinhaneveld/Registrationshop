@@ -8,7 +8,8 @@ from Landmark import Landmark
 from TransformationTool import TransformationTool
 from ui.widgets.PointsWidget import PointsWidget
 from ui.widgets.StatusWidget import StatusWidget
-from ui.transformations import TwoStepPicker as Picker
+from ui.transformations import TwoStepPicker
+from ui.transformations import SurfacePicker
 from ui.transformations import Transformation
 from core.decorators import overrides
 from core.vtkDrawing import TransformWithMatrix
@@ -30,11 +31,14 @@ class LandmarkTransformationTool(TransformationTool):
 	"""
 	updatedLandmarks = Signal(list)
 
-	def __init__(self):
+	SurfaceType = "SurfaceType"
+	TwoStepType = "TwoStepType"
+
+	def __init__(self, pickerType=SurfaceType):
 		super(LandmarkTransformationTool, self).__init__()
 
-		self.fixedPicker = Picker()
-		self.movingPicker = Picker()
+		self.pickerType = pickerType
+		self._initializePickers()
 
 		self.landmarkPointSets = []  # Sets of points
 		self.landmarkIndicators = []  # All the landmark indicator objects
@@ -119,8 +123,7 @@ class LandmarkTransformationTool(TransformationTool):
 
 		self.landmarkPointSets = []
 
-		self.fixedPicker = Picker()
-		self.movingPicker = Picker()
+		self._initializePickers()
 
 		self.fixedWidget.render()
 		self.movingWidget.render()
@@ -170,6 +173,14 @@ class LandmarkTransformationTool(TransformationTool):
 		The input location should be in local data coordinates.
 		"""
 		self._pickedLocation(location, "moving")
+
+	def _initializePickers(self):
+		if self.pickerType == LandmarkTransformationTool.SurfaceType:
+			self.fixedPicker = SurfacePicker()
+			self.movingPicker = SurfacePicker()
+		elif self.pickerType == LandmarkTransformationTool.TwoStepType:
+			self.fixedPicker = TwoStepPicker()
+			self.movingPicker = TwoStepPicker()
 
 	def _pickedLocation(self, location, landmarkType):
 		if self.activeIndex < len(self.landmarkPointSets):
