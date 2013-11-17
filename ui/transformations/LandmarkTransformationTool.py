@@ -24,15 +24,16 @@ from PySide.QtCore import Signal
 from PySide.QtCore import Slot
 from PySide.QtCore import Qt
 
+# Define picker types
+SurfaceType = "SurfaceType"
+TwoStepType = "TwoStepType"
+
 
 class LandmarkTransformationTool(TransformationTool):
 	"""
 	LandmarkTransformationTool
 	"""
 	updatedLandmarks = Signal(list)
-
-	SurfaceType = "SurfaceType"
-	TwoStepType = "TwoStepType"
 
 	def __init__(self, pickerType=SurfaceType):
 		super(LandmarkTransformationTool, self).__init__()
@@ -94,9 +95,13 @@ class LandmarkTransformationTool(TransformationTool):
 		self.multiWidget.transformations.append(transform)
 
 		statusWidget = StatusWidget.Instance()
-		statusWidget.setText("Place landmarks in both volumes to create a landmark transform. Hold your " +
-			"mouse over a volume and press 'A'. Turn the volume, move your mouse and press 'A' again to set a " +
-			"landmark.")
+		if self.pickerType == TwoStepType:
+			statusWidget.setText("Place landmarks in both volumes to create a landmark transform. Hold your "
+				"mouse over a volume and press 'A'. Turn the volume, move your mouse and press 'A' again to set a "
+				"landmark.")
+		elif self.pickerType == SurfaceType:
+			statusWidget.setText("Place landmarks in both volumes to create a landmark transform. Hold your "
+				"mouse over a volume to move the picker and press 'A' to pick a landmark.")
 
 	def setLandmarkWidgets(self, fixed, moving):
 		self.fixedLandmarkWidget = fixed
@@ -175,10 +180,10 @@ class LandmarkTransformationTool(TransformationTool):
 		self._pickedLocation(location, "moving")
 
 	def _initializePickers(self):
-		if self.pickerType == LandmarkTransformationTool.SurfaceType:
+		if self.pickerType == SurfaceType:
 			self.fixedPicker = SurfacePicker()
 			self.movingPicker = SurfacePicker()
-		elif self.pickerType == LandmarkTransformationTool.TwoStepType:
+		elif self.pickerType == TwoStepType:
 			self.fixedPicker = TwoStepPicker()
 			self.movingPicker = TwoStepPicker()
 

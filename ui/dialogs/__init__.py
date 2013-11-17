@@ -1,3 +1,4 @@
 from ExportProgressDialog import ExportProgressDialog
 from FileTypeDialog import FileTypeDialog
 from ElastixMainDialog import ElastixMainDialog
+from PickerTypeDialog import PickerTypeDialog

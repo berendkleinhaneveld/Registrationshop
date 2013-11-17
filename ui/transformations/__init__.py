@@ -1,4 +1,7 @@
 # Transformation tools package
+from TransformBox import TransformBox
+from ClippingBox import ClippingBox
+
 from Transformation import Transformation
 from TransformationList import TransformationList
 from TransformationModel import TransformationModel
@@ -10,9 +13,6 @@ from ParameterWidget import ParameterWidget
 
 from SurfacePicker import SurfacePicker
 from TwoStepPicker import TwoStepPicker
-
-from TransformBox import TransformBox
-from ClippingBox import ClippingBox
 
 from TransformationTool import TransformationTool
 from UserTransformationTool import UserTransformationTool
