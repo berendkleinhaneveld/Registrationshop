@@ -46,9 +46,7 @@ class DataReader(DataController):
 			# Check if the directory really contains DICOM images
 			files = [f for f in os.listdir(fileName) if f.endswith("."+DataReader.TypeDICOM)]
 			if len(files) > 0:
-				imageData = self.GetImageDataFromDirectory(fileName)
-				self.SanitizeImageData(imageData)
-				return imageData
+				return self.GetImageDataFromDirectory(fileName)
 			else:
 				# TODO: make this a proper Exception
 				print "Warning: directory does not contain DICOM files:", fileName
@@ -75,12 +73,7 @@ class DataReader(DataController):
 		elif extension == DataReader.TypeDICOM:
 			# Use a dicom reader
 			dirName = os.path.dirname(fileName)
-			imageReader = vtkDICOMImageReader()
-			imageReader.SetDirectoryName(dirName)
-			imageReader.Update()
-			imageData = imageReader.GetOutput()
-			self.SanitizeImageData(imageData)
-			return imageData
+			return self.GetImageDataFromDirectory(dirName)
 		elif extension == DataReader.TypeDAT:
 			raise Exception("Support for .dat files is not implemented.")
 			# Read in the .dat file byte by byte
@@ -124,9 +117,11 @@ class DataReader(DataController):
 		imageReader = vtkDICOMImageReader()
 		imageReader.SetDirectoryName(dirName)
 		imageReader.Update()
-		return imageReader.GetOutput()
+		imageData = imageReader.GetOutput()
+		self.SanitizeImageData(imageReader, imageData)
+		return imageData
 
-	def SanitizeImageData(self, imageData):
+	def SanitizeImageData(self, reader, imageData):
 		"""
 		Sanitizes the given imageData. At the moment it just checks the
 		spacings to see if there are spacings that zero. This gives problems
