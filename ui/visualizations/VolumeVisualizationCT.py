@@ -16,7 +16,6 @@ from PySide.QtGui import QGridLayout
 from PySide.QtGui import QLabel
 from PySide.QtCore import Qt
 from core.decorators import overrides
-from ColumnResizer import ColumnResizer
 
 
 class VolumeVisualizationCT(VolumeVisualization):
@@ -116,8 +115,12 @@ class VolumeVisualizationCT(VolumeVisualization):
 			layout.addWidget(label, index, 0)
 			layout.addWidget(slider, index, 1)
 
-		columnResizer = ColumnResizer()
-		columnResizer.addWidgetsFromLayout(layout, 0)
+		try:
+			from ColumnResizer import ColumnResizer
+			columnResizer = ColumnResizer()
+			columnResizer.addWidgetsFromLayout(layout, 0)
+		except Exception, e:
+			print e
 
 		widget = QWidget()
 		widget.setLayout(layout)

@@ -15,7 +15,6 @@ from core.decorators import overrides
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
 from PySide.QtCore import Qt
-from ColumnResizer import ColumnResizer
 
 
 class VolumeVisualizationSimple(VolumeVisualization):
@@ -86,14 +85,18 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		widget = QWidget()
 		widget.setLayout(layout)
 
-		self.columnResizer = ColumnResizer()
-		self.columnResizer.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 0)
-		self.columnResizer.addWidgetsFromLayout(self.upperBoundSlider.layout(), 0)
-		self.columnResizer.addWidgetsFromLayout(self.colorChooser.layout(), 0)
+		try:
+			from ColumnResizer import ColumnResizer
+			self.columnResizer = ColumnResizer()
+			self.columnResizer.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 0)
+			self.columnResizer.addWidgetsFromLayout(self.upperBoundSlider.layout(), 0)
+			self.columnResizer.addWidgetsFromLayout(self.colorChooser.layout(), 0)
 
-		self.otherColRes = ColumnResizer()
-		self.otherColRes.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 2)
-		self.otherColRes.addWidgetsFromLayout(self.upperBoundSlider.layout(), 2)
+			self.otherColRes = ColumnResizer()
+			self.otherColRes.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 2)
+			self.otherColRes.addWidgetsFromLayout(self.upperBoundSlider.layout(), 2)
+		except Exception, e:
+			print e
 
 		return widget
 
