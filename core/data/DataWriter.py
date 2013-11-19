@@ -16,7 +16,7 @@ class DataWriter(DataController):
 	def __init__(self):
 		super(DataWriter, self).__init__()
 
-		self.supportedExtensions = [DataReader.TypeMHA,
+		self.supportedExtensions = [DataReader.TypeMHD,
 									DataReader.TypeVTI]
 
 	def WriteToFile(self, imageData, exportFileName, fileType):

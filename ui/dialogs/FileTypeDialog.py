@@ -13,8 +13,8 @@ class FileTypeDialog(QDialog):
 		self.result = None
 
 	@Slot()
-	def _mhaButtonClicked(self):
-		self.result = DataReader.TypeMHA
+	def _mhdButtonClicked(self):
+		self.result = DataReader.TypeMHD
 		self.accept()
 
 	@Slot()
@@ -28,7 +28,7 @@ class FileTypeDialog(QDialog):
 		widget.setModal(True)
 
 		mhdButton = QPushButton("MHD")
-		mhdButton.clicked.connect(widget._mhaButtonClicked)
+		mhdButton.clicked.connect(widget._mhdButtonClicked)
 		vtiButton = QPushButton("VTI")
 		vtiButton.clicked.connect(widget._vtiButtonClicked)
 

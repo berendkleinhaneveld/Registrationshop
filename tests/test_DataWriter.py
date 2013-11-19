@@ -20,7 +20,7 @@ class DataWriterTest(unittest.TestCase):
 		exportFileName = outputFolder + "/output.mhd"
 		dataReader = DataReader()
 		imageData = dataReader.GetImageData(fileName)
-		fileType = DataReader.TypeMHA
+		fileType = DataReader.TypeMHD
 
 		self.writer.WriteToFile(imageData, exportFileName, fileType)
 

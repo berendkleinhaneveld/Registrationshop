@@ -21,7 +21,8 @@ class DataReader(DataController):
 	"""
 
 	# File extensions
-	TypeMHA = "mhd"  # vtkMetaImageReader
+	TypeMHA = "mha"  # vtkMetaImageReader
+	TypeMHD = "mhd"  # vtkMetaImageReader
 	TypeVTI = "vti"  # vtkXMLImageDataReader
 	TypeMRB = "mrb"  # Unreadable at the moment (Slicer stuff)
 	TypeVTK = "vtk"  # No real volume data... but might be used for polygon stuff
@@ -33,6 +34,7 @@ class DataReader(DataController):
 		super(DataReader, self).__init__()
 
 		self.supportedExtensions = [DataReader.TypeMHA,
+									DataReader.TypeMHD,
 									DataReader.TypeVTI,
 									DataReader.TypeDICOM]
 
@@ -64,7 +66,7 @@ class DataReader(DataController):
 		:type extension: basestring
 		:rtype: vtkImageData
 		"""
-		if extension == DataReader.TypeMHA:
+		if extension == DataReader.TypeMHA or extension == DataReader.TypeMHD:
 			# Use a vktMetaImageReader
 			imageReader = vtkMetaImageReader()
 			imageReader.SetFileName(fileName)
