@@ -20,7 +20,7 @@ class DataWriter(DataController):
 									DataReader.TypeVTI]
 
 	def WriteToFile(self, imageData, exportFileName, fileType):
-		if fileType == DataReader.TypeMHA:
+		if fileType == DataReader.TypeMHD:
 			if not exportFileName.endswith(".mhd"):
 				exportFileName = exportFileName + ".mhd"
 			writer = vtkMetaImageWriter()
