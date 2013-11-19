@@ -240,7 +240,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		deformableTransformIconName = AppResources.imageNamed('DeformableTransformButton.png')
 		helpIconName = AppResources.imageNamed('HelpButton.png')
 
-		self.actionFreeTransformTool = QAction('Free transform', self, shortcut='Ctrl+1')
+		self.actionFreeTransformTool = QAction('Manual transform', self, shortcut='Ctrl+1')
 		self.actionFreeTransformTool.setIcon(QIcon(userTransformIconName))
 		self.actionFreeTransformTool.triggered.connect(self.addFreeTransform)
 
@@ -339,7 +339,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 	@Slot()
 	def addFreeTransform(self):
 		"""
-		What happens when free transform is added:
+		What happens when manual transform is added:
 		* Entry is added to the tab history
 			* Translation fields
 			* Rotation fields
@@ -355,7 +355,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		"""
 		if not self.movingDataWidget.imageData:
 			statusWidget = StatusWidget.Instance()
-			statusWidget.setText("Please load a moving dataset before starting a free transform.")
+			statusWidget.setText("Please load a moving dataset before starting a manual transform.")
 			return
 
 		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)

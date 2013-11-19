@@ -14,7 +14,7 @@ class Transformation(object):
 	Could be extended by adding creation time of transformation.
 	"""
 
-	TypeUser = "Free transform"
+	TypeUser = "Manual transform"
 	TypeLandmark = "Landmark transform"
 	TypeDeformable = "Deformable transform"
 
