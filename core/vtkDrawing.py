@@ -158,6 +158,9 @@ def CreateBounds(bounds):
 	Creates a boundary object to display around a volume.
 	:rtype: list of actors
 	"""
+	originX = bounds[0]
+	originY = bounds[2]
+	originZ = bounds[4]
 	boundX = bounds[1]
 	boundY = bounds[3]
 	boundZ = bounds[5]
@@ -165,31 +168,31 @@ def CreateBounds(bounds):
 	linePartLength = 0.2
 
 	lineActors = []
-	lineActors += CreateLineBeginAndEnd([0, 0, 0], [boundX, 0, 0], linePartLength)
-	lineActors += CreateLineBeginAndEnd([0, 0, 0], [0, boundY, 0], linePartLength)
-	lineActors += CreateLineBeginAndEnd([0, 0, 0], [0, 0, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([originX, originY, originZ], [boundX, originY, originZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([originX, originY, originZ], [originX, boundY, originZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([originX, originY, originZ], [originX, originY, boundZ], linePartLength)
 
 	ColorActor(lineActors[0], [1, 0, 0])
 	ColorActor(lineActors[2], [0, 1, 0])
 	ColorActor(lineActors[4], [0, 0, 1])
 
-	lineActors += CreateLineBeginAndEnd([boundX, boundY, boundZ], [boundX, boundY, 0], linePartLength)
-	lineActors += CreateLineBeginAndEnd([boundX, boundY, boundZ], [0, boundY, boundZ], linePartLength)
-	lineActors += CreateLineBeginAndEnd([boundX, boundY, boundZ], [boundX, 0, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([boundX, boundY, boundZ], [boundX, boundY, originZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([boundX, boundY, boundZ], [originX, boundY, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([boundX, boundY, boundZ], [boundX, originY, boundZ], linePartLength)
 
-	lineActors += CreateLineBeginAndEnd([boundX, 0, 0], [boundX, 0, boundZ], linePartLength)
-	lineActors += CreateLineBeginAndEnd([boundX, 0, 0], [boundX, boundY, 0], linePartLength)
-	lineActors += CreateLineBeginAndEnd([0, boundY, 0], [0, boundY, boundZ], linePartLength)
-	lineActors += CreateLineBeginAndEnd([0, boundY, 0], [boundX, boundY, 0], linePartLength)
-	lineActors += CreateLineBeginAndEnd([0, 0, boundZ], [0, boundY, boundZ], linePartLength)
-	lineActors += CreateLineBeginAndEnd([0, 0, boundZ], [boundX, 0, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([boundX, originY, originZ], [boundX, originY, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([boundX, originY, originZ], [boundX, boundY, originZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([originX, boundY, originZ], [originX, boundY, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([originX, boundY, originZ], [boundX, boundY, originZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([originX, originY, boundZ], [originX, boundY, boundZ], linePartLength)
+	lineActors += CreateLineBeginAndEnd([originX, originY, boundZ], [boundX, originY, boundZ], linePartLength)
 
 	for lineActor in lineActors:
 		ColorActor(lineActor, color=None, opacity=0.5)
 
 	mean = reduce(lambda x, y: x + y, bounds) / 3.0
 	sphereActor = CreateSphere(mean / 25.0)
-	sphereActor.SetPosition(0, 0, 0)
+	sphereActor.SetPosition(originX, originY, originZ)
 
 	dataGrid = vtkAssembly()
 	for lineActor in lineActors:
