@@ -80,8 +80,6 @@ class MainWindow(QMainWindow):
 
 	def closeEvent(self, event):
 		"""
-		TODO: ask if app should really quit.
-
 		:param event: Close event
 		:type event: QCloseEvent
 		"""
