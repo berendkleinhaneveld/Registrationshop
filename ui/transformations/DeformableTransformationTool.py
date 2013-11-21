@@ -65,6 +65,7 @@ class DeformableTransformationTool(TransformationTool):
 		currentProject = ProjectController.Instance().currentProject
 		path = currentProject.folder
 		
+		# TODO: make sure to save to project before starting a deformable registration
 		transformationPath = os.path.join(path, "data/Transformation.txt")
 		initialTransformPath = os.path.join(path, "data/InitialTransformation.txt")
 		outputFolder = os.path.join(path, "data")
