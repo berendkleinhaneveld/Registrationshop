@@ -214,8 +214,6 @@ class Parameter(object):
 				or indexOfSpace < indexOfCaretOpen \
 				or indexOfSpace > indexOfCaretClose \
 				or indexOfSpace == indexOfCaretOpen+1:
-				# TODO: make a better exception message.
-				# raise Exception("Line is not correctly formatted.")
 				return None
 			
 			key = line[indexOfCaretOpen+1:indexOfSpace]
