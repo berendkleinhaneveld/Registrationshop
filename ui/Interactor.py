@@ -24,7 +24,7 @@ class Interactor(object):
 	def __init__(self):
 		super(Interactor, self).__init__()
 
-	def AddObserver(self, obj, eventName, callbackFunction):
+	def AddObserver(self, obj, eventName, callbackFunction, priority=None):
 		"""
 		Creates a callback and stores the callback so that later
 		on the callbacks can be properly cleaned up.
@@ -32,7 +32,10 @@ class Interactor(object):
 		if not hasattr(self, "_callbacks"):
 			self._callbacks = []
 
-		callback = obj.AddObserver(eventName, callbackFunction)
+		if priority is not None:
+			callback = obj.AddObserver(eventName, callbackFunction, priority)
+		else:
+			callback = obj.AddObserver(eventName, callbackFunction)
 		self._callbacks.append((obj, callback))
 
 	def cleanUpCallbacks(self):
