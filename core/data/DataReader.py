@@ -9,6 +9,7 @@ from vtk import vtkImageData
 from vtk import vtkMetaImageReader
 from vtk import vtkXMLImageDataReader
 from vtk import vtkDICOMImageReader
+from vtk import vtkNrrdReader
 from DataController import DataController
 import os
 
@@ -29,6 +30,7 @@ class DataReader(DataController):
 	TypeRaw = "raw"  # needs a mhd file... maybe choose some standard stuff
 	TypeDAT = "dat"  # should be read byte by byte
 	TypeDICOM = "dcm"  # Dicom does not really have an extension?
+	TypeNRRD = "nrrd"  # Nearly Raw Raster Data
 
 	def __init__(self):
 		super(DataReader, self).__init__()
@@ -36,7 +38,8 @@ class DataReader(DataController):
 		self.supportedExtensions = [DataReader.TypeMHA,
 									DataReader.TypeMHD,
 									DataReader.TypeVTI,
-									DataReader.TypeDICOM]
+									DataReader.TypeDICOM,
+									DataReader.TypeNRRD]
 
 	def GetImageData(self, fileName):
 		"""
@@ -108,6 +111,14 @@ class DataReader(DataController):
 			imageReader.SetFileName(fileName)
 			imageReader.Update()
 			return imageReader.GetOutput()
+		elif extension == DataReader.TypeNRRD:
+			# Use a NrrdReader
+			imageReader = vtkNrrdReader()
+			imageReader.SetFileName(fileName)
+			imageReader.Update()
+			return imageReader.GetOutput()
+		else:
+			assert False
 
 	def GetImageDataFromDirectory(self, dirName):
 		"""
