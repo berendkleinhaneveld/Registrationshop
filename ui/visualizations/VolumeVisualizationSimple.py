@@ -128,16 +128,14 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		# Transfer functions and properties
 		self.colorFunction = vtkColorTransferFunction()
 		self.colorFunction.AddRGBPoint(self.minimum, r, g, b)
-		self.colorFunction.AddRGBPoint(self.lowerBound, r, g, b)
-		self.colorFunction.AddRGBPoint(self.lowerBound+1, r, g, b)
 		self.colorFunction.AddRGBPoint(self.maximum, r, g, b)
 
 		self.opacityFunction = vtkPiecewiseFunction()
 		self.opacityFunction.AddPoint(self.minimum, 0)
 		self.opacityFunction.AddPoint(self.lowerBound, 0)
-		self.opacityFunction.AddPoint(self.lowerBound+1, 1)
-		self.opacityFunction.AddPoint(self.upperBound-1, 1)
-		self.opacityFunction.AddPoint(self.upperBound, 0)
+		self.opacityFunction.AddPoint(self.lowerBound+0.0001, 1)
+		self.opacityFunction.AddPoint(self.upperBound, 1)
+		self.opacityFunction.AddPoint(self.upperBound+0.0001, 0)
 		self.opacityFunction.AddPoint(self.maximum, 0)
 
 		self.volProp.SetColor(self.colorFunction)
