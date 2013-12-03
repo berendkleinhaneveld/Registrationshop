@@ -17,7 +17,8 @@ class DataWriter(DataController):
 		super(DataWriter, self).__init__()
 
 		self.supportedExtensions = [DataReader.TypeMHD,
-									DataReader.TypeVTI]
+									DataReader.TypeVTI,
+									DataReader.TypeMHA]
 
 	def WriteToFile(self, imageData, exportFileName, fileType):
 		if fileType == DataReader.TypeMHD:
@@ -29,6 +30,11 @@ class DataWriter(DataController):
 			writer.Write()
 		elif fileType == DataReader.TypeVTI:
 			writer = vtkXMLImageDataWriter()
+			writer.SetFileName(exportFileName)
+			writer.SetInputData(imageData)
+			writer.Write()
+		elif fileType == DataReader.TypeMHA:
+			writer = vtkMetaImageWriter()
 			writer.SetFileName(exportFileName)
 			writer.SetInputData(imageData)
 			writer.Write()
