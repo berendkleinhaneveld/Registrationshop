@@ -581,7 +581,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 		self.showProgressBar("Exporting data...")
 
-		transform = self.multiDataWidget.getFullTransform()
+		transform = self.multiDataWidget.transformations.completeTransform()
 		dataReader = DataReader()
 		imageData = dataReader.GetImageData(ProjectController.Instance().currentProject.movingData)
 		transformer = DataTransformer()
