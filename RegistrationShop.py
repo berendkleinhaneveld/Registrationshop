@@ -427,7 +427,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 			self.transformTool.cleanUp()
 
 		statusWidget = StatusWidget.Instance()
-		statusWidget.setText("Choose a template for a deformable transform. After choosing " +
+		statusWidget.setText("Choose a template for a deformable transform. After choosing "
 			"a template you will be able to review and adjust the parameters.")
 
 		dialog = ElastixMainDialog(self)
