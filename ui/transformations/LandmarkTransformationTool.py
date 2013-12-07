@@ -274,7 +274,8 @@ class LandmarkTransformationTool(TransformationTool):
 	def _addLandmarkIndicator(self, location, landmarkType):
 		imageData = self.fixedWidget.imageData if landmarkType == "fixed" else self.movingWidget.imageData
 		bounds = imageData.GetBounds()
-		mean = reduce(lambda x, y: x + y, bounds) / 3.0
+		sizes = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]
+		mean = reduce(lambda x, y: x + y, sizes) / 3.0
 		scale = mean / 50.0
 
 		# Create landmark for the correct widget
