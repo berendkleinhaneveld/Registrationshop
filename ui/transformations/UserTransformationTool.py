@@ -172,7 +172,7 @@ class UserTransformationTool(TransformationTool):
 		transform.Modified()
 		transform.Update()
 
-		self.renderWidget.transformations[-1] = transform
+		self.renderWidget.transformations[-1] = Transformation(transform, Transformation.TypeUser)
 		self.transformBox.setTransform(transform)
 		self.renderWidget.render()
 
