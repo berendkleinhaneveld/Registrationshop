@@ -136,7 +136,8 @@ class TwoStepPicker(Picker):
 
 		if not self.sphereSource:
 			bounds = self.widget.imageData.GetBounds()
-			mean = reduce(lambda x, y: x + y, bounds) / 3.0
+			sizes = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]
+			mean = reduce(lambda x, y: x + y, sizes) / 3.0
 			self.sphereSource = CreateSphere(mean / 50.0, [0.2, 1, 0.5])
 			self._addToRender(self.sphereSource)
 			self._createLocator()
@@ -242,7 +243,8 @@ class TwoStepPicker(Picker):
 
 	def _createLocator(self):
 		bounds = self.widget.imageData.GetBounds()
-		mean = reduce(lambda x, y: x + y, bounds) / 3.0
+		sizes = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]
+		mean = reduce(lambda x, y: x + y, sizes) / 3.0
 		multiplier = mean / 100.0
 		halfSize = 5 * multiplier
 		gapSize = 3 * multiplier
