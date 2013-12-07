@@ -60,6 +60,8 @@ from ui.transformations import UserTransformationTool
 from ui.transformations import LandmarkTransformationTool
 from ui.transformations import DeformableTransformationTool
 from ui.transformations.LandmarkTransformationTool import TwoStepType
+from InspectionTool import CompareWidget
+from InspectionTool import ComparisonController
 
 
 # Define settings parameters
@@ -238,6 +240,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		userTransformIconName = AppResources.imageNamed('UserTransformButton.png')
 		landmarkTransformIconName = AppResources.imageNamed('LandmarkTransformButton.png')
 		deformableTransformIconName = AppResources.imageNamed('DeformableTransformButton.png')
+		compareIconName = AppResources.imageNamed('CompareButton.png')
 		helpIconName = AppResources.imageNamed('HelpButton.png')
 
 		self.actionFreeTransformTool = QAction('Manual transform', self, shortcut='Ctrl+1')
@@ -272,6 +275,10 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 		self.actionNewProject = QAction('New project', self, shortcut='Ctrl+N')
 		self.actionNewProject.triggered.connect(self.newProject)
+
+		self.actionCompare = QAction('Compare', self, shortcut='Ctrl+U')
+		self.actionCompare.setIcon(QIcon(compareIconName))
+		self.actionCompare.triggered.connect(self.startComparison)
 
 		self.actionHelp = QAction('Help', self, shortcut='Ctrl+H')
 		self.actionHelp.setIcon(QIcon(helpIconName))
@@ -318,6 +325,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		self.toolbarWidget.addCenterItem(statusWidget)
 
 		# Add help button
+		self.toolbarWidget.addActionRight(self.actionCompare)
 		self.toolbarWidget.addActionRight(self.actionHelp)
 		self.toolbar.addWidget(self.toolbarWidget)
 
@@ -582,6 +590,26 @@ class RegistrationShop(MainWindow, WindowDialog):
 		writer.WriteToFile(outputData, fileName, fileType)
 
 		self.hideProgressBar()
+
+	@Slot()
+	def startComparison(self):
+		projectController = ProjectController.Instance()
+		project = projectController.currentProject
+		if not project:  # or not project.fixedData or not project.movingData:
+			statusWidget = StatusWidget.Instance()
+			statusWidget.setText("Could not start compare.")
+			return
+
+		if hasattr(self, "compareWidget"):
+			del self.compareWidget
+
+		transform = self.multiDataWidget.transformations.completeTransform()
+
+		self.controller = ComparisonController()
+		self.controller.setInputData(project.fixedData, project.movingData, transform)
+		self.compareWidget = CompareWidget(self.controller.widgets)
+		self.compareWidget.show()
+		# controller.slicerChanged(self.diffImageWidget)
 
 	@Slot()
 	def showHelp(self):
