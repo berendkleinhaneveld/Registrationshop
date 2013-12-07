@@ -22,6 +22,7 @@ from vtk import vtkFollower
 from vtk import vtkAssembly
 from vtk import vtkMatrix4x4
 from vtk import vtkTransform
+from vtk import vtkOutlineSource
 from core.operations import Add
 from core.operations import Subtract
 from core.operations import Multiply
@@ -151,6 +152,25 @@ def CreateCircle(radius):
 	circle.GetProperty().SetColor(1.0, 0.5, 0.5)
 
 	return circle
+
+
+def CreateSquare(width, color=None, zOffset=0):
+	halfWidth = width / 2.0
+	squareSource = vtkOutlineSource()
+	squareSource.GenerateFacesOff()
+	squareSource.SetBounds(-halfWidth, halfWidth, -halfWidth, halfWidth, zOffset, zOffset)
+
+	squareMapper = vtkPolyDataMapper()
+	squareMapper.SetInputConnection(squareSource.GetOutputPort())
+
+	square = vtkActor()
+	square.PickableOff()
+	square.SetMapper(squareMapper)
+	square.GetProperty().SetColor(1.0, 0.5, 0.5)
+
+	ColorActor(square, color)
+
+	return square
 
 
 def CreateBounds(bounds):
