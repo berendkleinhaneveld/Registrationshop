@@ -173,6 +173,24 @@ def CreateSquare(width, color=None, zOffset=0):
 	return square
 
 
+def CreateOutline(bounds, color=None):
+	squareSource = vtkOutlineSource()
+	squareSource.GenerateFacesOff()
+	squareSource.SetBounds(bounds)
+
+	squareMapper = vtkPolyDataMapper()
+	squareMapper.SetInputConnection(squareSource.GetOutputPort())
+
+	square = vtkActor()
+	square.PickableOff()
+	square.SetMapper(squareMapper)
+	square.GetProperty().SetColor(1.0, 1.0, 1.0)
+
+	ColorActor(square, color)
+
+	return square
+
+
 def CreateBounds(bounds):
 	"""
 	Creates a boundary object to display around a volume.
