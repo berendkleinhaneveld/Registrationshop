@@ -58,7 +58,6 @@ class TwoStepPicker(Picker):
 	@overrides(Picker)
 	def cleanUp(self):
 		super(TwoStepPicker, self).cleanUp()
-		
 		self.cleanUpProps()
 
 	def cleanUpProps(self):
