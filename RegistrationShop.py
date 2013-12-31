@@ -432,7 +432,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 			return
 		if not dialog.transformation:
 			# load custom file
-			filename, other = QFileDialog.getOpenFileName(self, "Open custom parameter file", "", "(*.c)")
+			filename, other = QFileDialog.getOpenFileName(self, "Open custom parameter file", "", "(*.c *.txt)")
 			if len(filename) == 0:
 				return
 			transformation = ParameterList()
