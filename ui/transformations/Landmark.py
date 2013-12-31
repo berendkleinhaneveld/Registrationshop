@@ -1,4 +1,9 @@
+"""
+Landmark
 
+:Authors:
+	Berend Klein Haneveld
+"""
 from vtk import vtkProp3DFollower
 from vtk import vtkTransform
 from core.vtkDrawing import CreateSphere
