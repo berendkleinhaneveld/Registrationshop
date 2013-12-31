@@ -65,6 +65,7 @@ class MultiRenderWidget(QWidget):
 		self.renderer.SetBackground2(0.4, 0.4, 0.4)
 		self.renderer.SetBackground(0.1, 0.1, 0.1)
 		self.renderer.SetGradientBackground(True)
+		self.renderer.SetInteractive(1)
 		self.renderer.SetLayer(0)
 
 		# Overlay renderer which is synced with the default renderer
