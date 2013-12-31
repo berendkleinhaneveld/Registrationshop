@@ -47,7 +47,6 @@ from ui import RenderController
 from ui import MultiRenderController
 from ui.dialogs import FileTypeDialog
 from ui.dialogs import ElastixMainDialog
-from ui.dialogs import PickerTypeDialog
 from ui.widgets import RenderWidget
 from ui.widgets import MultiRenderWidget
 from ui.widgets import TitleWidget
@@ -59,7 +58,6 @@ from ui.widgets.ToolbarWidget import ToolbarWidget
 from ui.transformations import UserTransformationTool
 from ui.transformations import LandmarkTransformationTool
 from ui.transformations import DeformableTransformationTool
-from ui.transformations.LandmarkTransformationTool import TwoStepType
 from InspectionTool import CompareWidget
 from InspectionTool import ComparisonController
 
@@ -382,35 +380,32 @@ class RegistrationShop(MainWindow, WindowDialog):
 			statusWidget.setText("Please load a fixed and a moving dataset before starting a landmark transform.")
 			return
 
+		# Bring the transform parameter widget up front under the multi render widget
 		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)
 
+		# Clean up the last transform tool
 		if self.transformTool is not None:
 			self.transformTool.cleanUp()
 
-		statusWidget = StatusWidget.Instance()
-		statusWidget.setText("Select the type of picker for specifying landmarks. Surface type "
-			"works good on Direct Volume Renders. For other visualization types, choose the two "
-			"step picker type.")
-
-		dialog = PickerTypeDialog(self)
-		result = dialog.exec_()
-		if not result or not dialog.pickerType:
-			return
-
-		self.transformTool = LandmarkTransformationTool(dialog.pickerType)
+		self.transformTool = LandmarkTransformationTool()
 		self.transformTool.setRenderWidgets(fixed=self.fixedDataWidget,
 			moving=self.movingDataWidget,
 			multi=self.multiDataWidget)
 
-		if dialog.pickerType == TwoStepType:
-			fixedLandmarkWidget = LandmarkWidget()
-			self.fixedPropWidget.tabWidget.addTab(fixedLandmarkWidget, "Landmark")
-			self.fixedPropWidget.tabWidget.setCurrentWidget(fixedLandmarkWidget)
-			movingLandmarkWidget = LandmarkWidget()
-			self.movingPropWidget.tabWidget.addTab(movingLandmarkWidget, "Landmark")
-			self.movingPropWidget.tabWidget.setCurrentWidget(movingLandmarkWidget)
-			self.transformTool.setLandmarkWidgets(fixedLandmarkWidget, movingLandmarkWidget)
+		# Create a tab page under the fixed render widget
+		fixedLandmarkWidget = LandmarkWidget()
+		self.fixedPropWidget.tabWidget.addTab(fixedLandmarkWidget, "Landmark")
+		self.fixedPropWidget.tabWidget.setCurrentWidget(fixedLandmarkWidget)
 
+		# Create a tab page under the moving render widget
+		movingLandmarkWidget = LandmarkWidget()
+		self.movingPropWidget.tabWidget.addTab(movingLandmarkWidget, "Landmark")
+		self.movingPropWidget.tabWidget.setCurrentWidget(movingLandmarkWidget)
+
+		# Make sure the landmark transform tool knows of these tab widgets
+		self.transformTool.setLandmarkWidgets(fixedLandmarkWidget, movingLandmarkWidget)
+
+		# Start the transformation
 		self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
 		self.transformTool.toolFinished.connect(self.transformToolFinished)
 

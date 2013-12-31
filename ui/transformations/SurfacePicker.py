@@ -35,14 +35,15 @@ class SurfacePicker(Picker, Interactor):
 
 		# TODO: make size relative to image data size
 		bounds = self.widget.imageData.GetBounds()
-		mean = reduce(lambda x, y: x + y, bounds) / 3.0
-		multiplier = mean / 100.0
+		sizes = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]
+		minSize = min(sizes)
+		multiplier = minSize / 70
 		coneSource = vtkConeSource()
 		coneSource.CappingOn()
-		coneSource.SetHeight(12*multiplier)
-		coneSource.SetRadius(5*multiplier)
+		coneSource.SetHeight(6*multiplier)
+		coneSource.SetRadius(3*multiplier)
 		coneSource.SetResolution(6)
-		coneSource.SetCenter(6*multiplier, 0, 0)
+		coneSource.SetCenter(3*multiplier, 0, 0)
 		coneSource.SetDirection(-1, 0, 0)
 
 		coneMapper = vtkDataSetMapper()

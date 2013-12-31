@@ -8,8 +8,8 @@ from Landmark import Landmark
 from TransformationTool import TransformationTool
 from ui.widgets.PointsWidget import PointsWidget
 from ui.widgets.StatusWidget import StatusWidget
-from ui.transformations import TwoStepPicker
-from ui.transformations import SurfacePicker
+from ui.transformations.TwoStepPicker import TwoStepPicker
+from ui.transformations.SurfacePicker import SurfacePicker
 from ui.transformations import Transformation
 from core.decorators import overrides
 from core.vtkDrawing import TransformWithMatrix
@@ -35,11 +35,14 @@ class LandmarkTransformationTool(TransformationTool):
 	"""
 	updatedLandmarks = Signal(list)
 
-	def __init__(self, pickerType=SurfaceType):
+	def __init__(self):
 		super(LandmarkTransformationTool, self).__init__()
 
-		self.pickerType = pickerType
-		self._initializePickers()
+		self.fixedPickerType = SurfaceType
+		self.movingPickerType = SurfaceType
+
+		self.fixedPicker = self._pickerForType(self.fixedPickerType)
+		self.movingPicker = self._pickerForType(self.movingPickerType)
 
 		self.landmarkPointSets = []  # Sets of points
 		self.landmarkIndicators = []  # All the landmark indicator objects
@@ -62,12 +65,12 @@ class LandmarkTransformationTool(TransformationTool):
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
 		layout.setContentsMargins(0, 0, 0, 0)
-		layout.addWidget(QLabel("Transform type"), 0, 0)
+		layout.addWidget(QLabel("Transform type:"), 0, 0)
 		layout.addWidget(self.landmarkComboBox, 0, 1)
 		layout.addWidget(self.pointsWidget, 1, 0, 1, 2)
 		
 		self.updatedLandmarks.connect(self.pointsWidget.setPoints)
-		self.landmarkComboBox.currentIndexChanged.connect(self.landmarkTypeChanged)
+		self.landmarkComboBox.currentIndexChanged.connect(self.landmarkTransformTypeChanged)
 		self.pointsWidget.activeLandmarkChanged.connect(self.setActiveLandmark)
 
 		widget = QWidget()
@@ -95,17 +98,21 @@ class LandmarkTransformationTool(TransformationTool):
 		self.multiWidget.transformations.append(transform)
 
 		statusWidget = StatusWidget.Instance()
-		if self.pickerType == TwoStepType:
-			statusWidget.setText("Place landmarks in both volumes to create a landmark transform. Hold your "
-				"mouse over a volume and press 'A'. Turn the volume, move your mouse and press 'A' again to set a "
-				"landmark.")
-		elif self.pickerType == SurfaceType:
-			statusWidget.setText("Place landmarks in both volumes to create a landmark transform. Hold your "
-				"mouse over a volume to move the picker and press 'A' to pick a landmark.")
+		statusWidget.setText("")
+		# if self.fixedPickerType == TwoStepType:
+		# 	statusWidget.setText("Place landmarks in both volumes to create a landmark transform. Hold your "
+		# 		"mouse over a volume and press 'A'. Turn the volume, move your mouse and press 'A' again to set a "
+		# 		"landmark.")
+		# elif self.fixedPickerType == SurfaceType:
+		# 	statusWidget.setText("Place landmarks in both volumes to create a landmark transform. Hold your "
+		# 		"mouse over a volume to move the picker and press 'A' to pick a landmark.")
 
 	def setLandmarkWidgets(self, fixed, moving):
 		self.fixedLandmarkWidget = fixed
 		self.movingLandmarkWidget = moving
+
+		self.fixedLandmarkWidget.landmarkTypeChanged.connect(self.landmarkToolTypeChanged)
+		self.movingLandmarkWidget.landmarkTypeChanged.connect(self.landmarkToolTypeChanged)
 
 		self.fixedPicker.setPropertiesWidget(self.fixedLandmarkWidget)
 		self.movingPicker.setPropertiesWidget(self.movingLandmarkWidget)
@@ -123,20 +130,20 @@ class LandmarkTransformationTool(TransformationTool):
 		self.fixedPicker.cleanUp()
 		self.movingPicker.cleanUp()
 
+		# self.fixedPicker = self._pickerForType(self.fixedPickerType)
+		# self.movingPicker = self._pickerForType(self.movingPickerType)
+
 		for landmarkIndicator in self.landmarkIndicators:
 			landmarkIndicator.cleanUp()
 
 		self.landmarkPointSets = []
 
-		self._initializePickers()
-
 		self.fixedWidget.render()
 		self.movingWidget.render()
 		self.multiWidget.render()
 
-		if self.pickerType == TwoStepType:
-			self.fixedLandmarkWidget.setVisible(False)
-			self.movingLandmarkWidget.setVisible(False)
+		self.fixedLandmarkWidget.setVisible(False)
+		self.movingLandmarkWidget.setVisible(False)
 
 		self.toolFinished.emit()
 
@@ -155,7 +162,7 @@ class LandmarkTransformationTool(TransformationTool):
 		self.multiWidget.render()
 
 	@Slot(int)
-	def landmarkTypeChanged(self, value):
+	def landmarkTransformTypeChanged(self, value):
 		"""
 		Called when the transformation type is changed
 		from the combo box. Rigid, Similarity or Affine.
@@ -180,13 +187,33 @@ class LandmarkTransformationTool(TransformationTool):
 		"""
 		self._pickedLocation(location, "moving")
 
-	def _initializePickers(self):
-		if self.pickerType == SurfaceType:
-			self.fixedPicker = SurfacePicker()
-			self.movingPicker = SurfacePicker()
-		elif self.pickerType == TwoStepType:
-			self.fixedPicker = TwoStepPicker()
-			self.movingPicker = TwoStepPicker()
+	@Slot(object)
+	def landmarkToolTypeChanged(self, widget):
+		if widget is self.fixedLandmarkWidget:
+			self.fixedPickerType = widget.landmarkType
+			self.fixedPicker.cleanUp()
+			self.fixedPicker = self._pickerForType(self.fixedPickerType)
+			self.fixedPicker.setWidget(self.fixedWidget)
+			self.fixedPicker.pickedLocation.connect(self.pickedFixedLocation)
+			self.fixedPicker.setPropertiesWidget(self.fixedLandmarkWidget)
+		elif widget is self.movingLandmarkWidget:
+			self.movingPickerType = widget.landmarkType
+			self.movingPicker.cleanUp()
+			self.movingPicker = self._pickerForType(self.movingPickerType)
+			self.movingPicker.setWidget(self.movingWidget)
+			self.movingPicker.pickedLocation.connect(self.pickedMovingLocation)
+			self.movingPicker.setPropertiesWidget(self.movingLandmarkWidget)
+
+	# Private methods
+
+	def _pickerForType(self, pickerType):
+		"""
+		Returns a picker object depending on the given picker type.
+		"""
+		if pickerType == SurfaceType:
+			return SurfacePicker()
+		elif pickerType == TwoStepType:
+			return TwoStepPicker()
 
 	def _pickedLocation(self, location, landmarkType):
 		if self.activeIndex < len(self.landmarkPointSets):
@@ -275,8 +302,8 @@ class LandmarkTransformationTool(TransformationTool):
 		imageData = self.fixedWidget.imageData if landmarkType == "fixed" else self.movingWidget.imageData
 		bounds = imageData.GetBounds()
 		sizes = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]
-		mean = reduce(lambda x, y: x + y, sizes) / 3.0
-		scale = mean / 50.0
+		smallest = min(sizes)
+		scale = smallest / 30.0
 
 		# Create landmark for the correct widget
 		widget = self.fixedWidget if landmarkType == "fixed" else self.movingWidget

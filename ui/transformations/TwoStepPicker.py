@@ -31,6 +31,7 @@ class TwoStepPicker(Picker):
 
 	pickedLocation = Signal(list)
 	locatorUpdated = Signal(float)
+	snappingPointsUpdated = Signal(list)
 
 	def __init__(self):
 		super(TwoStepPicker, self).__init__()
@@ -43,9 +44,10 @@ class TwoStepPicker(Picker):
 		self.sampleDiffs = None
 
 	def setPropertiesWidget(self, widget):
-		self.propertiesWidget = widget
+		self.propertiesWidget = widget.twoStepWidget
 		self.propertiesWidget.histogramWidget.updatedPosition.connect(self.histogramUpdatedPosition)
 		self.locatorUpdated.connect(self.propertiesWidget.histogramWidget.locatorUpdated)
+		self.snappingPointsUpdated.connect(self.propertiesWidget.histogramWidget.snappingPointsUpdated)
 		self.propertiesWidget.pickedPosition.connect(self.pickedPosition)
 		self.pickedLocation.connect(self.propertiesWidget.pickedLocation)
 
@@ -136,8 +138,9 @@ class TwoStepPicker(Picker):
 		if not self.sphereSource:
 			bounds = self.widget.imageData.GetBounds()
 			sizes = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]
-			mean = reduce(lambda x, y: x + y, sizes) / 3.0
-			self.sphereSource = CreateSphere(mean / 50.0, [0.2, 1, 0.5])
+			smallest = min(sizes)
+			scale = smallest / 30
+			self.sphereSource = CreateSphere(scale, [0.2, 1, 0.5])
 			self._addToRender(self.sphereSource)
 			self._createLocator()
 
@@ -243,8 +246,8 @@ class TwoStepPicker(Picker):
 	def _createLocator(self):
 		bounds = self.widget.imageData.GetBounds()
 		sizes = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]
-		mean = reduce(lambda x, y: x + y, sizes) / 3.0
-		multiplier = mean / 100.0
+		smallest = min(sizes)
+		multiplier = smallest / 30
 		halfSize = 5 * multiplier
 		gapSize = 3 * multiplier
 
