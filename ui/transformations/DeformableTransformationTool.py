@@ -103,6 +103,10 @@ class DeformableTransformationTool(TransformationTool):
 		else:
 			statusWidget.setText("Something went wrong. Please see the project folder for the "
 				+ "elastix log to see what went wrong.")
+			from subprocess import call
+			projectController = ProjectController.Instance()
+			projectFolder = projectController.currentProject.folder + "/data"
+			call(["open", projectFolder])
 
 	@overrides(TransformationTool)
 	def cleanUp(self):
