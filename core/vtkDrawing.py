@@ -139,7 +139,7 @@ def CreateTextItem(text, scale, camera, color=None):
 
 def CreateCircle(radius):
 	circleSource = vtkRegularPolygonSource()
-	circleSource.SetNumberOfSides(30)
+	circleSource.SetNumberOfSides(32)
 	circleSource.SetRadius(radius)
 	circleSource.SetGeneratePolygon(False)
 
