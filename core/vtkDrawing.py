@@ -23,6 +23,14 @@ from vtk import vtkAssembly
 from vtk import vtkMatrix4x4
 from vtk import vtkTransform
 from vtk import vtkOutlineSource
+from vtk import vtkConeSource
+from vtk import vtkParametricTorus
+from vtk import vtkParametricFunctionSource
+from vtk import vtkTubeFilter
+from vtk import vtkAppendPolyData
+from vtk import vtkCubeSource
+from vtk import vtkTransformFilter
+import math
 from core.operations import Add
 from core.operations import Subtract
 from core.operations import Multiply
@@ -171,6 +179,136 @@ def CreateSquare(width, color=None, zOffset=0):
 	ColorActor(square, color)
 
 	return square
+
+
+def CreateTorus(point1, point2, axe):
+	"""
+	Creates a torus that has point1 as center point2 defines
+	a point on the torus.
+	"""
+	direction = map(lambda x, y: x - y, point2, point1)
+	length = math.sqrt(sum(map(lambda x: x ** 2, direction)))
+
+	torus = vtkParametricTorus()
+	torus.SetRingRadius(length / 1.5)
+	torus.SetCrossSectionRadius(length / 30.0)
+
+	torusSource = vtkParametricFunctionSource()
+	torusSource.SetParametricFunction(torus)
+	torusSource.SetScalarModeToPhase()
+	torusSource.Update()
+
+	transform = vtkTransform()
+	if axe == 0:
+		transform.RotateY(90)
+	elif axe == 1:
+		transform.RotateX(90)
+
+	transformFilter = vtkTransformFilter()
+	transformFilter.SetInputConnection(torusSource.GetOutputPort())
+	transformFilter.SetTransform(transform)
+	transformFilter.Update()
+
+	torusMapper = vtkPolyDataMapper()
+	torusMapper.SetInputConnection(transformFilter.GetOutputPort())
+
+	torusActor = vtkActor()
+	torusActor.SetMapper(torusMapper)
+
+	return torusActor, transformFilter.GetOutput()
+
+
+def CreateBoxOnStick(point1, point2, tipRatio=0.3):
+	"""
+	Creates an stick with a box as tip from point1 to point2.
+	Use tipRatio for setting the ratio for tip of the arrow.
+	"""
+	direction = map(lambda x, y: x - y, point2, point1)
+	length = math.sqrt(sum(map(lambda x: x ** 2, direction)))
+
+	unitDir = map(lambda x: x / length, direction)
+	shaftDir = map(lambda x: x * (1.0 - tipRatio), unitDir)
+	tipPos = map(lambda x: x * (1.0 - (tipRatio * 0.5)), unitDir)
+
+	lineSource = vtkLineSource()
+	lineSource.SetPoint1(0, 0, 0)
+	lineSource.SetPoint2(shaftDir)
+
+	tubeFilter = vtkTubeFilter()
+	tubeFilter.SetInputConnection(lineSource.GetOutputPort())
+	tubeFilter.SetRadius(0.02)
+	tubeFilter.SetNumberOfSides(8)
+	tubeFilter.CappingOn()
+
+	cubeSource = vtkCubeSource()
+	# cubeSource.CappingOn()
+	cubeSource.SetXLength(tipRatio)
+	cubeSource.SetYLength(tipRatio)
+	cubeSource.SetZLength(tipRatio)
+	cubeSource.SetCenter(tipPos)
+
+	polyCombine = vtkAppendPolyData()
+	polyCombine.AddInputConnection(tubeFilter.GetOutputPort())
+	polyCombine.AddInputConnection(cubeSource.GetOutputPort())
+	polyCombine.Update()
+
+	polyMapper = vtkDataSetMapper()
+	polyMapper.SetInputConnection(polyCombine.GetOutputPort())
+
+	arrow = vtkActor()
+	arrow.SetMapper(polyMapper)
+	arrow.SetScale(length)
+	arrow.SetPosition(point1)
+	arrow.GetProperty().SetColor(1.0, 0.0, 1.0)
+
+	return arrow, polyCombine.GetOutput()
+
+
+def CreateArrow(point1, point2, tipRatio=0.3):
+	"""
+	Creates an arrow from point1 to point2. Use tipRatio for
+	setting the ratio for tip of the arrow.
+	"""
+	direction = map(lambda x, y: x - y, point2, point1)
+	length = math.sqrt(sum(map(lambda x: x ** 2, direction)))
+
+	unitDir = map(lambda x: x / length, direction)
+	shaftDir = map(lambda x: x * (1.0 - tipRatio), unitDir)
+	tipPos = map(lambda x: x * (1.0 - (tipRatio * 0.5)), unitDir)
+
+	lineSource = vtkLineSource()
+	lineSource.SetPoint1(0, 0, 0)
+	lineSource.SetPoint2(shaftDir)
+
+	tubeFilter = vtkTubeFilter()
+	tubeFilter.SetInputConnection(lineSource.GetOutputPort())
+	tubeFilter.SetRadius(0.02)
+	tubeFilter.SetNumberOfSides(8)
+	tubeFilter.CappingOn()
+
+	coneSource = vtkConeSource()
+	coneSource.CappingOn()
+	coneSource.SetHeight(tipRatio)
+	coneSource.SetRadius(.2)
+	coneSource.SetResolution(16)
+	coneSource.SetCenter(tipPos)
+	coneSource.SetDirection(tipPos)
+
+	polyCombine = vtkAppendPolyData()
+	polyCombine.AddInputConnection(tubeFilter.GetOutputPort())
+	polyCombine.AddInputConnection(coneSource.GetOutputPort())
+	polyCombine.Update()
+
+	polyMapper = vtkDataSetMapper()
+	polyMapper.SetInputConnection(polyCombine.GetOutputPort())
+
+	arrow = vtkActor()
+	arrow.SetMapper(polyMapper)
+	arrow.SetScale(length)
+	arrow.SetPosition(point1)
+	arrow.GetProperty().SetColor(1.0, 0.0, 1.0)
+
+	return arrow, polyCombine.GetOutput()
 
 
 def CreateOutline(bounds, color=None):
