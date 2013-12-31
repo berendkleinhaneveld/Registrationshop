@@ -168,6 +168,18 @@ class RenderWidget(QWidget):
 			else:
 				self.imagePlaneWidgets[sliceIndex].Off()
 
+	@Slot(object)
+	def transformationsUpdated(self, transformations):
+		"""
+		Get the scaling transform from the transformations and apply
+		it to the volume and to the grid that shows the bounds of the
+		volume.
+		"""
+		transform = transformations.scalingTransform()
+		self.volume.SetUserTransform(transform)
+		for item in self.gridItems:
+			item.SetUserTransform(transform)
+
 	def _syncCameras(self, camera, ev):
 		"""
 		Camera modified event callback. Copies the parameters of
@@ -195,15 +207,10 @@ class RenderWidget(QWidget):
 		for item in self.orientationGridItems:
 			self.renderer.AddViewProp(item)
 
-	def _cleanUpGrids(self):
-		for item in self.gridItems:
-			self.renderer.RemoveViewProp(item)
-		for item in self.orientationGridItems:
-			self.renderer.RemoveViewProp(item)
-		self.gridItems = []
-		self.orientationGridItems = []
-
 	def _createClippingBox(self):
+		"""
+		Create a clipping box that fits around the data.
+		"""
 		self.clippingBox = ClippingBox()
 		self.clippingBox.setWidget(self)
 		if not self.imageData:
@@ -211,14 +218,10 @@ class RenderWidget(QWidget):
 		else:
 			self.clippingBox.setImageData(self.imageData)
 
-	@Slot(object)
-	def transformationsUpdated(self, transformations):
-		"""
-		Get the scaling transform from the transformations and apply
-		it to the volume and to the grid that shows the bounds of the
-		volume.
-		"""
-		transform = transformations.scalingTransform()
-		self.volume.SetUserTransform(transform)
+	def _cleanUpGrids(self):
 		for item in self.gridItems:
-			item.SetUserTransform(transform)
+			self.renderer.RemoveViewProp(item)
+		for item in self.orientationGridItems:
+			self.renderer.RemoveViewProp(item)
+		self.gridItems = []
+		self.orientationGridItems = []
