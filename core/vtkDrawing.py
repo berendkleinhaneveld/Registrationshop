@@ -84,7 +84,7 @@ def CreateLineBeginAndEnd(p1, p2, length, color=None):
 
 	line1 = CreateLine(point1, point2, color)
 	line2 = CreateLine(point3, point4, color)
-	
+
 	return [line1, line2]
 
 
