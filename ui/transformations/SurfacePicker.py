@@ -65,12 +65,11 @@ class SurfacePicker(Picker, Interactor):
 		self.AddObserver(self.widget.rwi, "KeyPressEvent", self.keyPress)
 
 	def cleanUp(self):
+		super(SurfacePicker, self).cleanUp()
 		if self.widget:
 			self.widget.renderer.RemoveViewProp(self.greenCone)
 			self.widget.renderer.RemoveViewProp(self.redCone)
 			self.widget.rwi.ShowCursor()
-
-		self.cleanUpCallbacks()
 
 	# Callbacks
 
