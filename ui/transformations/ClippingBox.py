@@ -7,7 +7,6 @@ ClippingBox
 from ui.Interactor import Interactor
 from PySide.QtCore import QObject
 from vtk import vtkBoxWidget
-# from vtk import vtkTransform
 from vtk import vtkPlanes
 from PySide.QtCore import Signal
 
