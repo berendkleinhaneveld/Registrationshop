@@ -33,7 +33,7 @@ class TransformBox(QObject, Interactor):
 		self.transformBox.SetInteractor(self.widget.rwi)
 		self.transformBox.SetPlaceFactor(1.01)
 		self.transformBox.SetInputData(imageData)
-		self.transformBox.SetDefaultRenderer(self.widget.renderer)
+		self.transformBox.SetDefaultRenderer(self.widget.rendererOverlay)
 		self.transformBox.InsideOutOn()
 		self.transformBox.PlaceWidget()
 
