@@ -222,7 +222,10 @@ def CreateBounds(bounds):
 
 
 def CreateOrientationGrid(bounds, camera):
-	# TODO: instead of lines, spheres or other shapes could be used as nudges
+	return []
+	originX = bounds[0]
+	originY = bounds[2]
+	originZ = bounds[4]
 	boundX = bounds[1] * 1.2
 	boundY = bounds[3] * 1.2
 	boundZ = bounds[5] * 1.2
@@ -235,8 +238,11 @@ def CreateOrientationGrid(bounds, camera):
 
 	# Create the main axes
 	lineActorsX.append(CreateLine([0, 0, 0], [boundX, 0, 0]))
+	lineActorsX.append(CreateLine([0, 0, 0], [originX, 0, 0]))
 	lineActorsY.append(CreateLine([0, 0, 0], [0, boundY, 0]))
+	lineActorsY.append(CreateLine([0, 0, 0], [0, originY, 0]))
 	lineActorsZ.append(CreateLine([0, 0, 0], [0, 0, boundZ]))
+	lineActorsZ.append(CreateLine([0, 0, 0], [0, 0, originZ]))
 
 	# Create the nudges on the X axis
 	subdivSize = boundX / 10
