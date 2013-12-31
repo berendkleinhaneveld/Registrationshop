@@ -90,15 +90,7 @@ class Parameter(object):
 			if len(value) == 0:
 				raise AttributeError("Can't set an empty list as value")
 
-		if isinstance(value, basestring):
-			# Try to convert to another type
-			value, success = Parameter.valueAsBool(value)
-			if not success:
-				value, success = Parameter.valueAsInt(value)
-			if not success:
-				value, success = Parameter.valueAsFloat(value)
-
-		self._value = value
+		self._value = Parameter.convertValueToType(value)
 
 	def key(self):
 		"""
@@ -111,6 +103,23 @@ class Parameter(object):
 		:rtype: float, int, basestring
 		"""
 		return self._value
+
+	@classmethod
+	def convertValueToType(cls, value):
+		"""
+		Returns possibly converted value
+		"""
+		if isinstance(value, basestring):
+			# Try to convert to another type
+			value, success = Parameter.valueAsBool(value)
+			if not success:
+				value, success = Parameter.valueAsInt(value)
+			if not success:
+				value, success = Parameter.valueAsFloat(value)
+			if not success:
+				value, success = Parameter.valueAsList(value)
+
+		return value
 
 	@classmethod
 	def valueToString(cls, value):
@@ -191,6 +200,24 @@ class Parameter(object):
 				return floatValue, True
 			except ValueError:
 				pass
+
+		return value, False
+
+	@classmethod
+	def valueAsList(cls, value):
+		"""
+		"""
+		if isinstance(value, list):
+			return value, True
+		elif isinstance(value, basestring):
+			words = value.split()
+			if len(words) == 1:
+				return value, False
+			result = []
+			for word in words:
+				val = Parameter.convertValueToType(word)
+				result.append(val)
+			return result, True
 
 		return value, False
 

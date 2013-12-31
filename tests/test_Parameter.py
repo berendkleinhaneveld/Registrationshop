@@ -38,7 +38,7 @@ class ParameterTest(unittest.TestCase):
 		param.setKey("    Key With Spaces  \n")
 		self.assertEquals(param.key(), "KeyWithSpaces")
 		param.setValue("Value with spaces")
-		self.assertEquals(param.value(), "Value with spaces")
+		self.assertEquals(param.value(), ["Value", "with", "spaces"])
 
 		self.assertFalse(param == Parameter("Hello", 10))
 		self.assertTrue(param != Parameter("Hello", 10))
@@ -149,7 +149,13 @@ class ParameterTest(unittest.TestCase):
 		param = Parameter.parameterFromString("(a b c)")
 		self.assertIsNotNone(param)
 		self.assertEquals(param.key(), "a")
-		self.assertEquals(param.value(), "b c")
+		self.assertEquals(param.value(), ["b", "c"])
 
 		param = Parameter.parameterFromString("(ab)")
 		self.assertIsNone(param)
+
+	def testParameterList(self):
+		param = Parameter.parameterFromString("(a 4 4 4 1 1)")
+		self.assertIsNotNone(param)
+
+		self.assertEquals(param.__str__(), "(a 4 4 4 1 1)")
