@@ -50,9 +50,9 @@ class ComparisonController(QObject):
 		blue = map(lambda x: x / 255.0, blue)
 		orange = map(lambda x: x / 255.0, orange)
 		self.fixedImageWidget = SliceViewerWidget()
-		self.fixedImageWidget.color = blue
+		self.fixedImageWidget.color = orange
 		self.movingImageWidget = SliceViewerWidget()
-		self.movingImageWidget.color = orange
+		self.movingImageWidget.color = blue
 		self.diffImageWidget = SliceCompareViewerWidget()
 
 		self.widgets = [self.fixedImageWidget, self.diffImageWidget, self.movingImageWidget]
