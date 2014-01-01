@@ -49,7 +49,7 @@ class RenderController(QObject):
 	# RenderWidget, RenderParameterWidget(Slices) should connect
 	clippingBoxChanged = Signal(bool)
 
-	def __init__(self, renderWidget):
+	def __init__(self, renderWidget, tag):
 		"""
 		Set the renderWidget for direct control instead of Signal/Slot messages.
 		:type renderWidget: RenderWidget
@@ -64,6 +64,7 @@ class RenderController(QObject):
 		self.visualizations = dict()  # Keep track of used volume properties
 		self.slices = [False, False, False]
 		self.clippingBox = False
+		self.tag = tag
 
 	@Slot(basestring)
 	def setFile(self, fileName):
@@ -170,6 +171,11 @@ class RenderController(QObject):
 			self.visualization.updateTransferFunction()
 		else:
 			self.visualization = VolumeVisualizationFactory.CreateProperty(self.visualizationType)
+			if self.visualizationType == VisualizationTypeSimple:
+				if self.tag == "fixed":
+					self.visualization.color = self.visualization.colors[0]
+				elif self.tag == "moving":
+					self.visualization.color = self.visualization.colors[1]
 			self.visualization.setImageData(self.imageData)
 			self.visualization.updateTransferFunction()
 			self.visualizations[self.visualizationType] = self.visualization

@@ -126,8 +126,8 @@ class RegistrationShop(MainWindow, WindowDialog):
 		self.movingDataWidget = RenderWidget()
 		self.multiDataWidget = MultiRenderWidget()
 
-		self.fixedRenderController = RenderController(self.fixedDataWidget)
-		self.movingRenderController = RenderController(self.movingDataWidget)
+		self.fixedRenderController = RenderController(self.fixedDataWidget, "fixed")
+		self.movingRenderController = RenderController(self.movingDataWidget, "moving")
 		self.multiRenderController = MultiRenderController(self.multiDataWidget)
 
 		# Give references of the render controllers to the project controller
