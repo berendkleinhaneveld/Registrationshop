@@ -69,6 +69,7 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
+		layout.setContentsMargins(0, 0, 0, 0)
 		layout.addWidget(self.labelFixedOpacity, 0, 0)
 		layout.addWidget(self.sliderFixedOpacity, 0, 1)
 		layout.addWidget(self.labelMovingOpacity, 1, 0)
