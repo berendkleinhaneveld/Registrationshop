@@ -199,7 +199,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		propsLayout.addWidget(self.movingPropWidget)
 
 		propsWidget = QWidget()
-		propsWidget.setMinimumHeight(300)
+		propsWidget.setMinimumHeight(200)
 		propsWidget.setLayout(propsLayout)
 
 		self.verticalSplitter.addWidget(horizontalSplitter)
