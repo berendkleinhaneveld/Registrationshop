@@ -9,17 +9,13 @@ from vtk import vtkRenderer
 from vtk import vtkInteractorStyleUser
 from vtk import vtkImagePlaneWidget
 from vtk import vtkCellPicker
-from vtk import vtkImageBlend
-# from vtk import vtkLookupTable
 from vtk import vtkColorTransferFunction
-from vtk import vtkPiecewiseFunction
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.Interactor import Interactor
 from core.vtkDrawing import CreateSquare
-from core.vtkDrawing import ColorActor
 from core.vtkDrawing import CreateLine
 
 
@@ -38,9 +34,7 @@ class SliceViewerWidget(QWidget, Interactor):
 		self.color = [1, 1, 1]
 
 		self.renderer = vtkRenderer()
-		self.renderer.SetBackground2(0.4, 0.4, 0.4)
-		self.renderer.SetBackground(0.1, 0.1, 0.1)
-		self.renderer.SetGradientBackground(True)
+		self.renderer.SetBackground(0.0, 0.0, 0.0)
 		self.renderer.SetLayer(0)
 
 		# Overlay renderer which is synced with the default renderer
@@ -73,9 +67,11 @@ class SliceViewerWidget(QWidget, Interactor):
 
 		self.locator = []
 
+		self.setStyleSheet("background-color: #333")
+
 		layout = QGridLayout()
 		layout.setSpacing(0)
-		layout.setContentsMargins(0, 0, 0, 0)
+		layout.setContentsMargins(10, 0, 10, 10)
 		layout.addWidget(self.rwi)
 		self.setLayout(layout)
 
@@ -115,6 +111,14 @@ class SliceViewerWidget(QWidget, Interactor):
 		self.slicer.SetRestrictPlaneToVolume(1)
 		self.slicer.PlaceWidget()
 		self.slicer.On()
+		self.slicer.SetMarginSizeX(6.0)
+		self.slicer.SetMarginSizeY(20.0)
+		cursorProperty = self.slicer.GetCursorProperty()
+		cursorProperty.SetOpacity(0.0)
+		planeProperty = self.slicer.GetPlaneProperty()
+		planeProperty.SetColor(0, 0, 0)
+		selectedPlaneProperty = self.slicer.GetSelectedPlaneProperty()
+		selectedPlaneProperty.SetColor(0, 0, 0)
 
 		# Reset the camera and set the clipping range
 		self.renderer.ResetCamera()
@@ -143,12 +147,12 @@ class SliceViewerWidget(QWidget, Interactor):
 		index = self.slicer.GetSliceIndex()
 		nextIndex = index + sign
 		self.slicer.SetSliceIndex(nextIndex)
-		# self.slicer.UpdatePlacement()
-		# self.render()
 
 		self.slicePositionChanged.emit(self)
 
 	def mouseMovedEvent(self, arg1, arg2):
+		self.rwi.HideCursor()
+
 		x, y = arg1.GetEventPosition()
 
 		camera = self.renderer.GetActiveCamera()

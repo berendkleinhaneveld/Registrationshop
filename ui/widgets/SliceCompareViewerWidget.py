@@ -48,9 +48,7 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 		super(SliceCompareViewerWidget, self).__init__()
 
 		self.renderer = vtkRenderer()
-		self.renderer.SetBackground2(0.4, 0.4, 0.4)
-		self.renderer.SetBackground(0.1, 0.1, 0.1)
-		self.renderer.SetGradientBackground(True)
+		self.renderer.SetBackground(0.0, 0.0, 0.0)
 		self.renderer.SetLayer(0)
 
 		# Overlay renderer which is synced with the default renderer
@@ -83,9 +81,11 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 
 		self.locator = []
 
+		self.setStyleSheet("background-color: #333")
+
 		layout = QGridLayout()
 		layout.setSpacing(0)
-		layout.setContentsMargins(0, 0, 0, 0)
+		layout.setContentsMargins(10, 0, 10, 10)
 		layout.addWidget(self.rwi)
 		self.setLayout(layout)
 
@@ -117,6 +117,8 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 		pass
 
 	def mouseMovedEvent(self, arg1, arg2):
+		self.rwi.HideCursor()
+
 		x, y = arg1.GetEventPosition()
 		camera = self.renderer.GetActiveCamera()
 		cameraFP = list(camera.GetFocalPoint()) + [1.0]
