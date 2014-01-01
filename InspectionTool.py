@@ -8,13 +8,16 @@ CompareWidget
 from PySide.QtGui import QApplication
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
+from PySide.QtGui import QLabel
 from PySide.QtCore import QObject
 from PySide.QtCore import Slot
+from PySide.QtCore import Qt
 from core.data.DataReader import DataReader
 from core.data.DataTransformer import DataTransformer
 from core.data.DataResizer import DataResizer
 from ui.widgets.SliceViewerWidget import SliceViewerWidget
 from ui.widgets.SliceCompareViewerWidget import SliceCompareViewerWidget
+from ui.widgets.TitleWidget import TitleWidget
 from vtk import vtkTransform
 
 
@@ -25,14 +28,33 @@ class CompareWidget(QWidget):
 	def __init__(self, widgets):
 		super(CompareWidget, self).__init__()
 
+		self.setStyleSheet("background-color: #444")
+
+		fixedDataTitleWidget = self.createLabel("Fixed data", "#f80")
+		multiDataTitleWidget = self.createLabel("Mix / Result", "#fff")
+		movingDataTitleWidget = self.createLabel("Moving data", "#08f")
+
 		layout = QGridLayout()
 		layout.setSpacing(0)
 		layout.setContentsMargins(0, 0, 0, 0)
+		layout.addWidget(fixedDataTitleWidget, 0, 0)
+		layout.addWidget(multiDataTitleWidget, 0, 1)
+		layout.addWidget(movingDataTitleWidget, 0, 2)
 		for i in range(len(widgets)):
 			widget = widgets[i]
-			layout.addWidget(widget, 0, i)
+			layout.addWidget(widget, 1, i)
 
 		self.setLayout(layout)
+
+	def createLabel(self, text, color):
+		label = QLabel(text)
+		font = label.font()
+		font.setPixelSize(11)
+		label.setFont(font)
+		label.setAlignment(Qt.AlignCenter)
+		label.setStyleSheet("background-color: #444; color: " + color)
+		label.setMinimumHeight(30)
+		return label
 
 
 class ComparisonController(QObject):
