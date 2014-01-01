@@ -604,7 +604,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		self.controller.setInputData(project.fixedData, project.movingData, transform)
 		self.compareWidget = CompareWidget(self.controller.widgets)
 		self.compareWidget.show()
-		# controller.slicerChanged(self.diffImageWidget)
+		self.controller.slicerChanged(self.controller.fixedImageWidget)
 
 	@Slot()
 	def showHelp(self):

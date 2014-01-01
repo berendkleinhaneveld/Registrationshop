@@ -28,8 +28,8 @@ class CompareWidget(QWidget):
 		super(CompareWidget, self).__init__()
 
 		layout = QGridLayout()
-		# layout.setSpacing(0)
-		# layout.setContentsMargins(0, 0, 0, 0)
+		layout.setSpacing(0)
+		layout.setContentsMargins(0, 0, 0, 0)
 		for i in range(len(widgets)):
 			widget = widgets[i]
 			layout.addWidget(widget, 0, i)
@@ -143,6 +143,8 @@ class ComparisonController(QObject):
 
 		self.fixedImageWidget.slicer.AddObserver("WindowLevelEvent", self.slicerModified)
 		self.movingImageWidget.slicer.AddObserver("WindowLevelEvent", self.slicerModified)
+
+		self.diffImageWidget.updateCompareView()
 
 	def slicerModified(self, obj, ev):
 		window = obj.GetWindow()
