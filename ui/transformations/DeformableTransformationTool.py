@@ -49,9 +49,9 @@ class DeformableTransformationTool(TransformationTool):
 		* Define location for output
 		* Write transformation to output folder
 		* Call elastix to process the data
-		# TODO
 		* Load the new data into the moving widget / project (or
 			maybe ask the user whether he wants to import it)
+		# TODO
 		* Maybe construct an extra entry in ProjectController for
 			the transformed data. So that the reference to the old
 			data is not lost.
@@ -65,7 +65,11 @@ class DeformableTransformationTool(TransformationTool):
 		currentProject = ProjectController.Instance().currentProject
 		path = currentProject.folder
 		
-		# TODO: make sure to save to project before starting a deformable registration
+		if not path:
+			statusWidget.setText("Please create and save a project first so "
+				"that the results of the registration can be saved to disk.")
+			return
+
 		transformationPath = os.path.join(path, "data/Transformation.txt")
 		initialTransformPath = os.path.join(path, "data/InitialTransformation.txt")
 		outputFolder = os.path.join(path, "data")
