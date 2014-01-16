@@ -111,8 +111,6 @@ class SliceViewerWidget(QWidget, Interactor):
 		self.slicer.SetRestrictPlaneToVolume(1)
 		self.slicer.PlaceWidget()
 		self.slicer.On()
-		self.slicer.SetMarginSizeX(6.0)
-		self.slicer.SetMarginSizeY(20.0)
 		cursorProperty = self.slicer.GetCursorProperty()
 		cursorProperty.SetOpacity(0.0)
 		planeProperty = self.slicer.GetPlaneProperty()
