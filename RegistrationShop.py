@@ -500,9 +500,14 @@ class RegistrationShop(MainWindow, WindowDialog):
 		if projCont.currentProject.folder is not None:
 			# Save that project
 			saved = projCont.saveProject()
+			statusWidget = StatusWidget.Instance()
 			if saved:
 				# Save it in the settings that this was the last opened project
 				RegistrationShop.settings.setValue("project/lastProject", projCont.currentProject.folder)
+				statusWidget.setText("The project was succesfully saved to disk.")
+			else:
+				statusWidget.setText("Something went wrong while saving the project to disk. "
+					"Please try to save the project again.")
 		else:
 			self.saveProjectAs()
 
