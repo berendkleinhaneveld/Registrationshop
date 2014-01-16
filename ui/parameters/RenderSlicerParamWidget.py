@@ -26,7 +26,7 @@ class RenderSlicerParamWidget(QWidget):
 		self.renderController.clippingBoxChanged.connect(self.showsClippingBox)
 
 		self.slicesLabel = QLabel("Show slices for directions:")
-		self.sliceLabelTexts = ["x:", "y:", "z:"]
+		self.sliceLabelTexts = ["Axial:", "Coronal:", "Sagital:"]
 		self.sliceLabels = [QLabel(text) for text in self.sliceLabelTexts]
 		self.sliceCheckBoxes = [QCheckBox() for i in range(3)]
 		for index in range(3):
