@@ -14,6 +14,7 @@ from ui.widgets.ColorWidget import ColorChoiceWidget
 from core.decorators import overrides
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
+from PySide.QtGui import QGroupBox
 from PySide.QtCore import Qt
 
 
@@ -44,6 +45,7 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		colors = [[255, 139, 0], [0, 147, 255], [0, 255, 147], [213, 100, 255], [255, 75, 75]]
 		self.colors = map(lambda x: [x[0] / 255.0, x[1] / 255.0, x[2] / 255.0], colors)
 		self.color = self.colors[0]
+		self.opacity = 1.0
 
 	@overrides(VolumeVisualization)
 	def getParameterWidget(self):
@@ -66,6 +68,23 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.upperBoundSlider.label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 		self.upperBoundSlider.valueChanged.connect(self.valueChanged)
 
+		layoutGroup = QGridLayout()
+		layoutGroup.setAlignment(Qt.AlignTop)
+		layoutGroup.setContentsMargins(0, 0, 0, 0)
+		layoutGroup.setSpacing(0)
+		layoutGroup.addWidget(self.lowerBoundSlider)
+		layoutGroup.addWidget(self.upperBoundSlider)
+
+		groupbox = QGroupBox("Thresholds:")
+		groupbox.setLayout(layoutGroup)
+
+		self.opacitySlider = SliderFloatWidget()
+		self.opacitySlider.setName("Opacity:")
+		self.opacitySlider.setRange([0.0, 1.0])
+		self.opacitySlider.setValue(self.opacity)
+		self.opacitySlider.label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+		self.opacitySlider.valueChanged.connect(self.valueChanged)
+
 		self.colorChooser = ColorChoiceWidget()
 		self.colorChooser.setName("Color:")
 		self.colorChooser.setColors(self.colors)
@@ -74,13 +93,23 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.colorChooser.label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 		self.colorChooser.valueChanged.connect(self.valueChanged)
 
+		otherLayoutGroup = QGridLayout()
+		otherLayoutGroup.setAlignment(Qt.AlignTop)
+		otherLayoutGroup.setContentsMargins(0, 0, 0, 0)
+		otherLayoutGroup.setSpacing(0)
+		otherLayoutGroup.addWidget(self.opacitySlider)
+		# otherLayoutGroup.addWidget(self.colorChooser)
+
+		# otherBox = QGroupBox("Color and opacity:")
+		otherBox = QGroupBox()
+		otherBox.setLayout(otherLayoutGroup)
+
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
 		layout.setContentsMargins(0, 0, 0, 0)
-		layout.setSpacing(0)
-		layout.addWidget(self.lowerBoundSlider)
-		layout.addWidget(self.upperBoundSlider)
-		layout.addWidget(self.colorChooser)
+		layout.setHorizontalSpacing(0)
+		layout.addWidget(groupbox)
+		layout.addWidget(otherBox)
 
 		widget = QWidget()
 		widget.setLayout(layout)
@@ -91,10 +120,12 @@ class VolumeVisualizationSimple(VolumeVisualization):
 			self.columnResizer.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 0)
 			self.columnResizer.addWidgetsFromLayout(self.upperBoundSlider.layout(), 0)
 			self.columnResizer.addWidgetsFromLayout(self.colorChooser.layout(), 0)
+			self.columnResizer.addWidgetsFromLayout(self.opacitySlider.layout(), 0)
 
 			self.otherColRes = ColumnResizer()
 			self.otherColRes.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 2)
 			self.otherColRes.addWidgetsFromLayout(self.upperBoundSlider.layout(), 2)
+			self.otherColRes.addWidgetsFromLayout(self.opacitySlider.layout(), 2)
 		except Exception, e:
 			print e
 
@@ -107,11 +138,13 @@ class VolumeVisualizationSimple(VolumeVisualization):
 			self.maximum = 1.0
 			self.lowerBound = self.minimum
 			self.upperBound = self.maximum
+			self.opacity = 1.0
 			return
 
 		self.minimum, self.maximum = imageData.GetScalarRange()
 		self.lowerBound = self.minimum
 		self.upperBound = self.maximum
+		self.opacity = 1.0
 
 	@overrides(VolumeVisualization)
 	def setMapper(self, mapper):
@@ -133,8 +166,8 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.opacityFunction = vtkPiecewiseFunction()
 		self.opacityFunction.AddPoint(self.minimum, 0)
 		self.opacityFunction.AddPoint(self.lowerBound, 0)
-		self.opacityFunction.AddPoint(self.lowerBound+0.0001, 1)
-		self.opacityFunction.AddPoint(self.upperBound, 1)
+		self.opacityFunction.AddPoint(self.lowerBound+0.0001, self.opacity)
+		self.opacityFunction.AddPoint(self.upperBound, self.opacity)
 		self.opacityFunction.AddPoint(self.upperBound+0.0001, 0)
 		self.opacityFunction.AddPoint(self.maximum, 0)
 
@@ -155,5 +188,5 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.lowerBound = min(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
 		self.upperBound = max(self.lowerBoundSlider.value(), self.upperBoundSlider.value())
 		self.color = self.colorChooser.color
-
+		self.opacity = self.opacitySlider.value()
 		self.updateTransferFunction()
