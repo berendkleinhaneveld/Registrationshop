@@ -52,7 +52,7 @@ class PointsWidget(QWidget):
 		layout.addWidget(self.scrollArea)
 		self.setLayout(layout)
 
-	@Slot(list, list)
+	@Slot(list)
 	def setPoints(self, points):
 		self._clearLandmarkWidgets()
 		layout = self.landmarkLocationsWidget.layout()
