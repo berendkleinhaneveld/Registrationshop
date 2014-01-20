@@ -82,7 +82,7 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 
 		layout = QGridLayout()
 		layout.setSpacing(0)
-		layout.setContentsMargins(10, 0, 10, 10)
+		layout.setContentsMargins(0, 0, 0, 0)
 		layout.addWidget(self.rwi)
 		self.setLayout(layout)
 
