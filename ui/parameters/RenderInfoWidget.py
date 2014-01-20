@@ -10,8 +10,15 @@ from PySide.QtGui import QWidget
 from ui.widgets import Style
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QLabel
+from PySide.QtGui import QPushButton
+from PySide.QtGui import QDialog
+from PySide.QtGui import QVBoxLayout
+from PySide.QtGui import QGroupBox
+from PySide.QtGui import QScrollArea
+from PySide.QtGui import QFrame
 from PySide.QtCore import Slot
 from PySide.QtCore import Qt
+from core.project import ProjectController
 from core.data import DataReader
 from core.data.DataAnalyzer import DataAnalyzer
 from ui.widgets.histogram import Histogram
@@ -26,7 +33,14 @@ class RenderInfoWidget(QWidget):
 	def __init__(self):
 		super(RenderInfoWidget, self).__init__()
 
+		self.scrollArea = QScrollArea()
+		self.scrollArea.setFrameShape(QFrame.NoFrame)
+		self.scrollArea.setAutoFillBackground(False)
+		self.scrollArea.setAttribute(Qt.WA_TranslucentBackground)
+		self.scrollArea.setWidgetResizable(True)
+
 		Style.styleWidgetForTab(self)
+		Style.styleWidgetForTab(self.scrollArea)
 
 	@Slot(basestring)
 	def setFile(self, fileName):
@@ -35,6 +49,8 @@ class RenderInfoWidget(QWidget):
 		"""
 		if fileName is None:
 			return
+
+		self.fileName = fileName
 
 		# Read info from dataset
 		# TODO: read out the real world dimensions in inch or cm
@@ -45,6 +61,7 @@ class RenderInfoWidget(QWidget):
 		directory, name = os.path.split(fileName)
 		dimensions = imageData.GetDimensions()
 		minimum, maximum = imageData.GetScalarRange()
+		scalarType = imageData.GetScalarTypeAsString()
 
 		bins = DataAnalyzer.histogramForData(imageData, 256)
 
@@ -53,6 +70,7 @@ class RenderInfoWidget(QWidget):
 		self.histogram.enabled = True
 
 		self.histogramWidget = HistogramWidget()
+		self.histogramWidget.setMinimumHeight(100)
 		self.histogramWidget.setHistogram(self.histogram)
 		self.histogramWidget.setAxeMode(bottom=HistogramWidget.AxeClear,
 			left=HistogramWidget.AxeLog)
@@ -62,6 +80,7 @@ class RenderInfoWidget(QWidget):
 		dimsText = "(" + str(dimensions[0]) + ", " + str(dimensions[1]) + ", " + str(dimensions[2]) + ")"
 		voxsText = str(dimensions[0] * dimensions[1] * dimensions[2])
 		rangText = "[" + str(minimum) + " : " + str(maximum) + "]"
+		typeText = scalarType
 
 		layout = self.layout()
 		if not layout:
@@ -70,36 +89,49 @@ class RenderInfoWidget(QWidget):
 			layout.setAlignment(Qt.AlignTop)
 
 			# Create string representations
-			nameField = QLabel("File name:")
-			dimsField = QLabel("Dimensions:")
-			voxsField = QLabel("Voxels:")
-			rangField = QLabel("Range:")
+			nameLabels = []
+			nameLabels.append(QLabel("File name:"))
+			nameLabels.append(QLabel("Dimensions:"))
+			nameLabels.append(QLabel("Voxels:"))
+			nameLabels.append(QLabel("Range:"))
+			nameLabels.append(QLabel("Data type:"))
 
-			nameField.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-			dimsField.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-			voxsField.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-			rangField.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+			for label in nameLabels:
+				label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 
 			# Create 'dynamic' labels
 			self.labelTitle = QLabel(nameText)
 			self.labelDimensions = QLabel(dimsText)
 			self.labelVoxels = QLabel(voxsText)
 			self.labelRange = QLabel(rangText)
+			self.labelType = QLabel(typeText)
 
-			layout.addWidget(nameField, 0, 0)
-			layout.addWidget(dimsField, 1, 0)
-			layout.addWidget(voxsField, 2, 0)
-			layout.addWidget(rangField, 3, 0)
+			index = 0
+			for label in nameLabels:
+				layout.addWidget(label, index, 0)
+				index += 1
 
 			layout.addWidget(self.labelTitle, 0, 1)
 			layout.addWidget(self.labelDimensions, 1, 1)
 			layout.addWidget(self.labelVoxels, 2, 1)
 			layout.addWidget(self.labelRange, 3, 1)
-			layout.addWidget(self.histogramWidget, 4, 0, 1, 2)
-			self.setLayout(layout)
+			layout.addWidget(self.labelType, 4, 1)
+			layout.addWidget(self.histogramWidget, 5, 0, 1, 2)
+
+			widget = QWidget()
+			widget.setLayout(layout)
+			Style.styleWidgetForTab(widget)
+			self.scrollArea.setWidget(widget)
+
+			scrollLayout = QGridLayout()
+			scrollLayout.setSpacing(0)
+			scrollLayout.setContentsMargins(0, 0, 0, 0)
+			scrollLayout.addWidget(self.scrollArea)
+			self.setLayout(scrollLayout)
 		else:
 			# Just update the text for the 'dynamic' labels
 			self.labelTitle.setText(nameText)
 			self.labelDimensions.setText(dimsText)
 			self.labelVoxels.setText(voxsText)
 			self.labelRange.setText(rangText)
+			self.labelType.setText(typeText)
