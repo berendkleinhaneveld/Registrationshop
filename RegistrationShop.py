@@ -157,9 +157,9 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 		# Create the layouts
 
-		fixedDataTitleWidget = TitleWidget("Fixed data")
-		multiDataTitleWidget = TitleWidget("Mix / Result")
-		movingDataTitleWidget = TitleWidget("Moving data")
+		fixedDataTitleWidget = TitleWidget("Fixed volume")
+		multiDataTitleWidget = TitleWidget("Fixed + Moving")
+		movingDataTitleWidget = TitleWidget("Moving volume")
 
 		fixedLayout = QGridLayout()
 		fixedLayout.setSpacing(0)
