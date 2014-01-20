@@ -43,8 +43,8 @@ class RenderPropWidget(QWidget):
 		# Create the tab widget
 		self.tabWidget = QTabWidget()
 		self.tabWidget.addTab(self.visParamTabWidget, "Visualization")
-		self.tabWidget.addTab(self.dataInfoTabWidget, "Data info")
 		self.tabWidget.addTab(self.slicesTabWidget, "Slices")
+		self.tabWidget.addTab(self.dataInfoTabWidget, "Data info")
 
 		self.currentTabIndex = 0
 		self.extraTabWidget = None
