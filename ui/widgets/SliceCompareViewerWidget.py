@@ -76,9 +76,6 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 		self.picker = vtkCellPicker()
 		self.picker.SetTolerance(1e-6)
 
-		# Known state of mouse (maybe can ask the event as well...)
-		self.leftButtonPressed = False
-
 		self.locator = []
 
 		self.setStyleSheet("background-color: #333")
