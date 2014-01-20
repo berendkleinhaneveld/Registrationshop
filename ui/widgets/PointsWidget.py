@@ -37,12 +37,13 @@ class PointsWidget(QWidget):
 		self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.scrollArea.setWidgetResizable(True)
 
+		landmarkLocationsLayout = QGridLayout()
+		landmarkLocationsLayout.setSpacing(0)
+		landmarkLocationsLayout.setContentsMargins(0, 0, 0, 0)
+		landmarkLocationsLayout.setAlignment(Qt.AlignTop)
+
 		self.landmarkLocationsWidget = QWidget()
 		Style.styleWidgetForTab(self.landmarkLocationsWidget)
-		landmarkLocationsLayout = QGridLayout()
-		landmarkLocationsLayout.setAlignment(Qt.AlignTop)
-		landmarkLocationsLayout.setContentsMargins(0, 0, 0, 0)
-		landmarkLocationsLayout.setSpacing(0)
 		self.landmarkLocationsWidget.setLayout(landmarkLocationsLayout)
 		self.scrollArea.setWidget(self.landmarkLocationsWidget)
 
@@ -80,6 +81,23 @@ class PointsWidget(QWidget):
 		self.activeLandmarkChanged.emit(self.activeIndex)
 
 
+
+class SpecialButton(QLabel):
+	def __init__(self):
+		super(SpecialButton, self).__init__("")
+
+		self.setAlignment(Qt.AlignCenter)
+		self.setStyleSheet("QLabel:enabled { background: #ccc }"
+			"QLabel { background: none }")
+		
+	def wheelEvent(self, wheelEv):
+		"""
+		Overrides QGraphicsView.wheelEvent()
+		Make sure nothing happens when the user scrolls over this widget.
+		"""
+		wheelEv.ignore()
+
+
 class LandmarkLocationWidget(QWidget):
 	# Signals
 	activated = Signal(int, bool)
@@ -92,17 +110,17 @@ class LandmarkLocationWidget(QWidget):
 		self._font.setPointSize(10)
 
 		self.indexLabel = QLabel()
-		self.indexLabel.setMaximumWidth(8)
-		self.indexLabel.setMinimumWidth(8)
+		self.indexLabel.setMaximumWidth(10)
+		self.indexLabel.setMinimumWidth(10)
 
 		self.doneButton = QPushButton("Done")
 		self.doneButton.setMaximumWidth(50)
 		self.doneButton.setFont(self._font)
 		self.doneButton.clicked.connect(self.doneButtonClicked)
 
-		self.fixedButton = QPushButton("")
+		self.fixedButton = SpecialButton()
 		self.fixedButton.setFont(self._font)
-		self.movingButton = QPushButton("")
+		self.movingButton = SpecialButton()
 		self.movingButton.setFont(self._font)
 
 		layout = QGridLayout()
