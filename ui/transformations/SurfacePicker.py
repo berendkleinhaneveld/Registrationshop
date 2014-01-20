@@ -92,14 +92,8 @@ class SurfacePicker(Picker, Interactor):
 		key = iren.GetKeyCode()
 		if key != "a":
 			return
-		point, normal = PickPoint(iren, self.widget.renderer, self.picker)
-		# point in world coordinates
-		transform = TransformWithMatrix(self.widget.volume.GetMatrix())
-		transform.Inverse()
-		# transformedPoint in local coordinates
-		tranformedPoint = transform.TransformPoint(point)
-		point = list(tranformedPoint)
-		self.pickedLocation.emit(point)
+		pos = self.redCone.GetPosition()
+		self.pickedLocation.emit(pos)
 
 
 def PointCone(actor, nx, ny, nz):
