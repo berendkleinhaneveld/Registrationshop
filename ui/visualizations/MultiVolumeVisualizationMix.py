@@ -8,6 +8,7 @@ from MultiVolumeVisualization import MultiVolumeVisualization
 from MultiVolumeVisualization import CreateFunctionFromProperties
 from MultiVolumeVisualization import CreateEmptyFunctions
 from core.decorators import overrides
+from PySide.QtGui import QGroupBox
 from PySide.QtGui import QWidget
 from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
@@ -49,8 +50,8 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 
 	@overrides(MultiVolumeVisualization)
 	def getParameterWidget(self):
-		self.labelFixedOpacity = QLabel("Opacity fixed data")
-		self.labelMovingOpacity = QLabel("Opacity moving data")
+		self.labelFixedOpacity = QLabel("Fixed:")
+		self.labelMovingOpacity = QLabel("Moving:")
 
 		self.sliderFixedOpacity = QSlider(Qt.Horizontal)
 		self.sliderFixedOpacity.setValue(pow(self.fixedOpacity, 1.0/3.0) * 100.0)
@@ -67,15 +68,20 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 		self.sliderFixedOpacity.valueChanged.connect(self.valueChanged)
 		self.sliderMovingOpacity.valueChanged.connect(self.valueChanged)
 
+		groupLayout = QGridLayout()
+		groupLayout.setAlignment(Qt.AlignTop)
+		groupLayout.addWidget(self.labelFixedOpacity, 0, 0)
+		groupLayout.addWidget(self.sliderFixedOpacity, 0, 1)
+		groupLayout.addWidget(self.labelMovingOpacity, 1, 0)
+		groupLayout.addWidget(self.sliderMovingOpacity, 1, 1)
+
+		groupBox = QGroupBox()
+		groupBox.setTitle("Opacity:")
+		groupBox.setLayout(groupLayout)
+
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.setContentsMargins(0, 0, 0, 0)
-		layout.addWidget(self.labelFixedOpacity, 0, 0)
-		layout.addWidget(self.sliderFixedOpacity, 0, 1)
-		layout.addWidget(self.labelMovingOpacity, 1, 0)
-		layout.addWidget(self.sliderMovingOpacity, 1, 1)
-		layout.addWidget(QLabel("Blend type"), 2, 0)
-		layout.addWidget(self.blendTypeComboBox, 2, 1)
+		layout.addWidget(groupBox)
 
 		widget = QWidget()
 		widget.setLayout(layout)
