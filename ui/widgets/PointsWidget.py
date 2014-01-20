@@ -23,6 +23,7 @@ class PointsWidget(QWidget):
 	"""
 
 	activeLandmarkChanged = Signal(int)
+	landmarkDeleted = Signal(int)
 
 	def __init__(self):
 		super(PointsWidget, self).__init__()
@@ -60,7 +61,8 @@ class PointsWidget(QWidget):
 			landmarkWidget = LandmarkLocationWidget()
 			landmarkWidget.setIndex(index)
 			landmarkWidget.active = (index == self.activeIndex)
-			landmarkWidget.activated.connect(self.landmarkIsActived)
+			landmarkWidget.activated.connect(self.activateLandmark)
+			landmarkWidget.deleted.connect(self.deleteLandmark)
 			landmarkWidget.setLandmarkSet(points[index])
 			layout.addWidget(landmarkWidget, index, 0)
 			self.landmarkWidgets.append(landmarkWidget)
@@ -73,13 +75,18 @@ class PointsWidget(QWidget):
 			widget.deleteLater()
 		self.landmarkWidgets = []
 
-	def landmarkIsActived(self, index, state):
+	@Slot(int, object)
+	def activateLandmark(self, index, state):
 		if not state:
 			self.activeIndex = len(self.landmarkWidgets)
 		else:
 			self.activeIndex = index
 		self.activeLandmarkChanged.emit(self.activeIndex)
 
+	@Slot(int)
+	def deleteLandmark(self, index):
+		self.activateLandmark(index, False)
+		self.landmarkDeleted.emit(index)
 
 
 class SpecialButton(QLabel):
@@ -101,7 +108,7 @@ class SpecialButton(QLabel):
 class LandmarkLocationWidget(QWidget):
 	# Signals
 	activated = Signal(int, bool)
-	removed = Signal(int)
+	deleted = Signal(int)
 
 	def __init__(self):
 		super(LandmarkLocationWidget, self).__init__()
@@ -118,20 +125,28 @@ class LandmarkLocationWidget(QWidget):
 		self.doneButton.setFont(self._font)
 		self.doneButton.clicked.connect(self.doneButtonClicked)
 
+		self.deleteButton = QPushButton("X")
+		self.deleteButton.setMaximumWidth(15)
+		self.deleteButton.setMinimumWidth(15)
+		self.deleteButton.setMaximumHeight(15)
+		self.deleteButton.setMinimumHeight(15)
+		self.deleteButton.setFont(self._font)
+		self.deleteButton.setVisible(False)
+		self.deleteButton.clicked.connect(self.deleteButtonClicked)
+
 		self.fixedButton = SpecialButton()
 		self.fixedButton.setFont(self._font)
 		self.movingButton = SpecialButton()
 		self.movingButton.setFont(self._font)
 
 		layout = QGridLayout()
-		layout.setAlignment(Qt.AlignTop)
 		layout.setContentsMargins(0, 0, 0, 0)
-		layout.setHorizontalSpacing(4)
 		layout.setVerticalSpacing(0)
-		layout.addWidget(self.indexLabel, 0, 0)
-		layout.addWidget(self.fixedButton, 0, 1)
-		layout.addWidget(self.movingButton, 0, 2)
-		layout.addWidget(self.doneButton, 0, 3)
+		layout.addWidget(self.deleteButton, 0, 0)
+		layout.addWidget(self.indexLabel, 0, 1)
+		layout.addWidget(self.fixedButton, 0, 2)
+		layout.addWidget(self.movingButton, 0, 3)
+		layout.addWidget(self.doneButton, 0, 4)
 		self.setLayout(layout)
 		self._updateState()
 		
@@ -174,10 +189,15 @@ class LandmarkLocationWidget(QWidget):
 		self.activated.emit(self.index, self._active)
 		self._updateState()
 
+	@Slot()
+	def deleteButtonClicked(self):
+		print("TODO: implement delete func for landmark pair")
+		self.deleted.emit(self.index)
+
 	def _updateState(self):
-		if self._active:
-			self.doneButton.setText("Done")
-		else:
-			self.doneButton.setText("Edit")
+		text = "Done" if self._active else "Edit"
+		self.doneButton.setText(text)
+		self.deleteButton.setVisible(self._active)
+		self.indexLabel.setVisible(not self._active)
 		self.fixedButton.setEnabled(self._active)
 		self.movingButton.setEnabled(self._active)
