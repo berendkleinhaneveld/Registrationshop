@@ -85,7 +85,7 @@ class HistogramWidget(QGraphicsView):
 		Overrides QGraphicsView.wheelEvent()
 		Make sure nothing happens when the user scrolls over this widget.
 		"""
-		pass
+		wheelEv.ignore()
 
 	@Slot()
 	def updateScene(self):
