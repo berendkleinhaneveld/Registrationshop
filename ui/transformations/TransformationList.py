@@ -5,7 +5,6 @@ TransformationList
 	Berend Klein Haneveld
 """
 from vtk import vtkTransform
-from vtk import vtkMatrix4x4
 from PySide.QtCore import QObject
 from PySide.QtCore import Signal
 from Transformation import Transformation
@@ -26,7 +25,14 @@ class TransformationList(QObject):
 
 		self._transformations = []
 		self._cachedTransformation = None
+		self._activeIndex = 0
 		self._dirty = True
+
+	def activateTransformationAtIndex(self, index):
+		if index < 0:
+			self._setActiveIndex(len(self._transformations))
+		else:
+			self._setActiveIndex(index)
 
 	def completeTransform(self):
 		"""
@@ -34,7 +40,7 @@ class TransformationList(QObject):
 		a cached version of the complete transformation matrix.
 		"""
 		if self._dirty:
-			self._cachedTransformation = self.transform(len(self._transformations))
+			self._cachedTransformation = self.transform(self._activeIndex)
 			self._dirty = False
 		return self._cachedTransformation
 
@@ -97,6 +103,16 @@ class TransformationList(QObject):
 
 		self.transformationChanged.emit(self)
 
+	def _setActiveIndex(self, index):
+		"""
+		Updates the active index. Makes cached transformation dirty and
+		sends out a signal that the transformation changed.
+		"""
+		if self._activeIndex != index:
+			self._activeIndex = index
+			self._dirty = True
+			self.transformationChanged.emit(self)
+
 	# Override methods for list behaviour
 
 	def __getitem__(self, index):
@@ -110,6 +126,8 @@ class TransformationList(QObject):
 
 	def __delitem__(self, index):
 		del self._transformations[index]
+		if self._activeIndex > len(self._transformations):
+			self._activeIndex = len(self._transformations)
 		self._dirty = True
 		self.transformationChanged.emit(self)
 
@@ -125,5 +143,6 @@ class TransformationList(QObject):
 		"""
 		assert type(value) == Transformation
 		self._transformations.append(value)
+		self._activeIndex = len(self._transformations)
 		self._dirty = True
 		self.transformationChanged.emit(self)

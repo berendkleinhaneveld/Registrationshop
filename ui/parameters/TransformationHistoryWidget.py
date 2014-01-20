@@ -30,6 +30,9 @@ class TransformationHistoryWidget(QWidget):
 		self.transformationView.setRootIsDecorated(False)
 		self.transformationView.setModel(self.transformationModel)
 		self.transformationView.setAttribute(Qt.WA_MacShowFocusRect, False)
+		self.transformationView.clicked.connect(self.clickedTransformation)
+
+		self._transformCount = 0
 
 		layout = QVBoxLayout()
 		layout.setSpacing(0)
@@ -49,6 +52,13 @@ class TransformationHistoryWidget(QWidget):
 		self.renderWidget.transformations.transformationChanged.connect(self.updateTransformations)
 
 	def updateTransformations(self, transformations):
+		"""
+		Update the model. If the number of transformations is bigger
+		than last time: clear the selection.
+		"""
+		if len(transformations) > self._transformCount:
+			self.transformationView.clearSelection()
+		self._transformCount = len(transformations)
 		self.transformationModel.setTransformations(transformations)
 
 	def removeButtonClicked(self):
@@ -56,3 +66,9 @@ class TransformationHistoryWidget(QWidget):
 		Remove the last transformation in the list.
 		"""
 		self.transformationView.removeLastRow()
+
+	def clickedTransformation(self, index):
+		"""
+		Activate the transformation from the complete list.
+		"""
+		self.renderWidget.transformations.activateTransformationAtIndex(index.row()+1)
