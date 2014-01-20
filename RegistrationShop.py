@@ -244,7 +244,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 		self.actionFreeTransformTool = QAction('Manual transform', self, shortcut='Ctrl+1')
 		self.actionFreeTransformTool.setIcon(QIcon(userTransformIconName))
-		self.actionFreeTransformTool.triggered.connect(self.addFreeTransform)
+		self.actionFreeTransformTool.triggered.connect(self.addManualTransform)
 
 		self.actionLandmarkTransformTool = QAction('Landmark transform', self, shortcut='Ctrl+2')
 		self.actionLandmarkTransformTool.setIcon(QIcon(landmarkTransformIconName))
@@ -344,7 +344,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 	# Action callbacks
 	@Slot()
-	def addFreeTransform(self):
+	def addManualTransform(self):
 		"""
 		What happens when manual transform is added:
 		* Entry is added to the tab history
