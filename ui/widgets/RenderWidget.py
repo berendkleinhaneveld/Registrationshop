@@ -84,6 +84,7 @@ class RenderWidget(QWidget):
 		self.setLayout(layout)
 
 	def render(self):
+		self.clippingBox.update()
 		if self.shouldResetCamera:
 			self.renderer.ResetCamera()
 			self.shouldResetCamera = False
@@ -127,7 +128,16 @@ class RenderWidget(QWidget):
 		# when a volume property is loaded
 
 	def showClippingBox(self, show):
-		self.clippingBox.enable(show)
+		self.clippingBox.showClippingBox(show)
+		self.render()
+
+	def showClippingPlanes(self, show):
+		self.clippingBox.showClippingPlanes(show)
+		self.render()
+
+	def resetClippingBox(self):
+		self.clippingBox.resetClippingBox()
+		self.render()
 
 	@Slot(object)
 	def setVolumeVisualization(self, volumeVisualization):
@@ -174,11 +184,17 @@ class RenderWidget(QWidget):
 		Get the scaling transform from the transformations and apply
 		it to the volume and to the grid that shows the bounds of the
 		volume.
+
+		At the moment it is deprecated. It makes more trouble than that
+		it solves any real (user) problem...
 		"""
-		transform = transformations.scalingTransform()
-		self.volume.SetUserTransform(transform)
-		for item in self.gridItems:
-			item.SetUserTransform(transform)
+		# transform = transformations.scalingTransform()
+		# if self.volume:
+		# 	self.volume.SetUserTransform(transform)
+		# for item in self.gridItems:
+		# 	item.SetUserTransform(transform)
+		# self.clippingBox.setTransform(transform)
+		pass
 
 	def _syncCameras(self, camera, ev):
 		"""

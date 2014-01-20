@@ -30,6 +30,7 @@ class MultiRenderController(QObject):
 	visualizationUpdated = Signal(object)
 	slicesChanged = Signal(object)
 	clippingBoxChanged = Signal(object)
+	clippingPlanesChanged = Signal(object)
 
 	maxVoxelSize = 9000000
 
@@ -47,6 +48,7 @@ class MultiRenderController(QObject):
 		self.visualizations = dict()  # Dict of MultiVolumeVisualizations, visType as keys
 		self.slices = [False, False, False]
 		self.clippingBox = False
+		self.clippingPlanes = True
 
 	@Slot(basestring)
 	def setFixedFile(self, fileName):
@@ -114,16 +116,15 @@ class MultiRenderController(QObject):
 				transformations = TransformationList()
 				transformations.setPythonVersion(transformationsWrapped)
 				self.multiRenderWidget.transformations = transformations
-			try:
-				self.clippingBox = renderSettings["clippingBox"]
-			except:
-				self.clippingBox = False
+			self.clippingBox = renderSettings["clippingBox"]
+			self.clippingPlanes = renderSettings["clippingPlanes"]
 			self.updateVisualization()
 			self.slicesChanged.emit(self.slices)
 			self.clippingBoxChanged.emit(self.clippingBox)
 		else:
 			self.slices = [False, False, False]
 			self.clippingBox = False
+			self.clippingPlanes = True
 
 	def getRenderSettings(self):
 		settings = dict()
@@ -133,6 +134,7 @@ class MultiRenderController(QObject):
 		transformations = self.multiRenderWidget.transformations.getPythonVersion()
 		settings["transformations"] = transformations
 		settings["clippingBox"] = self.clippingBox
+		settings["clippingPlanes"] = self.clippingPlanes
 		return settings
 
 	def setVisualizationType(self, visualizationType):
@@ -186,6 +188,16 @@ class MultiRenderController(QObject):
 		"""
 		self.clippingBox = visibility
 		self.multiRenderWidget.showClippingBox(self.clippingBox)
+
+	def showClippingPlanes(self, visibility):
+		"""
+		:type visibility: bool
+		"""
+		self.clippingPlanes = visibility
+		self.multiRenderWidget.showClippingPlanes(self.clippingPlanes)
+
+	def resetClippingBox(self):
+		self.multiRenderWidget.resetClippingBox()
 
 	def updateVisualization(self):
 		"""

@@ -9,6 +9,8 @@ from PySide.QtGui import QWidget
 from PySide.QtGui import QLabel
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QCheckBox
+from PySide.QtGui import QGroupBox
+from PySide.QtGui import QPushButton
 from PySide.QtCore import Qt
 from PySide.QtCore import Slot
 
@@ -24,8 +26,8 @@ class RenderSlicerParamWidget(QWidget):
 		self.renderController = renderController
 		self.renderController.slicesChanged.connect(self.setSlices)
 		self.renderController.clippingBoxChanged.connect(self.showsClippingBox)
+		self.renderController.clippingPlanesChanged.connect(self.showsClippingPlanes)
 
-		self.slicesLabel = QLabel("Show slices for directions:")
 		self.sliceLabelTexts = ["Axial:", "Coronal:", "Sagital:"]
 		self.sliceLabels = [QLabel(text) for text in self.sliceLabelTexts]
 		self.sliceCheckBoxes = [QCheckBox() for i in range(3)]
@@ -34,24 +36,47 @@ class RenderSlicerParamWidget(QWidget):
 			self.sliceLabels[index].setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 			self.sliceCheckBoxes[index].setEnabled(True)
 
-		# Create a nice layout for the labels
-		layout = QGridLayout()
-		layout.setAlignment(Qt.AlignTop)
-		layout.setColumnStretch(0, 1)
-		layout.setColumnStretch(1, 3)
-		layout.addWidget(self.slicesLabel, 0, 0, 1, -1)
+		slicesLayout = QGridLayout()
+		slicesLayout.setAlignment(Qt.AlignTop)
 		for index in range(3):
-			layout.addWidget(self.sliceLabels[index], index+1, 0)
-			layout.addWidget(self.sliceCheckBoxes[index], index+1, 1)
+			slicesLayout.addWidget(self.sliceLabels[index], index+1, 0)
+			slicesLayout.addWidget(self.sliceCheckBoxes[index], index+1, 1)
+
+		self.slicesGroupBox = QGroupBox()
+		self.slicesGroupBox.setTitle("Visible slices")
+		self.slicesGroupBox.setLayout(slicesLayout)
 
 		# Create option to show clipping box
 		self.clippingCheckBox = QCheckBox()
+		self.clippingCheckBox.setChecked(self.renderController.clippingBox)
 		self.clippingCheckBox.clicked.connect(self.clippingCheckBoxChanged)
-		self.clippingLabel = QLabel("Clipping box:")
-		self.clippingLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+		self.clippingPlanesCheckBox = QCheckBox()
+		self.clippingPlanesCheckBox.setChecked(self.renderController.clippingPlanes)
+		self.clippingPlanesCheckBox.clicked.connect(self.clippingPlanesCheckBoxChanged)
+		self.resetButton = QPushButton("Reset")
+		self.resetButton.clicked.connect(self.resetClippingBox)
 
-		layout.addWidget(self.clippingLabel, 5, 0)
-		layout.addWidget(self.clippingCheckBox, 5, 1)
+		clippingLabel = QLabel("Clipping box:")
+		clippingLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+		clippingPlanesLabel = QLabel("Clipping planes:")
+		clippingPlanesLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+
+		clipLayout = QGridLayout()
+		clipLayout.addWidget(clippingLabel, 0, 0)
+		clipLayout.addWidget(self.clippingCheckBox, 0, 1)
+		clipLayout.addWidget(clippingPlanesLabel, 1, 0)
+		clipLayout.addWidget(self.clippingPlanesCheckBox, 1, 1)
+		clipLayout.addWidget(self.resetButton, 2, 0)
+
+		self.clippingGroupBox = QGroupBox()
+		self.clippingGroupBox.setTitle("Clipping box")
+		self.clippingGroupBox.setLayout(clipLayout)
+
+		# Create a nice layout for the labels
+		layout = QGridLayout()
+		layout.setAlignment(Qt.AlignTop)
+		layout.addWidget(self.slicesGroupBox, 0, 0)
+		layout.addWidget(self.clippingGroupBox, 0, 1)
 		self.setLayout(layout)
 
 	@Slot()
@@ -76,6 +101,21 @@ class RenderSlicerParamWidget(QWidget):
 		"""
 		self.renderController.showClippingBox(self.clippingCheckBox.checkState() == Qt.Checked)
 
+	@Slot()
+	def clippingPlanesCheckBoxChanged(self):
+		"""
+		Callback function for the clipping check box.
+		"""
+		self.renderController.showClippingPlanes(self.clippingPlanesCheckBox.checkState() == Qt.Checked)
+
+	@Slot()
+	def resetClippingBox(self):
+		self.renderController.resetClippingBox()
+
 	@Slot(bool)
 	def showsClippingBox(self, show):
 		self.clippingCheckBox.setChecked(show)
+
+	@Slot(bool)
+	def showsClippingPlanes(self, show):
+		self.clippingPlanesCheckBox.setChecked(show)

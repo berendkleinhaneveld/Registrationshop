@@ -43,11 +43,14 @@ class RenderController(QObject):
 	# RenderWidget should connect
 	visualizationUpdated = Signal(object)
 	# Emitted when the slices are loaded by the project controller.
-	# RenderWidget, RenderParameterWidget(Slices) should connect
+	# RenderParameterWidget(Slices) should connect
 	slicesChanged = Signal(object)
 	# Emitted when the clipping box is loaded by the project controller.
-	# RenderWidget, RenderParameterWidget(Slices) should connect
+	# RenderParameterWidget(Slices) should connect
 	clippingBoxChanged = Signal(bool)
+	# Emitted when clipping planes are loaded by the project controller.
+	# RenderParameterWidget(Slices) should connect
+	clippingPlanesChanged = Signal(bool)
 
 	def __init__(self, renderWidget, tag):
 		"""
@@ -64,6 +67,7 @@ class RenderController(QObject):
 		self.visualizations = dict()  # Keep track of used volume properties
 		self.slices = [False, False, False]
 		self.clippingBox = False
+		self.clippingPlanes = True
 		self.tag = tag
 
 	@Slot(basestring)
@@ -108,10 +112,8 @@ class RenderController(QObject):
 				self.visualizations[key] = visualizations[key].getVolumeVisualization()
 			self.visualizationType = renderSettings["visualizationType"]
 			self.slices = renderSettings["slices"]
-			try:
-				self.clippingBox = renderSettings["clippingBox"]
-			except:
-				self.clippingBox = False
+			self.clippingBox = renderSettings["clippingBox"]
+			self.clippingPlanes = renderSettings["clippingPlanes"]
 
 			cameraWrapped = renderSettings["camera"]
 			cameraWrapped.applyToObject(self.renderWidget.renderer.GetActiveCamera())
@@ -120,15 +122,18 @@ class RenderController(QObject):
 			self.visualizationType = None
 			self.slices = [False, False, False]
 			self.clippingBox = False
+			self.clippingPlanes = True
 
 		self.setVisualizationType(self.visualizationType)
 		self.renderWidget.setSlices(self.slices)
 		self.renderWidget.setVolumeVisualization(self.visualization)
 		self.renderWidget.showClippingBox(self.clippingBox)
+		self.renderWidget.showClippingPlanes(self.clippingPlanes)
 
 		self.visualizationChanged.emit(self.visualization)
 		self.slicesChanged.emit(self.slices)
 		self.clippingBoxChanged.emit(self.clippingBox)
+		self.clippingPlanesChanged.emit(self.clippingPlanes)
 
 	def getRenderSettings(self):
 		"""
@@ -145,6 +150,7 @@ class RenderController(QObject):
 		settings["visualizationType"] = self.visualizationType
 		settings["slices"] = self.slices
 		settings["clippingBox"] = self.clippingBox
+		settings["clippingPlanes"] = self.clippingPlanes
 
 		camera = self.renderWidget.renderer.GetActiveCamera()
 		settings["camera"] = vtkCameraWrapper(camera)
@@ -207,6 +213,13 @@ class RenderController(QObject):
 		self.clippingBox = visibility
 		self.renderWidget.showClippingBox(self.clippingBox)
 
+	def showClippingPlanes(self, visibility):
+		"""
+		:type visibility: bool
+		"""
+		self.clippingPlanes = visibility
+		self.renderWidget.showClippingPlanes(self.clippingPlanes)
+
 	def updateVisualization(self):
 		"""
 		Should be called by all interface elements that adjust the
@@ -215,3 +228,6 @@ class RenderController(QObject):
 		"""
 		self.renderWidget.setVolumeVisualization(self.visualization)
 		self.visualizationUpdated.emit(self.visualization)
+
+	def resetClippingBox(self):
+		self.renderWidget.resetClippingBox()

@@ -264,7 +264,16 @@ class MultiRenderWidget(QWidget):
 				self._imagePlaneWidgets[sliceIndex].Off()
 
 	def showClippingBox(self, show):
-		self.clippingBox.enable(show)
+		self.clippingBox.showClippingBox(show)
+		self.render()
+
+	def showClippingPlanes(self, show):
+		self.clippingBox.showClippingPlanes(show)
+		self.render()
+
+	def resetClippingBox(self):
+		self.clippingBox.resetClippingBox()
+		self.render()
 
 	@Slot()
 	def updateTransformation(self):
