@@ -39,6 +39,8 @@ class RenderParameterWidget(QWidget):
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
+		layout.setSpacing(10)
+		layout.setContentsMargins(10, 0, 10, 0)
 		# layout.addWidget(QLabel("Visualization type:"), 0, 0)
 		# layout.addWidget(self.visTypeComboBox, 0, 1)
 		self.setLayout(layout)
