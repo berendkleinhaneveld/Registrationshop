@@ -191,7 +191,6 @@ class LandmarkLocationWidget(QWidget):
 
 	@Slot()
 	def deleteButtonClicked(self):
-		print("TODO: implement delete func for landmark pair")
 		self.deleted.emit(self.index)
 
 	def _updateState(self):
