@@ -90,7 +90,7 @@ class RenderWidget(QWidget):
 		self.rwi.Render()
 		# Prevent warning messages on OSX by not asking to render
 		# when the render window has never rendered before
-		if self.rwi.GetRenderWindow().GetNeverRendered() == 0:
+		if not self.rwi.GetRenderWindow().GetNeverRendered():
 			self.rwi.GetRenderWindow().Render()
 
 	@Slot(object)
