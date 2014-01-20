@@ -20,6 +20,7 @@ from PySide.QtGui import QGridLayout
 from PySide.QtGui import QDoubleSpinBox
 from PySide.QtGui import QDoubleValidator
 from PySide.QtGui import QTabWidget
+from PySide.QtGui import QSizePolicy
 from PySide.QtCore import Slot
 from PySide.QtCore import Qt
 
@@ -67,20 +68,11 @@ class UserTransformationTool(TransformationTool):
 
 	@overrides(TransformationTool)
 	def getParameterWidget(self):
-		self.textFrame = QTextEdit("Move the box with the mouse or fill "
-			"the matrix with custom values.")
-		self.textFrame.setReadOnly(True)
-		self.textFrame.setFrameShape(QFrame.NoFrame)
-		self.textFrame.setAutoFillBackground(False)
-		self.textFrame.setAttribute(Qt.WA_TranslucentBackground)
-		self.textFrame.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-		self.textFrame.setStyleSheet("background: #aaa")
-		self.textFrame.setMaximumHeight(40)
-
 		matrixLayout = QGridLayout()
 		matrixLayout.setAlignment(Qt.AlignTop)
 		matrixLayout.setContentsMargins(0, 0, 0, 0)
-		matrixLayout.addWidget(self.textFrame, 0, 0, 1, 4)
+		matrixLayout.setSpacing(5)
+		matrixLayout.addWidget(QLabel("Transformation matrix:"), 0, 0, 1, 4)
 		self.m1Edits = [QLineEdit() for x in range(4)]
 		self.m2Edits = [QLineEdit() for x in range(4)]
 		self.m3Edits = [QLineEdit() for x in range(4)]
@@ -89,6 +81,9 @@ class UserTransformationTool(TransformationTool):
 		self.initLineEdits(self.m2Edits, matrixLayout, 2, 0)
 		self.initLineEdits(self.m3Edits, matrixLayout, 3, 0)
 		self.initLineEdits(self.m4Edits, matrixLayout, 4, 0)
+		expandingWidget = QWidget()
+		expandingWidget.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
+		matrixLayout.addWidget(expandingWidget, 5, 0, 1, 4)
 		
 		matrixWidget = QWidget()
 		matrixWidget.setLayout(matrixLayout)
