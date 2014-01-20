@@ -41,8 +41,9 @@ class RenderParameterWidget(QWidget):
 		layout.setAlignment(Qt.AlignTop)
 		layout.setSpacing(10)
 		layout.setContentsMargins(10, 0, 10, 0)
-		# layout.addWidget(QLabel("Visualization type:"), 0, 0)
-		# layout.addWidget(self.visTypeComboBox, 0, 1)
+		if len(self.renderController.visualizationTypes) > 1:
+			layout.addWidget(QLabel("Visualization type:"), 0, 0)
+			layout.addWidget(self.visTypeComboBox, 0, 1)
 		self.setLayout(layout)
 
 		self.scrollArea = QScrollArea()
