@@ -131,8 +131,6 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 		self.mouseMoved.emit(pickPosition)
 
 
-
-
 	def adjustTransferFunction(self, transferfunction, lower, upper):
 		transfer = vtkColorTransferFunction()
 		val1 = [0.0 for _ in range(6)]
