@@ -52,6 +52,8 @@ class UserTransformationTool(TransformationTool):
 		self.renderWidget.render()
 		self.movingWidget.render()
 
+		self.toolFinished.emit()
+
 	def cancelTransform(self):
 		# Remove the last transformation
 		del self.renderWidget.transformations[-1]

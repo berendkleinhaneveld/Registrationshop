@@ -113,8 +113,12 @@ class DeformableTransformationTool(TransformationTool):
 			call(["open", projectFolder])
 
 	@overrides(TransformationTool)
-	def cleanUp(self):
+	def cancelTransform(self):
 		pass
+
+	@overrides(TransformationTool)
+	def cleanUp(self):
+		self.toolFinished.emit()
 
 	@overrides(TransformationTool)
 	def getParameterWidget(self):

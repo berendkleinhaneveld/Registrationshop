@@ -72,6 +72,7 @@ class LandmarkTransformationTool(TransformationTool):
 		self.updatedLandmarks.connect(self.pointsWidget.setPoints)
 		self.landmarkComboBox.currentIndexChanged.connect(self.landmarkTransformTypeChanged)
 		self.pointsWidget.activeLandmarkChanged.connect(self.setActiveLandmark)
+		self.pointsWidget.landmarkDeleted.connect(self.deleteLandmark)
 
 		widget = QWidget()
 		widget.setLayout(layout)
@@ -98,7 +99,8 @@ class LandmarkTransformationTool(TransformationTool):
 		self.multiWidget.transformations.append(transform)
 
 		statusWidget = StatusWidget.Instance()
-		statusWidget.setText("")
+		statusWidget.setText("Place landmarks in both volumes to create a landmark transform. "
+			"Available methods for placing landmarks are the surface type and the two-step type.")
 		# if self.fixedPickerType == TwoStepType:
 		# 	statusWidget.setText("Place landmarks in both volumes to create a landmark transform. Hold your "
 		# 		"mouse over a volume and press 'A'. Turn the volume, move your mouse and press 'A' again to set a "
@@ -130,9 +132,6 @@ class LandmarkTransformationTool(TransformationTool):
 		self.fixedPicker.cleanUp()
 		self.movingPicker.cleanUp()
 
-		# self.fixedPicker = self._pickerForType(self.fixedPickerType)
-		# self.movingPicker = self._pickerForType(self.movingPickerType)
-
 		for landmarkIndicator in self.landmarkIndicators:
 			landmarkIndicator.cleanUp()
 
@@ -162,11 +161,47 @@ class LandmarkTransformationTool(TransformationTool):
 		self.multiWidget.render()
 
 	@Slot(int)
+	def deleteLandmark(self, index):
+		if index < len(self.landmarkPointSets):
+			del self.landmarkPointSets[index]
+		indices = []
+		for i in range(len(self.landmarkIndicators)):
+			indicator = self.landmarkIndicators[i]
+			if indicator.id == index:
+				indicator.cleanUp()
+				indices.append(i)
+
+		indices.reverse()
+		for i in indices:
+			del self.landmarkIndicators[i]
+
+		for indicator in self.landmarkIndicators:
+			if indicator.id > index:
+				indicator.id -= 1
+
+		self.activeIndex = len(self.landmarkPointSets)
+		self.pointsWidget.activeIndex = self.activeIndex
+		# self.activeIndex = -1
+		self._updateTransform()
+		self._update()
+		self.updatedLandmarks.emit(self.landmarkPointSets)
+
+		self.fixedWidget.render()
+		self.movingWidget.render()
+		self.multiWidget.render()
+
+	@Slot(int)
 	def landmarkTransformTypeChanged(self, value):
 		"""
 		Called when the transformation type is changed
 		from the combo box. Rigid, Similarity or Affine.
 		"""
+		if value == 2 and len(self.landmarkPointSets) < 3:
+			self.landmarkComboBox.setCurrentIndex(self.landmarkTransformType)
+			# TODO: let the user know that some more landmark point sets are needed...
+			# Or: solve in another way by only calculating the affine transform when
+			# there are actually 3 or more complete landmark point sets
+			return
 		self.landmarkTransformType = value
 		self._updateTransform()
 		self.multiWidget.render()
@@ -292,8 +327,9 @@ class LandmarkTransformationTool(TransformationTool):
 		# Update the transforms
 		for landmarkIndicator in self.landmarkIndicators:
 			if landmarkIndicator.flag == "moving" and landmarkIndicator.renderer == self.movingWidget.renderer:
-				landmarkIndicator.transform = self.multiWidget.transformations.scalingTransform()
-				landmarkIndicator.update()
+				# landmarkIndicator.transform = self.multiWidget.transformations.scalingTransform()
+				# landmarkIndicator.update()
+				pass
 			elif landmarkIndicator.flag == "moving" and landmarkIndicator.renderer == self.multiWidget.renderer:
 				landmarkIndicator.transform = self.multiWidget.transformations.completeTransform()
 				landmarkIndicator.update()

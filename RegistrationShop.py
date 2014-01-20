@@ -365,14 +365,13 @@ class RegistrationShop(MainWindow, WindowDialog):
 			statusWidget.setText("Please load a moving dataset before starting a manual transform.")
 			return
 
-		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)
-
 		if self.transformTool is not None:
 			self.transformTool.cleanUp()
 
 		self.transformTool = UserTransformationTool()
 		self.transformTool.setRenderWidgets(moving=self.movingDataWidget, multi=self.multiDataWidget)
-		self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
+		self.multiPropWidget.setTransformTool(self.transformTool)
+		self.transformTool.toolFinished.connect(self.transformToolFinished)
 
 	@Slot()
 	def addLandmarkTransform(self):
@@ -380,9 +379,6 @@ class RegistrationShop(MainWindow, WindowDialog):
 			statusWidget = StatusWidget.Instance()
 			statusWidget.setText("Please load a fixed and a moving dataset before starting a landmark transform.")
 			return
-
-		# Bring the transform parameter widget up front under the multi render widget
-		self.multiPropWidget.tabWidget.setCurrentWidget(self.multiPropWidget.transformParamWidget)
 
 		# Clean up the last transform tool
 		if self.transformTool is not None:
@@ -395,19 +391,21 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 		# Create a tab page under the fixed render widget
 		fixedLandmarkWidget = LandmarkWidget()
-		self.fixedPropWidget.tabWidget.addTab(fixedLandmarkWidget, "Landmark")
-		self.fixedPropWidget.tabWidget.setCurrentWidget(fixedLandmarkWidget)
+		self.fixedPropWidget.addTabWidget(fixedLandmarkWidget, "Landmark")
+		# self.fixedPropWidget.tabWidget.addTab(fixedLandmarkWidget, "Landmark")
+		# self.fixedPropWidget.tabWidget.setCurrentWidget(fixedLandmarkWidget)
 
 		# Create a tab page under the moving render widget
 		movingLandmarkWidget = LandmarkWidget()
-		self.movingPropWidget.tabWidget.addTab(movingLandmarkWidget, "Landmark")
-		self.movingPropWidget.tabWidget.setCurrentWidget(movingLandmarkWidget)
+		self.movingPropWidget.addTabWidget(movingLandmarkWidget, "Landmark")
+		# self.movingPropWidget.tabWidget.addTab(movingLandmarkWidget, "Landmark")
+		# self.movingPropWidget.tabWidget.setCurrentWidget(movingLandmarkWidget)
 
 		# Make sure the landmark transform tool knows of these tab widgets
 		self.transformTool.setLandmarkWidgets(fixedLandmarkWidget, movingLandmarkWidget)
 
 		# Start the transformation
-		self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
+		self.multiPropWidget.setTransformTool(self.transformTool)
 		self.transformTool.toolFinished.connect(self.transformToolFinished)
 
 	@Slot()
@@ -451,18 +449,15 @@ class RegistrationShop(MainWindow, WindowDialog):
 		self.transformTool.setRenderWidgets(fixed=self.fixedDataWidget,
 			moving=self.movingDataWidget,
 			multi=self.multiDataWidget)
-		self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
+		self.multiPropWidget.setTransformTool(self.transformTool)
+		self.transformTool.toolFinished.connect(self.transformToolFinished)
+		# self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
 
 	@Slot()
 	def transformToolFinished(self):
-		for index in range(self.fixedPropWidget.tabWidget.count()):
-			if self.fixedPropWidget.tabWidget.tabText(index) == "Landmark":
-				self.fixedPropWidget.tabWidget.removeTab(index)
-				break
-		for index in range(self.movingPropWidget.tabWidget.count()):
-			if self.movingPropWidget.tabWidget.tabText(index) == "Landmark":
-				self.movingPropWidget.tabWidget.removeTab(index)
-				break
+		self.multiPropWidget.transformToolFinished()
+		self.fixedPropWidget.removeTabWidget()
+		self.movingPropWidget.removeTabWidget()
 
 	@Slot()
 	def loadFixedDataSetFile(self):

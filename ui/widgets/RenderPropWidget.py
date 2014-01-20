@@ -46,6 +46,10 @@ class RenderPropWidget(QWidget):
 		self.tabWidget.addTab(self.dataInfoTabWidget, "Data info")
 		self.tabWidget.addTab(self.slicesTabWidget, "Slices")
 
+		self.currentTabIndex = 0
+		self.extraTabWidget = None
+		self.tabWidget.currentChanged.connect(self.tabIndexChanged)
+
 		layout = QVBoxLayout()
 		layout.addWidget(self.loadDataWidget)
 		self.setLayout(layout)
@@ -91,3 +95,26 @@ class RenderPropWidget(QWidget):
 				# Add the parameter widgets
 				layout.addWidget(self.tabWidget)
 				self.setLayout(layout)
+
+	@Slot(int)
+	def tabIndexChanged(self, index):
+		transformIndex = self.tabWidget.indexOf(self.extraTabWidget)
+		if index != transformIndex:
+			self.currentTabIndex = index
+
+	def addTabWidget(self, widget, name):
+		self.extraTabWidget = widget
+		self.tabWidget.addTab(widget, name)
+		self.tabWidget.setCurrentWidget(self.extraTabWidget)
+
+	def removeTabWidget(self):
+		if self.extraTabWidget is None:
+			return
+
+		index = self.tabWidget.indexOf(self.extraTabWidget)
+		if index >= 0:
+			# Restore the last tab index that wasn't the transform tab
+			self.tabWidget.setCurrentIndex(self.currentTabIndex)
+			self.tabWidget.removeTab(index)
+
+		self.extraTabWidget = None
