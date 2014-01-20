@@ -70,7 +70,7 @@ class VolumeVisualizationSimple(VolumeVisualization):
 
 		layoutGroup = QGridLayout()
 		layoutGroup.setAlignment(Qt.AlignTop)
-		layoutGroup.setContentsMargins(0, 0, 0, 0)
+		layoutGroup.setContentsMargins(5, 0, 0, 0)
 		layoutGroup.setSpacing(0)
 		layoutGroup.addWidget(self.lowerBoundSlider)
 		layoutGroup.addWidget(self.upperBoundSlider)
@@ -95,7 +95,7 @@ class VolumeVisualizationSimple(VolumeVisualization):
 
 		otherLayoutGroup = QGridLayout()
 		otherLayoutGroup.setAlignment(Qt.AlignTop)
-		otherLayoutGroup.setContentsMargins(0, 0, 0, 0)
+		otherLayoutGroup.setContentsMargins(5, 0, 0, 0)
 		otherLayoutGroup.setSpacing(0)
 		otherLayoutGroup.addWidget(self.opacitySlider)
 		# otherLayoutGroup.addWidget(self.colorChooser)

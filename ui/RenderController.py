@@ -60,7 +60,8 @@ class RenderController(QObject):
 		super(RenderController, self).__init__()
 
 		self.renderWidget = renderWidget
-		self.visualizationTypes = [VisualizationTypeSimple, VisualizationTypeCT, VisualizationTypeTransferFunction, VisualizationTypeMIP, VisualizationTypeMIDA]
+		# self.visualizationTypes = [VisualizationTypeSimple, VisualizationTypeCT, VisualizationTypeTransferFunction, VisualizationTypeMIP, VisualizationTypeMIDA]
+		self.visualizationTypes = [VisualizationTypeSimple, VisualizationTypeMIP]
 		self.visualizationType = None
 		self.imageData = None
 		self.visualization = None

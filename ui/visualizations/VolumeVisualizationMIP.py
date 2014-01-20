@@ -6,13 +6,13 @@ VolumeVisualizationMIP
 """
 from VolumeVisualization import VolumeVisualization
 from VolumeVisualization import VisualizationTypeMIP
+from ui.widgets.SliderFloatWidget import SliderFloatWidget
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
 from PySide.QtGui import QWidget
-from PySide.QtGui import QSlider
 from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
+from PySide.QtGui import QGroupBox
 from PySide.QtCore import Qt
 from core.decorators import overrides
 
@@ -39,52 +39,80 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		volume property can be adjusted.
 		:rtype: QWidget
 		"""
-		self.windowSlider = QSlider(Qt.Horizontal)
-		self.windowSlider.setMinimum(0)
-		self.windowSlider.setMaximum(int(abs(self.maximum - self.minimum)))
-		self.windowSlider.setValue(int(self.window))
+		self.windowSlider = SliderFloatWidget()
+		self.windowSlider.setName("Window:")
+		self.windowSlider.setRange([0, abs(self.maximum - self.minimum)])
+		self.windowSlider.setValue(self.window)
+		self.windowSlider.label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 		self.windowSlider.valueChanged.connect(self.valueChanged)
-		self.windowLabel = QLabel(str(self.window))
 
-		self.levelSlider = QSlider(Qt.Horizontal)
-		self.levelSlider.setMinimum(int(self.minimum))
-		self.levelSlider.setMaximum(int(self.maximum))
-		self.levelSlider.setValue(int(self.level))
+		self.levelSlider = SliderFloatWidget()
+		self.levelSlider.setName("Level:")
+		self.levelSlider.setRange([self.minimum, self.maximum])
+		self.levelSlider.setValue(self.level)
+		self.levelSlider.label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 		self.levelSlider.valueChanged.connect(self.valueChanged)
-		self.levelLabel = QLabel(str(self.level))
 
-		self.lowerBoundSlider = QSlider(Qt.Horizontal)
-		self.lowerBoundSlider.setMinimum(int(self.minimum))
-		self.lowerBoundSlider.setMaximum(int(self.maximum))
-		self.lowerBoundSlider.setValue(int(self.lowerBound))
+		self.lowerBoundSlider = SliderFloatWidget()
+		self.lowerBoundSlider.setName("Lower:")
+		self.lowerBoundSlider.setRange([self.minimum, self.maximum])
+		self.lowerBoundSlider.setValue(self.lowerBound)
+		self.lowerBoundSlider.label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 		self.lowerBoundSlider.valueChanged.connect(self.valueChanged)
-		self.lowerBoundLabel = QLabel(str(self.lowerBound))
 
-		self.upperBoundSlider = QSlider(Qt.Horizontal)
-		self.upperBoundSlider.setMinimum(int(self.minimum))
-		self.upperBoundSlider.setMaximum(int(self.maximum))
-		self.upperBoundSlider.setValue(int(self.upperBound))
+		self.upperBoundSlider = SliderFloatWidget()
+		self.upperBoundSlider.setName("Upper:")
+		self.upperBoundSlider.setRange([self.minimum, self.maximum])
+		self.upperBoundSlider.setValue(self.upperBound)
+		self.upperBoundSlider.label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
 		self.upperBoundSlider.valueChanged.connect(self.valueChanged)
-		self.upperBoundLabel = QLabel(str(self.upperBound))
 
+		windowLevelLayout = QGridLayout()
+		windowLevelLayout.setAlignment(Qt.AlignTop)
+		windowLevelLayout.setContentsMargins(5, 0, 0, 0)
+		windowLevelLayout.setSpacing(0)
+		windowLevelLayout.addWidget(self.windowSlider)
+		windowLevelLayout.addWidget(self.levelSlider)
+
+		windowLevelGroup = QGroupBox()
+		windowLevelGroup.setLayout(windowLevelLayout)
+
+		thresholdLayout = QGridLayout()
+		thresholdLayout.setAlignment(Qt.AlignTop)
+		thresholdLayout.setContentsMargins(5, 0, 0, 0)
+		thresholdLayout.setSpacing(0)
+		thresholdLayout.addWidget(self.lowerBoundSlider)
+		thresholdLayout.addWidget(self.upperBoundSlider)
+
+		thresholdGroup = QGroupBox("Thresholds:")
+		thresholdGroup.setLayout(thresholdLayout)
+		
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
+		layout.setHorizontalSpacing(0)
 		layout.setContentsMargins(0, 0, 0, 0)
-		layout.addWidget(QLabel("Window"), 0, 0)
-		layout.addWidget(self.windowSlider, 0, 1)
-		layout.addWidget(self.windowLabel, 0, 2)
-		layout.addWidget(QLabel("Level"), 1, 0)
-		layout.addWidget(self.levelSlider, 1, 1)
-		layout.addWidget(self.levelLabel, 1, 2)
-		layout.addWidget(QLabel("Lower threshold"), 2, 0)
-		layout.addWidget(self.lowerBoundSlider, 2, 1)
-		layout.addWidget(self.lowerBoundLabel, 2, 2)
-		layout.addWidget(QLabel("Upper threshold"), 3, 0)
-		layout.addWidget(self.upperBoundSlider, 3, 1)
-		layout.addWidget(self.upperBoundLabel, 3, 2)
+		layout.addWidget(windowLevelGroup)
+		layout.addWidget(thresholdGroup)
 
 		widget = QWidget()
 		widget.setLayout(layout)
+
+		try:
+			from ColumnResizer import ColumnResizer
+			self.columnResizer = ColumnResizer()
+			self.columnResizer.addWidgetsFromLayout(self.windowSlider.layout(), 0)
+			self.columnResizer.addWidgetsFromLayout(self.levelSlider.layout(), 0)
+			self.columnResizer.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 0)
+			self.columnResizer.addWidgetsFromLayout(self.upperBoundSlider.layout(), 0)
+
+			self.otherColRes = ColumnResizer()
+			self.otherColRes.addWidgetsFromLayout(self.windowSlider.layout(), 2)
+			self.otherColRes.addWidgetsFromLayout(self.levelSlider.layout(), 2)
+			self.otherColRes.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 2)
+			self.otherColRes.addWidgetsFromLayout(self.upperBoundSlider.layout(), 2)
+		except Exception, e:
+			print e
+
 		return widget
 
 	@overrides(VolumeVisualization)

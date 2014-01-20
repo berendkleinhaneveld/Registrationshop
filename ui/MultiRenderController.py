@@ -38,7 +38,8 @@ class MultiRenderController(QObject):
 		super(MultiRenderController, self).__init__()
 
 		self.multiRenderWidget = mulitRenderWidget
-		self.visualizationTypes = [MultiVisualizationTypeMix, MultiVisualizationTypeMIP, MultiVisualizationTypeMIDA]
+		# self.visualizationTypes = [MultiVisualizationTypeMix, MultiVisualizationTypeMIP, MultiVisualizationTypeMIDA]
+		self.visualizationTypes = [MultiVisualizationTypeMix]
 		self.visualizationType = None  # str
 		self.fixedImageData = None  # vtkImageData
 		self.movingImageData = None  # vtkImageData

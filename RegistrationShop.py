@@ -199,7 +199,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		propsLayout.addWidget(self.movingPropWidget)
 
 		propsWidget = QWidget()
-		propsWidget.setMinimumHeight(235)
+		propsWidget.setMinimumHeight(245)
 		propsWidget.setMaximumHeight(350)
 		propsWidget.setLayout(propsLayout)
 
