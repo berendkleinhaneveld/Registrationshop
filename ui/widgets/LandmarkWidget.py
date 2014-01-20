@@ -70,18 +70,22 @@ class SurfaceLandmarkWidget(QWidget):
 	def __init__(self):
 		super(SurfaceLandmarkWidget, self).__init__()
 		
-		self.titleLabel = QLabel("Instructions:")
-		self.textFrame = QTextEdit("Hold your mouse over the volume "
-			"to move a locator. To create a landmark, press 'A'.")
+		self.textFrame = QTextEdit("<p>Hold your mouse over the volume "
+			"to move the locator. To create a landmark, press 'A'.</p>"
+			"<p>When you want to proceed to the following landmark, "
+			"click the 'Done' button behind the landmark pair in the "
+			"center of the window.</p>")
 		self.textFrame.setReadOnly(True)
 		self.textFrame.setFrameShape(QFrame.NoFrame)
 		self.textFrame.setAutoFillBackground(False)
 		self.textFrame.setAttribute(Qt.WA_TranslucentBackground)
 		self.textFrame.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+		self.textFrame.setStyleSheet("background: #aaa")
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(self.titleLabel)
+		layout.setSpacing(0)
+		layout.setContentsMargins(0, 0, 0, 0)
 		layout.addWidget(self.textFrame)
 		self.setLayout(layout)
 
@@ -96,20 +100,39 @@ class TwoStepLandmarkWidget(QWidget):
 	def __init__(self):
 		super(TwoStepLandmarkWidget, self).__init__()
 
+		self.textFrame = QTextEdit("<p>Place your mouse over the desired "
+			"landmark point. Press 'A' to shoot a ray through the volume. "
+			"Move the volume around and move the mouse to move the locator. "
+			"Press 'A' again to define the final place of the landmark.</p>"
+			"<p>You can also use the ray profile to define the landmark's location.</p>")
+		self.textFrame.setReadOnly(True)
+		self.textFrame.setFrameShape(QFrame.NoFrame)
+		self.textFrame.setAutoFillBackground(False)
+		self.textFrame.setAttribute(Qt.WA_TranslucentBackground)
+		self.textFrame.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+		self.textFrame.setStyleSheet("background: #aaa")
+
 		self.histogramWidget = TrackingHistogramWidget()
+		self.histogramWidget.setMinimumHeight(100)
+		self.histogramWidget.setVisible(False)
+
 		self.button = QPushButton("Pick current landmark position")
 		self.button.clicked.connect(self.applyButtonClicked)
 		self.button.setVisible(False)
 
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(QLabel("Ray profile:"))
+		layout.setSpacing(0)
+		layout.setContentsMargins(0, 0, 0, 0)
+		layout.addWidget(self.textFrame)
 		layout.addWidget(self.histogramWidget)
 		layout.addWidget(self.button)
-
 		self.setLayout(layout)
 
 	def setSamples(self, samples, scope=None):
+		self.textFrame.setVisible(False)
+		self.histogramWidget.setVisible(True)
+
 		self.histogram = Histogram()
 		self.histogram.bins = samples
 		
