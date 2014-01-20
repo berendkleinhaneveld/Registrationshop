@@ -69,7 +69,7 @@ class HistogramItem(QGraphicsRectItem):
 		xOffset = self._margins.left()
 		yOffset = self._margins.top()+1
 		width = self.rect().width() - (self._margins.left() + self._margins.right() + 1)
-		height = self.rect().height() - (self._margins.top() + self._margins.bottom() + 1)
+		height = self.rect().height() - (self._margins.top() + self._margins.bottom() + 1) - 1
 		binCount = len(self._histogram.bins)
 
 		polygon = QPolygonF()
