@@ -30,6 +30,11 @@ class SliderFloatWidget(QWidget):
 		self.slider.valueChanged.connect(self.changedValueFromSlider)
 		self.spinbox.valueChanged.connect(self.changedValueFromSpinBox)
 
+		# Keep track of whether one of the values was changed
+		# By setting the value of the slider and the spinbox, valueChanged
+		# events are fired. These events have to be ignored
+		self._changed = False
+
 		layout = QGridLayout()
 		layout.setContentsMargins(0, 0, 0, 0)
 		layout.setVerticalSpacing(0)
@@ -49,36 +54,47 @@ class SliderFloatWidget(QWidget):
 		Set the range for the value
 		"""
 		self.range = range
-		self.slider.setMinimum(0)
-		self.slider.setMaximum(100)
+		self.slider.setMinimum(0.0)
+		self.slider.setMaximum(100.0)
 		self.spinbox.setRange(self.range[0], self.range[1])
 
 		diff = self.range[1] - self.range[0]
 		if diff <= 1:
-			self.spinbox.setSingleStep(0.1)
+			self.spinbox.setSingleStep(0.01)
 
 	def setValue(self, value):
 		"""
 		Set the value for the slider and the spinbox
 		"""
 		ratio = (value - self.range[0]) / (self.range[1] - self.range[0])
+		self._changed = False
 		self.slider.setValue(ratio * 100)
+		self._changed = False
 		self.spinbox.setValue(value)
+		self._changed = False
 
 	def value(self):
 		return self.spinbox.value()
 
 	@Slot(int)
 	def changedValueFromSlider(self, value):
+		if self._changed:
+			self._changed = False
+			return
 		ratio = value / 100.0
 		val = self.range[0] + ratio * (self.range[1] - self.range[0])
+		self._changed = True
 		self.spinbox.setValue(val)
 		self.valueChanged.emit(val)
 
 	@Slot(float)
 	def changedValueFromSpinBox(self, value):
+		if self._changed:
+			self._changed = False
+			return
 		ratio = (value - self.range[0]) / (self.range[1] - self.range[0])
-		self.slider.setValue(ratio * 100)
+		self._changed = True
+		self.slider.setValue(ratio * 100.0)
 		self.valueChanged.emit(value)
 
 
