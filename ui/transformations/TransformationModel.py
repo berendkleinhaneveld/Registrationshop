@@ -30,6 +30,12 @@ class TransformationModel(QAbstractItemModel):
 		del self.transformations[index]
 		self.removeRow(index, QModelIndex())
 
+	def removeLastTransformation(self):
+		index = len(self.transformations)-1
+		if index < 0:
+			return
+		self.removeTransformationAtIndex(index)
+
 	def index(self, row, column, parent):
 		if not self.hasIndex(row, column, parent):
 			return self._invalidIndex()

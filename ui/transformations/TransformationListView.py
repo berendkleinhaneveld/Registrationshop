@@ -21,7 +21,10 @@ class TransformationListView(QTreeView):
 
 	def removeSelectedRow(self):
 		model = self.model()
-
 		if len(self.selectedIndexes()) > 0:
 			index = self.selectedIndexes()[0]
 			model.removeTransformationAtIndex(index.row())
+
+	def removeLastRow(self):
+		model = self.model()
+		model.removeLastTransformation()

@@ -40,6 +40,7 @@ class TransformationHistoryWidget(QWidget):
 		removeButton = QPushButton()
 		removeButton.setIcon(QIcon(AppVars.imagePath() + "RemoveButton.png"))
 		removeButton.clicked.connect(self.removeButtonClicked)
+		removeButton.setToolTip("Remove the last transformation")
 		self.actionContainer.addButton(removeButton)
 
 	def setMultiRenderWidget(self, widget):
@@ -50,4 +51,7 @@ class TransformationHistoryWidget(QWidget):
 		self.transformationModel.setTransformations(transformations)
 
 	def removeButtonClicked(self):
-		self.transformationView.removeSelectedRow()
+		"""
+		Remove the last transformation in the list.
+		"""
+		self.transformationView.removeLastRow()
