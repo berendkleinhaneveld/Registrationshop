@@ -27,7 +27,7 @@ class SurfacePicker(Picker, Interactor):
 		self.props = []
 		self.picker = vtkVolumePicker()
 		self.picker.SetTolerance(1e-6)
-		self.picker.SetVolumeOpacityIsovalue(0.1)
+		self.picker.SetVolumeOpacityIsovalue(0.05)
 		self.widget = None
 
 	def setWidget(self, widget):
@@ -61,6 +61,9 @@ class SurfacePicker(Picker, Interactor):
 
 		self.widget.renderer.AddViewProp(self.redCone)
 		self.widget.renderer.AddViewProp(self.greenCone)
+
+		self.picker.PickFromListOn()
+		self.picker.AddPickList(self.widget.volume)
 
 		self.AddObserver(self.widget.rwi, "MouseMoveEvent", self.mouseMove)
 		self.AddObserver(self.widget.rwi, "KeyPressEvent", self.keyPress)
