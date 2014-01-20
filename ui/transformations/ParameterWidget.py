@@ -8,6 +8,7 @@ from PySide.QtGui import QWidget
 from PySide.QtGui import QVBoxLayout
 from PySide.QtGui import QPushButton
 from PySide.QtGui import QIcon
+from PySide.QtCore import Qt
 from core.AppVars import AppVars
 from ui.widgets import ButtonContainer
 from ui.transformations import ParameterModel
@@ -30,6 +31,7 @@ class ParameterWidget(QWidget):
 		self.parameterModel = ParameterModel()
 
 		self.parameterView = ParameterListView()
+		self.parameterView.setAttribute(Qt.WA_MacShowFocusRect, False)
 		self.parameterView.setRootIsDecorated(False)
 		self.parameterView.setModel(self.parameterModel)
 
@@ -58,4 +60,3 @@ class ParameterWidget(QWidget):
 
 	def removeButtonClicked(self):
 		self.parameterView.removeSelectedParameter()
-		# TODO: disable the add/remove buttons when no tranformation is selected
