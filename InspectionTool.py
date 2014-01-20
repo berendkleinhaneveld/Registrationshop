@@ -9,6 +9,7 @@ from PySide.QtGui import QApplication
 from PySide.QtGui import QWidget
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QLabel
+from PySide.QtGui import QHBoxLayout
 from PySide.QtCore import QObject
 from PySide.QtCore import Slot
 from PySide.QtCore import Qt
@@ -28,32 +29,47 @@ class CompareWidget(QWidget):
 	def __init__(self, widgets):
 		super(CompareWidget, self).__init__()
 
-		self.setStyleSheet("background-color: #444")
+		self.setStyleSheet("background-color: #333")
 
 		fixedDataTitleWidget = self.createLabel("Fixed data", "#f80")
-		multiDataTitleWidget = self.createLabel("Mix / Result", "#fff")
-		movingDataTitleWidget = self.createLabel("Moving data", "#08f")
+		movingDataTitleWidget = self.createLabel("Moving data", "#4bf")
+
+		# Labels for underneath the compare widget
+		fixedLabel = self.createLabel("Fixed", "#f80")
+		fixedLabel.setAlignment(Qt.AlignRight)
+		centerLabel = self.createLabel("+", "#fff")
+		movingLabel = self.createLabel("Moving", "#4bf")
+		movingLabel.setAlignment(Qt.AlignLeft)
+
+		horLayout = QHBoxLayout()
+		horLayout.setContentsMargins(0, 0, 0, 0)
+		horLayout.addStretch(1)
+		horLayout.addWidget(fixedLabel)
+		horLayout.addWidget(centerLabel)
+		horLayout.addWidget(movingLabel)
+		horLayout.addStretch(1)
+
+		combinedTextWidget = QWidget()
+		combinedTextWidget.setLayout(horLayout)
 
 		layout = QGridLayout()
-		layout.setSpacing(0)
-		layout.setContentsMargins(0, 0, 0, 0)
-		layout.addWidget(fixedDataTitleWidget, 0, 0)
-		layout.addWidget(multiDataTitleWidget, 0, 1)
-		layout.addWidget(movingDataTitleWidget, 0, 2)
+		layout.setSpacing(15)
+		layout.setContentsMargins(15, 15, 15, 15)
 		for i in range(len(widgets)):
 			widget = widgets[i]
-			layout.addWidget(widget, 1, i)
-
+			layout.addWidget(widget, 0, i)
+		layout.addWidget(fixedDataTitleWidget, 1, 0)
+		layout.addWidget(combinedTextWidget, 1, 1)
+		layout.addWidget(movingDataTitleWidget, 1, 2)
 		self.setLayout(layout)
 
 	def createLabel(self, text, color):
 		label = QLabel(text)
 		font = label.font()
-		font.setPixelSize(11)
+		font.setPixelSize(12)
 		label.setFont(font)
 		label.setAlignment(Qt.AlignCenter)
-		label.setStyleSheet("background-color: #444; color: " + color)
-		label.setMinimumHeight(30)
+		label.setStyleSheet("color: " + color)
 		return label
 
 
