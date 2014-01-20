@@ -130,18 +130,8 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 
 		self.mouseMoved.emit(pickPosition)
 
-	def transferfunction(self, imagedata, color):
-		scalarRange = imagedata.GetScalarRange()
 
-		opacity = vtkPiecewiseFunction()
-		opacity.AddPoint(scalarRange[0], 0)
-		opacity.AddPoint(scalarRange[1], 1)
 
-		transfer = vtkDiscretizableColorTransferFunction()
-		transfer.AddRGBPoint(scalarRange[0], 0, 0, 0)
-		transfer.AddRGBPoint(scalarRange[1], color[0], color[1], color[2])
-		transfer.SetScalarOpacityFunction(opacity)
-		return transfer
 
 	def adjustTransferFunction(self, transferfunction, lower, upper):
 		transfer = vtkColorTransferFunction()
