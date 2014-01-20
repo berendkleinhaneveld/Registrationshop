@@ -29,6 +29,7 @@ class TransformationHistoryWidget(QWidget):
 		self.transformationView = TransformationListView()
 		self.transformationView.setRootIsDecorated(False)
 		self.transformationView.setModel(self.transformationModel)
+		self.transformationView.setAttribute(Qt.WA_MacShowFocusRect, False)
 
 		layout = QVBoxLayout()
 		layout.setSpacing(0)
