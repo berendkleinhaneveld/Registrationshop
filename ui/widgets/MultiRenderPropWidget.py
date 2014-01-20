@@ -8,6 +8,7 @@ MultiRenderPropWidget
 from PySide.QtGui import QWidget
 from PySide.QtGui import QVBoxLayout
 from PySide.QtGui import QTabWidget
+from PySide.QtCore import Slot
 from ui.parameters import RenderParameterWidget
 from ui.parameters import RenderSlicerParamWidget
 from ui.parameters import TransformationHistoryWidget
@@ -31,7 +32,7 @@ class MultiRenderPropWidget(QWidget):
 
 		# Create the tab widget
 		self.tabWidget = QTabWidget()
-		self.tabWidget.addTab(self.mixParamWidget, "Mix")
+		self.tabWidget.addTab(self.mixParamWidget, "Visualization")
 		self.tabWidget.addTab(self.registrationHistoryWidget, "History")
 		self.tabWidget.addTab(self.slicesTabWidget, "Slices")
 
