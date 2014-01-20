@@ -33,7 +33,6 @@ class SliderFloatWidget(QWidget):
 		layout = QGridLayout()
 		layout.setContentsMargins(0, 0, 0, 0)
 		layout.setVerticalSpacing(0)
-		# layout.setHorizontalSpacing(0)
 		layout.addWidget(self.label, 0, 0)
 		layout.addWidget(self.slider, 0, 1)
 		layout.addWidget(self.spinbox, 0, 2)
