@@ -94,6 +94,7 @@ class SurfacePicker(Picker, Interactor):
 			return
 		pos = self.redCone.GetPosition()
 		self.pickedLocation.emit(pos)
+		self.widget.render()
 
 
 def PointCone(actor, nx, ny, nz):
