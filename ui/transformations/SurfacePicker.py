@@ -12,7 +12,6 @@ from vtk import vtkActor
 from vtk import vtkConeSource
 from vtk import vtkDataSetMapper
 from PySide.QtCore import Signal
-from core.vtkDrawing import TransformWithMatrix
 
 
 class SurfacePicker(Picker, Interactor):
