@@ -364,11 +364,11 @@ def CreateEmptyFunctions():
 	"""
 	# Transfer functions and properties
 	colorFunction = vtkColorTransferFunction()
-	colorFunction.AddRGBPoint(0, 0.0, 0.0, 0.0)
-	colorFunction.AddRGBPoint(1, 0.0, 0.0, 0.0)
+	colorFunction.AddRGBPoint(-1000, 0.0, 0.0, 0.0)
+	colorFunction.AddRGBPoint(1000, 0.0, 0.0, 0.0)
 
 	opacityFunction = vtkPiecewiseFunction()
-	opacityFunction.AddPoint(0, 0)
-	opacityFunction.AddPoint(1, 0)
+	opacityFunction.AddPoint(-1000, 0.0)
+	opacityFunction.AddPoint(1000, 0.0)
 
 	return colorFunction, opacityFunction
