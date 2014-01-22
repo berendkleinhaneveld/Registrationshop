@@ -90,7 +90,7 @@ class SurfacePicker(Picker, Interactor):
 
 	def keyPress(self, iren, event=""):
 		key = iren.GetKeyCode()
-		if key != "a":
+		if key != "a" and key != " ":
 			return
 		pos = self.redCone.GetPosition()
 		self.pickedLocation.emit(pos)

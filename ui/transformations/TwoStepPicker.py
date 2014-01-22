@@ -154,7 +154,7 @@ class TwoStepPicker(Picker):
 		vtk action callback
 		"""
 		key = iren.GetKeyCode()
-		if key != "a":
+		if key != "a" and key != " ":
 			# if key == " ":
 			# 	print "Pressed space"
 			return

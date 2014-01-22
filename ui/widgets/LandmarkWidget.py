@@ -71,7 +71,7 @@ class SurfaceLandmarkWidget(QWidget):
 		super(SurfaceLandmarkWidget, self).__init__()
 		
 		self.textFrame = QTextEdit("<p>Hold your mouse over the volume "
-			"to move the locator. To create a landmark, press 'A'.</p>"
+			"to move the locator. To create a landmark, press 'Space'.</p>"
 			"<p>When you want to proceed to the following landmark, "
 			"click the 'Done' button behind the landmark pair in the "
 			"center of the window.</p>")
@@ -101,9 +101,9 @@ class TwoStepLandmarkWidget(QWidget):
 		super(TwoStepLandmarkWidget, self).__init__()
 
 		self.textFrame = QTextEdit("<p>Place your mouse over the desired "
-			"landmark point. Press 'A' to shoot a ray through the volume. "
+			"landmark point. Press 'Space' to shoot a ray through the volume. "
 			"Move the volume around and move the mouse to move the locator. "
-			"Press 'A' again to define the final place of the landmark.</p>"
+			"Press 'Space' again to define the final place of the landmark.</p>"
 			"<p>You can also use the ray profile to define the landmark's location.</p>")
 		self.textFrame.setReadOnly(True)
 		self.textFrame.setFrameShape(QFrame.NoFrame)
