@@ -51,7 +51,7 @@ class RenderWidget(QWidget):
 		self.rwi.GetRenderWindow().AddRenderer(self.renderer)
 		self.rwi.GetRenderWindow().AddRenderer(self.rendererOverlay)
 		self.rwi.GetRenderWindow().SetNumberOfLayers(2)
-		self.rwi.SetDesiredUpdateRate(1)
+		self.rwi.SetDesiredUpdateRate(0)
 
 		self.imagePlaneWidgets = [vtkImagePlaneWidget() for i in range(3)]
 		for index in range(3):
