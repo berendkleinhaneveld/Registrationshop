@@ -6,18 +6,12 @@ ClippingBox
 """
 from ui.Interactor import Interactor
 from PySide.QtCore import QObject
+from PySide.QtCore import Signal
 from vtk import vtkBoxWidget
 from vtk import vtkPlanes
 from vtk import vtkImagePlaneWidget
-# from vtk import vtkActor
-# from vtk import vtkMatrix4x4
 from vtk import vtkPolyData
 from vtk import vtkTransform
-# from vtk import vtkDiscretizableColorTransferFunction
-# from vtk import vtkLookupTable
-# from vtk import vtkDataSetMapper
-# from vtk import vtkImageReslice
-from PySide.QtCore import Signal
 
 
 class ClippingBox(QObject, Interactor):
@@ -60,8 +54,12 @@ class ClippingBox(QObject, Interactor):
 
 	def update(self):
 		volVis = self.widget.volumeVisualization
-		if not hasattr(volVis, "lowerBound"):
-			# TODO: Reset the opacity of the slices
+		from ui.visualizations.VolumeVisualization import VisualizationTypeSimple
+		if volVis.visualizationType != VisualizationTypeSimple:
+			for i in range(6):
+				lookupTable = self.planes[i].GetLookupTable()
+				lookupTable.SetAlphaRange(1.0, 1.0)
+				lookupTable.Build()
 			return
 
 		# TODO: also use the upper bound
@@ -74,14 +72,22 @@ class ClippingBox(QObject, Interactor):
 		for i in range(6):
 			self.planes[i].SetWindowLevel(window, level)
 			lookupTable = self.planes[i].GetLookupTable()
+			nrOfValues = lookupTable.GetNumberOfTableValues()
 			lowerBorder = (lowerBound - minimum) / (maximum - minimum)
 			currVal = 0.0
 			j = 0
-			while currVal < lowerBorder:
+			# Make all values beneath a certain gray value transparent
+			while currVal < lowerBorder and j < nrOfValues:
 				value = list(lookupTable.GetTableValue(j))
 				value[3] = 0.0
 				lookupTable.SetTableValue(j, value)
 				currVal = value[0]
+				j += 1
+			# Don't forget to set all the following opacity values to 1.0
+			while j < nrOfValues:
+				value = list(lookupTable.GetTableValue(j))
+				value[3] = 1.0
+				lookupTable.SetTableValue(j, value)
 				j += 1
 
 			lookupTable.Build()
