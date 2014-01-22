@@ -7,32 +7,19 @@ SliceCompareViewerWidget
 
 from vtk import vtkRenderer
 from vtk import vtkInteractorStyleUser
-from vtk import vtkImagePlaneWidget
-from vtk import vtkLookupTable
 from vtk import vtkCellPicker
-from vtk import vtkImageAppendComponents
-from vtk import vtkImageShiftScale
-from vtk import vtkImageCast
 from vtk import vtkImageMapToColors
-from vtk import vtkDiscretizableColorTransferFunction
-from vtk import vtkImageBlend
-# from vtk import vtkLookupTable
 from vtk import vtkColorTransferFunction
 from vtk import vtkDataSetMapper
 from vtk import vtkActor
-from vtk import vtkPiecewiseFunction
-from vtk import vtkImageToImageStencil
-from vtk import vtkImageExtractComponents
 from vtk import vtkImageMathematics
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.Interactor import Interactor
-from core.vtkDrawing import CreateCircle
 from core.vtkDrawing import CreateSquare
 from core.vtkDrawing import CreateLine
-from core.vtkDrawing import ColorActor
 
 
 class SliceCompareViewerWidget(QWidget, Interactor):
@@ -129,7 +116,6 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 		pickPosition = map(lambda x: x / worldCoords[3], worldCoords[0:-1])
 
 		self.mouseMoved.emit(pickPosition)
-
 
 	def adjustTransferFunction(self, transferfunction, lower, upper):
 		transfer = vtkColorTransferFunction()
