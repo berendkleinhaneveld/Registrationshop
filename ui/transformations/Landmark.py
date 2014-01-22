@@ -23,8 +23,8 @@ class Landmark(object):
 		self.overlay = overlay
 		self.flag = flag
 
-		self.colorActive = [1.0, 0.5, 0.7]
-		self.colorInactive = [1.0, 1.0, 0.6]
+		self.colorActive = [0.5, 1.0, 0.5]
+		self.colorInactive = [0.8, 0.8, 0.8]
 
 		self._position = [0.0, 0.0, 0.0]  # coordinates in volume
 		self._scale = 1.0
