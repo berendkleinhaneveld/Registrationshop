@@ -31,14 +31,11 @@ class UserTransformationTool(TransformationTool):
 
 		self.transformBox = TransformBox()
 		self.transformBox.transformUpdated.connect(self.transformBoxUpdated)
-		self._originalUpdateRate = 15  # Default
 
 	@overrides(TransformationTool)
 	def setRenderWidgets(self, fixed=None, moving=None, multi=None):
 		self.movingWidget = moving
 		self.renderWidget = multi
-		self._originalUpdateRate = self.renderWidget.rwi.GetDesiredUpdateRate()
-		self.renderWidget.rwi.SetDesiredUpdateRate(5)
 		self.transformBox.setWidget(self.renderWidget)
 		self.transformBox.setImageData(self.renderWidget.movingImageData)
 		self.renderWidget.transformations.append(Transformation(vtkTransform(), Transformation.TypeUser))
@@ -52,7 +49,6 @@ class UserTransformationTool(TransformationTool):
 		self.transformBox.cleanUp()
 
 		# Reset the transformation
-		self.renderWidget.rwi.SetDesiredUpdateRate(self._originalUpdateRate)
 		self.renderWidget.render()
 		self.movingWidget.render()
 
