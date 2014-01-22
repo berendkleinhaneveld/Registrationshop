@@ -169,11 +169,6 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		self.level = self.levelSlider.value()
 		self.window = self.windowSlider.value()
 
-		self.lowerBoundLabel.setText(str(self.lowerBound))
-		self.upperBoundLabel.setText(str(self.upperBound))
-		self.levelLabel.setText(str(self.level))
-		self.windowLabel.setText(str(self.window))
-
 		self.updateTransferFunction()
 
 
