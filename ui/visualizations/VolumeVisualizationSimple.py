@@ -46,6 +46,8 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		self.colors = map(lambda x: [x[0] / 255.0, x[1] / 255.0, x[2] / 255.0], colors)
 		self.color = self.colors[0]
 		self.opacity = 1.0
+		self.colorFunction = None
+		self.opacityFunction = None
 
 	@overrides(VolumeVisualization)
 	def getParameterWidget(self):
@@ -159,17 +161,23 @@ class VolumeVisualizationSimple(VolumeVisualization):
 		r, g, b = self.color
 
 		# Transfer functions and properties
-		self.colorFunction = vtkColorTransferFunction()
-		self.colorFunction.AddRGBPoint(self.minimum, r, g, b)
+		if not self.colorFunction:
+			self.colorFunction = vtkColorTransferFunction()
+		else:
+			self.colorFunction.RemoveAllPoints()
+		self.colorFunction.AddRGBPoint(self.minimum, r*0.7, g*0.7, b*0.7)
 		self.colorFunction.AddRGBPoint(self.maximum, r, g, b)
 
-		self.opacityFunction = vtkPiecewiseFunction()
+		if not self.opacityFunction:
+			self.opacityFunction = vtkPiecewiseFunction()
+		else:
+			self.opacityFunction.RemoveAllPoints()
 		self.opacityFunction.AddPoint(self.minimum, 0)
 		self.opacityFunction.AddPoint(self.lowerBound, 0)
 		self.opacityFunction.AddPoint(self.lowerBound+0.0001, self.opacity)
-		self.opacityFunction.AddPoint(self.upperBound, self.opacity)
-		self.opacityFunction.AddPoint(self.upperBound+0.0001, 0)
-		self.opacityFunction.AddPoint(self.maximum, 0)
+		self.opacityFunction.AddPoint(self.upperBound-0.0001, self.opacity)
+		self.opacityFunction.AddPoint(self.upperBound, 0)
+		self.opacityFunction.AddPoint(self.maximum+0.0001, 0)
 
 		self.volProp.SetColor(self.colorFunction)
 		self.volProp.SetScalarOpacity(self.opacityFunction)
