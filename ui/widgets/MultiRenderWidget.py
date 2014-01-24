@@ -114,7 +114,7 @@ class MultiRenderWidget(QWidget):
 
 		self.mapper.SetInputData(0, self.fixedImageData)
 		self.mapper.SetInputData(1, self.movingImageData)
-		
+
 		self._transformations = TransformationList()
 		self._transformations.transformationChanged.connect(self.updateTransformation)
 		self._shouldResetCamera = False
@@ -199,10 +199,10 @@ class MultiRenderWidget(QWidget):
 	def _updateGrids(self):
 		if not self._hasImageData():
 			return
-			
-		if self._hasMovingImageData:
+
+		if self._hasMovingImageData():
 			self.movingGridItems = CreateBounds(self.movingImageData.GetBounds())
-			
+
 		boundsFixed = self.fixedImageData.GetBounds()
 		boundsMoving = self.movingImageData.GetBounds()
 		maxBounds = map(lambda x, y: max(x, y), boundsFixed, boundsMoving)
@@ -211,11 +211,7 @@ class MultiRenderWidget(QWidget):
 			self.renderer.AddViewProp(item)
 
 	def _cleanUpGrids(self):
-		for item in self.fixedGridItems:
-			self.renderer.RemoveViewProp(item)
-		for item in self.movingGridItems:
-			self.renderer.RemoveViewProp(item)
-		for item in self.orientationGridItems:
+		for item in (self.fixedGridItems + self.movingGridItems + self.orientationGridItems):
 			self.renderer.RemoveViewProp(item)
 		self.fixedGridItems = []
 		self.movingGridItems = []
@@ -227,8 +223,10 @@ class MultiRenderWidget(QWidget):
 		else:
 			if self._hasFixedImageData():
 				self.clippingBox.setImageData(self.fixedImageData)
-			else:
+			elif self._hasMovingImageData():
 				self.clippingBox.setImageData(self.movingImageData)
+			else:
+				self.clippingBox.enable(False)
 
 	def _hasImageData(self):
 		return self._hasFixedImageData() or self._hasMovingImageData()
@@ -248,11 +246,11 @@ class MultiRenderWidget(QWidget):
 	@property
 	def transformations(self):
 		return self._transformations
-	
+
 	@transformations.setter
 	def transformations(self, value):
 		self._transformations.copyFromTransformations(value)
-	
+
 	# Slots
 
 	@Slot(object)
