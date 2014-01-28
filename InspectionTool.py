@@ -18,7 +18,6 @@ from core.data.DataTransformer import DataTransformer
 from core.data.DataResizer import DataResizer
 from ui.widgets.SliceViewerWidget import SliceViewerWidget
 from ui.widgets.SliceCompareViewerWidget import SliceCompareViewerWidget
-from ui.widgets.TitleWidget import TitleWidget
 from vtk import vtkTransform
 
 
