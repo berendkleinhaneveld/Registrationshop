@@ -89,9 +89,9 @@ def listFromMatrix(matrix):
 		for i in range(3):
 			element = matrix.GetElement(i, j)
 			result.append(element)
-		for k in range(3):
-			element = matrix.GetElement(k, 3)
-			result.append(element)
+	for k in range(3):
+		element = matrix.GetElement(k, 3)
+		result.append(element)
 	return result
 
 
