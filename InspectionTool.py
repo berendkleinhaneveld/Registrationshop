@@ -96,6 +96,12 @@ class ComparisonController(QObject):
 			widget.slicePositionChanged.connect(self.slicerChanged)
 			widget.mouseMoved.connect(self.mouseMoved)
 
+	def initialize(self):
+		# Initialize the render window interactors only after calling show()
+		# otherwise OpenGL errors will occur on OS X
+		for widget in self.widgets:
+			widget.rwi.Initialize()
+
 	def syncCameras(self, viewUp=None):
 		# Copy the camera settings
 		sourceCam = self.fixedImageWidget.renderer.GetActiveCamera()
@@ -249,5 +255,6 @@ if __name__ == '__main__':
 	widget = CompareWidget(controller.widgets)
 	widget.raise_()
 	widget.show()
+	controller.initialize()
 	controller.slicerChanged(controller.fixedImageWidget)
 	app.exec_()

@@ -92,6 +92,13 @@ class RegistrationShop(MainWindow, WindowDialog):
 		if lastProject:
 			self.openProject(lastProject)
 
+	def initialize(self):
+		# Initialize the render window interactors only after calling show()
+		# otherwise OpenGL errors will occur on OS X
+		self.fixedDataWidget.rwi.Initialize()
+		self.movingDataWidget.rwi.Initialize()
+		self.multiDataWidget.rwi.Initialize()
+
 	# UI setup methods
 
 	def initUI(self):
@@ -605,6 +612,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		self.controller.setInputData(project.fixedData, project.movingData, transform)
 		self.compareWidget = CompareWidget(self.controller.widgets)
 		self.compareWidget.show()
+		self.controller.initialize()
 		self.controller.slicerChanged(self.controller.fixedImageWidget)
 
 	@Slot()
@@ -629,6 +637,7 @@ def main():
 	mainWindow = RegistrationShop(sys.argv)
 	mainWindow.raise_()
 	mainWindow.show()
+	mainWindow.initialize()
 	sys.exit(app.exec_())
 
 if __name__ == '__main__':

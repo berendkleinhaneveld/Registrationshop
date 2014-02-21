@@ -48,7 +48,6 @@ class RenderWidget(QWidget):
 
 		self.rwi = QVTKRenderWindowInteractor(parent=self)
 		self.rwi.SetInteractorStyle(vtkInteractorStyleTrackballCamera())
-		self.rwi.Initialize()
 		self.rwi.GetRenderWindow().AddRenderer(self.renderer)
 		self.rwi.GetRenderWindow().AddRenderer(self.rendererOverlay)
 		self.rwi.GetRenderWindow().SetNumberOfLayers(2)

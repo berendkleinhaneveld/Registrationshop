@@ -46,7 +46,6 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 
 		self.rwi = QVTKRenderWindowInteractor(parent=self)
 		self.rwi.SetInteractorStyle(vtkInteractorStyleUser())
-		self.rwi.Initialize()
 		self.rwi.GetRenderWindow().AddRenderer(self.renderer)
 		self.rwi.GetRenderWindow().AddRenderer(self.rendererOverlay)
 		self.rwi.GetRenderWindow().SetNumberOfLayers(2)
