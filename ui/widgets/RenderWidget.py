@@ -8,7 +8,7 @@ RenderWidget
 from vtk import vtkRenderer
 from vtk import vtkVolume
 from vtk import vtkInteractorStyleTrackballCamera
-from libvtkGPUMultiVolumeRenderPython import vtkOpenGLGPUVolumeRayCastMapper2 as vtkOpenGLGPUVolumeRayCastMapper
+from vtk import vtkOpenGLGPUVolumeRayCastMapper
 from vtk import vtkTransform
 from vtk import vtkImagePlaneWidget
 from PySide.QtGui import QGridLayout

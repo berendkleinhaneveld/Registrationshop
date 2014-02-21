@@ -5,7 +5,7 @@ MultiRenderWidget
 	Berend Klein Haneveld
 """
 
-from libvtkGPUMultiVolumeRenderPython import vtkOpenGLGPUMultiVolumeRayCastMapper
+from vtk import vtkOpenGLGPUMultiVolumeRayCastMapper
 from vtk import vtkRenderer
 from vtk import vtkInteractorStyleTrackballCamera
 from vtk import vtkImagePlaneWidget
