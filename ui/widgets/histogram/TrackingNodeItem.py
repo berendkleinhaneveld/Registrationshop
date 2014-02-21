@@ -108,8 +108,8 @@ class TrackingNodeItem(NodeItem):
 			y2 = line.y2()
 			ratio = (normX - x1) / (x2 - x1)
 			actualY = y1 + ratio * (y2 - y1)
-			assert normX >= x1
-			assert normX <= x2
+			# assert normX >= x1
+			# assert normX <= x2
 			actualPos.setY(actualY)
 			actualPos.setX(normX)
 			self._position = (normX - margins.left()) / width
