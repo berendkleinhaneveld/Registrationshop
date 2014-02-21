@@ -55,7 +55,7 @@ class ClippingBox(QObject, Interactor):
 	def update(self):
 		volVis = self.widget.volumeVisualization
 		from ui.visualizations.VolumeVisualization import VisualizationTypeSimple
-		if volVis.visualizationType != VisualizationTypeSimple:
+		if volVis is None or volVis.visualizationType != VisualizationTypeSimple:
 			for i in range(6):
 				lookupTable = self.planes[i].GetLookupTable()
 				lookupTable.SetAlphaRange(1.0, 1.0)
