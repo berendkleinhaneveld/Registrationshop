@@ -139,8 +139,7 @@ class ClippingBox(QObject, Interactor):
 		self.tranform = transform
 		self.clippingBox.SetTransform(transform)
 
-		for i in range(6):
-			plane = self.planes[i]
+		for plane in self.planes:
 			plane.SetUserTransform(transform)
 
 		self.updateImagePlanes()
@@ -219,8 +218,8 @@ class ClippingBox(QObject, Interactor):
 		self.planes[5].SetPoint1(p[7])
 		self.planes[5].SetPoint2(p[5])
 
-		for i in range(6):
-			self.planes[i].UpdatePlacement()
+		for plane in self.planes:
+			plane.UpdatePlacement()
 
 	def updateMapperWithClippingPlanes(self, planes):
 		self.widget.mapper.SetClippingPlanes(planes)
