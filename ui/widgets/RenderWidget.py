@@ -75,8 +75,8 @@ class RenderWidget(QWidget):
 		self.baseTransform = vtkTransform()
 		self.userTransform = vtkTransform()
 
-		self.setMinimumWidth(400)
-		self.setMinimumHeight(400)
+		self.setMinimumWidth(340)
+		self.setMinimumHeight(340)
 
 		layout = QGridLayout(self)
 		layout.setSpacing(0)

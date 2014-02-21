@@ -120,8 +120,8 @@ class MultiRenderWidget(QWidget):
 		self._transformations.transformationChanged.connect(self.updateTransformation)
 		self._shouldResetCamera = False
 
-		self.setMinimumWidth(400)
-		self.setMinimumHeight(400)
+		self.setMinimumWidth(340)
+		self.setMinimumHeight(340)
 
 		layout = QGridLayout(self)
 		layout.setSpacing(0)
