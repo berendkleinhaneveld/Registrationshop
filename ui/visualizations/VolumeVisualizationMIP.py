@@ -129,8 +129,8 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		self.minimum, self.maximum = imageData.GetScalarRange()
 		self.lowerBound = self.minimum
 		self.upperBound = self.maximum
-		self.window = abs(self.maximum - self.minimum)
-		self.level = (self.maximum + self.minimum) / 2.0
+		self.window = self.maximum - self.minimum
+		self.level = self.minimum + (self.maximum - self.minimum) * 0.5
 
 	@overrides(VolumeVisualization)
 	def setMapper(self, mapper):
@@ -142,7 +142,7 @@ class VolumeVisualizationMIP(VolumeVisualization):
 
 	@overrides(VolumeVisualization)
 	def updateTransferFunction(self):
-		self.colorFunction, self.opacityFunction = CreateRangeFunctions(self.minimum, self.maximum, self.window, self.level)
+		self.colorFunction, self.opacityFunction = CreateRangeFunctions(self.minimum, self.maximum, self.window, self.level, self.lowerBound, self.upperBound)
 		self.volProp.SetColor(self.colorFunction)
 		self.volProp.SetScalarOpacity(self.opacityFunction)
 
@@ -150,6 +150,8 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		upperBound = (self.upperBound - self.minimum) / (self.maximum - self.minimum)
 
 		if self.mapper:
+			self.mapper.SetWindow(self.window)
+			self.mapper.SetLevel(self.level)
 			self.mapper.SetLowerBound(lowerBound)
 			self.mapper.SetUpperBound(upperBound)
 
@@ -172,7 +174,7 @@ class VolumeVisualizationMIP(VolumeVisualization):
 		self.updateTransferFunction()
 
 
-def CreateRangeFunctions(minimum, maximum, window, level):
+def CreateRangeFunctions(minimum, maximum, window, level, lowerBound, upperBound):
 	"""
 	:type imageData: vktImageData
 	:type color: array of length 3 (r, g, b)
@@ -185,6 +187,8 @@ def CreateRangeFunctions(minimum, maximum, window, level):
 	colorFunction.AddRGBSegment(minV, 0, 0, 0, maxV, 1, 1, 1)
 
 	opacityFunction = vtkPiecewiseFunction()
-	opacityFunction.AddSegment(minimum, 1.0, maximum, 1.0)
+	opacityFunction.AddSegment(minimum-0.0001, 0.0, lowerBound, 0.0)
+	opacityFunction.AddSegment(lowerBound+0.0001, 1.0, upperBound, 1.0)
+	opacityFunction.AddSegment(upperBound+0.0001, 0.0, maximum+0.0001, 0.0)
 
 	return colorFunction, opacityFunction
