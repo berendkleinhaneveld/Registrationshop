@@ -219,7 +219,7 @@ class MultiRenderWidget(QWidget):
 
 	def _createClippingBox(self):
 		if not self._hasImageData():
-			self.clippingBox.enable(False)
+			self.clippingBox.showClippingBox(False)
 		else:
 			if self._hasFixedImageData():
 				self.clippingBox.setImageData(self.fixedImageData)
