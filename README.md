@@ -2,7 +2,7 @@
 
 Interactive registration tool for 3D medical datasets.
 
-![Screenshot of the Registrationshop user interface](https://graphics.tudelft.nl/wp-content/uploads/2013/09/Registrationshop-2013-09-16.png)
+![Screenshot of the Registrationshop user interface](https://graphics.tudelft.nl/wp-content/uploads/2013/09/maininterfacelungs.png)
 
 ## Components
 Written for the most part in Python. Uses PySide for the interface and uses VTK for the visualizations. Uses [vtkMultiVolRen](https://github.com/karlkrissian/vtkMultiVolRen) for rendering multiple datasets in one vtkRenderer. My fork can be found at [https://github.com/berendkleinhaneveld/vtkMultiVolRen](https://github.com/berendkleinhaneveld/vtkMultiVolRen). Needs to be compiled first before Registrationshop can be made to work.
