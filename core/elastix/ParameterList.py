@@ -46,15 +46,21 @@ class ParameterList(object):
 
 		# TODO: write tests for this method in order to better specify its behaviour
 		noErrors = True
-		with open(filename, "r") as parameterFile:
-			try:
-				for line in parameterFile:
-					param = Parameter.parameterFromString(line)
-					if param:
-						self.append(param)
-
-			except Exception:
+		try:
+			if filename.startswith('.DS'):
 				noErrors = False
+			else:
+				with open(filename, "r") as parameterFile:
+					try:
+						for line in parameterFile:
+							param = Parameter.parameterFromString(line)
+							if param:
+								self.append(param)
+
+					except Exception:
+						noErrors = False
+		except Exception:
+			noErrors = False
 			
 		return noErrors
 
