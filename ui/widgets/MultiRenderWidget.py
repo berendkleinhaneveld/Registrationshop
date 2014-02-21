@@ -21,7 +21,7 @@ from PySide.QtCore import Signal
 from PySide.QtCore import Slot
 from ui.transformations import TransformationList
 from ui.transformations import ClippingBox
-from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from core.vtkDrawing import CreateBounds
 from core.vtkDrawing import CreateOrientationGrid
 
@@ -76,6 +76,7 @@ class MultiRenderWidget(QWidget):
 
 		self.rwi = QVTKRenderWindowInteractor(parent=self)
 		self.rwi.SetInteractorStyle(vtkInteractorStyleTrackballCamera())
+		self.rwi.Initialize()
 		self.rwi.GetRenderWindow().AddRenderer(self.renderer)
 		self.rwi.GetRenderWindow().AddRenderer(self.rendererOverlay)
 		self.rwi.GetRenderWindow().SetNumberOfLayers(2)

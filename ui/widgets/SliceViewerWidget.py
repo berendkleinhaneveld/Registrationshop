@@ -13,7 +13,7 @@ from vtk import vtkColorTransferFunction
 from PySide.QtGui import QGridLayout
 from PySide.QtGui import QWidget
 from PySide.QtCore import Signal
-from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.Interactor import Interactor
 from core.vtkDrawing import CreateSquare
 from core.vtkDrawing import CreateLine
@@ -45,6 +45,7 @@ class SliceViewerWidget(QWidget, Interactor):
 
 		self.rwi = QVTKRenderWindowInteractor(parent=self)
 		self.rwi.SetInteractorStyle(vtkInteractorStyleUser())
+		self.rwi.Initialize()
 		self.rwi.GetRenderWindow().AddRenderer(self.renderer)
 		self.rwi.GetRenderWindow().AddRenderer(self.rendererOverlay)
 		self.rwi.GetRenderWindow().SetNumberOfLayers(2)
