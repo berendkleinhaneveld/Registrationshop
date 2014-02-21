@@ -250,7 +250,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		self.actionLandmarkTransformTool.setIcon(QIcon(landmarkTransformIconName))
 		self.actionLandmarkTransformTool.triggered.connect(self.addLandmarkTransform)
 
-		self.actionDeformableTransformTool = QAction('Deformable transform', self, shortcut='Ctrl+3')
+		self.actionDeformableTransformTool = QAction('Automatic transform', self, shortcut='Ctrl+3')
 		self.actionDeformableTransformTool.setIcon(QIcon(deformableTransformIconName))
 		self.actionDeformableTransformTool.triggered.connect(self.addDeformableTransform)
 
