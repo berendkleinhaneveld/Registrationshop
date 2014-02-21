@@ -28,7 +28,7 @@ class ElastixMainDialog(QDialog):
 		self.radioButtons = []
 		for transformation in self.transformations:
 			self.radioButtons.append(QRadioButton(transformation.name))
-		self.radioButtons.append(QRadioButton("Load custom transformation file..."))
+		self.radioButtons.append(QRadioButton("Load custom parameter file..."))
 		self.radioButtons[0].setChecked(True)
 
 		self.nextButton = QPushButton("Next")
@@ -40,7 +40,7 @@ class ElastixMainDialog(QDialog):
 		for radioButton in self.radioButtons:
 			groupLayout.addWidget(radioButton)
 		
-		self.groupBox = QGroupBox("Choose transformation")
+		self.groupBox = QGroupBox("Choose parameter file")
 		self.groupBox.setLayout(groupLayout)
 
 		self.setModal(True)
