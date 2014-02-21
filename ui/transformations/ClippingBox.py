@@ -162,6 +162,8 @@ class ClippingBox(QObject, Interactor):
 				plane.Off()
 
 	def updateImagePlanes(self):
+		if len(self.planes) == 0:
+			return
 		# First get the planes of the clipping box
 		planes = vtkPlanes()
 		self.clippingBox.GetPlanes(planes)
