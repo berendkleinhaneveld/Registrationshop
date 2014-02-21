@@ -1,0 +1,14 @@
+ObjectType = Image
+NDims = 3
+BinaryData = True
+BinaryDataByteOrderMSB = False
+CompressedData = True
+CompressedDataSize = 31881
+TransformMatrix = 1 0 0 0 1 0 0 0 1
+Offset = 5 5 5
+CenterOfRotation = 0 0 0
+ElementSpacing = 1 1 1
+DimSize = 30 30 30
+AnatomicalOrientation = ???
+ElementType = MET_FLOAT
+ElementDataFile = Block2.zraw

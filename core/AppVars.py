@@ -73,3 +73,15 @@ class AppVars(object):
 		else:
 			print "Warning: application path is not set"
 			return extension
+
+	@staticmethod
+	def dataPath():
+		"""
+		:rtype: basestring
+		"""
+		extension = "resources/data/"
+		if AppVars.applicationPath:
+			return os.path.join(AppVars.applicationPath, extension)
+		else:
+			print "Warning: application path is not set"
+			return extension
