@@ -614,6 +614,12 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 
 def main():
+	# Fix for PySide on OSX Mavericks
+	import sys
+	if sys.platform.startswith("darwin"):
+		from PySide.QtGui import QFont
+		QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")
+
 	app = QApplication(sys.argv)
 	app.setObjectName(APPNAME)
 	app.setApplicationName(APPNAME)
