@@ -43,11 +43,15 @@ class TransformixTransformation(object):
 
 		scalarType = imageData.GetScalarTypeAsString()
 		dimensions = list(imageData.GetDimensions())
+		bounds = list(imageData.GetBounds())
 		spacing = list(imageData.GetSpacing())
-		center = map(lambda x: x / 2.0, dimensions)
 
-		if not scalarType or not dimensions or not spacing:
+		if not scalarType or not bounds or not spacing:
 			raise Exception("Could not get the needed parameters")
+
+		center = [(bounds[0]+bounds[1]) / 2.0,
+			(bounds[2]+bounds[3]) / 2.0,
+			(bounds[4]+bounds[5]) / 2.0]
 
 		transformation.append(Parameter("NumberOfParameters", len(elemList)))
 		transformation.append(Parameter("TransformParameters", elemList))
