@@ -240,15 +240,9 @@ class ComparisonController(QObject):
 if __name__ == '__main__':
 	app = QApplication([])
 
-	# fixedDataName = "/Users/beer/Desktop/Datasets/Block1.mhd"
-	# movingDataName = "/Users/beer/Desktop/Datasets/Block2.mhd"
-	fixedDataName = "/Users/beer/Downloads/Datasets/LUMC_Kahler_scaled/Patient_1_(t1).mha"
-	movingDataName = "/Users/beer/Downloads/Datasets/LUMC_Kahler_scaled/Patient_1_(t2).mha"
-
-	# fixedDataName = "/Users/beer/Documents/Development/elastix/src/Testing/Data/3DCT_lung_baseline.mha"
-	# movingDataName = "/Users/beer/Documents/Development/elastix/src/Testing/Data/3DCT_lung_followup.mha"
-	# fixedDataName = "/Users/beer/Documents/Development/elastix/src/Testing/Data/3DCT_lung_baseline_mask.mha"
-	# movingDataName = "/Users/beer/Documents/Development/elastix/src/Testing/Data/3DCT_lung_followup_mask.mha"
+	from core.AppVars import AppVars
+	fixedDataName = AppVars.dataPath() + "Block1.mhd"
+	movingDataName = AppVars.dataPath() + "Block2.mhd"
 	
 	controller = ComparisonController()
 	controller.setInputData(fixedDataName, movingDataName)

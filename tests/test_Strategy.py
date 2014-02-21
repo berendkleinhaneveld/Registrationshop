@@ -2,6 +2,7 @@ import unittest
 # import os
 from core.strategy.Strategy import Strategy
 from core.elastix import ParameterList
+from core.AppVars import AppVars
 
 
 class TestStrategy(unittest.TestCase):
@@ -10,9 +11,10 @@ class TestStrategy(unittest.TestCase):
 
 	def setUp(self):
 		super(TestStrategy, self).setUp()
-		self.strategy = Strategy("/Users/beer/Registrationshop/Data/datasets/cryo.mhd",
-			"/Users/beer/Registrationshop/Data/datasets/CT.mhd",
-			"/Users/beer/Registrationshop/Data/datasets/output")
+		path = AppVars.dataPath()
+		self.strategy = Strategy(path + "Block1.mhd",
+			path + "Block2.mhd",
+			path + "output")
 
 	def tearDown(self):
 		super(TestStrategy, self).tearDown()
@@ -23,7 +25,7 @@ class TestStrategy(unittest.TestCase):
 	def testSimpleStrategy(self):
 		# Create a strategy with a fixed and moving data set
 		self.assertIsNotNone(self.strategy.fixedData)
-		self.assertIn("cryo", self.strategy.fixedData)
+		self.assertIn("Block1", self.strategy.fixedData)
 		self.assertIsNotNone(self.strategy.rootNode)
 		self.assertIsNotNone(self.strategy.rootNode.moving.filename)
 		self.assertFalse(self.strategy.rootNode.dirty)
