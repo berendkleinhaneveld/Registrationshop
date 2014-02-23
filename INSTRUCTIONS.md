@@ -70,3 +70,5 @@ Download RegistrationShop at https://github.com/berendkleinhaneveld/Registration
 You should now be able to run:
 
     python RegistrationShop.py
+
+Please send an email or open an issue if you have troubles with any of these steps: I'm happy to help out!
