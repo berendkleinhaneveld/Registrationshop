@@ -10,7 +10,7 @@ Written for the most part in Python. Uses PySide for the interface and uses VTK 
 For deformable registration it uses [elastix](http://elastix.isi.uu.nl). The rigid transformation that you can create with the rigid registration tools will serve as initial transformation for elastix. The parameters for elastix can be edited inside Registrationshop so you don't have fall back to editing raw parameter files!
 
 ## Installation
-Instructions on how to build RegistrationShop are now available [here][INSTRUCTIONS.md]! Let me know if you run into any troubles. Builds are not available yet.
+Instructions on how to build RegistrationShop are now available [here](INSTRUCTIONS.md)! Let me know if you run into any troubles. Builds are not available yet.
 
 ## Supported platforms
 * OS X (Mountain Lion+)
