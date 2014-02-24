@@ -96,8 +96,8 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 
 		:type value: int
 		"""
-		self.fixedOpacity = self._applyOpacityFunction(float(self.sliderFixedOpacity.value()) / 100.0)
-		self.movingOpacity = self._applyOpacityFunction(float(self.sliderMovingOpacity.value()) / 100.0)
+		self.fixedOpacity = applyOpacityFunction(float(self.sliderFixedOpacity.value()) / 100.0)
+		self.movingOpacity = applyOpacityFunction(float(self.sliderMovingOpacity.value()) / 100.0)
 		self.blendType = self.blendTypeComboBox.currentIndex()
 		self.updateTransferFunctions()
 
@@ -128,8 +128,9 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 
 		return volProp
 
-	def _applyOpacityFunction(self, value):
-		"""
-		Make sure that the slider opacity values are not linear.
-		"""
-		return value * value * value
+
+def applyOpacityFunction(value):
+	"""
+	Make sure that the slider opacity values are not linear.
+	"""
+	return value * value * value
