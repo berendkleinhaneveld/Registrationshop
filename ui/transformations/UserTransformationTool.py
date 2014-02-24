@@ -65,10 +65,10 @@ class UserTransformationTool(TransformationTool):
 		matrixLayout.setContentsMargins(0, 0, 0, 0)
 		matrixLayout.setSpacing(5)
 		matrixLayout.addWidget(QLabel("Transformation matrix:"), 0, 0, 1, 4)
-		self.m1Edits = [QLineEdit() for x in range(4)]
-		self.m2Edits = [QLineEdit() for x in range(4)]
-		self.m3Edits = [QLineEdit() for x in range(4)]
-		self.m4Edits = [QLineEdit() for x in range(4)]
+		self.m1Edits = [QLineEdit() for _ in range(4)]
+		self.m2Edits = [QLineEdit() for _ in range(4)]
+		self.m3Edits = [QLineEdit() for _ in range(4)]
+		self.m4Edits = [QLineEdit() for _ in range(4)]
 		self.initLineEdits(self.m1Edits, matrixLayout, 1, 0)
 		self.initLineEdits(self.m2Edits, matrixLayout, 2, 0)
 		self.initLineEdits(self.m3Edits, matrixLayout, 3, 0)
