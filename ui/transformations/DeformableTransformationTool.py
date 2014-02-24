@@ -74,6 +74,15 @@ class DeformableTransformationTool(TransformationTool):
 		initialTransformPath = os.path.join(path, "data/InitialTransformation.txt")
 		outputFolder = os.path.join(path, "data")
 
+		# Iterate over the parameters to ensure that some parameters are adjusted
+		# according to the data from the project
+		for i in range(len(self.transformation)):
+			param = self.transformation[i]
+			if param.key() == "DefaultPixelValue":
+				# Set the default pixel value to minimum scalar value
+				scalarRange = self.movingWidget.imageData.GetScalarRange()
+				param.setValue(scalarRange[0])
+
 		self.transformation.saveToFile(transformationPath)
 		transform = self.multiWidget.transformations.completeTransform()
 		dataset = ProjectController.Instance().currentProject.movingData
