@@ -70,7 +70,7 @@ class DeformableTransformationTool(TransformationTool):
 				"that the results of the registration can be saved to disk.")
 			return
 
-		transformationPath = os.path.join(path, "data/Transformation.txt")
+		transformationPath = os.path.join(path, "data/Parameters.txt")
 		initialTransformPath = os.path.join(path, "data/InitialTransformation.txt")
 		outputFolder = os.path.join(path, "data")
 
