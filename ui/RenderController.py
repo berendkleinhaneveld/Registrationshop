@@ -76,9 +76,6 @@ class RenderController(QObject):
 		"""
 		:type fileName: str
 		"""
-		# Clear out the old render types
-		self.visualizations = dict()
-
 		if fileName is None:
 			self.imageData = None
 			self.visualization = None
