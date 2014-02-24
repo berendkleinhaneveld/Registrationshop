@@ -7,6 +7,7 @@ MultiVolumeVisualizationMix
 from MultiVolumeVisualization import MultiVolumeVisualization
 from MultiVolumeVisualization import CreateFunctionFromProperties
 from MultiVolumeVisualization import CreateEmptyFunctions
+from VolumeVisualization import VisualizationTypeMIP
 from core.decorators import overrides
 from PySide.QtGui import QGroupBox
 from PySide.QtGui import QWidget
@@ -42,11 +43,15 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 	def setFixedVisualization(self, visualization):
 		self.fixedVisualization = visualization
 		self.fixedVolProp = self._createVolPropFromVis(self.fixedVisualization, self.fixedOpacity)
+		self.sliderFixedOpacity.setDisabled(self.fixedVisualization.visualizationType == VisualizationTypeMIP)
+		self.labelFixedOpacity.setDisabled(self.fixedVisualization.visualizationType == VisualizationTypeMIP)
 
 	@overrides(MultiVolumeVisualization)
 	def setMovingVisualization(self, visualization):
 		self.movingVisualization = visualization
 		self.movingVolProp = self._createVolPropFromVis(self.movingVisualization, self.movingOpacity)
+		self.sliderMovingOpacity.setDisabled(self.movingVisualization.visualizationType == VisualizationTypeMIP)
+		self.labelMovingOpacity.setDisabled(self.movingVisualization.visualizationType == VisualizationTypeMIP)
 
 	@overrides(MultiVolumeVisualization)
 	def getParameterWidget(self):
