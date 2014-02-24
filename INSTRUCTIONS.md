@@ -5,6 +5,10 @@ This file contains the instructions for building and running RegistrationShop on
 
 ### Prerequisites
 
+Please install Elastix by downloading it [here](http://elastix.isi.uu.nl/download.php). Binaries are available for all platforms. Make sure that it is reachable from your path. So you should be able to just run:
+
+    elastix --help
+
 Install pyyaml and pyside by running the following on OS X and Linux:
 
     sudo easy_install pyyaml
@@ -46,6 +50,7 @@ __LD_LIBRARY_PATH:__
     {VTKBUILDDIR}/bin
 
 On Windows:
+
 __VTK_DIR:__
 
     {VTKBUILDDIR}\bin\Release
