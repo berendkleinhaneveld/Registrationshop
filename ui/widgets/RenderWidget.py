@@ -57,6 +57,9 @@ class RenderWidget(QWidget):
 		for index in range(3):
 			self.imagePlaneWidgets[index].DisplayTextOn()
 			self.imagePlaneWidgets[index].SetInteractor(self.rwi)
+			# Disable the margin for free rotation
+			self.imagePlaneWidgets[index].SetMarginSizeX(0.0)
+			self.imagePlaneWidgets[index].SetMarginSizeY(0.0)
 
 		self.mapper = vtkOpenGLGPUVolumeRayCastMapper()
 		self.mapper.SetAutoAdjustSampleDistances(1)
