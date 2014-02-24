@@ -21,7 +21,6 @@ class TestProject(unittest.TestCase):
 		self.assertTrue(hasattr(self.project, "fixedData"))
 		self.assertTrue(hasattr(self.project, "movingData"))
 		self.assertTrue(hasattr(self.project, "isReference"))
-		self.assertTrue(hasattr(self.project, "resultData"))
 
 	def testEqual(self):
 		testProjectA = Project(title="TestProjectA", fixedData="FixedTest",

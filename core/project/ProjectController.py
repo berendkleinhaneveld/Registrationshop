@@ -27,7 +27,6 @@ class ProjectController(QObject):
 	fixedSettingsChanged = Signal(object)
 	movingSettingsChanged = Signal(object)
 	multiSettingsChanged = Signal(object)
-	resultFileChanged = Signal(basestring)
 	projectChanged = Signal(Project)
 
 	# Define the standard project file name
@@ -74,7 +73,6 @@ class ProjectController(QObject):
 		self.projectChanged.emit(self.currentProject)
 		self.fixedFileChanged.emit(self.currentProject.fixedData)
 		self.movingFileChanged.emit(self.currentProject.movingData)
-		self.resultFileChanged.emit(self.currentProject.resultData)
 		self.fixedSettingsChanged.emit(self.currentProject.fixedSettings)
 		self.movingSettingsChanged.emit(self.currentProject.movingSettings)
 		self.multiSettingsChanged.emit(self.currentProject.multiSettings)
@@ -127,7 +125,6 @@ class ProjectController(QObject):
 		self.projectChanged.emit(self.currentProject)
 		self.fixedFileChanged.emit(self.currentProject.fixedData)
 		self.movingFileChanged.emit(self.currentProject.movingData)
-		self.resultFileChanged.emit(self.currentProject.resultData)
 		self.fixedSettingsChanged.emit(self.currentProject.fixedSettings)
 		self.movingSettingsChanged.emit(self.currentProject.movingSettings)
 		self.multiSettingsChanged.emit(self.currentProject.multiSettings)

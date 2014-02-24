@@ -19,7 +19,6 @@ class Project(object):
 		self.movingData = movingData
 		self.isReference = isReference
 		self.folder = None
-		self.resultData = None
 		self.fixedSettings = None
 		self.movingSettings = None
 		self.multiSettings = None
