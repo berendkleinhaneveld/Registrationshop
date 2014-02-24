@@ -212,6 +212,8 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 		self.verticalSplitter.addWidget(horizontalSplitter)
 		self.verticalSplitter.addWidget(propsWidget)
+		self.verticalSplitter.setStretchFactor(0, 2)
+		self.verticalSplitter.setStretchFactor(1, 1)
 		self.setCentralWidget(self.verticalSplitter)
 
 	def connectElements(self):
