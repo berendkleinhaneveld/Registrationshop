@@ -112,6 +112,8 @@ class RenderWidget(QWidget):
 			if self.volume is not None:
 				self.renderer.RemoveViewProp(self.volume)
 			print "Warning: image data is None"
+			self.clippingBox.setImageData(None)
+			self.mapper.RemoveAllInputs()
 			self.render()
 			return
 
@@ -125,7 +127,8 @@ class RenderWidget(QWidget):
 
 		self._createGrid()
 		self._createOrientationGrid()
-		self._createClippingBox()
+		self.clippingBox.setImageData(self.imageData)
+		self.clippingBox.resetClippingBox()
 		self.shouldResetCamera = True
 		# Don't call render, because camera should only be reset
 		# when a volume property is loaded
@@ -225,17 +228,6 @@ class RenderWidget(QWidget):
 		self.orientationGridItems = CreateOrientationGrid(bounds, self.renderer.GetActiveCamera())
 		for item in self.orientationGridItems:
 			self.renderer.AddViewProp(item)
-
-	def _createClippingBox(self):
-		"""
-		Create a clipping box that fits around the data.
-		"""
-		self.clippingBox = ClippingBox()
-		self.clippingBox.setWidget(self)
-		if not self.imageData:
-			self.clippingBox.enable(False)
-		else:
-			self.clippingBox.setImageData(self.imageData)
 
 	def _cleanUpGrids(self):
 		for item in self.gridItems:

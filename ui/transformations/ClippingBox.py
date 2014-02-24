@@ -16,7 +16,9 @@ from vtk import vtkTransform
 
 class ClippingBox(QObject, Interactor):
 	"""
-	ClippingBox
+	ClippingBox is a class that wraps around a vtkBoxWidget and
+	vtkImagePlaneWidgets that can be displayed on the outside of
+	the box widget.
 	"""
 	transformUpdated = Signal(object)
 
@@ -25,41 +27,96 @@ class ClippingBox(QObject, Interactor):
 		self.widget = None
 
 		self.clippingBox = vtkBoxWidget()
-		self.planes = []
-		self.tranform = vtkTransform()
+		self.planes = [vtkImagePlaneWidget() for _ in range(6)]
+		self.transform = vtkTransform()  # For future functionality
 
-		self.clippingBoxState = False
-		self.clippingPlanesState = True
+		self._clippingBoxState = False
+		self._clippingPlanesState = False
 
 	def setWidget(self, widget):
+		"""
+		Sets the widget of which the interactor is used
+		to display the vtkBoxWidget and the vtkImagePlaneWidgets
+		"""
 		self.widget = widget
+		# TODO: disable interaction with the faces of the box widget
 		self.clippingBox.SetInteractor(self.widget.rwi)
 		self.clippingBox.SetDefaultRenderer(self.widget.renderer)
 		self.clippingBox.SetPlaceFactor(1.0)
 		self.clippingBox.SetRotationEnabled(False)
 		self.clippingBox.InsideOutOn()
 		self.clippingBox.GetSelectedFaceProperty().SetOpacity(0.3)
+		self.AddObserver(self.clippingBox, "InteractionEvent", self.transformCallback)
+		# Prepare the image plane widgets
+		for plane in self.planes:
+			plane.SetInteractor(self.widget.rwi)
+			plane.DisplayTextOff()
+			plane.PickingManagedOff()
+			plane.SetRestrictPlaneToVolume(1)
+			cursorProperty = plane.GetCursorProperty()
+			cursorProperty.SetOpacity(0.0)
+			planeProperty = plane.GetPlaneProperty()
+			planeProperty.SetColor(0, 0, 0)
+			planeProperty.SetOpacity(0.0)
+			selectedPlaneProperty = plane.GetSelectedPlaneProperty()
+			selectedPlaneProperty.SetColor(0, 0, 0)
+			selectedPlaneProperty.SetOpacity(0.0)
 
 	def showClippingBox(self, show):
-		self.clippingBoxState = show
-		self._updateClippingBoxAndPlanes()
+		"""
+		Shows or hides the vtkBoxWidget
+		"""
+		self._clippingBoxState = show
+
+		# Update visibility of clipping box
+		if self._clippingBoxState:
+			self.clippingBox.EnabledOn()
+		else:
+			self.clippingBox.EnabledOff()
 
 	def showClippingPlanes(self, show):
-		self.clippingPlanesState = show
-		self._updateClippingBoxAndPlanes()
+		"""
+		Shows or hides the vtkImagePlaneWidgets
+		"""
+		self._clippingPlanesState = show
+
+		# Update visibility of the plane widgets
+		if self._clippingPlanesState:
+			for plane in self.planes:
+				plane.On()
+				plane.InteractionOff()
+			self._updateImagePlanePlacement()
+		else:
+			for plane in self.planes:
+				plane.Off()
 
 	def cleanUp(self):
-		self.enable(False)
+		"""
+		Inherited from Interactor
+		Calls reset()
+		After calling this setWidget() should be called again
+		if this object is to be reused
+		"""
+		self.showClippingBox(False)
+		self.showClippingPlanes(False)
 		self.cleanUpCallbacks()
 
 	def update(self):
+		"""
+		Updates the lookup tables of the slice planes (only if they are changed)
+		"""
 		volVis = self.widget.volumeVisualization
 		from ui.visualizations.VolumeVisualization import VisualizationTypeSimple
-		if volVis is None or volVis.visualizationType != VisualizationTypeSimple:
-			for i in range(6):
-				lookupTable = self.planes[i].GetLookupTable()
+		if volVis is None:
+			if self._clippingPlanesState:
+				self.showClippingPlanes(False)
+			return
+		elif volVis.visualizationType != VisualizationTypeSimple:
+			for plane in self.planes:
+				lookupTable = plane.GetLookupTable()
 				lookupTable.SetAlphaRange(1.0, 1.0)
 				lookupTable.Build()
+			print "Reset lookup tables"
 			return
 
 		# TODO: also use the upper bound
@@ -93,32 +150,36 @@ class ClippingBox(QObject, Interactor):
 			lookupTable.Build()
 
 	def setImageData(self, imageData):
+		"""
+		Sets imagedata for vtkBoxWidget
+		Sets imagedata for all the vtkImagePlaneWidgets
+		"""
 		self.imageData = imageData
+		if self.imageData is None:
+			self.showClippingBox(False)
+			self.showClippingPlanes(False)
+			return
+
 		self.clippingBox.SetInputData(imageData)
 		self.clippingBox.PlaceWidget()
 
-		for i in range(6):
-			imagePlaneWidget = vtkImagePlaneWidget()
-			imagePlaneWidget.SetInteractor(self.widget.rwi)
-			imagePlaneWidget.PlaceWidget()
-			imagePlaneWidget.SetInputData(imageData)
-			imagePlaneWidget.DisplayTextOff()
-			imagePlaneWidget.PickingManagedOff()
-			
-			imagePlaneWidget.SetRestrictPlaneToVolume(1)
-			cursorProperty = imagePlaneWidget.GetCursorProperty()
-			cursorProperty.SetOpacity(0.0)
-			planeProperty = imagePlaneWidget.GetPlaneProperty()
-			planeProperty.SetColor(0, 0, 0)
-			planeProperty.SetOpacity(0.0)
-			selectedPlaneProperty = imagePlaneWidget.GetSelectedPlaneProperty()
-			selectedPlaneProperty.SetColor(0, 0, 0)
-			selectedPlaneProperty.SetOpacity(0.0)
-			self.planes.append(imagePlaneWidget)
-
-		self.AddObserver(self.clippingBox, "InteractionEvent", self.transformCallback)
+		for plane in self.planes:
+			plane.SetInputData(imageData)
+			plane.PlaceWidget()
+		
+	def reset(self):
+		"""
+		Hides the vtkBoxWidget
+		Hides the vtkImagePlaneWidgets
+		Sets all input data to NULL
+		Removes all vtkImagePlaneWidgets
+		"""
+		pass
 
 	def resetClippingBox(self):
+		"""
+		Resets position and shape of the clipping box.
+		"""
 		# Reset the planes by setting identity transform
 		transform = vtkTransform()
 		self.clippingBox.SetTransform(transform)
@@ -126,64 +187,40 @@ class ClippingBox(QObject, Interactor):
 		# Make sure the mapper is informed of the changes
 		planes = vtkPlanes()
 		self.clippingBox.GetPlanes(planes)
-		self.updateMapperWithClippingPlanes(planes)
+		self._updateMapperWithClippingPlanes(planes)
 
-		# Update the image plane widgets
-		self.updateImagePlanes()
+	def transformCallback(self, arg1, arg2):
+		planes = vtkPlanes()
+		arg1.GetPlanes(planes)
+		self._updateMapperWithClippingPlanes(planes)
 
-	def setTransform(self, transform):
-		"""
-		Deprecated...
-		"""
-		assert False
-		self.tranform = transform
-		self.clippingBox.SetTransform(transform)
-
-		for plane in self.planes:
-			plane.SetUserTransform(transform)
-
-		self.updateImagePlanes()
-
-	def _updateClippingBoxAndPlanes(self):
-		# Update visibility of clipping box
-		if self.clippingBoxState:
-			self.clippingBox.EnabledOn()
-		else:
-			self.clippingBox.EnabledOff()
-
-		# Update visibility of the plane widgets
-		if self.clippingPlanesState:
-			for plane in self.planes:
-				plane.On()
-				plane.InteractionOff()
-			self.updateImagePlanes()
-		else:
-			for plane in self.planes:
-				plane.Off()
-
-	def updateImagePlanes(self):
-		if len(self.planes) == 0:
+	# Private methods
+		
+	def _updateImagePlanePlacement(self):
+		if not self._clippingPlanesState:
 			return
 		# First get the planes of the clipping box
 		planes = vtkPlanes()
 		self.clippingBox.GetPlanes(planes)
 
 		# Also get the polydata of the box
-		p = []
 		polyData = vtkPolyData()
 		self.clippingBox.GetPolyData(polyData)
 
 		# Append a 4th element to the polydata points
+		p = []
 		for i in range(8):
-			point = list(polyData.GetPoint(i))
-			p.append(point + [1.0])
+			p.append(list(polyData.GetPoint(i)) + [1.0])
 
 		# Transform all the polydata points
-		inv = self.tranform.GetInverse()
+		inv = self.transform.GetInverse()
 		for i in range(len(p)):
 			inv.MultiplyPoint(p[i], p[i])
 			p[i] = p[i][0:3]
 			
+		# Calculate the center of the planes
+		# so that it is possible to figure out where
+		# to place the image planes
 		center = [0, 0, 0]
 		for point in p:
 			center[0] += point[0]
@@ -194,6 +231,7 @@ class ClippingBox(QObject, Interactor):
 		center[1] /= len(p)
 		center[2] /= len(p)
 
+		# Place the image plane just outside the clipping box
 		for i in range(len(p)):
 			point = p[i]
 			for j in range(3):
@@ -223,11 +261,6 @@ class ClippingBox(QObject, Interactor):
 		for plane in self.planes:
 			plane.UpdatePlacement()
 
-	def updateMapperWithClippingPlanes(self, planes):
+	def _updateMapperWithClippingPlanes(self, planes):
 		self.widget.mapper.SetClippingPlanes(planes)
-
-	def transformCallback(self, arg1, arg2):
-		planes = vtkPlanes()
-		arg1.GetPlanes(planes)
-		self.updateMapperWithClippingPlanes(planes)
-		self.updateImagePlanes()
+		self._updateImagePlanePlacement()
