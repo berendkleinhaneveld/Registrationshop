@@ -12,14 +12,10 @@ from ui.widgets.StatusWidget import StatusWidget
 from vtk import vtkTransform
 from vtk import vtkMatrix4x4
 from PySide.QtGui import QLabel
-from PySide.QtGui import QFrame
-from PySide.QtGui import QTextEdit
 from PySide.QtGui import QWidget
 from PySide.QtGui import QLineEdit
 from PySide.QtGui import QGridLayout
-from PySide.QtGui import QDoubleSpinBox
 from PySide.QtGui import QDoubleValidator
-from PySide.QtGui import QTabWidget
 from PySide.QtGui import QSizePolicy
 from PySide.QtCore import Slot
 from PySide.QtCore import Qt
