@@ -154,6 +154,8 @@ class ProjectController(QObject):
 		:type name: basestring
 		"""
 		# TODO: some extra magic like checking if file exists
+		if name == self.currentProject.movingData:
+			return
 		self.currentProject.movingData = name
 
 		# Emit signal that data set file name has changed
