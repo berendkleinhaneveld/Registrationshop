@@ -56,7 +56,9 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
 	@overrides(MultiVolumeVisualization)
 	def getParameterWidget(self):
 		self.labelFixedOpacity = QLabel("Fixed:")
+		self.labelFixedOpacity.setAlignment(Qt.AlignRight)
 		self.labelMovingOpacity = QLabel("Moving:")
+		self.labelMovingOpacity.setAlignment(Qt.AlignRight)
 
 		self.sliderFixedOpacity = QSlider(Qt.Horizontal)
 		self.sliderFixedOpacity.setValue(pow(self.fixedOpacity, 1.0/3.0) * 100.0)
