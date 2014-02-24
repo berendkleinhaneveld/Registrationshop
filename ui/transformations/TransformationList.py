@@ -121,6 +121,9 @@ class TransformationList(QObject):
 		if self._activeIndex != index:
 			self._activeIndex = index
 			self._dirty = True
+			if index >= 0 and index < len(self._transformations):
+				projectController = ProjectController.Instance()
+				projectController.loadMovingDataSet(self._transformations[index].filename)
 			self.transformationChanged.emit(self)
 
 	# Override methods for list behaviour
