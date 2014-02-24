@@ -71,4 +71,4 @@ class TransformationHistoryWidget(QWidget):
 		"""
 		Activate the transformation from the complete list.
 		"""
-		self.renderWidget.transformations.activateTransformationAtIndex(index.row()+1)
+		self.renderWidget.transformations.activateTransformationAtIndex(index.row())

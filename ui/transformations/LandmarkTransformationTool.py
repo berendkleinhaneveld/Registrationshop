@@ -13,6 +13,7 @@ from ui.transformations.SurfacePicker import SurfacePicker
 from ui.transformations import Transformation
 from core.decorators import overrides
 from core.vtkDrawing import TransformWithMatrix
+from core.project import ProjectController
 from vtk import vtkPoints
 from vtk import vtkLandmarkTransform
 from vtk import vtkTransform
@@ -95,19 +96,13 @@ class LandmarkTransformationTool(TransformationTool):
 		self.originalScalingTransform = self.multiWidget.transformations.scalingTransform()
 
 		# Add a new transform on top of the others
-		transform = Transformation(vtkTransform(), Transformation.TypeLandmark)
+		currentProject = ProjectController.Instance().currentProject
+		transform = Transformation(vtkTransform(), Transformation.TypeLandmark, currentProject.movingData)
 		self.multiWidget.transformations.append(transform)
 
 		statusWidget = StatusWidget.Instance()
 		statusWidget.setText("Place landmarks in both volumes to create a landmark transform. "
 			"Available methods for placing landmarks are the surface type and the two-step type.")
-		# if self.fixedPickerType == TwoStepType:
-		# 	statusWidget.setText("Place landmarks in both volumes to create a landmark transform. Hold your "
-		# 		"mouse over a volume and press 'A'. Turn the volume, move your mouse and press 'A' again to set a "
-		# 		"landmark.")
-		# elif self.fixedPickerType == SurfaceType:
-		# 	statusWidget.setText("Place landmarks in both volumes to create a landmark transform. Hold your "
-		# 		"mouse over a volume to move the picker and press 'A' to pick a landmark.")
 
 	def setLandmarkWidgets(self, fixed, moving):
 		self.fixedLandmarkWidget = fixed
@@ -314,7 +309,10 @@ class LandmarkTransformationTool(TransformationTool):
 		transform = TransformWithMatrix(landmarkTransform.GetMatrix())
 		transform.Inverse()
 		
-		self.multiWidget.transformations[-1] = Transformation(transform, Transformation.TypeLandmark)
+		transformation = self.multiWidget.transformations[-1]
+		assert transformation.transformType == Transformation.TypeLandmark
+		transformation.transform = transform
+		self.multiWidget.transformations[-1] = transformation
 		self._updateLandmarkTransforms()
 
 	def _update(self):

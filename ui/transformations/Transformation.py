@@ -18,8 +18,9 @@ class Transformation(object):
 	TypeLandmark = "Landmark transform"
 	TypeDeformable = "Deformable transform"
 
-	def __init__(self, transform, transformType):
+	def __init__(self, transform, transformType, filename):
 		super(Transformation, self).__init__()
 
 		self.transform = transform
 		self.transformType = transformType
+		self.filename = filename

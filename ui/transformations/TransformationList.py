@@ -10,6 +10,7 @@ from PySide.QtCore import Signal
 from Transformation import Transformation
 from core.vtkObjectWrapper import vtkTransformWrapper
 from core.vtkDrawing import TransformWithMatrix
+from core.project import ProjectController
 
 
 class TransformationList(QObject):
@@ -30,7 +31,7 @@ class TransformationList(QObject):
 
 	def activateTransformationAtIndex(self, index):
 		if index < 0:
-			self._setActiveIndex(len(self._transformations))
+			self._setActiveIndex(len(self._transformations)-1)
 		else:
 			self._setActiveIndex(index)
 
@@ -63,9 +64,16 @@ class TransformationList(QObject):
 
 	def transform(self, index):
 		tempTransform = vtkTransform()
-		tempTransform.PostMultiply()
-		for transformation in self._transformations[0:index]:
-			tempTransform.Concatenate(transformation.transform)
+		tempTransform.PreMultiply()
+
+		# Check for all the transforms that have the same filename
+		# as the one at a certain index
+		idx = index-1  # Legacy stuff.... Ouch... should be fixed!
+		if idx < len(self._transformations) and idx >= 0:
+			filename = self._transformations[idx].filename
+			while idx >= 0 and self._transformations[idx].filename == filename:
+				tempTransform.Concatenate(self._transformations[idx].transform)
+				idx -= 1
 
 		transform = TransformWithMatrix(tempTransform.GetMatrix())
 		return transform
@@ -76,15 +84,15 @@ class TransformationList(QObject):
 		"""
 		Returns an object that can be written to file by
 		yaml. It creates a list of tuples where each tuple
-		consists out of the transformation type and a wrapped
-		vtkTransform.
+		consists out of the transformation type, a wrapped
+		vtkTransform and the filename.
 		"""
 		result = []
 		for transformation in self._transformations:
 			# First wrap the transform
 			wrappedTransform = vtkTransformWrapper(transformation.transform)
 			# Create a tuple
-			wrappedTransformation = (transformation.transformType, wrappedTransform)
+			wrappedTransformation = (transformation.transformType, wrappedTransform, transformation.filename)
 			# Add the tuple to the results
 			result.append(wrappedTransformation)
 		return result
@@ -98,8 +106,10 @@ class TransformationList(QObject):
 			transformType = wrappedTransformation[0]
 			# Get the wrapped transform and unwrap immediately
 			transform = wrappedTransformation[1].originalObject()
+			# Get the filename
+			filename = wrappedTransformation[2]
 			# Add the transform to the internal transformations
-			self._transformations.append(Transformation(transform, transformType))
+			self._transformations.append(Transformation(transform, transformType, filename))
 
 		self.transformationChanged.emit(self)
 

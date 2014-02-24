@@ -14,7 +14,7 @@ class TransformationListTest(unittest.TestCase):
 
 	def testTransformationList(self):
 		transform = vtkTransform()
-		transformation = Transformation(transform, Transformation.TypeDeformable)
+		transformation = Transformation(transform, Transformation.TypeDeformable, "")
 		self.transformList.append(transformation)
 		self.assertEquals(len(self.transformList._transformations), 1)
 
@@ -31,7 +31,7 @@ class TransformationListTest(unittest.TestCase):
 
 		transform = vtkTransform()
 		transform.Scale(2.0, 2.0, 2.0)
-		transformation = Transformation(transform, Transformation.TypeDeformable)
+		transformation = Transformation(transform, Transformation.TypeDeformable, "")
 
 		self.transformList.append(transformation)
 		self.assertEquals(len(self.transformList._transformations), 2)
@@ -47,7 +47,7 @@ class TransformationListTest(unittest.TestCase):
 
 		transform = vtkTransform()
 		transform.Translate(3.0, 3.0, 3.0)
-		transformation = Transformation(transform, Transformation.TypeDeformable)
+		transformation = Transformation(transform, Transformation.TypeDeformable, "")
 		self.transformList.append(transformation)
 		self.assertEquals(len(self.transformList._transformations), 3)
 		self.assertNotEquals(self.transformList[1], self.transformList[2])
@@ -65,7 +65,7 @@ class TransformationListTest(unittest.TestCase):
 
 		transform = vtkTransform()
 		transform.RotateX(90.0)
-		transformation = Transformation(transform, Transformation.TypeDeformable)
+		transformation = Transformation(transform, Transformation.TypeDeformable, "")
 		self.transformList.append(transformation)
 
 		prevTransform = self.transformList.transform(3)

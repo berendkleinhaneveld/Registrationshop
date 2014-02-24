@@ -9,6 +9,7 @@ from core.decorators import overrides
 from ui.transformations import TransformBox
 from ui.transformations import Transformation
 from ui.widgets.StatusWidget import StatusWidget
+from core.project import ProjectController
 from vtk import vtkTransform
 from vtk import vtkMatrix4x4
 from PySide.QtGui import QLabel
@@ -32,9 +33,10 @@ class UserTransformationTool(TransformationTool):
 	def setRenderWidgets(self, fixed=None, moving=None, multi=None):
 		self.movingWidget = moving
 		self.renderWidget = multi
+		currentProject = ProjectController.Instance().currentProject
 		self.transformBox.setWidget(self.renderWidget)
 		self.transformBox.setImageData(self.renderWidget.movingImageData)
-		self.renderWidget.transformations.append(Transformation(vtkTransform(), Transformation.TypeUser))
+		self.renderWidget.transformations.append(Transformation(vtkTransform(), Transformation.TypeUser, currentProject.movingData))
 
 		statusWidget = StatusWidget.Instance()
 		statusWidget.setText("Use the box widget to transform the volume. "
@@ -85,7 +87,11 @@ class UserTransformationTool(TransformationTool):
 	
 	@Slot()
 	def transformBoxUpdated(self, transform):
-		self.renderWidget.transformations[-1] = Transformation(transform, Transformation.TypeUser)
+		transformation = self.renderWidget.transformations[-1]
+		assert transformation.transformType == Transformation.TypeUser
+		transformation.transform = transform
+		# 'Replace' last element so that the update mechanism triggers
+		self.renderWidget.transformations[-1] = transformation
 		self.transformUpdated(transform)
 
 	@Slot(object)
@@ -133,7 +139,10 @@ class UserTransformationTool(TransformationTool):
 		transform.Modified()
 		transform.Update()
 
-		self.renderWidget.transformations[-1] = Transformation(transform, Transformation.TypeUser)
+		transformation = self.renderWidget.transformations[-1]
+		assert transformation.transformType == Transformation.TypeUser
+		transformation.transform = transform
+		self.renderWidget.transformations[-1] = transformation
 		self.transformBox.setTransform(transform)
 		self.renderWidget.render()
 
