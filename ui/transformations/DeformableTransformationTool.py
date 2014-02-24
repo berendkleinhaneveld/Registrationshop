@@ -7,7 +7,9 @@ DeformableTransformationTool
 import os
 from TransformationTool import TransformationTool
 from ParameterWidget import ParameterWidget
+from ui.transformations import Transformation
 from ui.widgets.StatusWidget import StatusWidget
+from vtk import vtkTransform
 from core.decorators import overrides
 from core.worker import Operator
 from core.elastix import ElastixCommand
@@ -44,17 +46,11 @@ class DeformableTransformationTool(TransformationTool):
 	@overrides(TransformationTool)
 	def applyTransform(self):
 		"""
-		# DONE
 		* Show progress bar dialog
-		* Define location for output
-		* Write transformation to output folder
+		* Define folder for output (projectFolder/data/result-<id>/.)
+		* Write parameter file to output folder
 		* Call elastix to process the data
-		* Load the new data into the moving widget / project (or
-			maybe ask the user whether he wants to import it)
-		# TODO
-		* Maybe construct an extra entry in ProjectController for
-			the transformed data. So that the reference to the old
-			data is not lost.
+		* Load the new data into the moving widget / project
 		"""
 		statusWidget = StatusWidget.Instance()
 		statusWidget.setText("Please grab a cup of coffee while Elastix " +
@@ -62,7 +58,8 @@ class DeformableTransformationTool(TransformationTool):
 
 		self.startedElastix.emit("Transforming data...")
 
-		currentProject = ProjectController.Instance().currentProject
+		projectController = ProjectController.Instance()
+		currentProject = projectController.currentProject
 		path = currentProject.folder
 		
 		if not path:
@@ -70,9 +67,17 @@ class DeformableTransformationTool(TransformationTool):
 				"that the results of the registration can be saved to disk.")
 			return
 
-		transformationPath = os.path.join(path, "data/Parameters.txt")
-		initialTransformPath = os.path.join(path, "data/InitialTransformation.txt")
-		outputFolder = os.path.join(path, "data")
+		# Determine filename + folder for new dataset (projectFolder/data/result-<id>/.)
+		dataFolder = os.path.join(path, "data/")
+		filenames = os.listdir(dataFolder)
+		resultId = 0
+		for filename in filenames:
+			if os.path.isdir(filename) and "result" in filename:
+				resultId += 1
+		outputFolder = os.path.join(dataFolder, "result-" + str(resultId))
+
+		parameterFilePath = os.path.join(outputFolder, "Parameters.txt")
+		initialTransformPath = os.path.join(outputFolder, "InitialTransformation.txt")
 
 		# Iterate over the parameters to ensure that some parameters are adjusted
 		# according to the data from the project
@@ -82,21 +87,24 @@ class DeformableTransformationTool(TransformationTool):
 				# Set the default pixel value to minimum scalar value
 				scalarRange = self.movingWidget.imageData.GetScalarRange()
 				param.setValue(scalarRange[0])
+			if param.key() == "ResultImagePixelType":
+				# Set the resulting image pixel type to the type of the input data
+				pixelType = self.movingWidget.imageData.GetScalarTypeAsString()
+				param.setValue(pixelType)
 
-		self.transformation.saveToFile(transformationPath)
+		self.transformation.saveToFile(parameterFilePath)
 		transform = self.multiWidget.transformations.completeTransform()
 		dataset = ProjectController.Instance().currentProject.movingData
-		initialTransform = TransformixTransformation(dataset, transform)
-		parameters = initialTransform.transformation()
-		if parameters:
-			parameters.saveToFile(initialTransformPath)
+		initialTransform = TransformixTransformation(dataset, transform).transformation()
+		if initialTransform:
+			initialTransform.saveToFile(initialTransformPath)
 		else:
 			initialTransformPath = None
 
 		command = ElastixCommand(fixedData=currentProject.fixedData,
 			movingData=currentProject.movingData,
 			outputFolder=outputFolder,
-			transformation=transformationPath,
+			transformation=parameterFilePath,
 			initialTransformation=initialTransformPath)
 
 		self.operator = Operator()
@@ -105,21 +113,20 @@ class DeformableTransformationTool(TransformationTool):
 
 		self.endedElastix.emit()
 
-		statusWidget = StatusWidget.Instance()
-
+		# Assume that there is only one resulting dataset: result.0.mhd
 		outputData = os.path.join(outputFolder, "result.0.mhd")
 		if os.path.exists(outputData):
 			statusWidget.setText("Thanks for your patience. The " +
 				"transformed data will now be loaded. It can be found in the project folder.")
-			projectController = ProjectController.Instance()
+
+			transformation = Transformation(vtkTransform(), Transformation.TypeDeformable, outputData)
+			self.multiWidget.transformations.append(transformation)
 			projectController.loadMovingDataSet(outputData)
 		else:
 			statusWidget.setText("Something went wrong. Please see the project folder for the "
 				+ "elastix log to see what went wrong.")
 			from subprocess import call
-			projectController = ProjectController.Instance()
-			projectFolder = projectController.currentProject.folder + "/data"
-			call(["open", projectFolder])
+			call(["open", outputFolder])
 
 	@overrides(TransformationTool)
 	def cancelTransform(self):

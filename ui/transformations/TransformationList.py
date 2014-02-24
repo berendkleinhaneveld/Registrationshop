@@ -68,12 +68,14 @@ class TransformationList(QObject):
 
 		# Check for all the transforms that have the same filename
 		# as the one at a certain index
-		idx = index-1  # Legacy stuff.... Ouch... should be fixed!
+		idx = index
 		if idx < len(self._transformations) and idx >= 0:
 			filename = self._transformations[idx].filename
+			# print filename
 			while idx >= 0 and self._transformations[idx].filename == filename:
 				tempTransform.Concatenate(self._transformations[idx].transform)
 				idx -= 1
+			tempTransform.Update()
 
 		transform = TransformWithMatrix(tempTransform.GetMatrix())
 		return transform
@@ -139,8 +141,8 @@ class TransformationList(QObject):
 
 	def __delitem__(self, index):
 		del self._transformations[index]
-		if self._activeIndex > len(self._transformations):
-			self._activeIndex = len(self._transformations)
+		if self._activeIndex >= len(self._transformations):
+			self._activeIndex = len(self._transformations)-1
 		self._dirty = True
 		self.transformationChanged.emit(self)
 
@@ -156,6 +158,6 @@ class TransformationList(QObject):
 		"""
 		assert type(value) == Transformation
 		self._transformations.append(value)
-		self._activeIndex = len(self._transformations)
+		self._activeIndex = len(self._transformations)-1
 		self._dirty = True
 		self.transformationChanged.emit(self)
