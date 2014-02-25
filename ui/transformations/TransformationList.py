@@ -46,6 +46,9 @@ class TransformationList(QObject):
 		return self._cachedTransformation
 
 	def copyFromTransformations(self, other):
+		"""
+		Performs deep copy.
+		"""
 		self._transformations = []
 		for transformation in other._transformations:
 			self._transformations.append(transformation)
@@ -100,6 +103,10 @@ class TransformationList(QObject):
 		return result
 
 	def setPythonVersion(self, transformWrappers):
+		"""
+		Unwraps the wrapped transformations into this
+		transformation list.
+		"""
 		self._transformations = []
 		self._dirty = True
 
