@@ -401,14 +401,10 @@ class RegistrationShop(MainWindow, WindowDialog):
 		# Create a tab page under the fixed render widget
 		fixedLandmarkWidget = LandmarkWidget()
 		self.fixedPropWidget.addTabWidget(fixedLandmarkWidget, "Landmark")
-		# self.fixedPropWidget.tabWidget.addTab(fixedLandmarkWidget, "Landmark")
-		# self.fixedPropWidget.tabWidget.setCurrentWidget(fixedLandmarkWidget)
 
 		# Create a tab page under the moving render widget
 		movingLandmarkWidget = LandmarkWidget()
 		self.movingPropWidget.addTabWidget(movingLandmarkWidget, "Landmark")
-		# self.movingPropWidget.tabWidget.addTab(movingLandmarkWidget, "Landmark")
-		# self.movingPropWidget.tabWidget.setCurrentWidget(movingLandmarkWidget)
 
 		# Make sure the landmark transform tool knows of these tab widgets
 		self.transformTool.setLandmarkWidgets(fixedLandmarkWidget, movingLandmarkWidget)
@@ -460,7 +456,6 @@ class RegistrationShop(MainWindow, WindowDialog):
 			multi=self.multiDataWidget)
 		self.multiPropWidget.setTransformTool(self.transformTool)
 		self.transformTool.toolFinished.connect(self.transformToolFinished)
-		# self.multiPropWidget.transformParamWidget.setTransformationTool(self.transformTool)
 
 	@Slot()
 	def transformToolFinished(self):
