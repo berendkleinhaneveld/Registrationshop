@@ -229,3 +229,8 @@ class RenderController(QObject):
 
 	def resetClippingBox(self):
 		self.renderWidget.resetClippingBox()
+
+	def resetVisualizations(self):
+		# Clear out the old render types
+		self.visualizations = dict()
+		self.setVisualizationType(None)

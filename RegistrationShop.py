@@ -47,6 +47,7 @@ from ui import RenderController
 from ui import MultiRenderController
 from ui.dialogs import FileTypeDialog
 from ui.dialogs import ElastixMainDialog
+from ui.dialogs import ResetVisualizationDialog
 from ui.widgets import RenderWidget
 from ui.widgets import MultiRenderWidget
 from ui.widgets import TitleWidget
@@ -473,8 +474,17 @@ class RegistrationShop(MainWindow, WindowDialog):
 		extensions = dataReader.GetSupportedExtensionsAsString()
 		fileName, other = QFileDialog.getOpenFileName(self, "Open fixed data set", "", "Images ("+extensions+")", options=QFileDialog.Directory)
 		if len(fileName) > 0:
+			# If there was another dataset first, ask if the user if the
+			# visualizations should be reset
 			projectController = ProjectController.Instance()
-			projectController.loadFixedDataSet(fileName)
+			if projectController.currentProject.fixedData:
+				dialog = ResetVisualizationDialog(self)
+				dialog.setWindowModality(Qt.WindowModal)
+				dialog.exec_()
+				if dialog.result is not None:
+					projectController.loadFixedDataSet(fileName)
+					if dialog.result:
+						self.fixedRenderController.resetVisualizations()
 
 	@Slot()
 	def loadMovingDataSetFile(self):
@@ -486,8 +496,17 @@ class RegistrationShop(MainWindow, WindowDialog):
 		extensions = dataReader.GetSupportedExtensionsAsString()
 		fileName, other = QFileDialog.getOpenFileName(self, "Open moving data set", "", "Images ("+extensions+")", options=QFileDialog.Directory)
 		if len(fileName) > 0:
+			# If there was another dataset first, ask if the user if the
+			# visualizations should be reset
 			projectController = ProjectController.Instance()
-			projectController.loadMovingDataSet(fileName)
+			if projectController.currentProject.movingData:
+				dialog = ResetVisualizationDialog(self)
+				dialog.setWindowModality(Qt.WindowModal)
+				dialog.exec_()
+				if dialog.result is not None:
+					projectController.loadMovingDataSet(fileName)
+					if dialog.result:
+						self.movingRenderController.resetVisualizations()
 
 	@Slot()
 	def saveProject(self):
