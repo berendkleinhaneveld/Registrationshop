@@ -1,3 +1,10 @@
+"""
+FileTypeDialog
+
+:Authors:
+	Berend Klein Haneveld 2013
+"""
+
 from PySide.QtGui import QDialog
 from PySide.QtGui import QPushButton
 from PySide.QtGui import QGridLayout
