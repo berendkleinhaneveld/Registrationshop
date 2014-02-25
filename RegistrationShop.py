@@ -595,9 +595,10 @@ class RegistrationShop(MainWindow, WindowDialog):
 	def startComparison(self):
 		projectController = ProjectController.Instance()
 		project = projectController.currentProject
-		if not project:  # or not project.fixedData or not project.movingData:
+		if not project or not project.fixedData or not project.movingData:
 			statusWidget = StatusWidget.Instance()
-			statusWidget.setText("Could not start compare.")
+			statusWidget.setText("Could not start comparison. Please make a project first"
+				" and make sure to load two datasets.")
 			return
 
 		if hasattr(self, "compareWidget"):
