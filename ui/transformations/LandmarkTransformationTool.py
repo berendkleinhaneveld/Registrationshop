@@ -222,17 +222,23 @@ class LandmarkTransformationTool(TransformationTool):
 		if widget is self.fixedLandmarkWidget:
 			self.fixedPickerType = widget.landmarkType
 			self.fixedPicker.cleanUp()
+			self.fixedPicker.pickedLocation.disconnect()
 			self.fixedPicker = self._pickerForType(self.fixedPickerType)
 			self.fixedPicker.setWidget(self.fixedWidget)
 			self.fixedPicker.pickedLocation.connect(self.pickedFixedLocation)
 			self.fixedPicker.setPropertiesWidget(self.fixedLandmarkWidget)
+			if type(self.fixedPicker) == TwoStepPicker:
+				self.fixedPicker.pickedLocation.connect(self.fixedLandmarkWidget.twoStepWidget.pickedLocation)
 		elif widget is self.movingLandmarkWidget:
 			self.movingPickerType = widget.landmarkType
 			self.movingPicker.cleanUp()
+			self.movingPicker.pickedLocation.disconnect()
 			self.movingPicker = self._pickerForType(self.movingPickerType)
 			self.movingPicker.setWidget(self.movingWidget)
 			self.movingPicker.pickedLocation.connect(self.pickedMovingLocation)
 			self.movingPicker.setPropertiesWidget(self.movingLandmarkWidget)
+			if type(self.movingPicker) == TwoStepPicker:
+				self.movingPicker.pickedLocation.connect(self.movingLandmarkWidget.twoStepWidget.pickedLocation)
 
 	# Private methods
 
