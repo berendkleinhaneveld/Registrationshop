@@ -31,7 +31,6 @@ class TwoStepPicker(Picker):
 
 	pickedLocation = Signal(list)
 	locatorUpdated = Signal(float)
-	snappingPointsUpdated = Signal(list)
 
 	def __init__(self):
 		super(TwoStepPicker, self).__init__()
@@ -47,7 +46,6 @@ class TwoStepPicker(Picker):
 		self.propertiesWidget = widget.twoStepWidget
 		self.propertiesWidget.histogramWidget.updatedPosition.connect(self.histogramUpdatedPosition)
 		self.locatorUpdated.connect(self.propertiesWidget.histogramWidget.locatorUpdated)
-		self.snappingPointsUpdated.connect(self.propertiesWidget.histogramWidget.snappingPointsUpdated)
 		self.propertiesWidget.pickedPosition.connect(self.pickedPosition)
 		self.pickedLocation.connect(self.propertiesWidget.pickedLocation)
 
