@@ -21,20 +21,11 @@ class TrackingNodeItem(NodeItem):
 		self._histItem = None
 		self._lineIndex = 0
 		self._lineRatio = 0.0
-		self._position = 0.0
-		self._delegate = None
+		self.position = 0.0  # Value between 0 and 1
 		self.tracking = True
 
 	def setHistogramItem(self, histogramItem):
 		self._histItem = histogramItem
-
-	@property
-	def delegate(self):
-		return self._delegate
-
-	@delegate.setter
-	def delegate(self, value):
-		self._delegate = value
 
 	@Slot()
 	def update(self):
@@ -52,18 +43,11 @@ class TrackingNodeItem(NodeItem):
 
 	@overrides(NodeItem)
 	def mouseMoveEvent(self, event):
-		if not self.tracking:
-			return
-
-		self.setPos(event.scenePos())
-		if self._delegate:
-			self._delegate.updatePos(self._position)
-		margins = self._histItem._margins
-		rect = self._histItem.rect()
-		pos = self.pos()
-		width = rect.width() - (margins.left() + margins.right() + 1)
-		partOfLine = (pos.x() - margins.left()) / width
-		self._position = partOfLine
+		"""
+		Disable dragging the node directly. Mouse move events are
+		handled by the TrackingHistogramWidget
+		"""
+		return
 
 	def setPosition(self, position):
 		"""
@@ -112,7 +96,7 @@ class TrackingNodeItem(NodeItem):
 			# assert normX <= x2
 			actualPos.setY(actualY)
 			actualPos.setX(normX)
-			self._position = (normX - margins.left()) / width
+			self.position = (normX - margins.left()) / width
 			self._lineIndex = index
 			self._lineRatio = ratio
 

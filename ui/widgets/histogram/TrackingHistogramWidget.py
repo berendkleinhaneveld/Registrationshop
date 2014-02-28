@@ -37,7 +37,6 @@ class TrackingHistogramWidget(HistogramWidget):
 		self.nodeItem.setHistogramItem(self._histogramItem)
 		self.nodeItem.setPos(QPoint(0, 0))
 		self.nodeItem.setZValue(300)
-		self.nodeItem.delegate = self
 
 	def updatePos(self, position):
 		self.updatedPosition.emit(position)
@@ -47,3 +46,18 @@ class TrackingHistogramWidget(HistogramWidget):
 		Position is float between 0 and 1
 		"""
 		self.nodeItem.setPosition(position)
+
+	def mousePressEvent(self, mousePressEv):
+		"""
+		"""
+		super(HistogramWidget, self).mousePressEvent(mousePressEv)
+		if self.nodeItem.tracking:
+			self.nodeItem.setPos(mousePressEv.pos())
+			self.updatePos(self.nodeItem.position)
+
+	def mouseMoveEvent(self, mouseMoveEv):
+		super(HistogramWidget, self).mouseMoveEvent(mouseMoveEv)
+		if mouseMoveEv.buttons() & Qt.LeftButton:
+			if self.nodeItem.tracking:
+				self.nodeItem.setPos(mouseMoveEv.pos())
+				self.updatePos(self.nodeItem.position)
