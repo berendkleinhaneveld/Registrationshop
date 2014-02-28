@@ -9,6 +9,7 @@ from PySide.QtGui import QWidget
 from PySide.QtGui import QIcon
 from PySide.QtGui import QVBoxLayout
 from PySide.QtGui import QPushButton
+from PySide.QtGui import QMessageBox
 from PySide.QtCore import Qt
 from core.AppVars import AppVars
 from ui.widgets import ButtonContainer
@@ -65,7 +66,14 @@ class TransformationHistoryWidget(QWidget):
 		"""
 		Remove the last transformation in the list.
 		"""
-		self.transformationView.removeLastRow()
+		messageBox = QMessageBox()
+		messageBox.setText("The last transformation is about to be removed.")
+		messageBox.setInformativeText("Do you want to proceed?")
+		messageBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+		messageBox.setDefaultButton(QMessageBox.Ok)
+		res = messageBox.exec_()
+		if res == QMessageBox.Ok:
+			self.transformationView.removeLastRow()
 
 	def clickedTransformation(self, index):
 		"""
