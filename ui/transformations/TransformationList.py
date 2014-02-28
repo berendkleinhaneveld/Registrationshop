@@ -55,6 +55,13 @@ class TransformationList(QObject):
 		self._dirty = True
 		self.transformationChanged.emit(self)
 
+	def clear(self):
+		"""
+		Clears out all the transformations.
+		"""
+		self._transformations = []
+		self._dirty = True
+
 	def scalingTransform(self):
 		"""
 		For now, just return the complete transformation.

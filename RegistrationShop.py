@@ -565,6 +565,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		if len(fileName) > 0:
 			fullName = fileName + ProjectController.Instance().ProjectFile
 			if os.path.isfile(fullName):
+				self.multiDataWidget.transformations.clear()
 				loaded = ProjectController.Instance().loadProject(fileName)
 				if loaded:
 					RegistrationShop.settings.setValue("project/lastProject", fileName)
@@ -579,6 +580,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		"""
 		Create new project by calling the project controller
 		"""
+		self.multiDataWidget.transformations.clear()
 		ProjectController.Instance().newProject()
 		# Reset the last loaded project in the settings
 		RegistrationShop.settings.setValue("project/lastProject", "")
