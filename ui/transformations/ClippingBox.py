@@ -116,7 +116,6 @@ class ClippingBox(QObject, Interactor):
 				lookupTable = plane.GetLookupTable()
 				lookupTable.SetAlphaRange(1.0, 1.0)
 				lookupTable.Build()
-			print "Reset lookup tables"
 			return
 
 		# TODO: also use the upper bound
