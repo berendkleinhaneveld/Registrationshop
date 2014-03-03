@@ -485,6 +485,8 @@ class RegistrationShop(MainWindow, WindowDialog):
 					projectController.loadFixedDataSet(fileName)
 					if dialog.result:
 						self.fixedRenderController.resetVisualizations()
+			else:
+				projectController.loadFixedDataSet(fileName)
 
 	@Slot()
 	def loadMovingDataSetFile(self):
@@ -507,6 +509,10 @@ class RegistrationShop(MainWindow, WindowDialog):
 					projectController.loadMovingDataSet(fileName)
 					if dialog.result:
 						self.movingRenderController.resetVisualizations()
+			else:
+				# Inserting an identity transform
+				self.multiDataWidget.transformations.append(Transformation(vtkTransform(), "No transform", fileName))
+				projectController.loadMovingDataSet(fileName)
 
 	@Slot()
 	def saveProject(self):
