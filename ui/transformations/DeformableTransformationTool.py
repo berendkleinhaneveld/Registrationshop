@@ -69,7 +69,7 @@ class DeformableTransformationTool(TransformationTool):
 
 		# Determine filename + folder for new dataset (projectFolder/data/result-<id>/.)
 		dataFolder = os.path.join(path, "data/")
-		filenames = os.listdir(dataFolder)
+		filenames = os.listdir(dataFolder) if os.path.isdir(dataFolder) else []
 		resultId = 0
 		for filename in filenames:
 			if os.path.isdir(filename) and "result" in filename:
