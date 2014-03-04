@@ -72,7 +72,7 @@ class DeformableTransformationTool(TransformationTool):
 		filenames = os.listdir(dataFolder) if os.path.isdir(dataFolder) else []
 		resultId = 0
 		for filename in filenames:
-			if os.path.isdir(filename) and "result" in filename:
+			if os.path.isdir(os.path.join(dataFolder, filename)) and "result" in filename:
 				resultId += 1
 		outputFolder = os.path.join(dataFolder, "result-" + str(resultId))
 
