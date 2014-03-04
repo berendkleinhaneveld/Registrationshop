@@ -11,7 +11,6 @@ from PySide.QtCore import Signal
 from PySide.QtGui import QWidget
 from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data import DataReader
-from core.data import DataResizer
 from ui.transformations import TransformationList
 from ui.visualizations import MultiVisualizationTypeMix
 from ui.visualizations import MultiVolumeVisualizationFactory
@@ -29,8 +28,6 @@ class MultiRenderController(QObject):
 	slicesChanged = Signal(object)
 	clippingBoxChanged = Signal(object)
 	clippingPlanesChanged = Signal(object)
-
-	maxVoxelSize = 9000000
 
 	def __init__(self, mulitRenderWidget):
 		super(MultiRenderController, self).__init__()
@@ -67,11 +64,7 @@ class MultiRenderController(QObject):
 
 		# Read image data
 		dataReader = DataReader()
-		imageData = dataReader.GetImageData(fileName)
 
-		# Resize the image data
-		imageResizer = DataResizer()
-		self.fixedImageData = imageResizer.ResizeData(imageData, maximum=self.maxVoxelSize)
 		self.multiRenderWidget.setFixedData(self.fixedImageData)
 		self.fixedDataChanged.emit(self.fixedImageData)
 
@@ -91,11 +84,7 @@ class MultiRenderController(QObject):
 
 		# Read image data
 		dataReader = DataReader()
-		imageData = dataReader.GetImageData(fileName)
 
-		# Resize the image data
-		imageResizer = DataResizer()
-		self.movingImageData = imageResizer.ResizeData(imageData, maximum=self.maxVoxelSize)
 		self.multiRenderWidget.setMovingData(self.movingImageData)
 		self.movingDataChanged.emit(self.movingImageData)
 

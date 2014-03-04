@@ -23,7 +23,6 @@ from ui.visualizations import VolumeVisualizationFactory
 from ui.visualizations import VolumeVisualizationWrapper
 from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data import DataReader
-from core.data import DataResizer
 
 
 class RenderController(QObject):
@@ -83,11 +82,9 @@ class RenderController(QObject):
 
 		# Read image data
 		dataReader = DataReader()
-		imageData = dataReader.GetImageData(fileName)
+		self.imageData = dataReader.GetImageData(fileName)
 
-		# Resize the image data
-		imageResizer = DataResizer()
-		self.imageData = imageResizer.ResizeData(imageData, maximum=18000000)
+		# Give the image data to the widget
 		self.renderWidget.setData(self.imageData)
 		self.dataChanged.emit(self.imageData)
 
