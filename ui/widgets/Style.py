@@ -34,3 +34,6 @@ def styleWidgetForTab(widget):
 		# This makes it look pretty on Elementary theme
 		widget.setObjectName("tabWidget")
 		widget.setStyleSheet("#tabWidget {background: rgb(236, 236, 236);}")
+	elif sys.platform.startswith("win"):
+		widget.setObjectName("tabWidget")
+		widget.setStyleSheet("#tabWidget {background: rgb(255, 255, 255);}")
