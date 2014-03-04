@@ -59,8 +59,10 @@ from ui.widgets.ToolbarWidget import ToolbarWidget
 from ui.transformations import UserTransformationTool
 from ui.transformations import LandmarkTransformationTool
 from ui.transformations import DeformableTransformationTool
+from ui.transformations import Transformation
 from InspectionTool import CompareWidget
 from InspectionTool import ComparisonController
+from vtk import vtkTransform
 
 
 # Define settings parameters
