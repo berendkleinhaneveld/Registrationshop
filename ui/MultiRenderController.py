@@ -64,7 +64,9 @@ class MultiRenderController(QObject):
 
 		# Read image data
 		dataReader = DataReader()
+		self.fixedImageData = dataReader.GetImageData(fileName)
 
+		# Give the image data to the widget
 		self.multiRenderWidget.setFixedData(self.fixedImageData)
 		self.fixedDataChanged.emit(self.fixedImageData)
 
@@ -84,7 +86,9 @@ class MultiRenderController(QObject):
 
 		# Read image data
 		dataReader = DataReader()
+		self.movingImageData = dataReader.GetImageData(fileName)
 
+		# Give the image data to the widget
 		self.multiRenderWidget.setMovingData(self.movingImageData)
 		self.movingDataChanged.emit(self.movingImageData)
 
