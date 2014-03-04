@@ -13,8 +13,6 @@ from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data import DataReader
 from core.data import DataResizer
 from ui.transformations import TransformationList
-from ui.visualizations import MultiVisualizationTypeMIDA
-from ui.visualizations import MultiVisualizationTypeMIP
 from ui.visualizations import MultiVisualizationTypeMix
 from ui.visualizations import MultiVolumeVisualizationFactory
 
@@ -38,7 +36,6 @@ class MultiRenderController(QObject):
 		super(MultiRenderController, self).__init__()
 
 		self.multiRenderWidget = mulitRenderWidget
-		# self.visualizationTypes = [MultiVisualizationTypeMix, MultiVisualizationTypeMIP, MultiVisualizationTypeMIDA]
 		self.visualizationTypes = [MultiVisualizationTypeMix]
 		self.visualizationType = None  # str
 		self.fixedImageData = None  # vtkImageData
