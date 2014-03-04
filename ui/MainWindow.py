@@ -30,8 +30,8 @@ class MainWindow(QMainWindow):
 		if not self._storesSizeAndPosition:
 			return
 			
-		xPosition = int(MainWindow.settings.value("ui/window/origin/x", 0))
-		yPosition = int(MainWindow.settings.value("ui/window/origin/y", 0))
+		xPosition = int(MainWindow.settings.value("ui/window/origin/x", 5))
+		yPosition = int(MainWindow.settings.value("ui/window/origin/y", 20))
 		width = int(MainWindow.settings.value("ui/window/width", 800))
 		height = int(MainWindow.settings.value("ui/window/height", 600))
 
