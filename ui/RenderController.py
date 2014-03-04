@@ -17,11 +17,8 @@ from PySide.QtCore import QObject
 from PySide.QtCore import Signal
 from PySide.QtCore import Slot
 from PySide.QtGui import QWidget
-from ui.visualizations import VisualizationTypeCT
 from ui.visualizations import VisualizationTypeSimple
 from ui.visualizations import VisualizationTypeMIP
-from ui.visualizations import VisualizationTypeMIDA
-from ui.visualizations import VisualizationTypeTransferFunction
 from ui.visualizations import VolumeVisualizationFactory
 from ui.visualizations import VolumeVisualizationWrapper
 from core.vtkObjectWrapper import vtkCameraWrapper
@@ -60,7 +57,6 @@ class RenderController(QObject):
 		super(RenderController, self).__init__()
 
 		self.renderWidget = renderWidget
-		# self.visualizationTypes = [VisualizationTypeSimple, VisualizationTypeCT, VisualizationTypeTransferFunction, VisualizationTypeMIP, VisualizationTypeMIDA]
 		self.visualizationTypes = [VisualizationTypeSimple, VisualizationTypeMIP]
 		self.visualizationType = None
 		self.imageData = None
