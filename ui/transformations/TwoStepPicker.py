@@ -246,8 +246,8 @@ class TwoStepPicker(Picker):
 		sizes = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]
 		smallest = min(sizes)
 		multiplier = smallest / 30
-		halfSize = 5 * multiplier
-		gapSize = 3 * multiplier
+		halfSize = 4 * multiplier
+		gapSize = 2 * multiplier
 
 		upLine = CreateLine([0, gapSize, 0], [0, gapSize+halfSize, 0])
 		downLine = CreateLine([0, -gapSize, 0], [0, -(gapSize+halfSize), 0])
