@@ -32,7 +32,7 @@ class Landmark(object):
 		self.active = True
 		self.id = index
 
-		self.landmark = CreateSphere(1.0, [1, 1, 0.6])
+		self.landmark = CreateSphere(0.1, [1, 1, 0.6])
 
 		self.landmarkIndicator = CreateCircle(1.2)
 		self.landmarkIndicator.GetProperty().SetLineWidth(2)
