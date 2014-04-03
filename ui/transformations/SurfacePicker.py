@@ -41,7 +41,7 @@ class SurfacePicker(Picker, Interactor):
 		coneSource.CappingOn()
 		coneSource.SetHeight(6*multiplier)
 		coneSource.SetRadius(3*multiplier)
-		coneSource.SetResolution(6)
+		coneSource.SetResolution(12)
 		coneSource.SetCenter(3*multiplier, 0, 0)
 		coneSource.SetDirection(-1, 0, 0)
 
