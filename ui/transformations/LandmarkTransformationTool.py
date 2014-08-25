@@ -120,7 +120,9 @@ class LandmarkTransformationTool(TransformationTool):
 
 	@overrides(TransformationTool)
 	def applyTransform(self):
-		pass
+		# Add the landmark point sets to the transformation
+		transformation = self.multiWidget.transformations[-1]
+		transformation.landmarks = self.landmarkPointSets
 
 	@overrides(TransformationTool)
 	def cleanUp(self):

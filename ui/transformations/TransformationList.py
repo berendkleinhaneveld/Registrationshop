@@ -99,14 +99,17 @@ class TransformationList(QObject):
 		consists out of the transformation type, a wrapped
 		vtkTransform and the filename.
 		"""
-		result = []
+		result = list()
 		for transformation in self._transformations:
 			# First wrap the transform
-			wrappedTransform = vtkTransformWrapper(transformation.transform)
-			# Create a tuple
-			wrappedTransformation = (transformation.transformType, wrappedTransform, transformation.filename)
-			# Add the tuple to the results
-			result.append(wrappedTransformation)
+			transformWrap = vtkTransformWrapper(transformation.transform)
+			wrappedTransform = dict()
+			# Create a dict with all the information
+			wrappedTransform["TransformationType"] = transformation.transformType
+			wrappedTransform["Transformation"] = transformWrap
+			wrappedTransform["Filename"] = transformation.filename
+			wrappedTransform["Landmarks"] = transformation.landmarks
+			result.append(wrappedTransform)
 		return result
 
 	def setPythonVersion(self, transformWrappers):
@@ -118,14 +121,24 @@ class TransformationList(QObject):
 		self._dirty = True
 
 		for wrappedTransformation in transformWrappers:
-			# Get the transform type
-			transformType = wrappedTransformation[0]
-			# Get the wrapped transform and unwrap immediately
-			transform = wrappedTransformation[1].originalObject()
-			# Get the filename
-			filename = wrappedTransformation[2]
-			# Add the transform to the internal transformations
-			self._transformations.append(Transformation(transform, transformType, filename))
+			if isinstance(wrappedTransformation, dict):
+				transformType = wrappedTransformation["TransformationType"]
+				transform = wrappedTransformation["Transformation"].originalObject()
+				filename = wrappedTransformation["Filename"]
+				landmarks = wrappedTransformation["Landmarks"]
+				# Create new transformation
+				transformation = Transformation(transform, transformType, filename)
+				transformation.landmarks = landmarks
+				self._transformations.append(transformation)
+			elif isinstance(wrappedTransformation, list):
+				# Get the transform type
+				transformType = wrappedTransformation[0]
+				# Get the wrapped transform and unwrap immediately
+				transform = wrappedTransformation[1].originalObject()
+				# Get the filename
+				filename = wrappedTransformation[2]
+				# Add the transform to the internal transformations
+				self._transformations.append(Transformation(transform, transformType, filename))
 
 		self.transformationChanged.emit(self)
 

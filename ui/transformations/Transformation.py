@@ -24,3 +24,4 @@ class Transformation(object):
 		self.transform = transform
 		self.transformType = transformType
 		self.filename = filename
+		self.landmarks = None
