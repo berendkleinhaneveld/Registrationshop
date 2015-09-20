@@ -14,6 +14,10 @@ Install pyyaml and pyside by running the following on OS X and Linux:
     sudo easy_install pyyaml
     sudo easy_install pyside
 
+If easy_install doesn't work, then the following could work:
+
+    pip install -U pyside
+
 On Windows:
 
 * Install Python 2.7
