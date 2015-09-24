@@ -1,7 +1,7 @@
 # Build instructions
 
 This file contains the instructions for building and running RegistrationShop on OS X, Linux and Windows.
-For Linux/Ubuntu, there is a more extended guide over [here](https://github./com/berendkleinhaneveld/Registrationshop/INSTRUCTIONS_UBUNTU.md) which describes every step needed for installing RegistrationShop on a fresh install of Ubuntu.
+For Linux/Ubuntu, there is a more extended guide over [here](https://github.com/berendkleinhaneveld/Registrationshop/INSTRUCTIONS_UBUNTU.md) which describes every step needed for installing RegistrationShop on a fresh install of Ubuntu.
 
 ### Prerequisites
 
