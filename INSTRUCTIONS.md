@@ -1,7 +1,7 @@
 # Build instructions
 
 This file contains the instructions for building and running RegistrationShop on OS X, Linux and Windows.
-
+For Linux/Ubuntu, there is a more extended guide over [here](https://github./com/berendkleinhaneveld/Registrationshop/INSTRUCTIONS_UBUNTU.md) which describes every step needed for installing RegistrationShop on a fresh install of Ubuntu.
 
 ### Prerequisites
 
@@ -11,12 +11,8 @@ Please install Elastix by downloading it [here](http://elastix.isi.uu.nl/downloa
 
 Install pyyaml and pyside by running the following on OS X and Linux:
 
-    sudo easy_install pyyaml
-    sudo easy_install pyside
-
-If easy_install doesn't work, then the following could work:
-
-    pip install -U pyside
+    pip install -U pyyaml
+    pip install -U PySide
 
 On Windows:
 
@@ -27,31 +23,21 @@ On Windows:
 
 ### Custom VTK
 
-Download VTK at https://github.com/berendkleinhaneveld/VTK/tree/release and build with Cmake and make sure that Python wrappings are on.
+Download VTK at https://github.com/berendkleinhaneveld/VTK/tree/release and build with Cmake and make sure that Python wrappings are on. Please make sure you download the zip file instead of cloning the repo, because the wrong branch is checked out.
 
 After building VTK successfully, make sure you have the following system variables and make sure that they contain the following paths:
 
 On OS X (add to ~/.profile) and Linux (add to ~/.bashrc):
 
-__VTK_DIR:__
+    # Add Elastix folder to PATH
+    export PATH=/path/to/elastix/bin:$PATH
 
-    {VTKBUILDDIR}
+    # Specify VTK build folder
+    export VTK_DIR=/path/to/vtk/build/folder
+    export PYTHONPATH=$VTK_DIR/bin:$VTK_DIR/lib:$VTK_DIR/Wrapping/Python:$PYTHONPATH
+    export PATH=$VTK_DIR/bin:$VTK_DIR/Wrapping/Python:$VTK_DIR/Wrapping/PythonCore:$PATH
+    export LD_LIBRARY_PATH=$VTK_DIR/bin:$LD_LIBRARY_PATH
 
-__PYTHONPATH:__
-
-    {VTKBUILDDIR}/bin
-    {VTKBUILDDIR}/lib
-    {VTKBUILDDIR}/Wrapping/Python
-
-__PATH:__
-
-    {VTKBUILDDIR}/bin
-    {VTKBUILDDIR}/Wrapping/Python
-    {VTKBUILDDIR}/Wrapping/PythonCore
-
-__LD_LIBRARY_PATH:__
-
-    {VTKBUILDDIR}/bin
 
 On Windows:
 
