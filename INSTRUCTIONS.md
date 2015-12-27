@@ -13,6 +13,10 @@ Install pyyaml and pyside by running the following on OS X and Linux:
 
     pip install -U pyyaml
     pip install -U PySide
+    
+You might have to install qt before being able to install PySide by running:
+
+    brew install qt     # OS X
 
 On Windows:
 
