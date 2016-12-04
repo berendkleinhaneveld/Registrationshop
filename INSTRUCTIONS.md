@@ -22,7 +22,8 @@ On Windows:
 
 * Install Python 2.7
 * Install PyYaml (packages available at http://pyyaml.org/wiki/PyYAML)
-* Install PySide (https://qt-project.org/wiki/PySide_Binaries_Windows)
+* Install PySide (http://wiki.qt.io/PySide_Binaries_Windows) 
+  `python pip install -U PySide`
 
 
 ### Custom VTK
