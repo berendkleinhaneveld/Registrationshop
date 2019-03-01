@@ -4,19 +4,19 @@ ColorWidget
 :Authors:
 	Berend Klein Haneveld
 """
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QPainter
-from PySide.QtGui import QColor
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QColorDialog
-from PySide.QtGui import QButtonGroup
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QPen
-from PySide.QtCore import QSize
-from PySide.QtCore import QRectF
-from PySide.QtCore import Signal
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QLabel
+from PySide2.QtWidgets import QHBoxLayout
+from PySide2.QtGui import QPainter
+from PySide2.QtGui import QColor
+from PySide2.QtWidgets import QPushButton
+from PySide2.QtWidgets import QColorDialog
+from PySide2.QtWidgets import QButtonGroup
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtGui import QPen
+from PySide2.QtCore import QSize
+from PySide2.QtCore import QRectF
+from PySide2.QtCore import Signal
 
 
 class ColorWidget(QWidget):
@@ -31,7 +31,7 @@ class ColorWidget(QWidget):
 
 		self.label = QLabel()
 		self.color = [1.0, 1.0, 1.0]
-		
+
 		buttonLayout = QHBoxLayout()
 		buttonLayout.setContentsMargins(8, 0, 0, 0)
 
@@ -69,7 +69,7 @@ class ColorPickerWidget(ColorWidget):
 		self.colorButton.setColor(rgba[0:3])
 		self.color = self.colorButton.color
 		self.valueChanged.emit(self.color)
-		
+
 
 class ColorChoiceWidget(ColorWidget):
 	def __init__(self):
@@ -105,7 +105,7 @@ class ColorChoiceWidget(ColorWidget):
 	def selectColor(self, button):
 		self.color = button.color
 		self.valueChanged.emit(self.color)
-		
+
 
 class ColorButton(QPushButton):
 	def __init__(self):
@@ -114,7 +114,7 @@ class ColorButton(QPushButton):
 
 		self.setMinimumSize(QSize(24, 24))
 		self.setMaximumSize(QSize(24, 24))
-	
+
 	def setColor(self, color):
 		self.color = color
 		self.update(self.rect())
@@ -149,8 +149,8 @@ class ColorButton(QPushButton):
 
 
 if __name__ == '__main__':
-	from PySide.QtGui import QApplication
-	from PySide.QtGui import QVBoxLayout
+	from PySide2.QtWidgets import QApplication
+	from PySide2.QtWidgets import QVBoxLayout
 	app = QApplication([])
 
 	colorWidget = ColorPickerWidget()

@@ -16,11 +16,11 @@ class Parameter(object):
 	Just a little more interesting over normal dict entries because of the specific representation
 	to be used in a parameter file for Elastix.
 	"""
-	
+
 	def __init__(self, key=None, value=None):
 		"""
-		:type key: basestring
-		:type value: basestring or bool or int, float
+		:type key: str
+		:type value: str or bool or int, float
 		"""
 		super(Parameter, self).__init__()
 
@@ -49,14 +49,14 @@ class Parameter(object):
 
 	def setKeyValue(self, key, value):
 		"""
-		:type key: basestring
-		:type value: float, int, basestring
+		:type key: str
+		:type value: float, int, str
 		"""
 		# Raise attribute error if the key is None while the value has a value
 		if not key and value:
 			raise AttributeError("Key attribute can't be None if a value is specified.")
 
-		if key and not isinstance(key, basestring):
+		if key and not isinstance(key, str):
 			raise TypeError("attribute key should be of string type")
 
 		self.setKey(key)
@@ -66,12 +66,12 @@ class Parameter(object):
 		"""
 		Strips whitespace characters and spaces from key.
 
-		:type key: basestring
+		:type key: str
 		"""
 		if not key:
 			raise AttributeError("Can't set a key to None")
 
-		if not isinstance(key, basestring):
+		if not isinstance(key, str):
 			raise TypeError("attribute key should be of string type")
 
 		key = key.strip()
@@ -81,7 +81,7 @@ class Parameter(object):
 
 	def setValue(self, value):
 		"""
-		:type value: basestring, float, int
+		:type value: str, float, int
 		"""
 		if not self._key:
 			raise AttributeError("Can't set a value when the key is None")
@@ -94,13 +94,13 @@ class Parameter(object):
 
 	def key(self):
 		"""
-		:rtype: basestring
+		:rtype: str
 		"""
 		return self._key
 
 	def value(self):
 		"""
-		:rtype: float, int, basestring
+		:rtype: float, int, str
 		"""
 		return self._value
 
@@ -109,7 +109,7 @@ class Parameter(object):
 		"""
 		Returns possibly converted value
 		"""
-		if isinstance(value, basestring):
+		if isinstance(value, str):
 			# Try to convert to another type
 			value, success = Parameter.valueAsBool(value)
 			if not success:
@@ -132,7 +132,7 @@ class Parameter(object):
 			if not '.' in tmp:
 				tmp += '.0'
 			return tmp
-		elif isinstance(value, basestring):
+		elif isinstance(value, str):
 			return '"%s"' % value
 		elif isinstance(value, list):
 			result = ''
@@ -154,12 +154,12 @@ class Parameter(object):
 		"""
 		if isinstance(value, bool):
 			return value, True
-		if isinstance(value, basestring):
+		if isinstance(value, str):
 			if "true" in value.lower():
 				return True, True
 			elif "false" in value.lower():
 				return False, True
-		
+
 		return value, False
 
 	@classmethod
@@ -175,11 +175,11 @@ class Parameter(object):
 		"""
 		if isinstance(value, int) and not isinstance(value, bool):
 			return value, True
-		elif isinstance(value, basestring) and value.isdigit():
+		elif isinstance(value, str) and value.isdigit():
 			return int(value), True
-		
+
 		return value, False
-	
+
 	@classmethod
 	def valueAsFloat(cls, value):
 		"""
@@ -194,7 +194,7 @@ class Parameter(object):
 		"""
 		if isinstance(value, float):
 			return value, True
-		elif isinstance(value, basestring) and not value.isdigit():
+		elif isinstance(value, str) and not value.isdigit():
 			try:
 				floatValue = float(value)
 				return floatValue, True
@@ -209,7 +209,7 @@ class Parameter(object):
 		"""
 		if isinstance(value, list):
 			return value, True
-		elif isinstance(value, basestring):
+		elif isinstance(value, str):
 			words = value.split()
 			if len(words) == 1:
 				return value, False
@@ -224,7 +224,7 @@ class Parameter(object):
 	@classmethod
 	def parameterFromString(cls, line):
 		"""
-		:type value: basestring
+		:type value: str
 		:rtype: Parameter
 		"""
 		# Remove leading and trailing white space chars
@@ -242,7 +242,7 @@ class Parameter(object):
 				or indexOfSpace > indexOfCaretClose \
 				or indexOfSpace == indexOfCaretOpen+1:
 				return None
-			
+
 			key = line[indexOfCaretOpen+1:indexOfSpace]
 			value = line[indexOfSpace+1:indexOfCaretClose]
 			if len(key) == 0:

@@ -4,12 +4,12 @@ RenderPropWidget
 :Authors:
 	Berend Klein Haneveld
 """
-from PySide.QtGui import QWidget
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QVBoxLayout
-from PySide.QtGui import QTabWidget
-from PySide.QtCore import Qt
-from PySide.QtCore import Slot
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QPushButton
+from PySide2.QtWidgets import QVBoxLayout
+from PySide2.QtWidgets import QTabWidget
+from PySide2.QtCore import Qt
+from PySide2.QtCore import Slot
 from ui.parameters import RenderParameterWidget
 from ui.parameters import RenderInfoWidget
 from ui.parameters import RenderSlicerParamWidget
@@ -72,7 +72,7 @@ class RenderPropWidget(QWidget):
 		"""
 		self.loadDataButton.clicked.connect(slot)
 
-	@Slot(basestring)
+	@Slot(str)
 	def setFile(self, fileName):
 		"""
 		When a file is loaded, the 'load data' button is removed from the widget

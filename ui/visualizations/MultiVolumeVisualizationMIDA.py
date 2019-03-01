@@ -4,11 +4,11 @@ MIDAMultiVolumeVisualization
 :Authors:
 	Berend Klein Haneveld
 """
-from MultiVolumeVisualization import MultiVolumeVisualization
-from MultiVolumeVisualization import CreateEmptyFunctions
-from MultiVolumeVisualization import CreateRangeFunctions
+from .MultiVolumeVisualization import MultiVolumeVisualization
+from .MultiVolumeVisualization import CreateEmptyFunctions
+from .MultiVolumeVisualization import CreateRangeFunctions
 from core.decorators import overrides
-from PySide.QtGui import QWidget
+from PySide2.QtWidgets import QWidget
 from vtk import vtkVolumeProperty
 
 

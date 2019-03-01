@@ -4,14 +4,14 @@ VolumeVisualizationRamp
 :Authors:
 	Berend Klein Haneveld
 """
-from VolumeVisualization import VolumeVisualization
-from VolumeVisualization import VisualizationTypeRamp
+from .VolumeVisualization import VolumeVisualization
+from .VolumeVisualization import VisualizationTypeRamp
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtCore import Qt
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtCore import Qt
 from core.decorators import overrides
 
 

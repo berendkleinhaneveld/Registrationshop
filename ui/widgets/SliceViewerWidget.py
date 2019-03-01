@@ -10,10 +10,10 @@ from vtk import vtkInteractorStyleUser
 from vtk import vtkImagePlaneWidget
 from vtk import vtkCellPicker
 from vtk import vtkColorTransferFunction
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QWidget
-from PySide.QtCore import Signal
-from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QWidget
+from PySide2.QtCore import Signal
+from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.Interactor import Interactor
 from core.vtkDrawing import CreateSquare
 from core.vtkDrawing import CreateLine
@@ -81,7 +81,7 @@ class SliceViewerWidget(QWidget, Interactor):
 		self.rendererOverlay.GetActiveCamera().ShallowCopy(camera)
 
 	def charTyped(self, arg1, arg2):
-		# print arg1.GetKeyCode()
+		# print()arg1.GetKeyCode()
 		pass
 
 	def setLocatorPosition(self, position):
@@ -132,7 +132,7 @@ class SliceViewerWidget(QWidget, Interactor):
 			line2 = CreateLine([0, -width / 2.0, 0], [0, -10000, 0], self.color)
 			line3 = CreateLine([width / 2.0, 0, 0], [10000, 0, 0], self.color)
 			line4 = CreateLine([-width / 2.0, 0, 0], [-10000, 0, 0], self.color)
-			
+
 			self.locator = [square, line1, line2, line3, line4]
 			for actor in self.locator:
 				self.rendererOverlay.AddViewProp(actor)
@@ -159,7 +159,7 @@ class SliceViewerWidget(QWidget, Interactor):
 		self.renderer.SetDisplayPoint(x, y, 1)
 		self.renderer.DisplayToWorld()
 		worldCoords = self.renderer.GetWorldPoint()
-		pickPosition = map(lambda x: x / worldCoords[3], worldCoords[0:-1])
+		pickPosition = [x / worldCoords[3] for x in worldCoords[0:-1]]
 		self.mouseMoved.emit(pickPosition)
 
 	def render(self):

@@ -4,7 +4,7 @@ TwoStepPicker
 :Authors:
 	Berend Klein Haneveld
 """
-from Picker import Picker
+from .Picker import Picker
 from core.decorators import overrides
 from core.operations import Multiply
 from core.operations import Add
@@ -20,8 +20,8 @@ from vtk import vtkAssembly
 from vtk import vtkProp3DFollower
 from vtk import vtkMath
 from vtk import vtkImageInterpolator
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
+from PySide2.QtCore import Signal
+from PySide2.QtCore import Slot
 
 
 class TwoStepPicker(Picker):
@@ -154,7 +154,7 @@ class TwoStepPicker(Picker):
 		key = iren.GetKeyCode()
 		if key != "a" and key != " ":
 			# if key == " ":
-			# 	print "Pressed space"
+			# 	print()"Pressed space"
 			return
 		x, y = iren.GetEventPosition()
 		# p1 and p2 are in world coordination

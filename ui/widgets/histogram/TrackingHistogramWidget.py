@@ -4,10 +4,10 @@ TrackingHistogramWidget
 :Authors:
 	Berend Klein Haneveld
 """
-from PySide.QtGui import *
-from PySide.QtCore import *
-from HistogramWidget import HistogramWidget
-from TrackingNodeItem import TrackingNodeItem
+from PySide2.QtWidgets import *
+from PySide2.QtCore import *
+from .HistogramWidget import HistogramWidget
+from .TrackingNodeItem import TrackingNodeItem
 from ui.widgets import Style
 
 

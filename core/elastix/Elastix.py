@@ -56,11 +56,11 @@ class Elastix(object):
 		try:
 			proc = subprocess.Popen(commands, stdout=subprocess.PIPE)
 			for line in iter(proc.stdout.readline, ""):
-				# print line.rstrip()
+				# print()line.rstrip()
 				pass
-		except Exception, e:
-			print "Image registration failed with command:"
-			print commands
-			print "More detailed info:"
-			print sys.exc_info()
+		except Exception as e:
+			print("Image registration failed with command:")
+			print(commands)
+			print("More detailed info:")
+			print(sys.exc_info())
 			raise e

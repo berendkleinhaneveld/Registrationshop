@@ -16,7 +16,7 @@ class ParameterListTest(unittest.TestCase):
 		self.assertEquals(len(parameters), 0)
 		# Test adding a non Parameter value
 		self.assertRaises(TypeError, parameters.append, nonvalidValue)
-		
+
 		self.assertEquals(len(parameters), 0)
 		parameters.append(value)
 		self.assertEquals(len(parameters), 1)
@@ -48,5 +48,5 @@ class ParameterListTest(unittest.TestCase):
 		try:
 			import os
 			os.remove(unicode(path) + "/SampleOutput.c")
-		except Exception, e:
-			print e
+		except Exception as e:
+			print(e)

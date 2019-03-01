@@ -11,11 +11,11 @@ from vtk import vtkInteractorStyleTrackballCamera
 from vtk import vtkOpenGLGPUVolumeRayCastMapper
 from vtk import vtkTransform
 from vtk import vtkImagePlaneWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QWidget
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
-from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QWidget
+from PySide2.QtCore import Signal
+from PySide2.QtCore import Slot
+from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.transformations import ClippingBox
 from core.vtkDrawing import CreateBounds
 from core.vtkDrawing import CreateOrientationGrid
@@ -111,7 +111,7 @@ class RenderWidget(QWidget):
 		if self.imageData is None:
 			if self.volume is not None:
 				self.renderer.RemoveViewProp(self.volume)
-			print "Warning: image data is None"
+			print("Warning: image data is None")
 			self.clippingBox.setImageData(None)
 			self.mapper.RemoveAllInputs()
 			self.render()

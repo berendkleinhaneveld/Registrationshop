@@ -4,16 +4,16 @@ VolumeVisualizationMIP
 :Authors:
 	Berend Klein Haneveld
 """
-from VolumeVisualization import VolumeVisualization
-from VolumeVisualization import VisualizationTypeMIP
+from .VolumeVisualization import VolumeVisualization
+from .VolumeVisualization import VisualizationTypeMIP
 from ui.widgets.SliderFloatWidget import SliderFloatWidget
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QGroupBox
-from PySide.QtCore import Qt
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QGroupBox
+from PySide2.QtCore import Qt
 from core.decorators import overrides
 
 
@@ -86,7 +86,7 @@ class VolumeVisualizationMIP(VolumeVisualization):
 
 		thresholdGroup = QGroupBox("Thresholds:")
 		thresholdGroup.setLayout(thresholdLayout)
-		
+
 		layout = QGridLayout()
 		layout.setAlignment(Qt.AlignTop)
 		layout.setHorizontalSpacing(0)
@@ -110,8 +110,8 @@ class VolumeVisualizationMIP(VolumeVisualization):
 			self.otherColRes.addWidgetsFromLayout(self.levelSlider.layout(), 2)
 			self.otherColRes.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 2)
 			self.otherColRes.addWidgetsFromLayout(self.upperBoundSlider.layout(), 2)
-		except Exception, e:
-			print e
+		except Exception as e:
+			print(e)
 
 		return widget
 

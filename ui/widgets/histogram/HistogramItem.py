@@ -8,9 +8,9 @@ from Exposure Render (http://code.google.com/p/exposure-render/)
 	T. Kroes <t.kroes@tudelft.nl>
 	B. Klein Haneveld <b.a.kleinhaneveld@student.tudelft.nl>
 """
-from PySide.QtGui import *
-from PySide.QtCore import *
-from Histogram import Histogram
+from PySide2.QtWidgets import *
+from PySide2.QtCore import *
+from .Histogram import Histogram
 import math
 
 

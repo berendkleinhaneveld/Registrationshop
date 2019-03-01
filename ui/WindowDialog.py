@@ -5,8 +5,8 @@ WindowDialog
 	Berend Klein Haneveld
 """
 from ui.dialogs import ExportProgressDialog
-from PySide.QtCore import QObject
-from PySide.QtCore import Slot
+from PySide2.QtCore import QObject
+from PySide2.QtCore import Slot
 
 
 class WindowDialog(QObject):

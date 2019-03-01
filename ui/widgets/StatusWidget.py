@@ -5,14 +5,14 @@ StatusWidget
 	Berend Klein Haneveld
 """
 
-from PySide.QtGui import QFrame
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
-from PySide.QtGui import QPainter
-from PySide.QtGui import QPen
-from PySide.QtGui import QColor
-from PySide.QtGui import QFont
-from PySide.QtCore import QRectF
+from PySide2.QtWidgets import QFrame
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QLabel
+from PySide2.QtGui import QPainter
+from PySide2.QtGui import QPen
+from PySide2.QtGui import QColor
+from PySide2.QtGui import QFont
+from PySide2.QtCore import QRectF
 from core.decorators import Singleton
 
 

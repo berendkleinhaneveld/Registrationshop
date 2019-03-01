@@ -4,14 +4,14 @@ SliderFloatWidget
 :Authors:
 	Berend Klein Haneveld
 """
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QSlider
-from PySide.QtGui import QDoubleSpinBox
-from PySide.QtGui import QGridLayout
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
-from PySide.QtCore import Qt
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QLabel
+from PySide2.QtWidgets import QSlider
+from PySide2.QtWidgets import QDoubleSpinBox
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtCore import Signal
+from PySide2.QtCore import Slot
+from PySide2.QtCore import Qt
 
 
 class SliderFloatWidget(QWidget):
@@ -99,8 +99,8 @@ class SliderFloatWidget(QWidget):
 
 
 if __name__ == '__main__':
-	from PySide.QtGui import QApplication
-	from PySide.QtGui import QVBoxLayout
+	from PySide2.QtWidgets import QApplication
+	from PySide2.QtWidgets import QVBoxLayout
 	app = QApplication([])
 
 	sliderWidget = SliderFloatWidget()

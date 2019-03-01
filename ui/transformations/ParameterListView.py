@@ -5,8 +5,8 @@ ParameterListView
 	Berend Klein Haneveld
 """
 
-from PySide.QtGui import QTreeView
-from PySide.QtGui import QAbstractItemView
+from PySide2.QtWidgets import QTreeView
+from PySide2.QtWidgets import QAbstractItemView
 
 
 class ParameterListView(QTreeView):
@@ -41,6 +41,6 @@ class ParameterListView(QTreeView):
 		size = event.size()
 		width = size.width()
 		widthOfFirstColumn = int(2.0/3.0 * width)
-		
+
 		self.setColumnWidth(0, widthOfFirstColumn)
 		self.setColumnWidth(1, width - widthOfFirstColumn)

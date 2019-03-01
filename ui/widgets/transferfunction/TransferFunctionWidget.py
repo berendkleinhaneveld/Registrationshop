@@ -10,18 +10,18 @@ from ui.widgets.transferfunction import TransferFunctionNodeItem
 from ui.widgets.transferfunction import TransferFunctionItem
 from ui.widgets.ColorWidget import ColorButton
 from core.data.DataAnalyzer import DataAnalyzer
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QGraphicsLineItem
-from PySide.QtGui import QPen
-from PySide.QtGui import QLabel
-from PySide.QtGui import QLineEdit
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QColorDialog
-from PySide.QtGui import QColor
-from PySide.QtCore import QLineF
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QGraphicsLineItem
+from PySide2.QtGui import QPen
+from PySide2.QtWidgets import QLabel
+from PySide2.QtWidgets import QLineEdit
+from PySide2.QtWidgets import QPushButton
+from PySide2.QtWidgets import QColorDialog
+from PySide2.QtGui import QColor
+from PySide2.QtCore import QLineF
+from PySide2.QtCore import Signal
+from PySide2.QtCore import Slot
 from ui.widgets import Style
 
 
@@ -232,7 +232,7 @@ class NodeItemWidget(QWidget):
 		self.deleteButton.clicked.connect(self.deleteNode)
 
 		self.setLayout(layout)
-		
+
 	def setNode(self, node):
 		self.node = node
 		if not node:

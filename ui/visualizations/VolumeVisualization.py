@@ -4,8 +4,8 @@ VolumeVisualization
 :Authors:
 	Berend Klein Haneveld
 """
-from PySide.QtCore import Signal
-from PySide.QtCore import QObject
+from PySide2.QtCore import Signal
+from PySide2.QtCore import QObject
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
 

@@ -29,7 +29,7 @@ class DataWriterTest(unittest.TestCase):
 			if os.path.exists(outputFolder):
 				import shutil
 				shutil.rmtree(outputFolder)
-		except Exception, e:
+		except Exception as e:
 			raise e
 
 	def testUnsupportedDataType(self):

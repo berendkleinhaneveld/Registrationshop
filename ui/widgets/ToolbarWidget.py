@@ -5,18 +5,18 @@ ToolbarWidget
 	Berend Klein Haneveld
 """
 import sys
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QToolButton
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QMainWindow
-from PySide.QtGui import QFont
-from PySide.QtGui import QAction
-from PySide.QtGui import QSizePolicy
-from PySide.QtGui import QIcon
-from PySide.QtCore import Qt
-from PySide.QtCore import QSize
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QLabel
+from PySide2.QtWidgets import QHBoxLayout
+from PySide2.QtWidgets import QToolButton
+from PySide2.QtWidgets import QPushButton
+from PySide2.QtWidgets import QMainWindow
+from PySide2.QtWidgets import QFont
+from PySide2.QtWidgets import QAction
+from PySide2.QtWidgets import QSizePolicy
+from PySide2.QtGui import QIcon
+from PySide2.QtCore import Qt
+from PySide2.QtCore import QSize
 
 
 class ToolbarWidget(QWidget):
@@ -143,8 +143,8 @@ def CreateFlatButton(action):
 
 if __name__ == '__main__':
 	import os
-	from PySide.QtGui import QApplication
-	from PySide.QtGui import QVBoxLayout
+	from PySide2.QtWidgets import QApplication
+	from PySide2.QtWidgets import QVBoxLayout
 
 	app = QApplication([])
 	mainWindow = QMainWindow()

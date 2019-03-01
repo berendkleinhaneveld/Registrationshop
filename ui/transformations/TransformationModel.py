@@ -4,10 +4,10 @@ TransformationModel
 :Authors:
 	Berend Klein Haneveld
 """
-from PySide.QtCore import QAbstractItemModel
-from PySide.QtCore import QModelIndex
-from PySide.QtCore import Qt
-from PySide.QtCore import Slot
+from PySide2.QtCore import QAbstractItemModel
+from PySide2.QtCore import QModelIndex
+from PySide2.QtCore import Qt
+from PySide2.QtCore import Slot
 
 
 class TransformationModel(QAbstractItemModel):

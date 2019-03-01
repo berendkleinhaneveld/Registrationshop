@@ -3,7 +3,7 @@
 	Berend Klein Haneveld
 """
 
-from Queue import Queue
+# from .Queue import Queue
 from core.worker.Worker import Worker
 
 
@@ -30,10 +30,10 @@ class Operator(object):
 	def __init__(self):
 		super(Operator, self).__init__()
 
-		self.queue = Queue()
-		self.worker = Worker(self.queue)
-		self.worker.setDaemon(True)
-		self.worker.start()
+		# self.queue = Queue()
+		# self.worker = Worker(self.queue)
+		# self.worker.setDaemon(True)
+		# self.worker.start()
 
 	def addCommand(self, command):
 		self.queue.put(command)

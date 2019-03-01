@@ -4,10 +4,10 @@ ParameterModel
 :Authors:
 	Berend Klein Haneveld
 """
-from PySide.QtCore import QAbstractItemModel
-from PySide.QtCore import QModelIndex
-from PySide.QtCore import Qt
-from PySide.QtCore import Slot
+from PySide2.QtCore import QAbstractItemModel
+from PySide2.QtCore import QModelIndex
+from PySide2.QtCore import Qt
+from PySide2.QtCore import Slot
 from core.elastix import Parameter
 from core.elastix import ParameterList
 
@@ -22,7 +22,7 @@ class ParameterModel(QAbstractItemModel):
 
 		self.parameters = []
 		self.headers = ["Parameter", "Value"]
-	
+
 	# Public interface functions
 
 	def setParameters(self, parameters):
@@ -114,7 +114,7 @@ class ParameterModel(QAbstractItemModel):
 				return str(parameter.key())
 			if index.column() == 1:
 				return str(parameter.value())
-		
+
 		return None
 
 	# Functions needed for editing

@@ -82,10 +82,10 @@ class StrategyEdge(object):
 	# 		self.childNode.dirty = False
 	# 		del return_code
 	# 	except:
-	# 		print "Image registration failed with command:"
-	# 		print command
-	# 		print "More detailed info:"
-	# 		print sys.exc_info()
+	# 		print()"Image registration failed with command:"
+	# 		print()command
+	# 		print()"More detailed info:"
+	# 		print()sys.exc_info()
 
 	# 	assert self.childNode.moving.filename is not None
 	# 	assert self.childNode.dirty is False

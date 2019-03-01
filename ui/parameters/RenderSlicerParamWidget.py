@@ -5,14 +5,14 @@ RenderSlicerParamWidget
 	Berend Klein Haneveld
 """
 
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QCheckBox
-from PySide.QtGui import QGroupBox
-from PySide.QtGui import QPushButton
-from PySide.QtCore import Qt
-from PySide.QtCore import Slot
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QLabel
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QCheckBox
+from PySide2.QtWidgets import QGroupBox
+from PySide2.QtWidgets import QPushButton
+from PySide2.QtCore import Qt
+from PySide2.QtCore import Slot
 
 
 class RenderSlicerParamWidget(QWidget):

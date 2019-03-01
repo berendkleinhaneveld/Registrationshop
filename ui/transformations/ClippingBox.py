@@ -5,8 +5,8 @@ ClippingBox
 	Berend Klein Haneveld
 """
 from ui.Interactor import Interactor
-from PySide.QtCore import QObject
-from PySide.QtCore import Signal
+from PySide2.QtCore import QObject
+from PySide2.QtCore import Signal
 from vtk import vtkBoxWidget
 from vtk import vtkPlanes
 from vtk import vtkImagePlaneWidget
@@ -165,7 +165,7 @@ class ClippingBox(QObject, Interactor):
 		for plane in self.planes:
 			plane.SetInputData(imageData)
 			plane.PlaceWidget()
-		
+
 	def reset(self):
 		"""
 		Hides the vtkBoxWidget
@@ -194,7 +194,7 @@ class ClippingBox(QObject, Interactor):
 		self._updateMapperWithClippingPlanes(planes)
 
 	# Private methods
-		
+
 	def _updateImagePlanePlacement(self):
 		if not self._clippingPlanesState:
 			return
@@ -216,7 +216,7 @@ class ClippingBox(QObject, Interactor):
 		for i in range(len(p)):
 			inv.MultiplyPoint(p[i], p[i])
 			p[i] = p[i][0:3]
-			
+
 		# Calculate the center of the planes
 		# so that it is possible to figure out where
 		# to place the image planes

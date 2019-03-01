@@ -4,8 +4,8 @@ LandmarkTransformationTool (TransformationTool)
 :Authors:
 	Berend Klein Haneveld
 """
-from Landmark import Landmark
-from TransformationTool import TransformationTool
+from .Landmark import Landmark
+from .TransformationTool import TransformationTool
 from ui.widgets.PointsWidget import PointsWidget
 from ui.widgets.StatusWidget import StatusWidget
 from ui.transformations.TwoStepPicker import TwoStepPicker
@@ -17,13 +17,13 @@ from core.project import ProjectController
 from vtk import vtkPoints
 from vtk import vtkLandmarkTransform
 from vtk import vtkTransform
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QComboBox
-from PySide.QtGui import QLabel
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
-from PySide.QtCore import Qt
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QComboBox
+from PySide2.QtWidgets import QLabel
+from PySide2.QtCore import Signal
+from PySide2.QtCore import Slot
+from PySide2.QtCore import Qt
 
 # Define picker types
 SurfaceType = "SurfaceType"
@@ -69,7 +69,7 @@ class LandmarkTransformationTool(TransformationTool):
 		layout.addWidget(QLabel("Transform type:"), 0, 0)
 		layout.addWidget(self.landmarkComboBox, 0, 1)
 		layout.addWidget(self.pointsWidget, 1, 0, 1, 2)
-		
+
 		self.updatedLandmarks.connect(self.pointsWidget.setPoints)
 		self.landmarkComboBox.currentIndexChanged.connect(self.landmarkTransformTypeChanged)
 		self.pointsWidget.activeLandmarkChanged.connect(self.setActiveLandmark)
@@ -318,7 +318,7 @@ class LandmarkTransformationTool(TransformationTool):
 
 		transform = TransformWithMatrix(landmarkTransform.GetMatrix())
 		transform.Inverse()
-		
+
 		transformation = self.multiWidget.transformations[-1]
 		assert transformation.transformType == Transformation.TypeLandmark
 		transformation.transform = transform

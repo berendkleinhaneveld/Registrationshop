@@ -5,8 +5,8 @@ DeformableTransformationTool
 	Berend Klein Haneveld 2013
 """
 import os
-from TransformationTool import TransformationTool
-from ParameterWidget import ParameterWidget
+from .TransformationTool import TransformationTool
+from .ParameterWidget import ParameterWidget
 from ui.transformations import Transformation
 from ui.widgets.StatusWidget import StatusWidget
 from vtk import vtkTransform
@@ -15,11 +15,11 @@ from core.worker import Operator
 from core.elastix import ElastixCommand
 from core.elastix import TransformixTransformation
 from core.project import ProjectController
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QGridLayout
-from PySide.QtCore import Qt
-from PySide.QtCore import Signal
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QLabel
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtCore import Qt
+from PySide2.QtCore import Signal
 
 
 class DeformableTransformationTool(TransformationTool):
@@ -61,7 +61,7 @@ class DeformableTransformationTool(TransformationTool):
 		projectController = ProjectController.Instance()
 		currentProject = projectController.currentProject
 		path = currentProject.folder
-		
+
 		if not path:
 			statusWidget.setText("Please create and save a project first so "
 				"that the results of the registration can be saved to disk.")

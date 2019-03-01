@@ -4,19 +4,19 @@ LandmarkWidget
 :Authors:
 	Berend Klein Haneveld
 """
-from PySide.QtGui import QWidget
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
-from PySide.QtGui import QTextEdit
-from PySide.QtGui import QFrame
-from PySide.QtGui import QComboBox
-from PySide.QtCore import Qt
-from PySide.QtCore import Slot
-from PySide.QtCore import Signal
-from histogram import TrackingHistogramWidget
-from histogram import Histogram
-from histogram import HistogramWidget
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QPushButton
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QLabel
+from PySide2.QtWidgets import QTextEdit
+from PySide2.QtWidgets import QFrame
+from PySide2.QtWidgets import QComboBox
+from PySide2.QtCore import Qt
+from PySide2.QtCore import Slot
+from PySide2.QtCore import Signal
+from .histogram import TrackingHistogramWidget
+from .histogram import Histogram
+from .histogram import HistogramWidget
 from ui.transformations.LandmarkTransformationTool import TwoStepType
 from ui.transformations.LandmarkTransformationTool import SurfaceType
 
@@ -27,7 +27,7 @@ class LandmarkWidget(QWidget):
 
 	def __init__(self):
 		super(LandmarkWidget, self).__init__()
-		
+
 		self.typeLabel = QLabel("Picker type:")
 		self.typeCombo = QComboBox()
 		self.typeCombo.addItem("Surface")
@@ -69,7 +69,7 @@ class LandmarkWidget(QWidget):
 class SurfaceLandmarkWidget(QWidget):
 	def __init__(self):
 		super(SurfaceLandmarkWidget, self).__init__()
-		
+
 		self.textFrame = QTextEdit("<p>Hold your mouse over the volume "
 			"to move the locator. To create a landmark, press 'Space'.</p>"
 			"<p>When you want to proceed to the following landmark, "
@@ -135,7 +135,7 @@ class TwoStepLandmarkWidget(QWidget):
 
 		self.histogram = Histogram()
 		self.histogram.bins = samples
-		
+
 		if scope:
 			self.histogram.minY = scope[0]
 			self.histogram.maxY = scope[1]

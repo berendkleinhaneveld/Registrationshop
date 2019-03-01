@@ -2,8 +2,8 @@
 MainWindow.py
 """
 
-from PySide.QtGui import QMainWindow
-from PySide import QtCore
+from PySide2.QtWidgets import QMainWindow
+from PySide2 import QtCore
 
 
 class MainWindow(QMainWindow):
@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
 		"""
 		if not self._storesSizeAndPosition:
 			return
-			
+
 		xPosition = int(MainWindow.settings.value("ui/window/origin/x", 5))
 		yPosition = int(MainWindow.settings.value("ui/window/origin/y", 20))
 		width = int(MainWindow.settings.value("ui/window/width", 800))

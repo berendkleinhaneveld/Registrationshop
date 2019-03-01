@@ -5,13 +5,13 @@ SurfacePicker
 	Berend Klein Haneveld
 """
 import math
-from Picker import Picker
+from .Picker import Picker
 from ui.Interactor import Interactor
 from vtk import vtkVolumePicker
 from vtk import vtkActor
 from vtk import vtkConeSource
 from vtk import vtkDataSetMapper
-from PySide.QtCore import Signal
+from PySide2.QtCore import Signal
 
 
 class SurfacePicker(Picker, Interactor):
@@ -79,7 +79,7 @@ class SurfacePicker(Picker, Interactor):
 	def mouseMove(self, iren, event=""):
 		self.widget.rwi.HideCursor()
 		p, n = PickPoint(iren, self.widget.renderer, self.picker)
-		
+
 		self.redCone.SetPosition(p[0], p[1], p[2])
 		self.greenCone.SetPosition(p[0], p[1], p[2])
 		PointCone(self.redCone, n[0], n[1], n[2])

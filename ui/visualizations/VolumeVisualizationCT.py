@@ -5,16 +5,16 @@ VolumeVisualizationCT
 	Berend Klein Haneveld
 """
 import math
-from VolumeVisualization import VolumeVisualization
-from VolumeVisualization import VisualizationTypeCT
+from .VolumeVisualization import VolumeVisualization
+from .VolumeVisualization import VisualizationTypeCT
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from PySide.QtGui import QWidget
-from PySide.QtGui import QSlider
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
-from PySide.QtCore import Qt
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QSlider
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QLabel
+from PySide2.QtCore import Qt
 from core.decorators import overrides
 
 
@@ -119,8 +119,8 @@ class VolumeVisualizationCT(VolumeVisualization):
 			from ColumnResizer import ColumnResizer
 			columnResizer = ColumnResizer()
 			columnResizer.addWidgetsFromLayout(layout, 0)
-		except Exception, e:
-			print e
+		except Exception as e:
+			print(e)
 
 		widget = QWidget()
 		widget.setLayout(layout)

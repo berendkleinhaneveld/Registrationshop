@@ -5,10 +5,10 @@ MultiRenderController
 	Berend Klein Haneveld
 """
 
-from PySide.QtCore import QObject
-from PySide.QtCore import Slot
-from PySide.QtCore import Signal
-from PySide.QtGui import QWidget
+from PySide2.QtCore import QObject
+from PySide2.QtCore import Slot
+from PySide2.QtCore import Signal
+from PySide2.QtWidgets import QWidget
 from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data import DataReader
 from core.data import DataResizer
@@ -46,7 +46,7 @@ class MultiRenderController(QObject):
 		self.clippingBox = False
 		self.clippingPlanes = True
 
-	@Slot(basestring)
+	@Slot(str)
 	def setFixedFile(self, fileName):
 		"""
 		:type fileName: str
@@ -78,7 +78,7 @@ class MultiRenderController(QObject):
 		# Set the visualization type
 		self.setVisualizationType(self.visualizationType)
 
-	@Slot(basestring)
+	@Slot(str)
 	def setMovingFile(self, fileName):
 		if fileName is None:
 			self.movingImageData = None

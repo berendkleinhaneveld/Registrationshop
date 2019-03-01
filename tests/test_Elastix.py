@@ -20,7 +20,7 @@ class ElastixTest(unittest.TestCase):
 		if not hasattr(self, "path"):
 			# Get the path of the current test
 			self.path = os.path.dirname(os.path.abspath(__file__))
-		
+
 		# Create paths to some data sets
 		movingData = self.path + "/data/hi-5.mhd"
 		fixedData = self.path + "/data/hi-3.mhd"
@@ -49,11 +49,11 @@ class ElastixTest(unittest.TestCase):
 		try:
 			if os.path.exists(outputFolder):
 				shutil.rmtree(outputFolder)
-		except Exception, e:
+		except Exception as e:
 			raise e
 
 	def testProcessingInvalidTaskRaisesException(self):
 		# Create incomplete task (is missing command)
 		otherTask = ElastixCommand()
-		
+
 		self.assertRaises(Exception, Elastix.process, otherTask)

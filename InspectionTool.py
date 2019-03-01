@@ -5,14 +5,14 @@ CompareWidget
 	Berend Klein Haneveld
 """
 
-from PySide.QtGui import QApplication
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
-from PySide.QtGui import QHBoxLayout
-from PySide.QtCore import QObject
-from PySide.QtCore import Slot
-from PySide.QtCore import Qt
+from PySide2.QtWidgets import QApplication
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QLabel
+from PySide2.QtWidgets import QHBoxLayout
+from PySide2.QtCore import QObject
+from PySide2.QtCore import Slot
+from PySide2.QtCore import Qt
 from core.data.DataReader import DataReader
 from core.data.DataTransformer import DataTransformer
 from core.data.DataResizer import DataResizer
@@ -82,8 +82,8 @@ class ComparisonController(QObject):
 
 		blue = [0, 127, 255]
 		orange = [255, 127, 0]
-		blue = map(lambda x: x / 255.0, blue)
-		orange = map(lambda x: x / 255.0, orange)
+		blue = [x / 255.0 for x in  blue]
+		orange = [x / 255.0 for x in orange]
 		self.fixedImageWidget = SliceViewerWidget()
 		self.fixedImageWidget.color = orange
 		self.movingImageWidget = SliceViewerWidget()
@@ -249,7 +249,7 @@ if __name__ == '__main__':
 	from core.AppVars import AppVars
 	fixedDataName = AppVars.dataPath() + "Block1.mhd"
 	movingDataName = AppVars.dataPath() + "Block2.mhd"
-	
+
 	controller = ComparisonController()
 	controller.setInputData(fixedDataName, movingDataName)
 	widget = CompareWidget(controller.widgets)

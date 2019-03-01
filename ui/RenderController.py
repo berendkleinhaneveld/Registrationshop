@@ -13,10 +13,10 @@ widget that it should update.
 	Berend Klein Haneveld
 """
 
-from PySide.QtCore import QObject
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
-from PySide.QtGui import QWidget
+from PySide2.QtCore import QObject
+from PySide2.QtCore import Signal
+from PySide2.QtCore import Slot
+from PySide2.QtWidgets import QWidget
 from ui.visualizations import VisualizationTypeSimple
 from ui.visualizations import VisualizationTypeMIP
 from ui.visualizations import VolumeVisualizationFactory
@@ -67,7 +67,7 @@ class RenderController(QObject):
 		self.clippingPlanes = True
 		self.tag = tag
 
-	@Slot(basestring)
+	@Slot(str)
 	def setFile(self, fileName):
 		"""
 		:type fileName: str

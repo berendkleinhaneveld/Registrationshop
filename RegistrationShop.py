@@ -19,18 +19,18 @@ for path in relPaths:
 	sys.path.append(os.path.join(rootDir, path))
 
 # PySide stuff
-from PySide.QtGui import QMainWindow
-from PySide.QtGui import QApplication
-from PySide.QtGui import QAction
-from PySide.QtGui import QIcon
-from PySide.QtGui import QFileDialog
-from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QWidget
-from PySide.QtGui import QSizePolicy
-from PySide.QtGui import QSplitter
-from PySide.QtCore import Qt
-from PySide.QtCore import Slot
+from PySide2.QtWidgets import QMainWindow
+from PySide2.QtWidgets import QApplication
+from PySide2.QtWidgets import QAction
+from PySide2.QtGui import QIcon
+from PySide2.QtWidgets import QFileDialog
+from PySide2.QtWidgets import QHBoxLayout
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QSizePolicy
+from PySide2.QtWidgets import QSplitter
+from PySide2.QtCore import Qt
+from PySide2.QtCore import Slot
 
 # Import core stuff
 from core import AppVars
@@ -562,7 +562,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 		or project folder.
 
 		:param folderName: Name of a folder with a project
-		:type folderName: basestring
+		:type folderName: str
 		"""
 		fileName = ""
 		if folderName:
@@ -578,9 +578,9 @@ class RegistrationShop(MainWindow, WindowDialog):
 				if loaded:
 					RegistrationShop.settings.setValue("project/lastProject", fileName)
 				else:
-					print "Couldn't load project:", folderName
+					print("Couldn't load project:", folderName)
 			else:
-				print "Warning: Project file does not exist"
+				print("Warning: Project file does not exist")
 				RegistrationShop.settings.remove("project/lastProject")
 
 	@Slot()
@@ -652,7 +652,7 @@ def main():
 	# Fix for PySide on OSX Mavericks
 	import sys
 	if sys.platform.startswith("darwin"):
-		from PySide.QtGui import QFont
+		from PySide2.QtWidgets import QFont
 		QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")
 
 	app = QApplication(sys.argv)

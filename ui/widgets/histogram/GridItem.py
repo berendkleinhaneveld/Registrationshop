@@ -8,8 +8,8 @@ from Exposure Render (http://code.google.com/p/exposure-render/)
 	T. Kroes <t.kroes@tudelft.nl>
 	B. Klein Haneveld <b.a.kleinhaneveld@student.tudelft.nl>
 """
-from PySide.QtGui import *
-from PySide.QtCore import *
+from PySide2.QtWidgets import *
+from PySide2.QtCore import *
 
 
 class GridItem(QGraphicsRectItem):
@@ -22,7 +22,7 @@ class GridItem(QGraphicsRectItem):
 
 		self._brush = QBrush()
 		self._pen = QPen()
-		
+
 		self._font = QFont()
 		self._font.setFamily("Arial")
 		self._font.setPointSize(8)

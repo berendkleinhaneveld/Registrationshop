@@ -4,7 +4,7 @@ UserTransformationTool (TransformationTool)
 :Authors:
 	Berend Klein Haneveld
 """
-from TransformationTool import TransformationTool
+from .TransformationTool import TransformationTool
 from core.decorators import overrides
 from ui.transformations import TransformBox
 from ui.transformations import Transformation
@@ -12,14 +12,14 @@ from ui.widgets.StatusWidget import StatusWidget
 from core.project import ProjectController
 from vtk import vtkTransform
 from vtk import vtkMatrix4x4
-from PySide.QtGui import QLabel
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLineEdit
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QDoubleValidator
-from PySide.QtGui import QSizePolicy
-from PySide.QtCore import Slot
-from PySide.QtCore import Qt
+from PySide2.QtWidgets import QLabel
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QLineEdit
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtGui import QDoubleValidator
+from PySide2.QtWidgets import QSizePolicy
+from PySide2.QtCore import Slot
+from PySide2.QtCore import Qt
 
 
 class UserTransformationTool(TransformationTool):
@@ -78,13 +78,13 @@ class UserTransformationTool(TransformationTool):
 		expandingWidget = QWidget()
 		expandingWidget.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
 		matrixLayout.addWidget(expandingWidget, 5, 0, 1, 4)
-		
+
 		matrixWidget = QWidget()
 		matrixWidget.setLayout(matrixLayout)
 		self.transformUpdated(self.renderWidget.transformations.completeTransform())
 
 		return matrixWidget
-	
+
 	@Slot()
 	def transformBoxUpdated(self, transform):
 		transformation = self.renderWidget.transformations[-1]
@@ -110,7 +110,7 @@ class UserTransformationTool(TransformationTool):
 		self._updateText(self.m2Edits, values[4:8])
 		self._updateText(self.m3Edits, values[8:12])
 		self._updateText(self.m4Edits, values[12:16])
-	
+
 	def initLineEdits(self, lineEdits, layout, row, colOffset):
 		colIndex = 0
 		for lineEdit in lineEdits:
@@ -123,7 +123,7 @@ class UserTransformationTool(TransformationTool):
 
 	def updateTransformFromText(self, text):
 		transform = vtkTransform()
-	
+
 		line1 = self._readArrayOfValues(self.m1Edits)
 		line2 = self._readArrayOfValues(self.m2Edits)
 		line3 = self._readArrayOfValues(self.m3Edits)

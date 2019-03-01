@@ -6,7 +6,7 @@ AppResources
 """
 
 import os
-from AppVars import AppVars
+from .AppVars import AppVars
 from core.elastix import ParameterList
 
 
@@ -27,8 +27,8 @@ class AppResources(object):
 		through the resource folder. For now it just combines the AppVars
 		imagePath with the imageName.
 
-		:type imageName: basestring
-		:rtype: basestring
+		:type imageName: str
+		:rtype: str
 		"""
 		return os.path.join(AppVars.imagePath(), imageName)
 

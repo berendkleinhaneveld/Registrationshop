@@ -54,19 +54,19 @@ def overrides(interface_class):
     """
     Use this to override a method explicitely. It will check for the existance
     of an attribute or function with the same name in the superclass. Method
-    foot print is not checked (yet). But at least it will fail when typos are
+    foot print()is not checked (yet). But at least it will fail when typos are
     made or when refactoring goes wrong.
 
     Example of usage:
 
     class A:
         def someFunction(self):
-            print "function of A"
+            print()"function of A"
 
     class B(A):
         @overrides(A)
         def someFunction(self):
-            print "function of B"
+            print()"function of B"
 
     """
     def overrider(method):

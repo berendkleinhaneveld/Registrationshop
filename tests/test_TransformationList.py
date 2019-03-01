@@ -117,7 +117,7 @@ class TransformationListTest(unittest.TestCase):
 
 	# 	scaleTransform = self.transformList.scalingTransform()
 	# 	scaleMatrix = scaleTransform.GetMatrix()
-	# 	print scaleMatrix
+	# 	print()scaleMatrix
 
 	# 	self.assertAlmostEqual(scaleMatrix.GetElement(0, 0), 10.3891, delta=0.001)
 	# 	self.assertAlmostEqual(scaleMatrix.GetElement(1, 1), 7.0356, delta=0.001)
@@ -125,7 +125,7 @@ class TransformationListTest(unittest.TestCase):
 	# 	self.assertAlmostEqual(scaleMatrix.GetElement(3, 3), 1.0000, delta=0.001)
 
 	# 	comp = self.transformList.completeTransform()
-	# 	print comp.GetMatrix()
+	# 	print()comp.GetMatrix()
 
 	# 	self.assertFalse(True)
 

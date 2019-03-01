@@ -22,7 +22,7 @@ pip install -U pyyaml
 pip install -U PySide  # Will take a while...
 ```
 
-If installing PySide doesn't work, you can perform the next steps (steps from http://pyside.readthedocs.org/en/latest/building/linux.html):
+If installing PySide doesn't work, you can perform the next steps (steps from http://PySide2.readthedocs.org/en/latest/building/linux.html):
 
 ```bash
 wget https://pypi.python.org/packages/source/P/PySide/PySide-1.2.2.tar.gz
@@ -36,7 +36,7 @@ ldd ~/.local/lib/python2.7/site-packages/PySide/libpyside-python2.7.so.1.2
 The last step prints the dependencies of the shared library. If you see something like 'file not found' behind the shiboken line, then you'll need to perform the following steps as well (source: http://stackoverflow.com/questions/18369516/pyside-import-error-on-ubuntu-13-04):
 
 ```bash
-echo "$HOME/.local/lib/python2.7/site-packages/PySide" | sudo dd of=/etc/ld.so.conf.d/pyside.conf
+echo "$HOME/.local/lib/python2.7/site-packages/PySide" | sudo dd of=/etc/ld.so.conf.d/PySide2.conf
 sudo ldconfig
 ```
 

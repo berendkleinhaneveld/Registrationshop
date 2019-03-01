@@ -86,7 +86,7 @@ class ParameterTest(unittest.TestCase):
 		param = Parameter("Key", "False")
 		self.assertIsInstance(param.value(), bool)
 		param = Parameter("Key", "other")
-		self.assertIsInstance(param.value(), basestring)
+		self.assertIsInstance(param.value(), str)
 
 	def testListAsValue(self):
 		# Multiple values
@@ -131,12 +131,12 @@ class ParameterTest(unittest.TestCase):
 
 		param = Parameter.parameterFromString("( )")
 		self.assertIsNone(param)
-		
+
 		param = Parameter.parameterFromString("(a 1)")
 		self.assertIsNotNone(param)
 		self.assertEquals(param.key(), "a")
 		self.assertEquals(param.value(), 1)
-		
+
 		param = Parameter.parameterFromString("a (1)")
 		self.assertIsNone(param)
 

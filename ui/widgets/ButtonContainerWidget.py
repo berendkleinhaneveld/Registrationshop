@@ -9,17 +9,17 @@ they are displayed as flat buttons.
 	Berend Klein Haneveld 2013
 """
 
-from PySide import QtCore
-from PySide.QtGui import QWidget
-from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QVBoxLayout
-from PySide.QtGui import QPalette
-from PySide.QtGui import QBrush
-from PySide.QtGui import QPainter
-from PySide.QtCore import QPoint
-from PySide.QtGui import QLinearGradient
-from PySide.QtGui import QColor
-from PySide.QtCore import Qt
+from PySide2 import QtCore
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QHBoxLayout
+from PySide2.QtWidgets import QVBoxLayout
+from PySide2.QtGui import QPalette
+from PySide2.QtGui import QBrush
+from PySide2.QtGui import QPainter
+from PySide2.QtCore import QPoint
+from PySide2.QtGui import QLinearGradient
+from PySide2.QtGui import QColor
+from PySide2.QtCore import Qt
 import sys
 
 

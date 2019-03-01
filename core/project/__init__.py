@@ -1,2 +1,2 @@
-from Project import Project
-from ProjectController import ProjectController
+from .Project import Project
+from .ProjectController import ProjectController

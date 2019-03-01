@@ -9,7 +9,7 @@ class ElastixCommandTest(unittest.TestCase):
 		if not hasattr(self, "path"):
 			# Get the path of the current test
 			self.path = os.path.dirname(os.path.abspath(__file__))
-		
+
 		# Create paths to some data sets
 		movingData = self.path + "/data/hi-5.mhd"
 		fixedData = self.path + "/data/hi-3.mhd"
@@ -43,7 +43,7 @@ class ElastixCommandTest(unittest.TestCase):
 	def testCommandIsValidForCompleteParameter(self):
 		# self.command should be a valid parameter
 		self.assertTrue(self.command.isValid())
-		
+
 	def testCommandIsInvalidForTooDeepOutputDirectory(self):
 		self.assertTrue(self.command.isValid())
 		self.command.outputFolder = self.path + "/data/subfolder/tooDeep"
@@ -61,5 +61,5 @@ class ElastixCommandTest(unittest.TestCase):
 			if os.path.exists(self.command.outputFolder):
 				import shutil
 				shutil.rmtree(self.command.outputFolder)
-		except Exception, e:
+		except Exception as e:
 			raise e

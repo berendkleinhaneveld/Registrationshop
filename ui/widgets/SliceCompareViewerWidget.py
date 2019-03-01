@@ -13,10 +13,10 @@ from vtk import vtkColorTransferFunction
 from vtk import vtkDataSetMapper
 from vtk import vtkActor
 from vtk import vtkImageMathematics
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QWidget
-from PySide.QtCore import Signal
-from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QWidget
+from PySide2.QtCore import Signal
+from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.Interactor import Interactor
 from core.vtkDrawing import CreateSquare
 from core.vtkDrawing import CreateLine
@@ -82,7 +82,7 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 		self.rendererOverlay.GetActiveCamera().ShallowCopy(camera)
 
 	def charTyped(self, arg1, arg2):
-		# print arg1.GetKeyCode()
+		# print()arg1.GetKeyCode()
 		pass
 
 	def setLocatorPosition(self, position):
@@ -227,7 +227,7 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 			line2 = CreateLine([0, -width / 2.0, 0], [0, -10000, 0], color)
 			line3 = CreateLine([width / 2.0, 0, 0], [10000, 0, 0], color)
 			line4 = CreateLine([-width / 2.0, 0, 0], [-10000, 0, 0], color)
-			
+
 			self.locator = [square, line1, line2, line3, line4]  # , otherSquare]
 			for actor in self.locator:
 				self.rendererOverlay.AddViewProp(actor)

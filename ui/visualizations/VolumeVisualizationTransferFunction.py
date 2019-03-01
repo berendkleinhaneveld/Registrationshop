@@ -4,13 +4,13 @@ VolumeVisualizationTransferFunction
 :Authors:
 	Berend Klein Haneveld
 """
-from VolumeVisualization import VolumeVisualization
-from VolumeVisualization import VisualizationTypeTransferFunction
+from .VolumeVisualization import VolumeVisualization
+from .VolumeVisualization import VisualizationTypeTransferFunction
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QGridLayout
 from core.decorators import overrides
 from ui.widgets.transferfunction import TransferFunctionWidget
 from ui.widgets.transferfunction import TransferFunction

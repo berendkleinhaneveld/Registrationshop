@@ -15,10 +15,10 @@ from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
 from vtk import vtkVolumeProperty
 from vtk import VTK_FLOAT
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtCore import Signal
+from PySide2.QtCore import Slot
 from ui.transformations import TransformationList
 from ui.transformations import ClippingBox
 from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor

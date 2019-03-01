@@ -6,7 +6,7 @@ TransferFunctionEditor
 """
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
-from PySide.QtCore import QObject
+from PySide2.QtCore import QObject
 
 
 class TransferFunction(QObject):

@@ -5,10 +5,10 @@ MultiRenderPropWidget
 	Berend Klein Haneveld
 """
 
-from PySide.QtGui import QWidget
-from PySide.QtGui import QVBoxLayout
-from PySide.QtGui import QTabWidget
-from PySide.QtCore import Slot
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QVBoxLayout
+from PySide2.QtWidgets import QTabWidget
+from PySide2.QtCore import Slot
 from ui.parameters import RenderParameterWidget
 from ui.parameters import RenderSlicerParamWidget
 from ui.parameters import TransformationHistoryWidget
@@ -48,7 +48,7 @@ class MultiRenderPropWidget(QWidget):
 	def setTransformTool(self, transformTool):
 		if self.tabWidget.indexOf(self.transformParamWidget) < 0:
 			self.tabWidget.addTab(self.transformParamWidget, "Transformation")
-		
+
 		self.tabWidget.setCurrentWidget(self.transformParamWidget)
 		self.transformParamWidget.setTransformationTool(transformTool)
 

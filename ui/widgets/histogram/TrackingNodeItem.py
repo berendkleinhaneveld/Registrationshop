@@ -4,9 +4,9 @@ TrackingNodeItem
 :Authors:
 	Berend Klein Haneveld
 """
-from PySide.QtGui import *
-from PySide.QtCore import *
-from NodeItem import NodeItem
+from PySide2.QtWidgets import *
+from PySide2.QtCore import *
+from .NodeItem import NodeItem
 from core.decorators import overrides
 
 

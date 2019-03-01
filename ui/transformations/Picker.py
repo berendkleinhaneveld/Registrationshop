@@ -5,8 +5,8 @@ Picker
 	Berend Klein Haneveld
 """
 from ui.Interactor import Interactor
-from PySide.QtCore import Signal
-from PySide.QtCore import QObject
+from PySide2.QtCore import Signal
+from PySide2.QtCore import QObject
 
 
 class Picker(QObject, Interactor):

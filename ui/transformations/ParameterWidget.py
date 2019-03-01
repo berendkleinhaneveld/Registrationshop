@@ -4,11 +4,11 @@ ParameterWidget
 :Authors:
 	Berend Klein Haneveld 2013
 """
-from PySide.QtGui import QWidget
-from PySide.QtGui import QVBoxLayout
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QIcon
-from PySide.QtCore import Qt
+from PySide2.QtWidgets import QWidget
+from PySide2.QtWidgets import QVBoxLayout
+from PySide2.QtWidgets import QPushButton
+from PySide2.QtGui import QIcon
+from PySide2.QtCore import Qt
 from core.AppVars import AppVars
 from ui.widgets import ButtonContainer
 from ui.transformations import ParameterModel
@@ -24,7 +24,7 @@ class ParameterWidget(QWidget):
 		super(ParameterWidget, self).__init__()
 
 		self.initUI()
-		
+
 	def initUI(self):
 		# Create container for action buttons
 		self.actionContainer = ButtonContainer()
@@ -54,7 +54,7 @@ class ParameterWidget(QWidget):
 		removeButton.setIcon(QIcon(AppVars.imagePath() + "RemoveButton.png"))
 		removeButton.clicked.connect(self.removeButtonClicked)
 		self.actionContainer.addButton(removeButton)
-		
+
 	def addButtonClicked(self):
 		self.parameterView.addParameter()
 

@@ -13,12 +13,12 @@ class DataController(object):
 	"""
 	def __init__(self):
 		super(DataController, self).__init__()
-		
+
 		self.supportedExtensions = []
 
 	def IsExtensionSupported(self, extension):
 		"""
-		:type extension: basestring
+		:type extension: str
 		:rtype: bool
 		"""
 		result = False

@@ -5,12 +5,12 @@ ProjectController
 	Berend Klein Haneveld
 """
 
-from PySide.QtCore import QObject
-from PySide.QtCore import Slot
-from PySide.QtCore import Signal
+from PySide2.QtCore import QObject
+from PySide2.QtCore import Slot
+from PySide2.QtCore import Signal
 import yaml
 
-from Project import Project
+from .Project import Project
 from core.decorators import Singleton
 
 
@@ -22,8 +22,8 @@ class ProjectController(QObject):
 	"""
 
 	# Signals
-	fixedFileChanged = Signal(basestring)
-	movingFileChanged = Signal(basestring)
+	fixedFileChanged = Signal(str)
+	movingFileChanged = Signal(str)
 	fixedSettingsChanged = Signal(object)
 	movingSettingsChanged = Signal(object)
 	multiSettingsChanged = Signal(object)
@@ -62,8 +62,8 @@ class ProjectController(QObject):
 		try:
 			project = yaml.load(projectFile)
 			self.currentProject = project
-		except Exception, e:
-			print e
+		except Exception as e:
+			print(e)
 			return False
 
 		if not self.currentProject.isValid():
@@ -104,8 +104,8 @@ class ProjectController(QObject):
 			# Create a readable project file
 			yaml.dump(self.currentProject, projectFile, default_flow_style=False)
 			projectFile.close()
-		except Exception, e:
-			print e
+		except Exception as e:
+			print(e)
 			return False
 
 		# TODO:
@@ -130,12 +130,12 @@ class ProjectController(QObject):
 		self.multiSettingsChanged.emit(self.currentProject.multiSettings)
 
 	# Slots for signals of SlicerWidget
-	@Slot(basestring)
+	@Slot(str)
 	def loadFixedDataSet(self, name=None):
 		"""
 		Sets the name in the current project as the fixed data set filename
 		:param name: File name of fixed data set
-		:type name: basestring
+		:type name: str
 		"""
 		# TODO: some extra magic like checking if file exists
 		self.currentProject.fixedData = name
@@ -143,12 +143,12 @@ class ProjectController(QObject):
 		# Emit signal that data set file name has changed
 		self.fixedFileChanged.emit(self.currentProject.fixedData)
 
-	@Slot(basestring)
+	@Slot(str)
 	def loadMovingDataSet(self, name=None):
 		"""
 		Sets the name in the current project as the moving data set filename
 		:param name: File name of moving data set
-		:type name: basestring
+		:type name: str
 		"""
 		# TODO: some extra magic like checking if file exists
 		if name == self.currentProject.movingData:

@@ -26,14 +26,14 @@ class StrategyNode(object):
 	def __init__(self, fixedFile=None, movingFile=None, outputFolder=None):
 		"""
 		:param fixedData: Path to the fixed data set
-		:type fixedData: basestring
+		:type fixedData: str
 		:param movingData: Path to the moving data set
-		:type movingData: basestring
+		:type movingData: str
 		:param outputFolder: Path to where the output should be saved
-		:type outputFolder: basestring
+		:type outputFolder: str
 		"""
 		super(StrategyNode, self).__init__()
-		
+
 		# properties
 		self.incomingEdge = None
 		self.outgoingEdges = []
@@ -44,7 +44,7 @@ class StrategyNode(object):
 
 		self.outputFolder = outputFolder
 		self.dirty = False
-		
+
 
 class DataWrapper(object):
 	"""

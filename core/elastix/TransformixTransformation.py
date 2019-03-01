@@ -4,8 +4,8 @@ TransformixTransformation
 :Authors:
 	Berend Klein Haneveld
 """
-from ParameterList import ParameterList
-from Parameter import Parameter
+from .ParameterList import ParameterList
+from .Parameter import Parameter
 from core.data import DataReader
 from vtk import vtkMatrix4x4
 

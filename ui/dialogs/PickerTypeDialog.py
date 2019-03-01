@@ -4,15 +4,15 @@ PickerTypeDialog
 :Authors:
 	Berend Klein Haneveld
 """
-from PySide.QtGui import QDialog
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QVBoxLayout
-from PySide.QtGui import QRadioButton
-from PySide.QtGui import QGroupBox
-from PySide.QtGui import QButtonGroup
-from PySide.QtGui import QPushButton
-from PySide.QtCore import Qt
-from PySide.QtCore import Slot
+from PySide2.QtWidgets import QDialog
+from PySide2.QtWidgets import QGridLayout
+from PySide2.QtWidgets import QVBoxLayout
+from PySide2.QtWidgets import QRadioButton
+from PySide2.QtWidgets import QGroupBox
+from PySide2.QtWidgets import QButtonGroup
+from PySide2.QtWidgets import QPushButton
+from PySide2.QtCore import Qt
+from PySide2.QtCore import Slot
 from ui.transformations.LandmarkTransformationTool import SurfaceType
 from ui.transformations.LandmarkTransformationTool import TwoStepType
 
@@ -49,7 +49,7 @@ class PickerTypeDialog(QDialog):
 		groupLayout = QVBoxLayout()
 		for radioButton in self.radioButtons:
 			groupLayout.addWidget(radioButton)
-		
+
 		self.groupBox = QGroupBox("Choose picker type:")
 		self.groupBox.setLayout(groupLayout)
 

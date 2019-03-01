@@ -29,9 +29,9 @@ class AppVars(object):
 	@staticmethod
 	def setPath(path):
 		"""
-		:type path: basestring
+		:type path: str
 		"""
-		if not(isinstance(path, basestring)):
+		if not(isinstance(path, str)):
 			raise TypeError
 
 		if not os.path.exists(path) and os.path.isdir(path):
@@ -41,14 +41,14 @@ class AppVars(object):
 	@staticmethod
 	def path():
 		"""
-		:rtype: basestring
+		:rtype: str
 		"""
 		return AppVars.applicationPath
 
 	@staticmethod
 	def imagePath():
 		"""
-		:rtype: basestring
+		:rtype: str
 		"""
 		extension = "resources/images/"
 		if AppVars.applicationPath:
@@ -59,29 +59,29 @@ class AppVars(object):
 			else:
 				return extension
 		else:
-			print "Warning: application path is not set"
+			print("Warning: application path is not set")
 			return extension
 
 	@staticmethod
 	def transformationsPath():
 		"""
-		:rtype: basestring
+		:rtype: str
 		"""
 		extension = "resources/transformations/"
 		if AppVars.applicationPath:
 			return os.path.join(AppVars.applicationPath, extension)
 		else:
-			print "Warning: application path is not set"
+			print("Warning: application path is not set")
 			return extension
 
 	@staticmethod
 	def dataPath():
 		"""
-		:rtype: basestring
+		:rtype: str
 		"""
 		extension = "resources/data/"
 		if AppVars.applicationPath:
 			return os.path.join(AppVars.applicationPath, extension)
 		else:
-			print "Warning: application path is not set"
+			print("Warning: application path is not set")
 			return extension

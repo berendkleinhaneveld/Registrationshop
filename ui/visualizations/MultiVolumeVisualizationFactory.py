@@ -4,12 +4,12 @@ MultiVolumeVisualizationFactory
 :Authors:
 	Berend Klein Haneveld
 """
-from MultiVolumeVisualization import MultiVisualizationTypeMix
-from MultiVolumeVisualization import MultiVisualizationTypeMIP
-from MultiVolumeVisualization import MultiVisualizationTypeMIDA
-from MultiVolumeVisualizationMix import MultiVolumeVisualizationMix
-from MultiVolumeVisualizationMIP import MultiVolumeVisualizationMIP
-from MultiVolumeVisualizationMIDA import MultiVolumeVisualizationMIDA
+from .MultiVolumeVisualization import MultiVisualizationTypeMix
+from .MultiVolumeVisualization import MultiVisualizationTypeMIP
+from .MultiVolumeVisualization import MultiVisualizationTypeMIDA
+from .MultiVolumeVisualizationMix import MultiVolumeVisualizationMix
+from .MultiVolumeVisualizationMIP import MultiVolumeVisualizationMIP
+from .MultiVolumeVisualizationMIDA import MultiVolumeVisualizationMIDA
 
 
 class MultiVolumeVisualizationFactory(object):
@@ -29,6 +29,6 @@ class MultiVolumeVisualizationFactory(object):
 		elif visualizationType == MultiVisualizationTypeMIDA:
 			return MultiVolumeVisualizationMIDA()
 		else:
-			print "Warning: unknown visualizationType given:", visualizationType
+			print("Warning: unknown visualizationType given:", visualizationType)
 			return MultiVolumeVisualizationMix()
 			# assert False

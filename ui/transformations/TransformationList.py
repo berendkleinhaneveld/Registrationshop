@@ -5,9 +5,9 @@ TransformationList
 	Berend Klein Haneveld
 """
 from vtk import vtkTransform
-from PySide.QtCore import QObject
-from PySide.QtCore import Signal
-from Transformation import Transformation
+from PySide2.QtCore import QObject
+from PySide2.QtCore import Signal
+from .Transformation import Transformation
 from core.vtkObjectWrapper import vtkTransformWrapper
 from core.vtkDrawing import TransformWithMatrix
 from core.project import ProjectController
@@ -81,7 +81,7 @@ class TransformationList(QObject):
 		idx = index
 		if idx < len(self._transformations) and idx >= 0:
 			filename = self._transformations[idx].filename
-			# print filename
+			# print()filename
 			while idx >= 0 and self._transformations[idx].filename == filename:
 				tempTransform.Concatenate(self._transformations[idx].transform)
 				idx -= 1

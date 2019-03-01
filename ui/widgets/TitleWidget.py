@@ -6,14 +6,14 @@ TitleWidget
 """
 
 import sys
-from PySide.QtGui import QWidget
-from PySide.QtGui import QColor
-from PySide.QtGui import QLinearGradient
-from PySide.QtGui import QBrush
-from PySide.QtGui import QPalette
-from PySide.QtGui import QLabel
-from PySide.QtGui import QVBoxLayout
-from PySide.QtCore import Qt
+from PySide2.QtWidgets import QWidget
+from PySide2.QtGui import QColor
+from PySide2.QtGui import QLinearGradient
+from PySide2.QtGui import QBrush
+from PySide2.QtGui import QPalette
+from PySide2.QtWidgets import QLabel
+from PySide2.QtWidgets import QVBoxLayout
+from PySide2.QtCore import Qt
 
 
 class TitleWidget(QWidget):

@@ -6,7 +6,7 @@ ParameterList
 """
 
 import os
-from Parameter import Parameter
+from .Parameter import Parameter
 
 
 class ParameterList(object):
@@ -38,7 +38,7 @@ class ParameterList(object):
 		Reads a list of parameters from file. Returns whether it has succeeded
 		in doing so.
 
-		:type filename: basestring
+		:type filename: str
 		:rtype: bool
 		"""
 		directory, lastPathComponent = os.path.split(filename)
@@ -61,7 +61,7 @@ class ParameterList(object):
 						noErrors = False
 		except Exception:
 			noErrors = False
-			
+
 		return noErrors
 
 	def saveToFile(self, filename):
@@ -69,7 +69,7 @@ class ParameterList(object):
 		Saves a list of parameters to file. Returns whether it has succeeded in
 		doing so. Overwrites anything on the given path.
 
-		:type filename: basestring
+		:type filename: str
 		:rtype: bool
 		"""
 		lines = []
@@ -113,7 +113,7 @@ class ParameterList(object):
 		for x in self.parameters:
 			if x not in other.parameters:
 				return False
-		
+
 		for x in other.parameters:
 			if x not in self.parameters:
 				return False

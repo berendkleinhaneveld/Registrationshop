@@ -10,7 +10,7 @@ from vtk import vtkMetaImageReader
 from vtk import vtkXMLImageDataReader
 from vtk import vtkDICOMImageReader
 from vtk import vtkNrrdReader
-from DataController import DataController
+from .DataController import DataController
 import os
 
 
@@ -54,7 +54,7 @@ class DataReader(DataController):
 				return self.GetImageDataFromDirectory(fileName)
 			else:
 				# TODO: make this a proper Exception
-				print "Warning: directory does not contain DICOM files:", fileName
+				print("Warning: directory does not contain DICOM files:", fileName)
 				return None
 
 		baseFileName, extension = fileName.rsplit(".", 1)
@@ -65,8 +65,8 @@ class DataReader(DataController):
 
 	def GetImageDataForBaseAndExtension(self, fileName, extension):
 		"""
-		:type fileName: basestring
-		:type extension: basestring
+		:type fileName: str
+		:type extension: str
 		:rtype: vtkImageData
 		"""
 		if extension == DataReader.TypeMHA or extension == DataReader.TypeMHD:
