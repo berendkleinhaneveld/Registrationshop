@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "registrationshop"
+version = "0.1.0"
+description = "3D registration tool for medical purposes"
+authors = ["Berend Klein Haneveld <berendkleinhaneveld@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = ">=3.6.2,<3.10"
+PySide6 = "^6.1.2"
+
+[tool.poetry.dev-dependencies]
+black = "^21.6b0"
+flake8 = "^3.9.2"
+flake8-black = "^0.2.1"
+pytest = "^6.2.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
