@@ -2,7 +2,7 @@
 RenderPropWidget
 
 :Authors:
-	Berend Klein Haneveld
+    Berend Klein Haneveld
 """
 from PySide.QtGui import QWidget
 from PySide.QtGui import QPushButton
@@ -16,105 +16,106 @@ from ui.parameters import RenderSlicerParamWidget
 
 
 class RenderPropWidget(QWidget):
-	"""
-	RenderPropWidget is a widget that is displayed under the render widgets. It
-	contains a tabwidget in which information of the data can be displayed and
-	in which visualization parameters can be shown. One of the tabs is a
-	RenderParameterWidget object.
-	"""
-	def __init__(self, renderController, parent=None):
-		super(RenderPropWidget, self).__init__(parent=parent)
+    """
+    RenderPropWidget is a widget that is displayed under the render widgets. It
+    contains a tabwidget in which information of the data can be displayed and
+    in which visualization parameters can be shown. One of the tabs is a
+    RenderParameterWidget object.
+    """
 
-		# Three tabs: Visualization, data info and slices
-		self.visParamTabWidget = RenderParameterWidget(renderController)
-		self.dataInfoTabWidget = RenderInfoWidget()
-		self.slicesTabWidget = RenderSlicerParamWidget(renderController)
+    def __init__(self, renderController, parent=None):
+        super(RenderPropWidget, self).__init__(parent=parent)
 
-		# Create the load dataset widget
-		self.loadDataWidget = QWidget()
-		self.loadDataButton = QPushButton()
-		self.loadDataButton.setText("Load a dataset")
+        # Three tabs: Visualization, data info and slices
+        self.visParamTabWidget = RenderParameterWidget(renderController)
+        self.dataInfoTabWidget = RenderInfoWidget()
+        self.slicesTabWidget = RenderSlicerParamWidget(renderController)
 
-		layout = QVBoxLayout()
-		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(self.loadDataButton)
-		self.loadDataWidget.setLayout(layout)
+        # Create the load dataset widget
+        self.loadDataWidget = QWidget()
+        self.loadDataButton = QPushButton()
+        self.loadDataButton.setText("Load a dataset")
 
-		# Create the tab widget
-		self.tabWidget = QTabWidget()
-		self.tabWidget.addTab(self.visParamTabWidget, "Visualization")
-		self.tabWidget.addTab(self.slicesTabWidget, "Slices")
-		self.tabWidget.addTab(self.dataInfoTabWidget, "Data info")
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignTop)
+        layout.addWidget(self.loadDataButton)
+        self.loadDataWidget.setLayout(layout)
 
-		self.currentTabIndex = 0
-		self.extraTabWidget = None
-		self.tabWidget.currentChanged.connect(self.tabIndexChanged)
+        # Create the tab widget
+        self.tabWidget = QTabWidget()
+        self.tabWidget.addTab(self.visParamTabWidget, "Visualization")
+        self.tabWidget.addTab(self.slicesTabWidget, "Slices")
+        self.tabWidget.addTab(self.dataInfoTabWidget, "Data info")
 
-		layout = QVBoxLayout()
-		layout.addWidget(self.loadDataWidget)
-		self.setLayout(layout)
+        self.currentTabIndex = 0
+        self.extraTabWidget = None
+        self.tabWidget.currentChanged.connect(self.tabIndexChanged)
 
-	def setFileChangedSignal(self, signal):
-		"""
-		:param signal: Signal that is connected to some file-loading slots.
-		:type signal: SIGNAL
-		"""
-		self.signal = signal
-		self.signal.connect(self.setFile)
-		self.signal.connect(self.dataInfoTabWidget.setFile)
+        layout = QVBoxLayout()
+        layout.addWidget(self.loadDataWidget)
+        self.setLayout(layout)
 
-	def setLoadDataSlot(self, slot):
-		"""
-		The button is connected to the given slot. The slot action should load
-		a dataset from disk.
+    def setFileChangedSignal(self, signal):
+        """
+        :param signal: Signal that is connected to some file-loading slots.
+        :type signal: SIGNAL
+        """
+        self.signal = signal
+        self.signal.connect(self.setFile)
+        self.signal.connect(self.dataInfoTabWidget.setFile)
 
-		:type slot: Slot
-		"""
-		self.loadDataButton.clicked.connect(slot)
+    def setLoadDataSlot(self, slot):
+        """
+        The button is connected to the given slot. The slot action should load
+        a dataset from disk.
 
-	@Slot(basestring)
-	def setFile(self, fileName):
-		"""
-		When a file is loaded, the 'load data' button is removed from the widget
-		and the actual tabs with parameters are put on screen.
-		"""
-		layout = self.layout()
-		if fileName is None:
-			if layout.indexOf(self.tabWidget) != -1:
-				# Remove the parameter widgets
-				layout.removeWidget(self.tabWidget)
-				self.tabWidget.setParent(None)
-				# Show the load data button
-				layout.addWidget(self.loadDataWidget)
-				self.setLayout(layout)
-		else:
-			if layout.indexOf(self.loadDataWidget) != -1:
-				# Remove the load data button
-				layout.removeWidget(self.loadDataWidget)
-				self.loadDataWidget.setParent(None)
-				# Add the parameter widgets
-				layout.addWidget(self.tabWidget)
-				self.setLayout(layout)
+        :type slot: Slot
+        """
+        self.loadDataButton.clicked.connect(slot)
 
-	@Slot(int)
-	def tabIndexChanged(self, index):
-		transformIndex = self.tabWidget.indexOf(self.extraTabWidget)
-		if index != transformIndex:
-			self.currentTabIndex = index
+    @Slot(str)
+    def setFile(self, fileName):
+        """
+        When a file is loaded, the 'load data' button is removed from the widget
+        and the actual tabs with parameters are put on screen.
+        """
+        layout = self.layout()
+        if fileName is None:
+            if layout.indexOf(self.tabWidget) != -1:
+                # Remove the parameter widgets
+                layout.removeWidget(self.tabWidget)
+                self.tabWidget.setParent(None)
+                # Show the load data button
+                layout.addWidget(self.loadDataWidget)
+                self.setLayout(layout)
+        else:
+            if layout.indexOf(self.loadDataWidget) != -1:
+                # Remove the load data button
+                layout.removeWidget(self.loadDataWidget)
+                self.loadDataWidget.setParent(None)
+                # Add the parameter widgets
+                layout.addWidget(self.tabWidget)
+                self.setLayout(layout)
 
-	def addTabWidget(self, widget, name):
-		self.extraTabWidget = widget
-		self.tabWidget.addTab(widget, name)
-		self.tabWidget.setCurrentWidget(self.extraTabWidget)
+    @Slot(int)
+    def tabIndexChanged(self, index):
+        transformIndex = self.tabWidget.indexOf(self.extraTabWidget)
+        if index != transformIndex:
+            self.currentTabIndex = index
 
-	def removeTabWidget(self):
-		if self.extraTabWidget is None:
-			return
+    def addTabWidget(self, widget, name):
+        self.extraTabWidget = widget
+        self.tabWidget.addTab(widget, name)
+        self.tabWidget.setCurrentWidget(self.extraTabWidget)
 
-		index = self.tabWidget.indexOf(self.extraTabWidget)
-		if index >= 0:
-			# Restore the last tab index that wasn't the transform tab
-			self.tabWidget.setCurrentIndex(self.currentTabIndex)
-			self.tabWidget.removeTab(index)
+    def removeTabWidget(self):
+        if self.extraTabWidget is None:
+            return
 
-		self.extraTabWidget = None
+        index = self.tabWidget.indexOf(self.extraTabWidget)
+        if index >= 0:
+            # Restore the last tab index that wasn't the transform tab
+            self.tabWidget.setCurrentIndex(self.currentTabIndex)
+            self.tabWidget.removeTab(index)
+
+        self.extraTabWidget = None

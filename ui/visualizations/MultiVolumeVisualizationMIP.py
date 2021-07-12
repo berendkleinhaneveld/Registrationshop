@@ -2,7 +2,7 @@
 MultiVolumeVisualizationMIP
 
 :Authors:
-	Berend Klein Haneveld
+    Berend Klein Haneveld
 """
 from MultiVolumeVisualization import MultiVolumeVisualization
 from MultiVolumeVisualization import CreateEmptyFunctions
@@ -17,62 +17,63 @@ from vtk import vtkVolumeProperty
 
 
 class MultiVolumeVisualizationMIP(MultiVolumeVisualization):
-	"""
-	MultiVolumeVisualizationMIP is a visualization that shows
-	MIP visualizations of both datasets and adds them
-	together. It uses complementary colors for the datasets
-	so that the visualization is white in the spots where
-	they are the same.
-	"""
-	def __init__(self):
-		super(MultiVolumeVisualizationMIP, self).__init__()
+    """
+    MultiVolumeVisualizationMIP is a visualization that shows
+    MIP visualizations of both datasets and adds them
+    together. It uses complementary colors for the datasets
+    so that the visualization is white in the spots where
+    they are the same.
+    """
 
-		self.fixedHue = 0
+    def __init__(self):
+        super(MultiVolumeVisualizationMIP, self).__init__()
 
-	@overrides(MultiVolumeVisualization)
-	def getParameterWidget(self):
-		self.hueSlider = QSlider(Qt.Horizontal)
-		self.hueSlider.setMaximum(360)
-		self.hueSlider.setValue(self.fixedHue)
-		self.hueSlider.valueChanged.connect(self.valueChanged)
+        self.fixedHue = 0
 
-		layout = QGridLayout()
-		layout.setAlignment(Qt.AlignTop)
-		layout.addWidget(QLabel("Base hue"), 0, 0)
-		layout.addWidget(self.hueSlider, 0, 1)
+    @overrides(MultiVolumeVisualization)
+    def getParameterWidget(self):
+        self.hueSlider = QSlider(Qt.Horizontal)
+        self.hueSlider.setMaximum(360)
+        self.hueSlider.setValue(self.fixedHue)
+        self.hueSlider.valueChanged.connect(self.valueChanged)
 
-		widget = QWidget()
-		widget.setLayout(layout)
-		return widget
+        layout = QGridLayout()
+        layout.setAlignment(Qt.AlignTop)
+        layout.addWidget(QLabel("Base hue"), 0, 0)
+        layout.addWidget(self.hueSlider, 0, 1)
 
-	@overrides(MultiVolumeVisualization)
-	def setImageData(self, fixedImageData, movingImageData):
-		self.fixedImageData = fixedImageData
-		self.movingImageData = movingImageData
+        widget = QWidget()
+        widget.setLayout(layout)
+        return widget
 
-	@overrides(MultiVolumeVisualization)
-	def updateTransferFunctions(self):
-		self.fixedVolProp = self._createVolPropFromImageData(self.fixedImageData)
-		self.movingVolProp = self._createVolPropFromImageData(self.movingImageData)
+    @overrides(MultiVolumeVisualization)
+    def setImageData(self, fixedImageData, movingImageData):
+        self.fixedImageData = fixedImageData
+        self.movingImageData = movingImageData
 
-		self.updatedTransferFunction.emit()
+    @overrides(MultiVolumeVisualization)
+    def updateTransferFunctions(self):
+        self.fixedVolProp = self._createVolPropFromImageData(self.fixedImageData)
+        self.movingVolProp = self._createVolPropFromImageData(self.movingImageData)
 
-	@overrides(MultiVolumeVisualization)
-	def valueChanged(self, value):
-		self.fixedHue = self.hueSlider.value()
-		self.updateTransferFunctions()
+        self.updatedTransferFunction.emit()
 
-	@overrides(MultiVolumeVisualization)
-	def setMapper(self, mapper):
-		self.mapper = mapper
+    @overrides(MultiVolumeVisualization)
+    def valueChanged(self, value):
+        self.fixedHue = self.hueSlider.value()
+        self.updateTransferFunctions()
 
-	def _createVolPropFromImageData(self, imageData):
-		volProp = vtkVolumeProperty()
-		if imageData is not None:
-			color, opacityFunction = CreateRangeFunctions(imageData)
-		else:
-			color, opacityFunction = CreateEmptyFunctions()
-		volProp.SetColor(color)
-		volProp.SetScalarOpacity(opacityFunction)
+    @overrides(MultiVolumeVisualization)
+    def setMapper(self, mapper):
+        self.mapper = mapper
 
-		return volProp
+    def _createVolPropFromImageData(self, imageData):
+        volProp = vtkVolumeProperty()
+        if imageData is not None:
+            color, opacityFunction = CreateRangeFunctions(imageData)
+        else:
+            color, opacityFunction = CreateEmptyFunctions()
+        volProp.SetColor(color)
+        volProp.SetScalarOpacity(opacityFunction)
+
+        return volProp

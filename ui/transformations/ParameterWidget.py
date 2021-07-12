@@ -2,7 +2,7 @@
 ParameterWidget
 
 :Authors:
-	Berend Klein Haneveld 2013
+    Berend Klein Haneveld 2013
 """
 from PySide.QtGui import QWidget
 from PySide.QtGui import QVBoxLayout
@@ -16,47 +16,48 @@ from ui.transformations import ParameterListView
 
 
 class ParameterWidget(QWidget):
-	"""
-	Widget that displays parameters. Holds buttons for
-	acting on the parameters.
-	"""
-	def __init__(self):
-		super(ParameterWidget, self).__init__()
+    """
+    Widget that displays parameters. Holds buttons for
+    acting on the parameters.
+    """
 
-		self.initUI()
-		
-	def initUI(self):
-		# Create container for action buttons
-		self.actionContainer = ButtonContainer()
-		self.parameterModel = ParameterModel()
+    def __init__(self):
+        super(ParameterWidget, self).__init__()
 
-		self.parameterView = ParameterListView()
-		self.parameterView.setAttribute(Qt.WA_MacShowFocusRect, False)
-		self.parameterView.setRootIsDecorated(False)
-		self.parameterView.setModel(self.parameterModel)
+        self.initUI()
 
-		# Create a main layout (vertical) for this widget
-		self.layout = QVBoxLayout()
-		self.layout.setSpacing(0)
-		self.layout.setContentsMargins(0, 0, 0, 0)
-		self.layout.addWidget(self.parameterView)
-		self.layout.addWidget(self.actionContainer)
+    def initUI(self):
+        # Create container for action buttons
+        self.actionContainer = ButtonContainer()
+        self.parameterModel = ParameterModel()
 
-		self.setLayout(self.layout)
+        self.parameterView = ParameterListView()
+        self.parameterView.setAttribute(Qt.WA_MacShowFocusRect, False)
+        self.parameterView.setRootIsDecorated(False)
+        self.parameterView.setModel(self.parameterModel)
 
-		# Add a button to the container
-		addButton = QPushButton()
-		addButton.setIcon(QIcon(AppVars.imagePath() + "AddButton.png"))
-		addButton.clicked.connect(self.addButtonClicked)
-		self.actionContainer.addButton(addButton)
+        # Create a main layout (vertical) for this widget
+        self.layout = QVBoxLayout()
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.addWidget(self.parameterView)
+        self.layout.addWidget(self.actionContainer)
 
-		removeButton = QPushButton()
-		removeButton.setIcon(QIcon(AppVars.imagePath() + "RemoveButton.png"))
-		removeButton.clicked.connect(self.removeButtonClicked)
-		self.actionContainer.addButton(removeButton)
-		
-	def addButtonClicked(self):
-		self.parameterView.addParameter()
+        self.setLayout(self.layout)
 
-	def removeButtonClicked(self):
-		self.parameterView.removeSelectedParameter()
+        # Add a button to the container
+        addButton = QPushButton()
+        addButton.setIcon(QIcon(AppVars.imagePath() + "AddButton.png"))
+        addButton.clicked.connect(self.addButtonClicked)
+        self.actionContainer.addButton(addButton)
+
+        removeButton = QPushButton()
+        removeButton.setIcon(QIcon(AppVars.imagePath() + "RemoveButton.png"))
+        removeButton.clicked.connect(self.removeButtonClicked)
+        self.actionContainer.addButton(removeButton)
+
+    def addButtonClicked(self):
+        self.parameterView.addParameter()
+
+    def removeButtonClicked(self):
+        self.parameterView.removeSelectedParameter()

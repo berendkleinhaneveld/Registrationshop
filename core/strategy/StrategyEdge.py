@@ -2,90 +2,92 @@
 StrategyEdge
 
 :Authors:
-	Berend Klein Haneveld
+    Berend Klein Haneveld
 """
 
 
 class StrategyEdge(object):
-	"""
-	An edge is the relation between two nodes. It contains the transformation
-	that is applied to node A to get the result at node B. It also knows the
-	parameters with which the transformation was made (with elastix). So that
-	this can be adjusted / tweaked later by the user.
-	An edge can be seen as the function that is applied to a dataset from a
-	node. Custom edges should be supported that can modify / play with the
-	data. These edges need to support custom modules / code from the user.
+    """
+    An edge is the relation between two nodes. It contains the transformation
+    that is applied to node A to get the result at node B. It also knows the
+    parameters with which the transformation was made (with elastix). So that
+    this can be adjusted / tweaked later by the user.
+    An edge can be seen as the function that is applied to a dataset from a
+    node. Custom edges should be supported that can modify / play with the
+    data. These edges need to support custom modules / code from the user.
 
-	- Transformation
-	- Transformation parameters
-	- Node (parent)
-	- Node (child)
-	"""
-	def __init__(self, parent=None, child=None, operation=None):
-		"""
-		:param parent: Parent node of the edge to be constructed
-		:type parent: StrategyNode
-		:param child: Child node of the edge to be constructed
-		:type child: StrategyNode
-		:param operation: Transformation that this edge will represent
-		:type operation: Transformation
-		"""
-		super(StrategyEdge, self).__init__()
+    - Transformation
+    - Transformation parameters
+    - Node (parent)
+    - Node (child)
+    """
 
-		# define properties
-		self.parentNode = parent
-		self.childNode = None
-		self.operation = None
+    def __init__(self, parent=None, child=None, operation=None):
+        """
+        :param parent: Parent node of the edge to be constructed
+        :type parent: StrategyNode
+        :param child: Child node of the edge to be constructed
+        :type child: StrategyNode
+        :param operation: Transformation that this edge will represent
+        :type operation: Transformation
+        """
+        super(StrategyEdge, self).__init__()
 
-	# def execute(self):
-	# 	"""
-	# 	Call Elastix to execute the transformation.
-	# 	Needed at least:
-	# 	- Fixed data set (also from parent node)
-	# 	- Moving data set (from parent node)
-	# 	- Parameter file (made from transformation)
+        # define properties
+        self.parentNode = parent
+        self.childNode = None
+        self.operation = None
 
-	# 	TODO: this will be replaced by the ElastixCommand and ElastixTask system
-	# 	"""
-	# 	assert self.parentNode is not None
-	# 	assert self.childNode is not None
-	# 	assert self.transformation is not None
-	# 	assert self.parentNode.moving.filename is not None
-	# 	assert self.parentNode.fixed.filename is not None
-	# 	assert self.parentNode.outputFolder is not None
-	# 	assert self.childNode.outputFolder is not None
+    # def execute(self):
+    #   """
+    #   Call Elastix to execute the transformation.
+    #   Needed at least:
+    #   - Fixed data set (also from parent node)
+    #   - Moving data set (from parent node)
+    #   - Parameter file (made from transformation)
 
-	# 	# Create a parameter file of the transformation in the output folder
-	# 	# of the parent node (next to the (moving) input data)
-	# 	parameterFile = self.parentNode.outputFolder + "/TransformationParameters.txt"
-	# 	self.transformation.saveToFile(parameterFile)
-	# 	assert os.path.exists(parameterFile)
+    #   TODO: this will be replaced by the ElastixCommand and ElastixTask system
+    #   """
+    #   assert self.parentNode is not None
+    #   assert self.childNode is not None
+    #   assert self.transformation is not None
+    #   assert self.parentNode.moving.filename is not None
+    #   assert self.parentNode.fixed.filename is not None
+    #   assert self.parentNode.outputFolder is not None
+    #   assert self.childNode.outputFolder is not None
 
-	# 	# Ensure that the output folder actually exists before calling Elastix
-	# 	if not os.path.exists(self.childNode.outputFolder):
-	# 		os.makedirs(self.childNode.outputFolder)
+    #   # Create a parameter file of the transformation in the output folder
+    #   # of the parent node (next to the (moving) input data)
+    #   parameterFile = self.parentNode.outputFolder + "/TransformationParameters.txt"
+    #   self.transformation.saveToFile(parameterFile)
+    #   assert os.path.exists(parameterFile)
 
-	# 	# Create Elastix command with the right parameters
-	# 	# TODO: build some class or thing to actually call Elastix instead of
-	# 	# calling directly from the StrategyEdge class
-	# 	command = ["elastix",
-	# 		"-m", self.parentNode.moving.filename,
-	# 		"-f", self.parentNode.fixed.filename,
-	# 		"-out", self.childNode.outputFolder,
-	# 		"-p", parameterFile]
+    #   # Ensure that the output folder actually exists before calling Elastix
+    #   if not os.path.exists(self.childNode.outputFolder):
+    #       os.makedirs(self.childNode.outputFolder)
 
-	# 	# Try and call elastix
-	# 	try:
-	# 		return_code = subprocess.check_call(command)
-	# 		# TODO: call transformix if (WriteResultImage "true") was set to false
-	# 		self.childNode.moving.filename = self.childNode.outputFolder + "/result.0.mhd"
-	# 		self.childNode.dirty = False
-	# 		del return_code
-	# 	except:
-	# 		print "Image registration failed with command:"
-	# 		print command
-	# 		print "More detailed info:"
-	# 		print sys.exc_info()
+    #   # Create Elastix command with the right parameters
+    #   # TODO: build some class or thing to actually call Elastix instead of
+    #   # calling directly from the StrategyEdge class
+    #   command = ["elastix",
+    #       "-m", self.parentNode.moving.filename,
+    #       "-f", self.parentNode.fixed.filename,
+    #       "-out", self.childNode.outputFolder,
+    #       "-p", parameterFile]
 
-	# 	assert self.childNode.moving.filename is not None
-	# 	assert self.childNode.dirty is False
+    #   # Try and call elastix
+    #   try:
+    #       return_code = subprocess.check_call(command)
+    #       # TODO: call transformix if (WriteResultImage "true") was set to false
+    #       self.childNode.moving.filename
+    #            = self.childNode.outputFolder + "/result.0.mhd"
+    #       self.childNode.dirty = False
+    #       del return_code
+    #   except:
+    #       print "Image registration failed with command:"
+    #       print command
+    #       print "More detailed info:"
+    #       print sys.exc_info()
+
+    #   assert self.childNode.moving.filename is not None
+    #   assert self.childNode.dirty is False

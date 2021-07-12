@@ -1,4 +1,4 @@
-from TransferFunction import TransferFunction
-from TransferFunctionItem import TransferFunctionItem
-from TransferFunctionNodeItem import TransferFunctionNodeItem
-from TransferFunctionWidget import TransferFunctionWidget
+from TransferFunction import TransferFunction  # noqa: F401
+from TransferFunctionItem import TransferFunctionItem  # noqa: F401
+from TransferFunctionNodeItem import TransferFunctionNodeItem  # noqa: F401
+from TransferFunctionWidget import TransferFunctionWidget  # noqa: F401

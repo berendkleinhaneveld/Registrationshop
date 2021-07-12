@@ -2,7 +2,7 @@
 MultiRenderPropWidget
 
 :Authors:
-	Berend Klein Haneveld
+    Berend Klein Haneveld
 """
 
 from PySide.QtGui import QWidget
@@ -16,51 +16,54 @@ from ui.parameters import TransformationParameterWidget
 
 
 class MultiRenderPropWidget(QWidget):
-	"""
-	MultiRenderPropWidget is a widget that is displayed under the multi render
-	widget. It contains tabs with some controls for interaction and
-	visualization of the combined / multi-volume render widget.
-	"""
-	def __init__(self, multiRenderController, parent=None):
-		super(MultiRenderPropWidget, self).__init__(parent=parent)
+    """
+    MultiRenderPropWidget is a widget that is displayed under the multi render
+    widget. It contains tabs with some controls for interaction and
+    visualization of the combined / multi-volume render widget.
+    """
 
-		# Two tabs: Visualization and Data info
-		self.mixParamWidget = RenderParameterWidget(multiRenderController)
-		self.transformParamWidget = TransformationParameterWidget()
-		self.registrationHistoryWidget = TransformationHistoryWidget()
-		self.slicesTabWidget = RenderSlicerParamWidget(multiRenderController)
+    def __init__(self, multiRenderController, parent=None):
+        super(MultiRenderPropWidget, self).__init__(parent=parent)
 
-		# Create the tab widget
-		self.tabWidget = QTabWidget()
-		self.tabWidget.addTab(self.mixParamWidget, "Visualization")
-		self.tabWidget.addTab(self.registrationHistoryWidget, "History")
-		self.tabWidget.addTab(self.slicesTabWidget, "Slices")
+        # Two tabs: Visualization and Data info
+        self.mixParamWidget = RenderParameterWidget(multiRenderController)
+        self.transformParamWidget = TransformationParameterWidget()
+        self.registrationHistoryWidget = TransformationHistoryWidget()
+        self.slicesTabWidget = RenderSlicerParamWidget(multiRenderController)
 
-		self.currentTabIndex = 0
-		self.tabWidget.currentChanged.connect(self.tabIndexChanged)
+        # Create the tab widget
+        self.tabWidget = QTabWidget()
+        self.tabWidget.addTab(self.mixParamWidget, "Visualization")
+        self.tabWidget.addTab(self.registrationHistoryWidget, "History")
+        self.tabWidget.addTab(self.slicesTabWidget, "Slices")
 
-		layout = QVBoxLayout()
-		self.setLayout(layout)
-		layout.addWidget(self.tabWidget)
+        self.currentTabIndex = 0
+        self.tabWidget.currentChanged.connect(self.tabIndexChanged)
 
-		self.registrationHistoryWidget.setMultiRenderWidget(multiRenderController.multiRenderWidget)
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        layout.addWidget(self.tabWidget)
 
-	def setTransformTool(self, transformTool):
-		if self.tabWidget.indexOf(self.transformParamWidget) < 0:
-			self.tabWidget.addTab(self.transformParamWidget, "Transformation")
-		
-		self.tabWidget.setCurrentWidget(self.transformParamWidget)
-		self.transformParamWidget.setTransformationTool(transformTool)
+        self.registrationHistoryWidget.setMultiRenderWidget(
+            multiRenderController.multiRenderWidget
+        )
 
-	def transformToolFinished(self):
-		index = self.tabWidget.indexOf(self.transformParamWidget)
-		if index >= 0:
-			# Restore the last tab index that wasn't the transform tab
-			self.tabWidget.setCurrentIndex(self.currentTabIndex)
-			self.tabWidget.removeTab(index)
+    def setTransformTool(self, transformTool):
+        if self.tabWidget.indexOf(self.transformParamWidget) < 0:
+            self.tabWidget.addTab(self.transformParamWidget, "Transformation")
 
-	@Slot(int)
-	def tabIndexChanged(self, index):
-		transformIndex = self.tabWidget.indexOf(self.transformParamWidget)
-		if index != transformIndex:
-			self.currentTabIndex = index
+        self.tabWidget.setCurrentWidget(self.transformParamWidget)
+        self.transformParamWidget.setTransformationTool(transformTool)
+
+    def transformToolFinished(self):
+        index = self.tabWidget.indexOf(self.transformParamWidget)
+        if index >= 0:
+            # Restore the last tab index that wasn't the transform tab
+            self.tabWidget.setCurrentIndex(self.currentTabIndex)
+            self.tabWidget.removeTab(index)
+
+    @Slot(int)
+    def tabIndexChanged(self, index):
+        transformIndex = self.tabWidget.indexOf(self.transformParamWidget)
+        if index != transformIndex:
+            self.currentTabIndex = index

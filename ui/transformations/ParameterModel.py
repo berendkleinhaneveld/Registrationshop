@@ -2,7 +2,7 @@
 ParameterModel
 
 :Authors:
-	Berend Klein Haneveld
+    Berend Klein Haneveld
 """
 from PySide.QtCore import QAbstractItemModel
 from PySide.QtCore import QModelIndex
@@ -13,174 +13,179 @@ from core.elastix import ParameterList
 
 
 class ParameterModel(QAbstractItemModel):
-	"""
-	Model for parameters to be viewed in a view
-	"""
+    """
+    Model for parameters to be viewed in a view
+    """
 
-	def __init__(self):
-		super(ParameterModel, self).__init__()
+    def __init__(self):
+        super(ParameterModel, self).__init__()
 
-		self.parameters = []
-		self.headers = ["Parameter", "Value"]
-	
-	# Public interface functions
+        self.parameters = []
+        self.headers = ["Parameter", "Value"]
 
-	def setParameters(self, parameters):
-		"""
-		The parameter value should be a list of Parameter items.
-		The use of a dictionary has no use here, because a dictionary
-		has no fixed ordering.
+    # Public interface functions
 
-		:type parameters: list
-		"""
-		self.parameters = parameters
-		self.layoutChanged.emit()
+    def setParameters(self, parameters):
+        """
+        The parameter value should be a list of Parameter items.
+        The use of a dictionary has no use here, because a dictionary
+        has no fixed ordering.
 
-	def addParameter(self):
-		"""
-		Add a standard parameter to the end of the list.
-		"""
-		standardParameter = Parameter("ParameterName", "Value")
-		self.parameters.append(standardParameter)
-		self.insertRows(len(self.parameters), 1, QModelIndex())
+        :type parameters: list
+        """
+        self.parameters = parameters
+        self.layoutChanged.emit()
 
-	def removeParameterAtIndex(self, index):
-		"""
-		:type index: int
-		"""
-		del self.parameters[index]
-		self.removeRow(index, QModelIndex())
+    def addParameter(self):
+        """
+        Add a standard parameter to the end of the list.
+        """
+        standardParameter = Parameter("ParameterName", "Value")
+        self.parameters.append(standardParameter)
+        self.insertRows(len(self.parameters), 1, QModelIndex())
 
-	@Slot(ParameterList)
-	def setTransformation(self, transformation):
-		"""
-		:type transformation: ParameterList
-		"""
-		self.setParameters(transformation.parameters)
+    def removeParameterAtIndex(self, index):
+        """
+        :type index: int
+        """
+        del self.parameters[index]
+        self.removeRow(index, QModelIndex())
 
-	# Functions needed for read only behaviour
+    @Slot(ParameterList)
+    def setTransformation(self, transformation):
+        """
+        :type transformation: ParameterList
+        """
+        self.setParameters(transformation.parameters)
 
-	def index(self, row, column, parent):
-		"""
-		:type row: int
-		:type column: int
-		:type parent: QModelIndex
-		:rtype: QModelIndex
-		"""
-		#If the model does not have this index
-		if not self.hasIndex(row, column, parent):
-			return self.invalidIndex()
+    # Functions needed for read only behaviour
 
-		if column == 0:
-			return self.createIndex(row, column, str(self.parameters[row].key()))
-		if column == 1:
-			return self.createIndex(row, column, str(self.parameters[row].value()))
+    def index(self, row, column, parent):
+        """
+        :type row: int
+        :type column: int
+        :type parent: QModelIndex
+        :rtype: QModelIndex
+        """
+        # If the model does not have this index
+        if not self.hasIndex(row, column, parent):
+            return self.invalidIndex()
 
-		return None
+        if column == 0:
+            return self.createIndex(row, column, str(self.parameters[row].key()))
+        if column == 1:
+            return self.createIndex(row, column, str(self.parameters[row].value()))
 
-	def parent(self, index):
-		"""
-		:type index: QModelIndex
-		:rtype: QModelIndex
-		"""
-		return self.invalidIndex()
+        return None
 
-	def rowCount(self, index):
-		"""
-		:type parent: QModelIndex
-		:rtype: int
-		"""
-		if index.isValid():
-			return 0
+    def parent(self, index):
+        """
+        :type index: QModelIndex
+        :rtype: QModelIndex
+        """
+        return self.invalidIndex()
 
-		return len(self.parameters)
+    def rowCount(self, index):
+        """
+        :type parent: QModelIndex
+        :rtype: int
+        """
+        if index.isValid():
+            return 0
 
-	def columnCount(self, parent=None):
-		"""
-		:type parent: QModelIndex
-		:rtype: int
-		"""
-		return len(self.headers)
+        return len(self.parameters)
 
-	def data(self, index, role):
-		"""
-		:type index: QModelIndex
-		:type role: Qt.ItemDataRole
-		:rtype: QVariant
-		"""
-		if role == Qt.DisplayRole or role == Qt.EditRole:
-			parameter = self.parameters[index.row()]
-			if index.column() == 0:
-				return str(parameter.key())
-			if index.column() == 1:
-				return str(parameter.value())
-		
-		return None
+    def columnCount(self, parent=None):
+        """
+        :type parent: QModelIndex
+        :rtype: int
+        """
+        return len(self.headers)
 
-	# Functions needed for editing
+    def data(self, index, role):
+        """
+        :type index: QModelIndex
+        :type role: Qt.ItemDataRole
+        :rtype: QVariant
+        """
+        if role == Qt.DisplayRole or role == Qt.EditRole:
+            parameter = self.parameters[index.row()]
+            if index.column() == 0:
+                return str(parameter.key())
+            if index.column() == 1:
+                return str(parameter.value())
 
-	def setData(self, index, value, role):
-		"""
-		:type index: QModelIndex
-		:type value: QVariant
-		:type role: Qt.ItemDataRole
-		:rtype: bool
-		"""
-		if not role == Qt.EditRole:
-			return False
+        return None
 
-		parameter = self.parameters[index.row()]
-		if index.column() == 0:
-			parameter.setKey(value)
-		elif index.column() == 1:
-			parameter.setValue(value)
+    # Functions needed for editing
 
-		self.dataChanged.emit(index, index)
-		self.layoutChanged.emit()
-		return True
+    def setData(self, index, value, role):
+        """
+        :type index: QModelIndex
+        :type value: QVariant
+        :type role: Qt.ItemDataRole
+        :rtype: bool
+        """
+        if not role == Qt.EditRole:
+            return False
 
-	def flags(self, index):
-		if not index.isValid():
-			return Qt.NoItemFlags
-		return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
-			| Qt.ItemIsDropEnabled | Qt.ItemIsEditable)
+        parameter = self.parameters[index.row()]
+        if index.column() == 0:
+            parameter.setKey(value)
+        elif index.column() == 1:
+            parameter.setValue(value)
 
-	def insertRows(self, row, count, parent):
-		"""
-		:type row: int
-		:type count: int
-		:type parent: QModelIndex
-		:rtype: bool
-		"""
-		self.beginInsertRows(parent, row, row+count-1)
-		self.endInsertRows()
-		return True
+        self.dataChanged.emit(index, index)
+        self.layoutChanged.emit()
+        return True
 
-	def removeRows(self, row, count, parent):
-		"""
-		:type row: int
-		:type count: int
-		:type parent: QModelIndex
-		:rtype: bool
-		"""
-		self.beginRemoveRows(parent, row, row+count-1)
-		self.endRemoveRows()
-		return True
+    def flags(self, index):
+        if not index.isValid():
+            return Qt.NoItemFlags
+        return (
+            Qt.ItemIsEnabled
+            | Qt.ItemIsSelectable
+            | Qt.ItemIsDragEnabled
+            | Qt.ItemIsDropEnabled
+            | Qt.ItemIsEditable
+        )
 
-	def headerData(self, section, orientation, role=Qt.DisplayRole):
-		"""
-		:type section: int
-		:type orientation: Qt.Orientation
-		"""
-		if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-			return self.headers[section]
+    def insertRows(self, row, count, parent):
+        """
+        :type row: int
+        :type count: int
+        :type parent: QModelIndex
+        :rtype: bool
+        """
+        self.beginInsertRows(parent, row, row + count - 1)
+        self.endInsertRows()
+        return True
 
-		return None
+    def removeRows(self, row, count, parent):
+        """
+        :type row: int
+        :type count: int
+        :type parent: QModelIndex
+        :rtype: bool
+        """
+        self.beginRemoveRows(parent, row, row + count - 1)
+        self.endRemoveRows()
+        return True
 
-	def invalidIndex(self):
-		"""
-		Convenience method for creating an invalid QModelIndex object
-		for use in some methods.
-		:rtype: QModelIndex
-		"""
-		return self.createIndex(-1, -1, None)
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
+        """
+        :type section: int
+        :type orientation: Qt.Orientation
+        """
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return self.headers[section]
+
+        return None
+
+    def invalidIndex(self):
+        """
+        Convenience method for creating an invalid QModelIndex object
+        for use in some methods.
+        :rtype: QModelIndex
+        """
+        return self.createIndex(-1, -1, None)

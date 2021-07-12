@@ -4,62 +4,61 @@ from core.elastix import ElastixCommand
 
 
 class ElastixCommandTest(unittest.TestCase):
+    def setUp(self):
+        if not hasattr(self, "path"):
+            # Get the path of the current test
+            self.path = os.path.dirname(os.path.abspath(__file__))
 
-	def setUp(self):
-		if not hasattr(self, "path"):
-			# Get the path of the current test
-			self.path = os.path.dirname(os.path.abspath(__file__))
-		
-		# Create paths to some data sets
-		movingData = self.path + "/data/hi-5.mhd"
-		fixedData = self.path + "/data/hi-3.mhd"
-		outputFolder = self.path + "/data/data"
-		transformation = self.path + "/data/Sample.txt"
+        # Create paths to some data sets
+        movingData = self.path + "/data/hi-5.mhd"
+        fixedData = self.path + "/data/hi-3.mhd"
+        outputFolder = self.path + "/data/data"
+        transformation = self.path + "/data/Sample.txt"
 
-		# Construct a simple command object
-		self.command = ElastixCommand(fixedData=fixedData,
-			movingData=movingData,
-			outputFolder=outputFolder,
-			transformation=transformation)
+        # Construct a simple command object
+        self.command = ElastixCommand(
+            fixedData=fixedData,
+            movingData=movingData,
+            outputFolder=outputFolder,
+            transformation=transformation,
+        )
 
-	def tearDown(self):
-		del self.command
+    def tearDown(self):
+        del self.command
 
-	def testCommandParametersAreSetCorrectly(self):
-		self.assertIn("/data/hi-5", self.command.movingData)
-		self.assertIn("/data/hi-3", self.command.fixedData)
-		self.assertIn("/data/data", self.command.outputFolder)
-		self.assertIn("/data/Sample.txt", self.command.transformation)
+    def testCommandParametersAreSetCorrectly(self):
+        self.assertIn("/data/hi-5", self.command.movingData)
+        self.assertIn("/data/hi-3", self.command.fixedData)
+        self.assertIn("/data/data", self.command.outputFolder)
+        self.assertIn("/data/Sample.txt", self.command.transformation)
 
-	def testCommandIsInvalidForMissingParameter(self):
-		self.command.transformation = None
-		self.assertFalse(self.command.isValid())
+    def testCommandIsInvalidForMissingParameter(self):
+        self.command.transformation = None
+        self.assertFalse(self.command.isValid())
 
-	def testCommandIsInvalidForNonexistingFileParameter(self):
-		# Change the transformation to an invalid string
-		self.command.transformation = "NonexistantTransformationFileName.txt"
-		self.assertFalse(self.command.isValid())
+    def testCommandIsInvalidForNonexistingFileParameter(self):
+        # Change the transformation to an invalid string
+        self.command.transformation = "NonexistantTransformationFileName.txt"
+        self.assertFalse(self.command.isValid())
 
-	def testCommandIsValidForCompleteParameter(self):
-		# self.command should be a valid parameter
-		self.assertTrue(self.command.isValid())
-		
-	def testCommandIsInvalidForTooDeepOutputDirectory(self):
-		self.assertTrue(self.command.isValid())
-		self.command.outputFolder = self.path + "/data/subfolder/tooDeep"
-		self.assertFalse(self.command.isValid())
+    def testCommandIsValidForCompleteParameter(self):
+        # self.command should be a valid parameter
+        self.assertTrue(self.command.isValid())
 
-	def testCommandCanExecute(self):
-		# Set a 'unique' output folder
-		self.command.outputFolder = self.path + "/data/command_output"
-		self.command.execute()
+    def testCommandIsInvalidForTooDeepOutputDirectory(self):
+        self.assertTrue(self.command.isValid())
+        self.command.outputFolder = self.path + "/data/subfolder/tooDeep"
+        self.assertFalse(self.command.isValid())
 
-		self.assertTrue(os.path.exists(self.command.outputFolder + "/result.0.mhd"))
+    def testCommandCanExecute(self):
+        # Set a 'unique' output folder
+        self.command.outputFolder = self.path + "/data/command_output"
+        self.command.execute()
 
-		# Cleanup test directory
-		try:
-			if os.path.exists(self.command.outputFolder):
-				import shutil
-				shutil.rmtree(self.command.outputFolder)
-		except Exception, e:
-			raise e
+        self.assertTrue(os.path.exists(self.command.outputFolder + "/result.0.mhd"))
+
+        # Cleanup test directory
+        if os.path.exists(self.command.outputFolder):
+            import shutil
+
+            shutil.rmtree(self.command.outputFolder)

@@ -42,13 +42,14 @@ class Singleton:
             return self._instance
 
     def __call__(self):
-        raise TypeError('Singletons must be accessed through `Instance()`.')
+        raise TypeError("Singletons must be accessed through `Instance()`.")
 
     def __instancecheck__(self, inst):
         return isinstance(inst, self._decorated)
 
 
 # Override decorator
+
 
 def overrides(interface_class):
     """
@@ -61,15 +62,17 @@ def overrides(interface_class):
 
     class A:
         def someFunction(self):
-            print "function of A"
+            print("function of A")
 
     class B(A):
         @overrides(A)
         def someFunction(self):
-            print "function of B"
+            print("function of B")
 
     """
+
     def overrider(method):
-        assert(method.__name__ in dir(interface_class))
+        assert method.__name__ in dir(interface_class)
         return method
+
     return overrider
