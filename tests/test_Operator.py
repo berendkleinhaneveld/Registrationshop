@@ -28,7 +28,7 @@ class OperatorTest(unittest.TestCase):
         def execute(self):
             time.sleep(0.1)
 
-        function = types.MethodType(execute, command, Command)
+        function = types.MethodType(execute, command)
         command.execute = function
 
         # Add command to the queue
@@ -73,25 +73,28 @@ class OperatorTest(unittest.TestCase):
     #     except Exception, e:
     #         raise e
 
-    # def testAddingMultipleCommands(self):
-    #     command = Command()
-    #     otherCommand = Command()
+    def testAddingMultipleCommands(self):
+        command = Command()
+        otherCommand = Command()
 
-    #     import time
-    #     import types
-    #     # Create empty command
-    #     command = Command()
-    #     # Override the execute function
-    #     def execute(self):
-    #         time.sleep(0.1)
-    #     function = types.MethodType(execute, command, Command)
-    #     command.execute = function
-    #     otherCommand.execute = function
+        import time
+        import types
 
-    #     self.operator.addCommand(command)
-    #     self.operator.addCommand(otherCommand)
+        # Create empty command
+        command = Command()
 
-    #     self.assertEqual(self.operator.queue.qsize(), 2)
+        # Override the execute function
+        def execute(self):
+            time.sleep(0.1)
 
-    #     self.operator.queue.join()
-    #     self.assertTrue(self.operator.queue.empty())
+        function = types.MethodType(execute, command)
+        command.execute = function
+        otherCommand.execute = function
+
+        self.operator.addCommand(command)
+        self.operator.addCommand(otherCommand)
+
+        self.assertEqual(self.operator.queue.qsize(), 2)
+
+        self.operator.queue.join()
+        self.assertTrue(self.operator.queue.empty())

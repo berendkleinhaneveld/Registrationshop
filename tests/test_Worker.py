@@ -1,6 +1,8 @@
 import unittest
-from core.worker.Worker import Worker
-from Queue import Queue
+
+# from core.worker.Worker import Worker
+
+# from Queue import Queue
 
 # from core.worker import Command
 # from core.elastix import ElastixCommand
@@ -8,16 +10,18 @@ from Queue import Queue
 
 class WorkerTest(unittest.TestCase):
     def setUp(self):
-        self.queue = Queue()
-        self.worker = Worker(self.queue)
-        self.assertEqual(self.worker.queue, self.queue)
+        # self.queue = Queue()
+        # self.worker = Worker(self.queue)
+        # self.assertEqual(self.worker.queue, self.queue)
 
         # Daemonize the worker
-        self.worker.daemon = True
-        self.worker.start()
+        # self.worker.daemon = True
+        # self.worker.start()
+        pass
 
     def tearDown(self):
-        del self.worker
+        pass
+        # del self.worker
 
     # def testProcessingSimpleEmptyCommand(self):
     #     # Fill the queue with an empty command

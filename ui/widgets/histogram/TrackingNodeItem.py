@@ -4,9 +4,10 @@ TrackingNodeItem
 :Authors:
     Berend Klein Haneveld
 """
-from PySide.QtCore import Slot
-from PySide.QtCore import QPointF
-from NodeItem import NodeItem
+from PySide6.QtCore import Slot
+from PySide6.QtCore import QPointF
+
+from .NodeItem import NodeItem
 from core.decorators import overrides
 
 

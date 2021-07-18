@@ -5,10 +5,10 @@ MultiRenderController
     Berend Klein Haneveld
 """
 
-from PySide.QtCore import QObject
-from PySide.QtCore import Slot
-from PySide.QtCore import Signal
-from PySide.QtGui import QWidget
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Slot
+from PySide6.QtCore import Signal
+from PySide6.QtWidgets import QWidget
 from core.vtkObjectWrapper import vtkCameraWrapper
 from core.data import DataReader
 from core.data import DataResizer
@@ -74,7 +74,8 @@ class MultiRenderController(QObject):
         self.fixedImageData = resizer.ResizeData(imageData, maximum=25000000)
 
         # Give the image data to the widget
-        self.multiRenderWidget.setFixedData(self.fixedImageData)
+        # FIXME
+        # self.multiRenderWidget.setFixedData(self.fixedImageData)
         self.fixedDataChanged.emit(self.fixedImageData)
 
         # Set the visualization type
@@ -99,7 +100,8 @@ class MultiRenderController(QObject):
         self.movingImageData = resizer.ResizeData(imageData, maximum=25000000)
 
         # Give the image data to the widget
-        self.multiRenderWidget.setMovingData(self.movingImageData)
+        # FIXME
+        # self.multiRenderWidget.setMovingData(self.movingImageData)
         self.movingDataChanged.emit(self.movingImageData)
 
         # Set the visualization type
@@ -108,13 +110,13 @@ class MultiRenderController(QObject):
     @Slot(object)
     def setRenderSettings(self, renderSettings):
         if renderSettings is not None:
-            self.slices = renderSettings["slices"]
+            self.slices = renderSettings.get("slices", [False, False, False])
             self.multiRenderWidget.setSlices(self.slices)
             cameraWrapper = renderSettings["camera"]
             cameraWrapper.applyToObject(
                 self.multiRenderWidget.renderer.GetActiveCamera()
             )
-            transformationsWrapped = renderSettings["transformations"]
+            transformationsWrapped = renderSettings.get("transformations")
             if transformationsWrapped is not None:
                 transformations = TransformationList()
                 transformations.setPythonVersion(transformationsWrapped)
@@ -134,8 +136,9 @@ class MultiRenderController(QObject):
         settings["slices"] = self.slices
         camera = self.multiRenderWidget.renderer.GetActiveCamera()
         settings["camera"] = vtkCameraWrapper(camera)
-        transformations = self.multiRenderWidget.transformations.getPythonVersion()
-        settings["transformations"] = transformations
+        # FIXME
+        # transformations = self.multiRenderWidget.transformations.getPythonVersion()
+        # settings["transformations"] = transformations
         settings["clippingBox"] = self.clippingBox
         settings["clippingPlanes"] = self.clippingPlanes
         return settings

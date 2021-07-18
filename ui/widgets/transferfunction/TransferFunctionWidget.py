@@ -10,18 +10,18 @@ from ui.widgets.transferfunction import TransferFunctionNodeItem
 from ui.widgets.transferfunction import TransferFunctionItem
 from ui.widgets.ColorWidget import ColorButton
 from core.data.DataAnalyzer import DataAnalyzer
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QGraphicsLineItem
-from PySide.QtGui import QPen
-from PySide.QtGui import QLabel
-from PySide.QtGui import QLineEdit
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QColorDialog
-from PySide.QtGui import QColor
-from PySide.QtCore import QLineF
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QGraphicsLineItem
+from PySide6.QtGui import QPen
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QLineEdit
+from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QColorDialog
+from PySide6.QtGui import QColor
+from PySide6.QtCore import QLineF
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
 from ui.widgets import Style
 
 

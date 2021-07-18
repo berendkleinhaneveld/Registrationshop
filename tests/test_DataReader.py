@@ -17,7 +17,7 @@ class DataReaderTest(unittest.TestCase):
         imageData = self.reader.GetImageData(fileName)
         self.assertIsNotNone(imageData)
         dimensions = imageData.GetDimensions()
-        self.assertEquals(dimensions, (21, 15, 9))
+        self.assertEqual(dimensions, (21, 15, 9))
 
     def testUnsupportedDataTypes(self):
         self.assertRaises(Exception, self.reader.GetImageData, "data/hi-3.mrb")
@@ -38,14 +38,14 @@ class DataReaderTest(unittest.TestCase):
 
     #     imageData = self.reader.GetImageData(fileName)
     #     dimensions = imageData.GetDimensions()
-    #     self.assertEquals(dimensions, (492, 492, 442))
+    #     self.assertEqual(dimensions, (492, 492, 442))
 
     def testVTIFileFormat(self):
         path = os.path.dirname(os.path.abspath(__file__))
         fileName = path + "/data/modelSegmentation.vti"
         imageData = self.reader.GetImageData(fileName)
         dimensions = imageData.GetDimensions()
-        self.assertEquals(dimensions, (376, 245, 206))
+        self.assertEqual(dimensions, (376, 245, 206))
 
     def testEmptyDirectory(self):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -59,4 +59,4 @@ class DataReaderTest(unittest.TestCase):
         imageData = self.reader.GetImageData(fileName)
         self.assertIsNotNone(imageData)
         dimensions = imageData.GetDimensions()
-        self.assertEquals(dimensions, (320, 384, 11))
+        self.assertEqual(dimensions, (320, 384, 11))

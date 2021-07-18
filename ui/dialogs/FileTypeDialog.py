@@ -5,11 +5,11 @@ FileTypeDialog
     Berend Klein Haneveld 2013
 """
 
-from PySide.QtGui import QDialog
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
-from PySide.QtCore import Slot
+from PySide6.QtWidgets import QDialog
+from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtCore import Slot
 from core.data import DataReader
 
 
@@ -46,7 +46,7 @@ class FileTypeDialog(QDialog):
         layout.addWidget(vtiButton, 1, 1)
 
         widget.setLayout(layout)
-        result = widget.exec_()
+        result = widget.exec()
         if result == QDialog.Accepted:
             return widget.result
         return ""

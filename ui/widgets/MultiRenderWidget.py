@@ -5,23 +5,27 @@ MultiRenderWidget
     Berend Klein Haneveld
 """
 
-from vtk import vtkOpenGLGPUMultiVolumeRayCastMapper
-from vtk import vtkRenderer
-from vtk import vtkInteractorStyleTrackballCamera
-from vtk import vtkImagePlaneWidget
-from vtk import vtkVolume
-from vtk import vtkImageData
-from vtk import vtkColorTransferFunction
-from vtk import vtkPiecewiseFunction
-from vtk import vtkVolumeProperty
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QWidget
 from vtk import VTK_FLOAT
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
+from vtk import vtkColorTransferFunction
+from vtk import vtkImageData
+from vtk import vtkImagePlaneWidget
+from vtk import vtkInteractorStyleTrackballCamera
+from vtk import vtkOpenGLGPUVolumeRayCastMapper as vtkOpenGLGPUMultiVolumeRayCastMapper
+from vtk import vtkPiecewiseFunction
+from vtk import vtkRenderer
+from vtk import vtkVolume
+from vtk import vtkVolumeProperty
+
+# from vtk import vtkOpenGLGPUMultiVolumeRayCastMapper
+
+# from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.transformations import TransformationList
 from ui.transformations import ClippingBox
-from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from core.vtkDrawing import CreateBounds
 from core.vtkDrawing import CreateOrientationGrid
 
@@ -112,8 +116,10 @@ class MultiRenderWidget(QWidget):
         self.clippingBox = ClippingBox()
         self.clippingBox.setWidget(self)
 
-        self.mapper.SetInputData(0, self.fixedImageData)
-        self.mapper.SetInputData(1, self.movingImageData)
+        # FIXME
+        # self.mapper.SetInputData(0, self.fixedImageData)
+        # self.mapper.SetInputData(1, self.movingImageData)
+        self.mapper.SetInputData(self.movingImageData)
 
         self._transformations = TransformationList()
         self._transformations.transformationChanged.connect(self.updateTransformation)
@@ -205,7 +211,7 @@ class MultiRenderWidget(QWidget):
 
         boundsFixed = self.fixedImageData.GetBounds()
         boundsMoving = self.movingImageData.GetBounds()
-        maxBounds = map(lambda x, y: max(x, y), boundsFixed, boundsMoving)
+        maxBounds = list(map(lambda x, y: max(x, y), boundsFixed, boundsMoving))
         self.orientationGridItems = CreateOrientationGrid(
             maxBounds, self.renderer.GetActiveCamera()
         )
@@ -282,7 +288,8 @@ class MultiRenderWidget(QWidget):
     @Slot()
     def updateTransformation(self):
         transform = self._transformations.completeTransform()
-        self.mapper.SetSecondInputUserTransform(transform)
+        # FIXME
+        # self.mapper.SetSecondInputUserTransform(transform)
         for item in self.movingGridItems:
             item.SetUserTransform(transform)
         self.render()
@@ -290,6 +297,8 @@ class MultiRenderWidget(QWidget):
     # Private methods
 
     def _updateMapper(self, volVis, volNr):
+        # FIXME
+        return
         shaderType = volVis.shaderType()
         if volNr == 1:
             self.mapper.SetShaderType1(shaderType)
@@ -340,8 +349,9 @@ class MultiRenderWidget(QWidget):
         """
         if self.volume.GetProperty() != self.fixedVolumeProperty:
             self.volume.SetProperty(self.fixedVolumeProperty)
-        if self.mapper.GetProperty2() != self.movingVolumeProperty:
-            self.mapper.SetProperty2(self.movingVolumeProperty)
+        # FIXME
+        # if self.mapper.GetProperty2() != self.movingVolumeProperty:
+        #     self.mapper.SetProperty2(self.movingVolumeProperty)
         self.render()
 
     def _syncCameras(self, camera, ev):

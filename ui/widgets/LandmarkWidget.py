@@ -4,19 +4,19 @@ LandmarkWidget
 :Authors:
     Berend Klein Haneveld
 """
-from PySide.QtGui import QWidget
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
-from PySide.QtGui import QTextEdit
-from PySide.QtGui import QFrame
-from PySide.QtGui import QComboBox
-from PySide.QtCore import Qt
-from PySide.QtCore import Slot
-from PySide.QtCore import Signal
-from histogram import TrackingHistogramWidget
-from histogram import Histogram
-from histogram import HistogramWidget
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QTextEdit
+from PySide6.QtWidgets import QFrame
+from PySide6.QtWidgets import QComboBox
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Slot
+from PySide6.QtCore import Signal
+from .histogram import TrackingHistogramWidget
+from .histogram import Histogram
+from .histogram import HistogramWidget
 from ui.transformations.LandmarkTransformationTool import TwoStepType
 from ui.transformations.LandmarkTransformationTool import SurfaceType
 

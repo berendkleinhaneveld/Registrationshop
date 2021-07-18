@@ -5,10 +5,10 @@ TransformBox
     Berend Klein Haneveld
 """
 from ui.Interactor import Interactor
-from PySide.QtCore import QObject
+from PySide6.QtCore import QObject
 from vtk import vtkBoxWidget
 from vtk import vtkTransform
-from PySide.QtCore import Signal
+from PySide6.QtCore import Signal
 
 
 class TransformBox(QObject, Interactor):

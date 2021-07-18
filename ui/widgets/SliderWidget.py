@@ -4,16 +4,16 @@ SliderWidget
 :Authors:
     Berend Klein Haneveld
 """
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QSlider
-from PySide.QtGui import QSpinBox
+import sys
 
-# from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QGridLayout
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
-from PySide.QtCore import Qt
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QSlider
+from PySide6.QtWidgets import QSpinBox
+from PySide6.QtWidgets import QWidget
 
 
 class SliderWidget(QWidget):
@@ -73,8 +73,8 @@ class SliderWidget(QWidget):
 
 
 if __name__ == "__main__":
-    from PySide.QtGui import QApplication
-    from PySide.QtGui import QVBoxLayout
+    from PySide6.QtWidgets import QApplication
+    from PySide6.QtWidgets import QVBoxLayout
 
     app = QApplication([])
 
@@ -98,4 +98,4 @@ if __name__ == "__main__":
     widget = QWidget()
     widget.setLayout(layout)
     widget.show()
-    app.exec_()
+    sys.exit(app.exec())

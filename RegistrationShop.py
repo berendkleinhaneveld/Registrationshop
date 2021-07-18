@@ -12,18 +12,18 @@ import sys
 import os.path
 
 # PySide stuff
-from PySide.QtGui import QMainWindow
-from PySide.QtGui import QApplication
-from PySide.QtGui import QAction
-from PySide.QtGui import QIcon
-from PySide.QtGui import QFileDialog
-from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QWidget
-from PySide.QtGui import QSizePolicy
-from PySide.QtGui import QSplitter
-from PySide.QtCore import Qt
-from PySide.QtCore import Slot
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QAction
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QSizePolicy
+from PySide6.QtWidgets import QSplitter
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Slot
 
 # Import core stuff
 from core import AppVars
@@ -43,6 +43,7 @@ from ui.dialogs import FileTypeDialog
 from ui.dialogs import ElastixMainDialog
 from ui.dialogs import ResetVisualizationDialog
 from ui.widgets import RenderWidget
+
 from ui.widgets import MultiRenderWidget
 from ui.widgets import TitleWidget
 from ui.widgets import RenderPropWidget
@@ -496,7 +497,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 
         dialog = ElastixMainDialog(self)
         dialog.setModal(True)
-        result = dialog.exec_()
+        result = dialog.exec()
         if not result:
             return
         if not dialog.transformation:
@@ -542,10 +543,12 @@ class RegistrationShop(MainWindow, WindowDialog):
         extensions = dataReader.GetSupportedExtensionsAsString()
         fileName, other = QFileDialog.getOpenFileName(
             self,
+            None,
             "Open fixed data set",
             "",
             "Images (" + extensions + ")",
-            options=QFileDialog.Directory,
+            # QFileDialog.ShowDirsOnly,
+            # options=QFileDialog.Directory,
         )
         if len(fileName) > 0:
             # If there was another dataset first, ask if the user if the
@@ -554,7 +557,7 @@ class RegistrationShop(MainWindow, WindowDialog):
             if projectController.currentProject.fixedData:
                 dialog = ResetVisualizationDialog(self)
                 dialog.setWindowModality(Qt.WindowModal)
-                dialog.exec_()
+                dialog.exec()
                 if dialog.result is not None:
                     projectController.loadFixedDataSet(fileName)
                     if dialog.result:
@@ -572,10 +575,11 @@ class RegistrationShop(MainWindow, WindowDialog):
         extensions = dataReader.GetSupportedExtensionsAsString()
         fileName, other = QFileDialog.getOpenFileName(
             self,
+            None,
             "Open moving data set",
             "",
             "Images (" + extensions + ")",
-            options=QFileDialog.Directory,
+            # options=QFileDialog.Directory,
         )
         if len(fileName) > 0:
             # If there was another dataset first, ask if the user if the
@@ -584,7 +588,7 @@ class RegistrationShop(MainWindow, WindowDialog):
             if projectController.currentProject.movingData:
                 dialog = ResetVisualizationDialog(self)
                 dialog.setWindowModality(Qt.WindowModal)
-                dialog.exec_()
+                dialog.exec()
                 if dialog.result is not None:
                     projectController.loadMovingDataSet(fileName)
                     if dialog.result:
@@ -727,6 +731,7 @@ class RegistrationShop(MainWindow, WindowDialog):
         if hasattr(self, "compareWidget"):
             del self.compareWidget
 
+        # FIXME
         transform = self.multiDataWidget.transformations.completeTransform()
 
         self.controller = ComparisonController()
@@ -746,10 +751,10 @@ def main():
     # Fix for PySide on OSX Mavericks
     import sys
 
-    if sys.platform.startswith("darwin"):
-        from PySide.QtGui import QFont
+    # if sys.platform.startswith("darwin"):
+    #     from PySide6.QtGui import QFont
 
-        QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")
+    #     QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")
 
     app = QApplication(sys.argv)
     app.setObjectName(APPNAME)
@@ -761,7 +766,7 @@ def main():
     mainWindow.raise_()
     mainWindow.show()
     mainWindow.initialize()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":

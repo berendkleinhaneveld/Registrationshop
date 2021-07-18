@@ -8,20 +8,22 @@ from Exposure Render (http://code.google.com/p/exposure-render/)
     T. Kroes <t.kroes@tudelft.nl>
     B. Klein Haneveld <b.a.kleinhaneveld@student.tudelft.nl>
 """
-from PySide.QtGui import QGraphicsRectItem
-from PySide.QtGui import QGraphicsPolygonItem
-from PySide.QtGui import QGraphicsLineItem
-from PySide.QtGui import QBrush
-from PySide.QtGui import QColor
-from PySide.QtGui import QPolygonF
-from PySide.QtGui import QPen
-from PySide.QtGui import QLinearGradient
-from PySide.QtCore import QMargins
-from PySide.QtCore import Qt
-from PySide.QtCore import QPointF
-from PySide.QtCore import QLineF
-from Histogram import Histogram
 import math
+
+from PySide6.QtWidgets import QGraphicsRectItem
+from PySide6.QtWidgets import QGraphicsPolygonItem
+from PySide6.QtWidgets import QGraphicsLineItem
+from PySide6.QtGui import QBrush
+from PySide6.QtGui import QColor
+from PySide6.QtGui import QPolygonF
+from PySide6.QtGui import QPen
+from PySide6.QtGui import QLinearGradient
+from PySide6.QtCore import QMargins
+from PySide6.QtCore import Qt
+from PySide6.QtCore import QPointF
+from PySide6.QtCore import QLineF
+
+from .Histogram import Histogram
 
 
 class HistogramItem(QGraphicsRectItem):

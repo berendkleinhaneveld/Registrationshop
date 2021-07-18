@@ -4,16 +4,17 @@ MultiVolumeVisualizationMIP
 :Authors:
     Berend Klein Haneveld
 """
-from MultiVolumeVisualization import MultiVolumeVisualization
-from MultiVolumeVisualization import CreateEmptyFunctions
-from MultiVolumeVisualization import CreateRangeFunctions
-from core.decorators import overrides
-from PySide.QtGui import QLabel
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QSlider
-from PySide.QtCore import Qt
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QSlider
+from PySide6.QtCore import Qt
 from vtk import vtkVolumeProperty
+
+from core.decorators import overrides
+from .MultiVolumeVisualization import MultiVolumeVisualization
+from .MultiVolumeVisualization import CreateEmptyFunctions
+from .MultiVolumeVisualization import CreateRangeFunctions
 
 
 class MultiVolumeVisualizationMIP(MultiVolumeVisualization):

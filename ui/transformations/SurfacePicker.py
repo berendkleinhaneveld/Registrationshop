@@ -5,13 +5,15 @@ SurfacePicker
     Berend Klein Haneveld
 """
 import math
-from Picker import Picker
-from ui.Interactor import Interactor
+
+from PySide6.QtCore import Signal
 from vtk import vtkVolumePicker
 from vtk import vtkActor
 from vtk import vtkConeSource
 from vtk import vtkDataSetMapper
-from PySide.QtCore import Signal
+
+from .Picker import Picker
+from ui.Interactor import Interactor
 
 
 class SurfacePicker(Picker, Interactor):

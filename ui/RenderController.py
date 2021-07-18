@@ -13,10 +13,10 @@ widget that it should update.
     Berend Klein Haneveld
 """
 
-from PySide.QtCore import QObject
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
-from PySide.QtGui import QWidget
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QWidget
 from ui.visualizations import VisualizationTypeSimple
 from ui.visualizations import VisualizationTypeMIP
 from ui.visualizations import VolumeVisualizationFactory

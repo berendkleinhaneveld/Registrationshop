@@ -5,8 +5,8 @@ ClippingBox
     Berend Klein Haneveld
 """
 from ui.Interactor import Interactor
-from PySide.QtCore import QObject
-from PySide.QtCore import Signal
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Signal
 from vtk import vtkBoxWidget
 from vtk import vtkPlanes
 from vtk import vtkImagePlaneWidget

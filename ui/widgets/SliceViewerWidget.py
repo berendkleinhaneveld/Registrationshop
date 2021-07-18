@@ -5,15 +5,16 @@ SliceViewerWidget
     Berend Klein Haneveld
 """
 
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import Signal
 from vtk import vtkRenderer
 from vtk import vtkInteractorStyleUser
 from vtk import vtkImagePlaneWidget
 from vtk import vtkCellPicker
 from vtk import vtkColorTransferFunction
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QWidget
-from PySide.QtCore import Signal
-from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+
+from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.Interactor import Interactor
 from core.vtkDrawing import CreateSquare
 from core.vtkDrawing import CreateLine
@@ -161,7 +162,7 @@ class SliceViewerWidget(QWidget, Interactor):
         self.renderer.SetDisplayPoint(x, y, 1)
         self.renderer.DisplayToWorld()
         worldCoords = self.renderer.GetWorldPoint()
-        pickPosition = map(lambda x: x / worldCoords[3], worldCoords[0:-1])
+        pickPosition = list(map(lambda x: x / worldCoords[3], worldCoords[0:-1]))
         self.mouseMoved.emit(pickPosition)
 
     def render(self):

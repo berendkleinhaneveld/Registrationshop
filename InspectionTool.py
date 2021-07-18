@@ -4,21 +4,23 @@ CompareWidget
 :Authors:
     Berend Klein Haneveld
 """
+import sys
 
-from PySide.QtGui import QApplication
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
-from PySide.QtGui import QHBoxLayout
-from PySide.QtCore import QObject
-from PySide.QtCore import Slot
-from PySide.QtCore import Qt
+from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Slot
+from PySide6.QtCore import Qt
+from vtk import vtkTransform
+
 from core.data.DataReader import DataReader
 from core.data.DataTransformer import DataTransformer
 from core.data.DataResizer import DataResizer
 from ui.widgets.SliceViewerWidget import SliceViewerWidget
 from ui.widgets.SliceCompareViewerWidget import SliceCompareViewerWidget
-from vtk import vtkTransform
 
 
 class CompareWidget(QWidget):
@@ -84,8 +86,8 @@ class ComparisonController(QObject):
 
         blue = [0, 127, 255]
         orange = [255, 127, 0]
-        blue = map(lambda x: x / 255.0, blue)
-        orange = map(lambda x: x / 255.0, orange)
+        blue = list(map(lambda x: x / 255.0, blue))
+        orange = list(map(lambda x: x / 255.0, orange))
         self.fixedImageWidget = SliceViewerWidget()
         self.fixedImageWidget.color = orange
         self.movingImageWidget = SliceViewerWidget()
@@ -279,4 +281,4 @@ if __name__ == "__main__":
     widget.show()
     controller.initialize()
     controller.slicerChanged(controller.fixedImageWidget)
-    app.exec_()
+    sys.exit(app.exec())

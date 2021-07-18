@@ -5,14 +5,14 @@ StatusWidget
     Berend Klein Haneveld
 """
 
-from PySide.QtGui import QFrame
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
-from PySide.QtGui import QPainter
-from PySide.QtGui import QPen
-from PySide.QtGui import QColor
-from PySide.QtGui import QFont
-from PySide.QtCore import QRectF
+from PySide6.QtWidgets import QFrame
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtGui import QPainter
+from PySide6.QtGui import QPen
+from PySide6.QtGui import QColor
+from PySide6.QtGui import QFont
+from PySide6.QtCore import QRectF
 from core.decorators import Singleton
 
 
@@ -25,11 +25,13 @@ class StatusWidget(QFrame):
     def __init__(self):
         QFrame.__init__(self)
 
+        # FIXME: update for dark theme
         self._color = [220, 220, 220]
 
         self._font = QFont()
         self._font.setPixelSize(10)
 
+        # FIXME: update for dark theme
         self._pen = QPen(QColor(100, 100, 100, 255))
 
         self.label = QLabel()
@@ -62,5 +64,5 @@ class StatusWidget(QFrame):
         painter.setPen(self._pen)
         painter.setBrush(QColor(self._color[0], self._color[1], self._color[2]))
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setRenderHint(QPainter.HighQualityAntialiasing)
+        painter.setRenderHint(QPainter.TextAntialiasing)
         painter.drawRoundedRect(rect, 4, 4)

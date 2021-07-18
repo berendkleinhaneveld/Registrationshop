@@ -5,9 +5,9 @@ TransferFunctionNodeItem
     Berend Klein Haneveld
 """
 from ui.widgets.histogram.NodeItem import NodeItem
-from PySide.QtGui import QColor
-from PySide.QtCore import QPointF
-from PySide.QtCore import Qt
+from PySide6.QtGui import QColor
+from PySide6.QtCore import QPointF
+from PySide6.QtCore import Qt
 
 
 class TransferFunctionNodeItem(NodeItem):

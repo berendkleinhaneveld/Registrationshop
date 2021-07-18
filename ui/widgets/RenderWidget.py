@@ -11,11 +11,13 @@ from vtk import vtkInteractorStyleTrackballCamera
 from vtk import vtkOpenGLGPUVolumeRayCastMapper
 from vtk import vtkTransform
 from vtk import vtkImagePlaneWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QWidget
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
-from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+
+# from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.transformations import ClippingBox
 from core.vtkDrawing import CreateBounds
 from core.vtkDrawing import CreateOrientationGrid
@@ -168,7 +170,7 @@ class RenderWidget(QWidget):
             self.renderer.AddViewProp(self.volume)
 
         self.volumeVisualization.setMapper(self.mapper)
-        self.mapper.SetShaderType(self.volumeVisualization.shaderType())
+        # self.mapper.SetShaderType(self.volumeVisualization.shaderType())
         if self.volume.GetProperty() != self.volumeVisualization.volProp:
             self.volume.SetProperty(self.volumeVisualization.volProp)
         if self.volume.GetMapper() != self.mapper:

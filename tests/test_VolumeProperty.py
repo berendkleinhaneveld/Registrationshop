@@ -48,7 +48,7 @@ class VolumeVisualizationTest(unittest.TestCase):
         volPropWrapper.setOriginalObject(self.visualizationCT.volProp)
 
         dump = yaml.dump(volPropWrapper)
-        VolumeVisualizationWrapper2 = yaml.load(dump)
+        VolumeVisualizationWrapper2 = yaml.load(dump, Loader=yaml.UnsafeLoader)
 
         self.assertEqual(
             volPropWrapper.independentComponents,
@@ -77,7 +77,7 @@ class VolumeVisualizationTest(unittest.TestCase):
         colorFunctionWrapper = vtkColorTransferFunctionWrapper()
         colorFunctionWrapper.setOriginalObject(self.visualizationCT.colorFunction)
         dump = yaml.dump(colorFunctionWrapper)
-        colorFunctionWrapper2 = yaml.load(dump)
+        colorFunctionWrapper2 = yaml.load(dump, Loader=yaml.UnsafeLoader)
 
         self.assertEqual(
             len(colorFunctionWrapper.nodes), len(colorFunctionWrapper2.nodes)
@@ -126,7 +126,7 @@ class VolumeVisualizationTest(unittest.TestCase):
             self.visualizationSimple.opacityFunction
         )
         dump = yaml.dump(piecewiseFunctionWrapper)
-        piecewiseFunctionWrapper2 = yaml.load(dump)
+        piecewiseFunctionWrapper2 = yaml.load(dump, Loader=yaml.UnsafeLoader)
 
         self.assertEqual(
             len(piecewiseFunctionWrapper.nodes), len(piecewiseFunctionWrapper2.nodes)
@@ -143,7 +143,7 @@ class VolumeVisualizationTest(unittest.TestCase):
         self.assertIsNotNone(volPropWrapper.opacityFunction)
 
         dump = yaml.dump(volPropWrapper)
-        volPropWrapper2 = yaml.load(dump)
+        volPropWrapper2 = yaml.load(dump, Loader=yaml.UnsafeLoader)
 
         self.assertEqual(
             volPropWrapper.visualizationType, volPropWrapper2.visualizationType

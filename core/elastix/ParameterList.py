@@ -6,7 +6,7 @@ ParameterList
 """
 
 import os
-from Parameter import Parameter
+from .Parameter import Parameter
 
 
 class ParameterList(object):
@@ -83,11 +83,8 @@ class ParameterList(object):
         if not os.path.exists(paramDirectory):
             os.makedirs(paramDirectory)
 
-        parameterFile = open(filename, "w+")
-        try:
-            parameterFile.write(content.encode("utf-8"))
-        finally:
-            parameterFile.close()
+        with open(filename, mode="w+") as fh:
+            fh.write(content)
 
     # Override methods for simple list behaviour
 

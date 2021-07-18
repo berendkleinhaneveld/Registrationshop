@@ -27,7 +27,7 @@ def Subtract(u, v):
     res = u - v
     """
     assert len(u) == len(v)
-    return map(lambda x, y: x - y, u, v)
+    return list(map(lambda x, y: x - y, u, v))
 
 
 def Multiply(u, s):
@@ -38,7 +38,7 @@ def Multiply(u, s):
     def __multiply(x):
         return x * s
 
-    return map(__multiply, u)
+    return list(map(__multiply, u))
 
 
 def Add(u, v):
@@ -46,7 +46,7 @@ def Add(u, v):
     Returns addition of two vectors.
     """
     assert len(u) == len(v)
-    return map(lambda x, y: x + y, u, v)
+    return list(map(lambda x, y: x + y, u, v))
 
 
 def Length(u):
@@ -67,7 +67,7 @@ def Normalize(u):
     length = Length(u)
     if length == 0:
         return [float("nan") for x in range(len(u))]
-    return map(lambda x: __devide(x), u)
+    return list(map(lambda x: __devide(x), u))
 
 
 def Mean(vectors):
@@ -75,7 +75,7 @@ def Mean(vectors):
     Returns the mean vector of a collection of vectors.
     :type vectors: list of iterables
     """
-    assert isinstance(vectors[0], collections.Iterable)
+    assert isinstance(vectors[0], collections.abc.Iterable)
     return Multiply(reduce(lambda x, y: Add(x, y), vectors), 1.0 / len(vectors))
 
 

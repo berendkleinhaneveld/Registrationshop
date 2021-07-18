@@ -5,18 +5,19 @@ ToolbarWidget
     Berend Klein Haneveld
 """
 import sys
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QToolButton
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QMainWindow
-from PySide.QtGui import QFont
-from PySide.QtGui import QAction
-from PySide.QtGui import QSizePolicy
-from PySide.QtGui import QIcon
-from PySide.QtCore import Qt
-from PySide.QtCore import QSize
+
+from PySide6.QtCore import QSize
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont
+from PySide6.QtGui import QIcon
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QSizePolicy
+from PySide6.QtWidgets import QToolButton
+from PySide6.QtWidgets import QWidget
 
 
 class ToolbarWidget(QWidget):
@@ -103,32 +104,7 @@ def CreateFlatButton(action):
     toolButton.setAutoRaise(True)
     toolButton.setIconSize(QSize(32, 32))
     toolButton.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-    if sys.platform.startswith("darwin"):
-        # Bug for Mac: QToolButtons do not react to setAutoRaise so
-        # can't be made flat when they are not used inside a toolbar.
-        # Setting a custom style sheet with border to none fixes this.
-        # But then it looses all its highlight and pressed visual cues
-        # so some extra styling needs to be done to provide some nice
-        # visual feedback on hover and pressed states.
-        toolButton.setStyleSheet(
-            "QToolButton {"
-            "border: none;"
-            "} "
-            "QToolButton:hover {"
-            "background-color: qradialgradient(cx: 0.5, cy: 0.5,"
-            "fx: 0.5, fy: 0.5,"
-            "radius: 0.5, "
-            "stop: 0 rgba(255, 255, 255, 100), "
-            "stop: 1 rgba(0, 0, 0, 0));"
-            "}"
-            "QToolButton:pressed {"
-            "background-color: qradialgradient(cx: 0.5, cy: 0.5,"
-            "fx: 0.5, fy: 0.5,"
-            "radius: 0.5, "
-            "stop: 0 rgba(255, 255, 255, 200), "
-            "stop: 1 rgba(0, 0, 0, 0));"
-            "}"
-        )
+
     font = QFont()
     font.setPixelSize(10)
     toolButton.setFont(font)
@@ -146,8 +122,8 @@ def CreateFlatButton(action):
 
 if __name__ == "__main__":
     import os
-    from PySide.QtGui import QApplication
-    from PySide.QtGui import QVBoxLayout
+    from PySide6.QtWidgets import QApplication
+    from PySide6.QtWidgets import QVBoxLayout
 
     app = QApplication([])
     mainWindow = QMainWindow()
@@ -188,4 +164,4 @@ if __name__ == "__main__":
     mainWindow.setCentralWidget(widget)
     mainWindow.setGeometry(100, 100, 500, 300)
     mainWindow.show()
-    app.exec_()
+    sys.exit(app.exec())

@@ -4,18 +4,19 @@ VolumeVisualizationSimple
 :Authors:
     Berend Klein Haneveld
 """
-from VolumeVisualization import VolumeVisualization
-from VolumeVisualization import VisualizationTypeSimple
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QGroupBox
+from PySide6.QtCore import Qt
 from vtk import vtkVolumeProperty
 from vtk import vtkColorTransferFunction
 from vtk import vtkPiecewiseFunction
+
+from .VolumeVisualization import VolumeVisualization
+from .VolumeVisualization import VisualizationTypeSimple
+from core.decorators import overrides
 from ui.widgets.SliderFloatWidget import SliderFloatWidget
 from ui.widgets.ColorWidget import ColorChoiceWidget
-from core.decorators import overrides
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QGroupBox
-from PySide.QtCore import Qt
 
 
 class VolumeVisualizationSimple(VolumeVisualization):
@@ -50,7 +51,9 @@ class VolumeVisualizationSimple(VolumeVisualization):
             [213, 100, 255],
             [255, 75, 75],
         ]
-        self.colors = map(lambda x: [x[0] / 255.0, x[1] / 255.0, x[2] / 255.0], colors)
+        self.colors = list(
+            map(lambda x: [x[0] / 255.0, x[1] / 255.0, x[2] / 255.0], colors)
+        )
         self.color = self.colors[0]
         self.opacity = 1.0
         self.colorFunction = None

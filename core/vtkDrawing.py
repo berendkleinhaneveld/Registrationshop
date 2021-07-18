@@ -189,7 +189,7 @@ def CreateTorus(point1, point2, axe):
     Creates a torus that has point1 as center point2 defines
     a point on the torus.
     """
-    direction = map(lambda x, y: x - y, point2, point1)
+    direction = list(map(lambda x, y: x - y, point2, point1))
     length = math.sqrt(sum(map(lambda x: x ** 2, direction)))
 
     torus = vtkParametricTorus()
@@ -226,12 +226,12 @@ def CreateBoxOnStick(point1, point2, tipRatio=0.3):
     Creates an stick with a box as tip from point1 to point2.
     Use tipRatio for setting the ratio for tip of the arrow.
     """
-    direction = map(lambda x, y: x - y, point2, point1)
+    direction = list(map(lambda x, y: x - y, point2, point1))
     length = math.sqrt(sum(map(lambda x: x ** 2, direction)))
 
-    unitDir = map(lambda x: x / length, direction)
-    shaftDir = map(lambda x: x * (1.0 - tipRatio), unitDir)
-    tipPos = map(lambda x: x * (1.0 - (tipRatio * 0.5)), unitDir)
+    unitDir = list(map(lambda x: x / length, direction))
+    shaftDir = list(map(lambda x: x * (1.0 - tipRatio), unitDir))
+    tipPos = list(map(lambda x: x * (1.0 - (tipRatio * 0.5)), unitDir))
 
     lineSource = vtkLineSource()
     lineSource.SetPoint1(0, 0, 0)
@@ -272,12 +272,12 @@ def CreateArrow(point1, point2, tipRatio=0.3):
     Creates an arrow from point1 to point2. Use tipRatio for
     setting the ratio for tip of the arrow.
     """
-    direction = map(lambda x, y: x - y, point2, point1)
+    direction = list(map(lambda x, y: x - y, point2, point1))
     length = math.sqrt(sum(map(lambda x: x ** 2, direction)))
 
-    unitDir = map(lambda x: x / length, direction)
-    shaftDir = map(lambda x: x * (1.0 - tipRatio), unitDir)
-    tipPos = map(lambda x: x * (1.0 - (tipRatio * 0.5)), unitDir)
+    unitDir = list(map(lambda x: x / length, direction))
+    shaftDir = list(map(lambda x: x * (1.0 - tipRatio), unitDir))
+    tipPos = list(map(lambda x: x * (1.0 - (tipRatio * 0.5)), unitDir))
 
     lineSource = vtkLineSource()
     lineSource.SetPoint1(0, 0, 0)
@@ -517,6 +517,6 @@ def ClosestToMeasurement(number):
     gridNudges = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000]
 
     # Calculate diff
-    diff = map(lambda x: abs(x - number), gridNudges)
+    diff = list(map(lambda x: abs(x - number), gridNudges))
     index = diff.index(min(diff))
     return gridNudges[index]

@@ -4,19 +4,21 @@ ColorWidget
 :Authors:
     Berend Klein Haneveld
 """
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QPainter
-from PySide.QtGui import QColor
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QColorDialog
-from PySide.QtGui import QButtonGroup
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QPen
-from PySide.QtCore import QSize
-from PySide.QtCore import QRectF
-from PySide.QtCore import Signal
+import sys
+
+from PySide6.QtCore import QRectF
+from PySide6.QtCore import QSize
+from PySide6.QtCore import Signal
+from PySide6.QtGui import QColor
+from PySide6.QtGui import QPainter
+from PySide6.QtGui import QPen
+from PySide6.QtWidgets import QButtonGroup
+from PySide6.QtWidgets import QColorDialog
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QWidget
 
 
 class ColorWidget(QWidget):
@@ -149,8 +151,8 @@ class ColorButton(QPushButton):
 
 
 if __name__ == "__main__":
-    from PySide.QtGui import QApplication
-    from PySide.QtGui import QVBoxLayout
+    from PySide6.QtWidgets import QApplication
+    from PySide6.QtWidgets import QVBoxLayout
 
     app = QApplication([])
 
@@ -171,4 +173,4 @@ if __name__ == "__main__":
     widget = QWidget()
     widget.setLayout(layout)
     widget.show()
-    app.exec_()
+    sys.exit(app.exec())

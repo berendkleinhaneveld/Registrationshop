@@ -1,7 +1,7 @@
 from core.vtkObjectWrapper import vtkPiecewiseFunctionWrapper
 from core.vtkObjectWrapper import vtkColorTransferFunctionWrapper
 from core.vtkObjectWrapper import vtkVolumePropertyWrapper
-from VolumeVisualizationFactory import VolumeVisualizationFactory
+from .VolumeVisualizationFactory import VolumeVisualizationFactory
 
 
 class VolumeVisualizationWrapper(object):

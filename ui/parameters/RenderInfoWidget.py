@@ -6,14 +6,14 @@ RenderInfoWidget
 """
 
 import os
-from PySide.QtGui import QWidget
+from PySide6.QtWidgets import QWidget
 from ui.widgets import Style
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QLabel
-from PySide.QtGui import QScrollArea
-from PySide.QtGui import QFrame
-from PySide.QtCore import Slot
-from PySide.QtCore import Qt
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QScrollArea
+from PySide6.QtWidgets import QFrame
+from PySide6.QtCore import Slot
+from PySide6.QtCore import Qt
 from core.data import DataReader
 from core.data.DataAnalyzer import DataAnalyzer
 from ui.widgets.histogram import Histogram

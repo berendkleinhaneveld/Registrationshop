@@ -4,7 +4,14 @@ TwoStepPicker
 :Authors:
     Berend Klein Haneveld
 """
-from Picker import Picker
+from vtk import vtkAssembly
+from vtk import vtkProp3DFollower
+from vtk import vtkMath
+from vtk import vtkImageInterpolator
+from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
+
+from .Picker import Picker
 from core.decorators import overrides
 from core.operations import Multiply
 from core.operations import Add
@@ -16,12 +23,6 @@ from core.operations import Normalize
 from core.vtkDrawing import CreateSphere
 from core.vtkDrawing import CreateLine
 from core.vtkDrawing import TransformWithMatrix
-from vtk import vtkAssembly
-from vtk import vtkProp3DFollower
-from vtk import vtkMath
-from vtk import vtkImageInterpolator
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
 
 
 class TwoStepPicker(Picker):
@@ -226,9 +227,11 @@ class TwoStepPicker(Picker):
         # Sample volume for ray profile: should be done in local coordinates,
         # so the intersections have to be transformed again
         transform.Inverse()
-        localIntersects = map(
-            lambda x: list(transform.TransformPoint(x[0], x[1], x[2])),
-            sortedIntersections,
+        localIntersects = list(
+            map(
+                lambda x: list(transform.TransformPoint(x[0], x[1], x[2])),
+                sortedIntersections,
+            )
         )
         # ab is vector pointing from localIntersects[0] to localIntersects[1]
         ab = Subtract(localIntersects[1], localIntersects[0])
@@ -378,7 +381,7 @@ def intersectionsWithBounds(bounds, transform, point1, point2):
     p[7] = [bounds[1], bounds[3], bounds[5]]
 
     # Transform corner points
-    tp = map(lambda x: list(transform.TransformPoint(x[0], x[1], x[2])), p)
+    tp = list(map(lambda x: list(transform.TransformPoint(x[0], x[1], x[2])), p))
 
     # Create triangles for each face of the cube
     triangles = []
@@ -396,7 +399,9 @@ def intersectionsWithBounds(bounds, transform, point1, point2):
     triangles.append([tp[7], tp[4], tp[1]])
 
     # Check intersection for each triangle
-    result = map(lambda x: LineIntersectionWithTriangle(point1, point2, x), triangles)
+    result = list(
+        map(lambda x: LineIntersectionWithTriangle(point1, point2, x), triangles)
+    )
     intersections = [x[1] for x in result if x[0]]
     assert len(intersections) == 2 or len(intersections) == 0
 

@@ -4,7 +4,7 @@ TransferFunctionItem
 :Authors:
     B. Klein Haneveld <b.a.kleinhaneveld@student.tudelft.nl>
 """
-from PySide.QtGui import QGraphicsRectItem
+from PySide6.QtWidgets import QGraphicsRectItem
 
 
 class TransferFunctionItem(QGraphicsRectItem):

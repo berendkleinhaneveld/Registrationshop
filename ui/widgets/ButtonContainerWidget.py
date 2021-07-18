@@ -9,17 +9,17 @@ they are displayed as flat buttons.
     Berend Klein Haneveld 2013
 """
 
-from PySide import QtCore
-from PySide.QtGui import QWidget
-from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QVBoxLayout
-from PySide.QtGui import QPalette
-from PySide.QtGui import QBrush
-from PySide.QtGui import QPainter
-from PySide.QtCore import QPoint
-from PySide.QtGui import QLinearGradient
-from PySide.QtGui import QColor
-from PySide.QtCore import Qt
+from PySide6 import QtCore
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QHBoxLayout
+from PySide6.QtWidgets import QVBoxLayout
+from PySide6.QtGui import QPalette
+from PySide6.QtGui import QBrush
+from PySide6.QtGui import QPainter
+from PySide6.QtCore import QPoint
+from PySide6.QtGui import QLinearGradient
+from PySide6.QtGui import QColor
+from PySide6.QtCore import Qt
 import sys
 
 
@@ -50,6 +50,7 @@ class ButtonContainer(QWidget):
             gradient.setStart(0, 0)
             gradient.setFinalStop(0, self.Height)
 
+            # FIXME: update for dark theme
             colorTop = QColor(250, 250, 250, 255)
             colorMid = QColor(244, 244, 244, 255)
             colorInBetween = QColor(238, 238, 238, 255)
@@ -63,10 +64,10 @@ class ButtonContainer(QWidget):
 
             brush = QBrush(gradient)
             palette = QPalette()
-            palette.setBrush(QPalette.Background, brush)
+            palette.setBrush(QPalette.Window, brush)
 
             self.setAutoFillBackground(True)
-            self.setPalette(palette)
+            # self.setPalette(palette)
 
         # Use a horizontal layout in which to keep
         # buttons. Initialize with an empty QWidget to

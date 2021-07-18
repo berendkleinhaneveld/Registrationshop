@@ -6,14 +6,14 @@ TitleWidget
 """
 
 import sys
-from PySide.QtGui import QWidget
-from PySide.QtGui import QColor
-from PySide.QtGui import QLinearGradient
-from PySide.QtGui import QBrush
-from PySide.QtGui import QPalette
-from PySide.QtGui import QLabel
-from PySide.QtGui import QVBoxLayout
-from PySide.QtCore import Qt
+from PySide6.QtWidgets import QWidget
+from PySide6.QtGui import QColor
+from PySide6.QtGui import QLinearGradient
+from PySide6.QtGui import QBrush
+from PySide6.QtGui import QPalette
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QVBoxLayout
+from PySide6.QtCore import Qt
 
 
 class TitleWidget(QWidget):
@@ -27,6 +27,7 @@ class TitleWidget(QWidget):
         super(TitleWidget, self).__init__()
 
         if sys.platform.startswith("darwin"):
+            # FIXME: update for dark theme
             color1 = QColor(230, 230, 230, 255)
             color2 = QColor(177, 177, 177, 255)
 
@@ -38,7 +39,7 @@ class TitleWidget(QWidget):
 
             brush = QBrush(gradient)
             palette = QPalette()
-            palette.setBrush(QPalette.Background, brush)
+            palette.setBrush(QPalette.Window, brush)
             self.setPalette(palette)
             self.setAutoFillBackground(True)
 

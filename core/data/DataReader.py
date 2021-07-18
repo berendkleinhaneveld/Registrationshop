@@ -5,13 +5,15 @@ DataReader
     Berend Klein Haneveld
 """
 
+import os
+
 from vtk import vtkImageData
 from vtk import vtkMetaImageReader
 from vtk import vtkXMLImageDataReader
 from vtk import vtkDICOMImageReader
 from vtk import vtkNrrdReader
-from DataController import DataController
-import os
+
+from .DataController import DataController
 
 
 class DataReader(DataController):

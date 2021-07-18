@@ -5,12 +5,12 @@ TransformationHistoryWidget
     Berend Klein Haneveld
 """
 
-from PySide.QtGui import QWidget
-from PySide.QtGui import QIcon
-from PySide.QtGui import QVBoxLayout
-from PySide.QtGui import QPushButton
-from PySide.QtGui import QMessageBox
-from PySide.QtCore import Qt
+from PySide6.QtWidgets import QWidget
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QVBoxLayout
+from PySide6.QtWidgets import QPushButton
+from PySide6.QtWidgets import QMessageBox
+from PySide6.QtCore import Qt
 from core.AppVars import AppVars
 from ui.widgets import ButtonContainer
 from ui.transformations import TransformationModel
@@ -74,7 +74,7 @@ class TransformationHistoryWidget(QWidget):
         messageBox.setInformativeText("Do you want to proceed?")
         messageBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         messageBox.setDefaultButton(QMessageBox.Ok)
-        res = messageBox.exec_()
+        res = messageBox.exec()
         if res == QMessageBox.Ok:
             self.transformationView.removeLastRow()
 

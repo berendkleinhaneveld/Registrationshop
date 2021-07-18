@@ -5,12 +5,12 @@ ProjectController
     Berend Klein Haneveld
 """
 
-from PySide.QtCore import QObject
-from PySide.QtCore import Slot
-from PySide.QtCore import Signal
+from PySide6.QtCore import QObject
+from PySide6.QtCore import Slot
+from PySide6.QtCore import Signal
 import yaml
 
-from Project import Project
+from .Project import Project
 from core.decorators import Singleton
 
 
@@ -60,7 +60,7 @@ class ProjectController(QObject):
         projectFile = open(projectFileName, "r")
 
         try:
-            project = yaml.load(projectFile)
+            project = yaml.load(projectFile, Loader=yaml.UnsafeLoader)
             self.currentProject = project
         except Exception as e:
             print(e)

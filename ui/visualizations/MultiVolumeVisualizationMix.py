@@ -4,19 +4,20 @@ MultiVolumeVisualizationMix
 :Authors:
     Berend Klein Haneveld
 """
-from MultiVolumeVisualization import MultiVolumeVisualization
-from MultiVolumeVisualization import CreateFunctionFromProperties
-from MultiVolumeVisualization import CreateEmptyFunctions
-from VolumeVisualization import VisualizationTypeSimple
-from core.decorators import overrides
-from PySide.QtGui import QGroupBox
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QSlider
-from PySide.QtGui import QComboBox
-from PySide.QtCore import Qt
+from PySide6.QtWidgets import QGroupBox
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtWidgets import QSlider
+from PySide6.QtWidgets import QComboBox
+from PySide6.QtCore import Qt
 from vtk import vtkVolumeProperty
+
+from .MultiVolumeVisualization import MultiVolumeVisualization
+from .MultiVolumeVisualization import CreateFunctionFromProperties
+from .MultiVolumeVisualization import CreateEmptyFunctions
+from .VolumeVisualization import VisualizationTypeSimple
+from core.decorators import overrides
 
 
 class MultiVolumeVisualizationMix(MultiVolumeVisualization):
@@ -134,8 +135,9 @@ class MultiVolumeVisualizationMix(MultiVolumeVisualization):
             self.movingVisualization, self.movingOpacity
         )
 
-        if self.mapper:
-            self.mapper.SetBlendType(self.blendType)
+        # FIXME
+        # if self.mapper:
+        # self.mapper.SetBlendType(self.blendType)
 
         self.updatedTransferFunction.emit()
 

@@ -3,7 +3,7 @@
     Berend Klein Haneveld
 """
 
-from Queue import Queue
+from queue import Queue
 from core.worker.Worker import Worker
 
 

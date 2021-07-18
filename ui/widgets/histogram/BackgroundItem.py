@@ -8,13 +8,13 @@ from Exposure Render (http://code.google.com/p/exposure-render/)
     T. Kroes <t.kroes@tudelft.nl>
     B. Klein Haneveld <b.a.kleinhaneveld@student.tudelft.nl>
 """
-from PySide.QtGui import QBrush
-from PySide.QtGui import QColor
-from PySide.QtGui import QGraphicsRectItem
-from PySide.QtGui import QPainter
-from PySide.QtGui import QPen
-from PySide.QtCore import QMargins
-from PySide.QtCore import QRectF
+from PySide6.QtGui import QBrush
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QGraphicsRectItem
+from PySide6.QtGui import QPainter
+from PySide6.QtGui import QPen
+from PySide6.QtCore import QMargins
+from PySide6.QtCore import QRectF
 
 
 class BackgroundItem(QGraphicsRectItem):

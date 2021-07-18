@@ -47,7 +47,7 @@ class TestProject(unittest.TestCase):
         yamlObjectDump = yaml.dump(self.project)
         self.assertIn("title", yamlObjectDump)
 
-        project = yaml.load(yamlObjectDump)
+        project = yaml.load(yamlObjectDump, Loader=yaml.UnsafeLoader)
         self.assertEqual(project, self.project)
 
     # def testStrategy(self):

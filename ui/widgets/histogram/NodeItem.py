@@ -8,15 +8,15 @@ from Exposure Render (http://code.google.com/p/exposure-render/)
     T. Kroes <t.kroes@tudelft.nl>
     B. Klein Haneveld <b.a.kleinhaneveld@student.tudelft.nl>
 """
-from PySide.QtGui import QGraphicsEllipseItem
-from PySide.QtGui import QCursor
-from PySide.QtGui import QBrush
-from PySide.QtGui import QPen
-from PySide.QtGui import QColor
-from PySide.QtGui import QGraphicsItem
-from PySide.QtCore import QPointF
-from PySide.QtCore import QRectF
-from PySide.QtCore import Qt
+from PySide6.QtWidgets import QGraphicsEllipseItem
+from PySide6.QtGui import QCursor
+from PySide6.QtGui import QBrush
+from PySide6.QtGui import QPen
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QGraphicsItem
+from PySide6.QtCore import QPointF
+from PySide6.QtCore import QRectF
+from PySide6.QtCore import Qt
 
 
 class NodeItem(QGraphicsEllipseItem):

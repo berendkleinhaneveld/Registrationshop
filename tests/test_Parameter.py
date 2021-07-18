@@ -6,13 +6,13 @@ class ParameterTest(unittest.TestCase):
     def testParameter(self):
         # Test init function
         param = Parameter("key", 10)
-        self.assertEquals(param.key(), "key")
-        self.assertEquals(param.value(), 10)
+        self.assertEqual(param.key(), "key")
+        self.assertEqual(param.value(), 10)
         # Test string representation
-        self.assertEquals(param.__str__(), "(key 10)")
+        self.assertEqual(param.__str__(), "(key 10)")
         # Test changing the key
         param.setKey("otherKey")
-        self.assertEquals(param.key(), "otherKey")
+        self.assertEqual(param.key(), "otherKey")
 
         # Test simple object creation
         param = Parameter()
@@ -21,23 +21,23 @@ class ParameterTest(unittest.TestCase):
 
         # Test setting the values with the KeyValue function
         param.setKeyValue("otherKey", 20)
-        self.assertEquals(param.key(), "otherKey")
-        self.assertEquals(param.value(), 20)
+        self.assertEqual(param.key(), "otherKey")
+        self.assertEqual(param.value(), 20)
 
         # Test with setting only the key
         param = Parameter("key")
-        self.assertEquals(param.key(), "key")
+        self.assertEqual(param.key(), "key")
         self.assertIsNone(param.value())
 
         param = Parameter("key", 0.4)
         otherParam = Parameter("".join(["k", "e", "y"]), 0.4)
-        self.assertEquals(param, otherParam)
+        self.assertEqual(param, otherParam)
 
         # Strip characters from key, but not from value
         param.setKey("    Key With Spaces  \n")
-        self.assertEquals(param.key(), "KeyWithSpaces")
+        self.assertEqual(param.key(), "KeyWithSpaces")
         param.setValue("Value with spaces")
-        self.assertEquals(param.value(), ["Value", "with", "spaces"])
+        self.assertEqual(param.value(), ["Value", "with", "spaces"])
 
         self.assertFalse(param == Parameter("Hello", 10))
         self.assertTrue(param != Parameter("Hello", 10))
@@ -62,11 +62,11 @@ class ParameterTest(unittest.TestCase):
             newValue, success = Parameter.valueAsInt(value)
             if success:
                 self.assertIsInstance(newValue, int)
-                self.assertEquals(newValue, 20)
+                self.assertEqual(newValue, 20)
             newValue, success = Parameter.valueAsFloat(value)
             if success:
                 self.assertIsInstance(newValue, float)
-                self.assertEquals(newValue, 0.4)
+                self.assertEqual(newValue, 0.4)
 
         param = Parameter("Key", 0)
         self.assertIsInstance(param.value(), int)
@@ -91,7 +91,7 @@ class ParameterTest(unittest.TestCase):
         # Multiple values
         ls = [0.5, 0.3, 5.2, 3, -2]
         param = Parameter("key", ls)
-        self.assertEquals(param.__str__(), "(key 0.5 0.3 5.2 3 -2)")
+        self.assertEqual(param.__str__(), "(key 0.5 0.3 5.2 3 -2)")
 
         # Empty list
         ls = []
@@ -100,26 +100,26 @@ class ParameterTest(unittest.TestCase):
         # Single item
         ls = [0.3]
         param.setValue(ls)
-        self.assertEquals(param.__str__(), "(key 0.3)")
+        self.assertEqual(param.__str__(), "(key 0.3)")
         param.setValue("value")
-        self.assertEquals(param.__str__(), '(key "value")')
+        self.assertEqual(param.__str__(), '(key "value")')
 
     def testStringRepresentations(self):
         # Test the string representations
         # String value
         param = Parameter("key", "value")
-        self.assertEquals(param.__str__(), '(key "value")')
+        self.assertEqual(param.__str__(), '(key "value")')
         # Integer value
         param.setValue(20)
-        self.assertEquals(param.__str__(), "(key 20)")
+        self.assertEqual(param.__str__(), "(key 20)")
         # Float value
         param.setValue(20.0)
-        self.assertEquals(param.__str__(), "(key 20.0)")
+        self.assertEqual(param.__str__(), "(key 20.0)")
         # bool values
         param.setValue(True)
-        self.assertEquals(param.__str__(), '(key "true")')
+        self.assertEqual(param.__str__(), '(key "true")')
         param.setValue(False)
-        self.assertEquals(param.__str__(), '(key "false")')
+        self.assertEqual(param.__str__(), '(key "false")')
 
     def testParameterFromString(self):
         param = Parameter.parameterFromString("")
@@ -133,8 +133,8 @@ class ParameterTest(unittest.TestCase):
 
         param = Parameter.parameterFromString("(a 1)")
         self.assertIsNotNone(param)
-        self.assertEquals(param.key(), "a")
-        self.assertEquals(param.value(), 1)
+        self.assertEqual(param.key(), "a")
+        self.assertEqual(param.value(), 1)
 
         param = Parameter.parameterFromString("a (1)")
         self.assertIsNone(param)
@@ -147,8 +147,8 @@ class ParameterTest(unittest.TestCase):
 
         param = Parameter.parameterFromString("(a b c)")
         self.assertIsNotNone(param)
-        self.assertEquals(param.key(), "a")
-        self.assertEquals(param.value(), ["b", "c"])
+        self.assertEqual(param.key(), "a")
+        self.assertEqual(param.value(), ["b", "c"])
 
         param = Parameter.parameterFromString("(ab)")
         self.assertIsNone(param)
@@ -157,4 +157,4 @@ class ParameterTest(unittest.TestCase):
         param = Parameter.parameterFromString("(a 4 4 4 1 1)")
         self.assertIsNotNone(param)
 
-        self.assertEquals(param.__str__(), "(a 4 4 4 1 1)")
+        self.assertEqual(param.__str__(), "(a 4 4 4 1 1)")

@@ -5,21 +5,22 @@ DeformableTransformationTool
     Berend Klein Haneveld 2013
 """
 import os
-from TransformationTool import TransformationTool
-from ParameterWidget import ParameterWidget
-from ui.transformations import Transformation
-from ui.widgets.StatusWidget import StatusWidget
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QGridLayout
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
 from vtk import vtkTransform
+
+from .TransformationTool import TransformationTool
+from .ParameterWidget import ParameterWidget
 from core.decorators import overrides
 from core.worker import Operator
 from core.elastix import ElastixCommand
 from core.elastix import TransformixTransformation
 from core.project import ProjectController
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QGridLayout
-from PySide.QtCore import Qt
-from PySide.QtCore import Signal
+from ui.transformations import Transformation
+from ui.widgets.StatusWidget import StatusWidget
 
 
 class DeformableTransformationTool(TransformationTool):

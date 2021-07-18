@@ -23,9 +23,9 @@ class DataResizerTest(unittest.TestCase):
 
         newDimensions = resizedData.GetDimensions()
 
-        self.assertEquals(newDimensions[0], 256)
-        self.assertEquals(newDimensions[1], 256)
-        self.assertEquals(newDimensions[2], 98)
+        self.assertEqual(newDimensions[0], 256)
+        self.assertEqual(newDimensions[1], 256)
+        self.assertEqual(newDimensions[2], 98)
 
     def testCalculateFactor(self):
         dimensions = [512, 512, 196]
@@ -57,9 +57,9 @@ class DataResizerTest(unittest.TestCase):
 
         newDimensions = resizedData.GetDimensions()
 
-        self.assertEquals(dimensions[0], newDimensions[0])
-        self.assertEquals(dimensions[1], newDimensions[1])
-        self.assertEquals(dimensions[2], newDimensions[2])
+        self.assertEqual(dimensions[0], newDimensions[0])
+        self.assertEqual(dimensions[1], newDimensions[1])
+        self.assertEqual(dimensions[2], newDimensions[2])
 
 
 # Helper method
