@@ -53,7 +53,7 @@ class MultiRenderController(QObject):
         """
         :type fileName: str
         """
-        if fileName is None:
+        if not fileName:
             self.fixedImageData = None
             self.fixedVisualization = None
             self.visualization = None
@@ -83,7 +83,7 @@ class MultiRenderController(QObject):
 
     @Slot(str)
     def setMovingFile(self, fileName):
-        if fileName is None:
+        if not fileName:
             self.movingImageData = None
             self.movingVisualization = None
             self.multiRenderWidget.setMovingData(self.movingImageData)

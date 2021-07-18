@@ -154,8 +154,9 @@ class MultiRenderWidget(QWidget):
         if self.movingImageData is None:
             self.movingImageData = CreateEmptyImageData()
 
-        self.mapper.SetInputData(0, self.fixedImageData)
-        self.mapper.SetInputData(1, self.movingImageData)
+        # FIXME
+        # self.mapper.SetInputData(0, self.fixedImageData)
+        # self.mapper.SetInputData(1, self.movingImageData)
 
         for index in range(3):
             self._imagePlaneWidgets[index].SetInputData(self.fixedImageData)
@@ -175,8 +176,9 @@ class MultiRenderWidget(QWidget):
         if self.fixedImageData is None:
             self.fixedImageData = CreateEmptyImageData()
 
-        self.mapper.SetInputData(0, self.fixedImageData)
-        self.mapper.SetInputData(1, self.movingImageData)
+        # FIXME
+        # self.mapper.SetInputData(0, self.fixedImageData)
+        # self.mapper.SetInputData(1, self.movingImageData)
 
         self._updateGrids()
         self._shouldResetCamera = True

@@ -43,7 +43,7 @@ class RenderInfoWidget(QWidget):
         """
         Slot that reads properties of the dataset and displays them in a few widgets.
         """
-        if fileName is None:
+        if not fileName:
             return
 
         self.fileName = fileName

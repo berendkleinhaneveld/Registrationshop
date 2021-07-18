@@ -80,7 +80,7 @@ class RenderPropWidget(QWidget):
         and the actual tabs with parameters are put on screen.
         """
         layout = self.layout()
-        if fileName is None:
+        if not fileName:
             if layout.indexOf(self.tabWidget) != -1:
                 # Remove the parameter widgets
                 layout.removeWidget(self.tabWidget)

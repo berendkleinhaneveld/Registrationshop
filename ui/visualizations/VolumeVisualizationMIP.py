@@ -113,8 +113,9 @@ class VolumeVisualizationMIP(VolumeVisualization):
             self.otherColRes.addWidgetsFromLayout(self.levelSlider.layout(), 2)
             self.otherColRes.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 2)
             self.otherColRes.addWidgetsFromLayout(self.upperBoundSlider.layout(), 2)
-        except Exception as e:
-            print(e)
+        except Exception:
+            # print(e)
+            pass
 
         return widget
 
@@ -156,14 +157,15 @@ class VolumeVisualizationMIP(VolumeVisualization):
         self.volProp.SetColor(self.colorFunction)
         self.volProp.SetScalarOpacity(self.opacityFunction)
 
-        lowerBound = (self.lowerBound - self.minimum) / (self.maximum - self.minimum)
-        upperBound = (self.upperBound - self.minimum) / (self.maximum - self.minimum)
+        # FIXME
+        # lowerBound = (self.lowerBound - self.minimum) / (self.maximum - self.minimum)
+        # upperBound = (self.upperBound - self.minimum) / (self.maximum - self.minimum)
 
-        if self.mapper:
-            self.mapper.SetWindow(self.window)
-            self.mapper.SetLevel(self.level)
-            self.mapper.SetLowerBound(lowerBound)
-            self.mapper.SetUpperBound(upperBound)
+        # if self.mapper:
+        #     self.mapper.SetWindow(self.window)
+        #     self.mapper.SetLevel(self.level)
+        #     self.mapper.SetLowerBound(lowerBound)
+        #     self.mapper.SetUpperBound(upperBound)
 
         self.updatedTransferFunction.emit()
 

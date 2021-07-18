@@ -8,6 +8,7 @@ they are displayed as flat buttons.
 :Authors:
     Berend Klein Haneveld 2013
 """
+import sys
 
 from PySide6 import QtCore
 from PySide6.QtWidgets import QWidget
@@ -20,7 +21,7 @@ from PySide6.QtCore import QPoint
 from PySide6.QtGui import QLinearGradient
 from PySide6.QtGui import QColor
 from PySide6.QtCore import Qt
-import sys
+import darkdetect
 
 
 class ButtonContainer(QWidget):
@@ -50,16 +51,27 @@ class ButtonContainer(QWidget):
             gradient.setStart(0, 0)
             gradient.setFinalStop(0, self.Height)
 
-            # FIXME: update for dark theme
-            colorTop = QColor(250, 250, 250, 255)
-            colorMid = QColor(244, 244, 244, 255)
-            colorInBetween = QColor(238, 238, 238, 255)
-            colorMidLow = QColor(234, 234, 234, 255)
-            colorLow = QColor(239, 239, 239, 255)
+            colorTop = (
+                QColor(250, 250, 250, 255)
+                if not darkdetect.isDark()
+                else QColor(73, 73, 73)
+            )
+            # colorMid = QColor(244, 244, 244, 255)
+            colorInBetween = (
+                QColor(238, 238, 238, 255)
+                if not darkdetect.isDark()
+                else QColor(70, 70, 70)
+            )
+            # colorMidLow = QColor(234, 234, 234, 255)
+            colorLow = (
+                QColor(239, 239, 239, 255)
+                if not darkdetect.isDark()
+                else QColor(66, 66, 66)
+            )
             gradient.setColorAt(0, colorTop)
-            gradient.setColorAt(0.45, colorMid)
+            # gradient.setColorAt(0.45, colorMid)
             gradient.setColorAt(0.5, colorInBetween)
-            gradient.setColorAt(0.55, colorMidLow)
+            # gradient.setColorAt(0.55, colorMidLow)
             gradient.setColorAt(1, colorLow)
 
             brush = QBrush(gradient)
@@ -67,7 +79,7 @@ class ButtonContainer(QWidget):
             palette.setBrush(QPalette.Window, brush)
 
             self.setAutoFillBackground(True)
-            # self.setPalette(palette)
+            self.setPalette(palette)
 
         # Use a horizontal layout in which to keep
         # buttons. Initialize with an empty QWidget to
@@ -112,7 +124,11 @@ class ButtonContainer(QWidget):
         height = size.height() - 1
         width = size.width() - 1
         painter = QPainter(self)
-        painter.setPen(QColor(165, 165, 165, 255))
+        painter.setPen(
+            QColor(165, 165, 165, 255)
+            if not darkdetect.isDark()
+            else QColor(90, 90, 90, 255)
+        )
         painter.drawLine(QPoint(0, 0), QPoint(0, height))
         painter.drawLine(QPoint(0, height), QPoint(width, height))
         painter.drawLine(QPoint(width, height), QPoint(width, 0))

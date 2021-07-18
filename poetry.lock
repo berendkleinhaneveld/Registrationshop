@@ -163,6 +163,14 @@ python-versions = "*"
 six = "*"
 
 [[package]]
+name = "darkdetect"
+version = "0.3.1"
+description = "Detect OS Dark Mode from Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "dataclasses"
 version = "0.8"
 description = "A backport of the dataclasses module for Python 3.6"
@@ -686,7 +694,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.2,<3.10"
-content-hash = "c5ee489ecd25696236dc279a74fe3cedf344f87ce170f5036c9414065331377f"
+content-hash = "80758a2275b8ac0677a7ee170d8ad9e3e04768b0653ab3fe38d707efeeb7639a"
 
 [metadata.files]
 appdirs = [
@@ -784,6 +792,10 @@ cryptography = [
 cycler = [
     {file = "cycler-0.10.0-py2.py3-none-any.whl", hash = "sha256:1d8a5ae1ff6c5cf9b93e8811e581232ad8920aeec647c37316ceac982b08cb2d"},
     {file = "cycler-0.10.0.tar.gz", hash = "sha256:cd7b2d1018258d7247a71425e9f26463dfb444d411c39569972f4ce586b0c9d8"},
+]
+darkdetect = [
+    {file = "darkdetect-0.3.1-py3-none-any.whl", hash = "sha256:2c4248f00de75492b3b1443c600cd32f835136342c0de2e77a56a09f799d0d1c"},
+    {file = "darkdetect-0.3.1.tar.gz", hash = "sha256:bfe2f6e9b4eedacf9d52e4b0af4295869ea18e848194469cee5aa78cd4980e4c"},
 ]
 dataclasses = [
     {file = "dataclasses-0.8-py3-none-any.whl", hash = "sha256:0201d89fa866f68c8ebd9d08ee6ff50c0b255f8ec63a71c16fda7af82bb887bf"},

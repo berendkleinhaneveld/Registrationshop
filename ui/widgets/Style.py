@@ -7,6 +7,7 @@ Contains convenience functions for styling widgets.
     Berend Klein Haneveld
 """
 import sys
+import darkdetect
 
 
 def styleWidgetForTab(widget):
@@ -29,7 +30,10 @@ def styleWidgetForTab(widget):
     """
     if sys.platform.startswith("darwin"):
         widget.setObjectName("tabWidget")
-        widget.setStyleSheet("#tabWidget {background: rgb(229, 229, 229);}")
+        if darkdetect.isDark():
+            widget.setStyleSheet("#tabWidget {background: rgb(57, 57, 57);}")
+        else:
+            widget.setStyleSheet("#tabWidget {background: rgb(229, 229, 229);}")
     elif sys.platform.startswith("linux"):
         # This makes it look pretty on Elementary theme
         widget.setObjectName("tabWidget")

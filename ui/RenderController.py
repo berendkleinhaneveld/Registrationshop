@@ -73,7 +73,7 @@ class RenderController(QObject):
         """
         :type fileName: str
         """
-        if fileName is None:
+        if not fileName:
             self.imageData = None
             self.visualization = None
             self.renderWidget.setData(self.imageData)

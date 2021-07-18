@@ -139,8 +139,9 @@ class VolumeVisualizationSimple(VolumeVisualization):
             self.otherColRes.addWidgetsFromLayout(self.lowerBoundSlider.layout(), 2)
             self.otherColRes.addWidgetsFromLayout(self.upperBoundSlider.layout(), 2)
             self.otherColRes.addWidgetsFromLayout(self.opacitySlider.layout(), 2)
-        except Exception as e:
-            print(e)
+        except Exception:
+            # print(e)
+            pass
 
         return widget
 

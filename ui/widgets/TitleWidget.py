@@ -6,6 +6,8 @@ TitleWidget
 """
 
 import sys
+
+import darkdetect
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QColor
 from PySide6.QtGui import QLinearGradient
@@ -28,8 +30,12 @@ class TitleWidget(QWidget):
 
         if sys.platform.startswith("darwin"):
             # FIXME: update for dark theme
-            color1 = QColor(230, 230, 230, 255)
-            color2 = QColor(177, 177, 177, 255)
+            if not darkdetect.isDark():
+                color1 = QColor(230, 230, 230, 255)
+                color2 = QColor(177, 177, 177, 255)
+            else:
+                color1 = QColor(110, 110, 110, 255)
+                color2 = QColor(70, 70, 70, 255)
 
             gradient = QLinearGradient()
             gradient.setStart(0, 0)

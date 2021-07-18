@@ -147,8 +147,9 @@ class VolumeVisualizationCT(VolumeVisualization):
 
             columnResizer = ColumnResizer()
             columnResizer.addWidgetsFromLayout(layout, 0)
-        except Exception as e:
-            print(e)
+        except Exception:
+            # print(e)
+            pass
 
         widget = QWidget()
         widget.setLayout(layout)

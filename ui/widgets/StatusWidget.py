@@ -5,6 +5,7 @@ StatusWidget
     Berend Klein Haneveld
 """
 
+import darkdetect
 from PySide6.QtWidgets import QFrame
 from PySide6.QtWidgets import QGridLayout
 from PySide6.QtWidgets import QLabel
@@ -13,6 +14,7 @@ from PySide6.QtGui import QPen
 from PySide6.QtGui import QColor
 from PySide6.QtGui import QFont
 from PySide6.QtCore import QRectF
+
 from core.decorators import Singleton
 
 
@@ -25,13 +27,11 @@ class StatusWidget(QFrame):
     def __init__(self):
         QFrame.__init__(self)
 
-        # FIXME: update for dark theme
-        self._color = [220, 220, 220]
+        self._color = [220, 220, 220] if not darkdetect.isDark() else [80, 80, 80]
 
         self._font = QFont()
         self._font.setPixelSize(10)
 
-        # FIXME: update for dark theme
         self._pen = QPen(QColor(100, 100, 100, 255))
 
         self.label = QLabel()
