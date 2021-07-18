@@ -49,8 +49,3 @@ class TestProject(unittest.TestCase):
 
         project = yaml.load(yamlObjectDump, Loader=yaml.UnsafeLoader)
         self.assertEqual(project, self.project)
-
-    # def testStrategy(self):
-    #     # testProject = Project(title="TestProject", fixedData="FixedTest",
-    #     #     movingData="MovingTest", isReference=True)
-    #     self.assertIsNotNone(self.project.strategy)

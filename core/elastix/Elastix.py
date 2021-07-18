@@ -6,9 +6,9 @@ Elastix
 """
 
 import os
-import sys
-import subprocess
 import multiprocessing
+
+import itk
 
 
 class Elastix(object):
@@ -40,34 +40,23 @@ class Elastix(object):
 
         numberOfCores = multiprocessing.cpu_count()
 
-        # Create Elastix command with the right parameters
-        commands = [
-            "elastix",
-            "-m",
-            command.movingData,
-            "-f",
-            command.fixedData,
-            "-out",
-            command.outputFolder,
-            "-p",
-            command.transformation,
-            "-threads",
-            str(numberOfCores),
-        ]
+        fixedImage = itk.imread(command.fixedData, itk.F)
+        movingImage = itk.imread(command.movingData, itk.F)
 
+        parameterObject = itk.ParameterObject.New()
+        parameterObject.AddParameterFile(command.transformation)
+
+        kwargs = {
+            "parameter_object": parameterObject,
+            "log_to_console": False,
+            "output_directory": command.outputFolder,
+            "number_of_threads": numberOfCores,
+        }
         if command.initialTransformation:
-            commands.append("-t0")
-            commands.append(command.initialTransformation)
+            kwargs[
+                "initial_transform_parameter_file_name"
+            ] = command.initialTransformation
 
-        # Try and call elastix
-        try:
-            proc = subprocess.Popen(commands, stdout=subprocess.PIPE)
-            for line in iter(proc.stdout.readline, ""):
-                # print line.rstrip()
-                pass
-        except Exception:
-            print("Image registration failed with command:")
-            print(commands)
-            print("More detailed info:")
-            print(sys.exc_info())
-            raise
+        resultImage, resultTransformParameters = itk.elastix_registration_method(
+            fixedImage, movingImage, **kwargs
+        )
