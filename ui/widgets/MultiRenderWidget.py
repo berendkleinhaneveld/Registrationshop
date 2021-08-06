@@ -12,12 +12,14 @@ from PySide6.QtWidgets import QWidget
 from vtk import VTK_FLOAT
 from vtk import vtkColorTransferFunction
 from vtk import vtkImageData
+from vtk import vtkImageDataStreamer
 from vtk import vtkImagePlaneWidget
 from vtk import vtkInteractorStyleTrackballCamera
-from vtk import vtkOpenGLGPUVolumeRayCastMapper as vtkOpenGLGPUMultiVolumeRayCastMapper
+from vtk import vtkGPUVolumeRayCastMapper
+from vtk import vtkVolume
+from vtk import vtkMultiVolume
 from vtk import vtkPiecewiseFunction
 from vtk import vtkRenderer
-from vtk import vtkVolume
 from vtk import vtkVolumeProperty
 
 # from vtk import vtkOpenGLGPUMultiVolumeRayCastMapper
@@ -77,6 +79,7 @@ class MultiRenderWidget(QWidget):
         self.rendererOverlay.SetLayer(1)
         self.rendererOverlay.SetInteractive(0)
         self.renderer.GetActiveCamera().AddObserver("ModifiedEvent", self._syncCameras)
+        self.renderer.GetActiveCamera().SetPosition(200, 0, 0)
 
         self.rwi = QVTKRenderWindowInteractor(parent=self)
         self.rwi.SetInteractorStyle(vtkInteractorStyleTrackballCamera())
@@ -90,9 +93,14 @@ class MultiRenderWidget(QWidget):
             self._imagePlaneWidgets[index].DisplayTextOn()
             self._imagePlaneWidgets[index].SetInteractor(self.rwi)
 
-        self.mapper = vtkOpenGLGPUMultiVolumeRayCastMapper()
+        self.mapper = vtkGPUVolumeRayCastMapper()
         self.mapper.SetBlendModeToComposite()
-        self.volume = vtkVolume()
+        self.mapper.SetAutoAdjustSampleDistances(1)
+        self.fixedVolume = vtkVolume()
+        self.movingVolume = vtkVolume()
+        self.volume = vtkMultiVolume()
+        self.volume.SetVolume(self.fixedVolume, 0)
+        self.volume.SetVolume(self.movingVolume, 1)
         self.volume.SetMapper(self.mapper)
         self.renderer.AddViewProp(self.volume)
 
@@ -116,10 +124,11 @@ class MultiRenderWidget(QWidget):
         self.clippingBox = ClippingBox()
         self.clippingBox.setWidget(self)
 
-        # FIXME
-        # self.mapper.SetInputData(0, self.fixedImageData)
-        # self.mapper.SetInputData(1, self.movingImageData)
-        self.mapper.SetInputData(self.movingImageData)
+        self.fixedImageDataStreamer = vtkImageDataStreamer()
+        self.movingImageDataStreamer = vtkImageDataStreamer()
+
+        self.mapper.SetInputConnection(0, self.fixedImageDataStreamer.GetOutputPort())
+        self.mapper.SetInputConnection(1, self.movingImageDataStreamer.GetOutputPort())
 
         self._transformations = TransformationList()
         self._transformations.transformationChanged.connect(self.updateTransformation)
@@ -137,7 +146,8 @@ class MultiRenderWidget(QWidget):
     def render(self):
         if self._shouldResetCamera:
             self.renderer.ResetCamera()
-            self._shouldResetCamera = False
+            # self._shouldResetCamera = False
+
         self.rwi.Render()
         # Prevent warning messages on OSX by not asking to render
         # when the render window has never rendered before
@@ -154,9 +164,11 @@ class MultiRenderWidget(QWidget):
         if self.movingImageData is None:
             self.movingImageData = CreateEmptyImageData()
 
-        # FIXME
-        # self.mapper.SetInputData(0, self.fixedImageData)
-        # self.mapper.SetInputData(1, self.movingImageData)
+        self.fixedImageDataStreamer.SetInputData(self.fixedImageData)
+        self.movingImageDataStreamer.SetInputData(self.movingImageData)
+
+        self.fixedImageDataStreamer.Modified()
+        self.movingImageDataStreamer.Modified()
 
         for index in range(3):
             self._imagePlaneWidgets[index].SetInputData(self.fixedImageData)
@@ -176,9 +188,11 @@ class MultiRenderWidget(QWidget):
         if self.fixedImageData is None:
             self.fixedImageData = CreateEmptyImageData()
 
-        # FIXME
-        # self.mapper.SetInputData(0, self.fixedImageData)
-        # self.mapper.SetInputData(1, self.movingImageData)
+        self.fixedImageDataStreamer.SetInputData(self.fixedImageData)
+        self.movingImageDataStreamer.SetInputData(self.movingImageData)
+
+        self.fixedImageDataStreamer.Modified()
+        self.movingImageDataStreamer.Modified()
 
         self._updateGrids()
         self._shouldResetCamera = True
@@ -264,6 +278,7 @@ class MultiRenderWidget(QWidget):
     @transformations.setter
     def transformations(self, value):
         self._transformations.copyFromTransformations(value)
+        self._shouldResetCamera = True
 
     # Slots
 
@@ -294,13 +309,18 @@ class MultiRenderWidget(QWidget):
         # self.mapper.SetSecondInputUserTransform(transform)
         for item in self.movingGridItems:
             item.SetUserTransform(transform)
+
         self.render()
 
     # Private methods
 
     def _updateMapper(self, volVis, volNr):
-        # FIXME
+        volume = self.fixedVolume if volNr == 1 else self.movingVolume
+
+        if volume.GetProperty() != volVis.volProp:
+            volume.SetProperty(volVis.volProp)
         return
+
         shaderType = volVis.shaderType()
         if volNr == 1:
             self.mapper.SetShaderType1(shaderType)
@@ -349,11 +369,10 @@ class MultiRenderWidget(QWidget):
         """
         Private method to update the volume properties.
         """
-        if self.volume.GetProperty() != self.fixedVolumeProperty:
-            self.volume.SetProperty(self.fixedVolumeProperty)
-        # FIXME
-        # if self.mapper.GetProperty2() != self.movingVolumeProperty:
-        #     self.mapper.SetProperty2(self.movingVolumeProperty)
+        if self.fixedVolume.GetProperty() != self.fixedVolumeProperty:
+            self.fixedVolume.SetProperty(self.fixedVolumeProperty)
+        if self.movingVolume.GetProperty() != self.movingVolumeProperty:
+            self.movingVolume.SetProperty(self.movingVolumeProperty)
         self.render()
 
     def _syncCameras(self, camera, ev):

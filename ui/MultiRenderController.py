@@ -74,8 +74,7 @@ class MultiRenderController(QObject):
         self.fixedImageData = resizer.ResizeData(imageData, maximum=25000000)
 
         # Give the image data to the widget
-        # FIXME
-        # self.multiRenderWidget.setFixedData(self.fixedImageData)
+        self.multiRenderWidget.setFixedData(self.fixedImageData)
         self.fixedDataChanged.emit(self.fixedImageData)
 
         # Set the visualization type
@@ -100,8 +99,7 @@ class MultiRenderController(QObject):
         self.movingImageData = resizer.ResizeData(imageData, maximum=25000000)
 
         # Give the image data to the widget
-        # FIXME
-        # self.multiRenderWidget.setMovingData(self.movingImageData)
+        self.multiRenderWidget.setMovingData(self.movingImageData)
         self.movingDataChanged.emit(self.movingImageData)
 
         # Set the visualization type
@@ -136,9 +134,8 @@ class MultiRenderController(QObject):
         settings["slices"] = self.slices
         camera = self.multiRenderWidget.renderer.GetActiveCamera()
         settings["camera"] = vtkCameraWrapper(camera)
-        # FIXME
-        # transformations = self.multiRenderWidget.transformations.getPythonVersion()
-        # settings["transformations"] = transformations
+        transformations = self.multiRenderWidget.transformations.getPythonVersion()
+        settings["transformations"] = transformations
         settings["clippingBox"] = self.clippingBox
         settings["clippingPlanes"] = self.clippingPlanes
         return settings

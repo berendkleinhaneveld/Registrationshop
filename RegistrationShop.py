@@ -731,7 +731,6 @@ class RegistrationShop(MainWindow, WindowDialog):
         if hasattr(self, "compareWidget"):
             del self.compareWidget
 
-        # FIXME
         transform = self.multiDataWidget.transformations.completeTransform()
 
         self.controller = ComparisonController()

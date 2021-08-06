@@ -83,7 +83,6 @@ class vtkColorTransferFunctionWrapper(vtkObjectWrapper):
     @overrides(vtkObjectWrapper)
     def originalObject(self):
         colorTransferFunction = vtkColorTransferFunction()
-        print(f"nr nodes: {len(self.nodes)}")
         for index in range(len(self.nodes)):
             value = self.nodes[index]
             colorTransferFunction.AddRGBPoint(
