@@ -22,14 +22,11 @@ from vtk import vtkPiecewiseFunction
 from vtk import vtkRenderer
 from vtk import vtkVolumeProperty
 
-# from vtk import vtkOpenGLGPUMultiVolumeRayCastMapper
-
-# from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from core.vtkDrawing import CreateBounds
+from core.vtkDrawing import CreateOrientationGrid
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.transformations import TransformationList
 from ui.transformations import ClippingBox
-from core.vtkDrawing import CreateBounds
-from core.vtkDrawing import CreateOrientationGrid
 
 
 class MultiRenderWidget(QWidget):
@@ -79,7 +76,6 @@ class MultiRenderWidget(QWidget):
         self.rendererOverlay.SetLayer(1)
         self.rendererOverlay.SetInteractive(0)
         self.renderer.GetActiveCamera().AddObserver("ModifiedEvent", self._syncCameras)
-        self.renderer.GetActiveCamera().SetPosition(200, 0, 0)
 
         self.rwi = QVTKRenderWindowInteractor(parent=self)
         self.rwi.SetInteractorStyle(vtkInteractorStyleTrackballCamera())
@@ -126,6 +122,9 @@ class MultiRenderWidget(QWidget):
 
         self.fixedImageDataStreamer = vtkImageDataStreamer()
         self.movingImageDataStreamer = vtkImageDataStreamer()
+
+        self.fixedImageDataStreamer.SetInputData(self.fixedImageData)
+        self.movingImageDataStreamer.SetInputData(self.movingImageData)
 
         self.mapper.SetInputConnection(0, self.fixedImageDataStreamer.GetOutputPort())
         self.mapper.SetInputConnection(1, self.movingImageDataStreamer.GetOutputPort())
@@ -400,7 +399,7 @@ def CreateEmptyImageData():
     imageData.Initialize()
     imageData.SetDimensions(dimensions)
     imageData.SetSpacing(1, 1, 1)
-    imageData.SetOrigin(10, 10, 0)
+    imageData.SetOrigin(10, 10, 10)
     imageData.AllocateScalars(VTK_FLOAT, 1)
     for z in range(0, dimensions[2] - 1):
         for y in range(0, dimensions[1] - 1):

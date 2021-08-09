@@ -533,24 +533,32 @@ class RegistrationShop(MainWindow, WindowDialog):
         self.fixedPropWidget.removeTabWidget()
         self.movingPropWidget.removeTabWidget()
 
+    def loadDataSet(self, caption):
+        """
+        Open file dialog to search for data files.
+        """
+        dataReader = DataReader()
+        extensions = dataReader.GetSupportedExtensionsAsString()
+        dialog = QFileDialog(
+            parent=self,
+            caption=caption,
+            directory=None,
+            filter=f"Images ({extensions})",
+        )
+
+        dialog.exec()
+        fileNames = dialog.selectedFiles()
+        return fileNames
+
     @Slot()
     def loadFixedDataSetFile(self):
         """
         Open file dialog to search for data files. If valid data is given, it will
         pass the data file location on to the slicer and the project controller.
         """
-        dataReader = DataReader()
-        extensions = dataReader.GetSupportedExtensionsAsString()
-        fileName, other = QFileDialog.getOpenFileName(
-            self,
-            None,
-            "Open fixed data set",
-            "",
-            "Images (" + extensions + ")",
-            # QFileDialog.ShowDirsOnly,
-            # options=QFileDialog.Directory,
-        )
-        if len(fileName) > 0:
+        fileNames = self.loadDataSet("Open fixed data set")
+        if len(fileNames) > 0:
+            fileName = fileNames[0]
             # If there was another dataset first, ask if the user if the
             # visualizations should be reset
             projectController = ProjectController.Instance()
@@ -571,17 +579,9 @@ class RegistrationShop(MainWindow, WindowDialog):
         Open file dialog to search for data files. If valid data is given, it will
         pass the data file location on to the slicer and the project controller.
         """
-        dataReader = DataReader()
-        extensions = dataReader.GetSupportedExtensionsAsString()
-        fileName, other = QFileDialog.getOpenFileName(
-            self,
-            None,
-            "Open moving data set",
-            "",
-            "Images (" + extensions + ")",
-            # options=QFileDialog.Directory,
-        )
-        if len(fileName) > 0:
+        fileNames = self.loadDataSet("Open moving data set")
+        if len(fileNames) > 0:
+            fileName = fileNames[0]
             # If there was another dataset first, ask if the user if the
             # visualizations should be reset
             projectController = ProjectController.Instance()

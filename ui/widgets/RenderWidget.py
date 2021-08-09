@@ -67,7 +67,7 @@ class RenderWidget(QWidget):
         self.mapper.SetAutoAdjustSampleDistances(1)
         self.volume = None
         self.imageData = None
-        self.VolumeVisualization = None
+        self.volumeVisualization = None
         self.shouldResetCamera = False
         self.gridItems = []
         self.orientationGridItems = []
@@ -153,6 +153,7 @@ class RenderWidget(QWidget):
         Updates the volume property. It actually removes the volume,
         creates a new volume and sets the updated volume property and
         then adds the new volume to the renderer.
+        # FIXME / Verify with new VTK
         Just updating the vtkVolumeProperty gives artifacts and seems
         to not work correctly.
         :type volumeVisualization: volumeVisualization

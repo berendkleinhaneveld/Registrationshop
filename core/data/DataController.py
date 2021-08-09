@@ -37,7 +37,4 @@ class DataController(object):
         It will be formatted as follows: '*.mbr *.dcm'
         :rtype: basestr
         """
-        stringRepresentation = ""
-        for extension in self.supportedExtensions:
-            stringRepresentation += "*." + extension + " "
-        return stringRepresentation
+        return " ".join(map(lambda x: f"*.{x}", self.supportedExtensions))
