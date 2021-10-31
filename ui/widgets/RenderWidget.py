@@ -8,7 +8,7 @@ RenderWidget
 from vtk import vtkRenderer
 from vtk import vtkVolume
 from vtk import vtkInteractorStyleTrackballCamera
-from vtk import vtkOpenGLGPUVolumeRayCastMapper
+from vtk import vtkGPUVolumeRayCastMapper
 from vtk import vtkTransform
 from vtk import vtkImagePlaneWidget
 from PySide6.QtWidgets import QGridLayout
@@ -16,7 +16,6 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Signal
 from PySide6.QtCore import Slot
 
-# from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.transformations import ClippingBox
 from core.vtkDrawing import CreateBounds
@@ -63,7 +62,7 @@ class RenderWidget(QWidget):
             self.imagePlaneWidgets[index].SetMarginSizeX(0.0)
             self.imagePlaneWidgets[index].SetMarginSizeY(0.0)
 
-        self.mapper = vtkOpenGLGPUVolumeRayCastMapper()
+        self.mapper = vtkGPUVolumeRayCastMapper()
         self.mapper.SetAutoAdjustSampleDistances(1)
         self.volume = None
         self.imageData = None
@@ -171,7 +170,7 @@ class RenderWidget(QWidget):
             self.renderer.AddViewProp(self.volume)
 
         self.volumeVisualization.setMapper(self.mapper)
-        # self.mapper.SetShaderType(self.volumeVisualization.shaderType())
+
         if self.volume.GetProperty() != self.volumeVisualization.volProp:
             self.volume.SetProperty(self.volumeVisualization.volProp)
         if self.volume.GetMapper() != self.mapper:

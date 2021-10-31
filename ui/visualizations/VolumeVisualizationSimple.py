@@ -58,6 +58,7 @@ class VolumeVisualizationSimple(VolumeVisualization):
         self.opacity = 1.0
         self.colorFunction = None
         self.opacityFunction = None
+        self.mapper = None
 
     @overrides(VolumeVisualization)
     def getParameterWidget(self):
@@ -126,6 +127,7 @@ class VolumeVisualizationSimple(VolumeVisualization):
         widget = QWidget()
         widget.setLayout(layout)
 
+        # FIXME: replace with grid layout?
         try:
             from ColumnResizer import ColumnResizer
 
@@ -162,7 +164,8 @@ class VolumeVisualizationSimple(VolumeVisualization):
 
     @overrides(VolumeVisualization)
     def setMapper(self, mapper):
-        pass
+        self.mapper = mapper
+        self.mapper.SetBlendModeToComposite()
 
     @overrides(VolumeVisualization)
     def shaderType(self):
@@ -184,12 +187,13 @@ class VolumeVisualizationSimple(VolumeVisualization):
             self.opacityFunction = vtkPiecewiseFunction()
         else:
             self.opacityFunction.RemoveAllPoints()
+
         self.opacityFunction.AddPoint(self.minimum, 0)
         self.opacityFunction.AddPoint(self.lowerBound, 0)
-        self.opacityFunction.AddPoint(self.lowerBound + 0.0001, self.opacity)
-        self.opacityFunction.AddPoint(self.upperBound - 0.0001, self.opacity)
+        self.opacityFunction.AddPoint(self.lowerBound + 1, self.opacity)
+        self.opacityFunction.AddPoint(self.upperBound - 1, self.opacity)
         self.opacityFunction.AddPoint(self.upperBound, 0)
-        self.opacityFunction.AddPoint(self.maximum + 0.0001, 0)
+        self.opacityFunction.AddPoint(self.maximum + 1, 0)
 
         self.volProp.SetColor(self.colorFunction)
         self.volProp.SetScalarOpacity(self.opacityFunction)

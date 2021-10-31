@@ -139,6 +139,7 @@ class VolumeVisualizationMIP(VolumeVisualization):
     @overrides(VolumeVisualization)
     def setMapper(self, mapper):
         self.mapper = mapper
+        self.mapper.SetBlendModeToMaximumIntensity()
 
     @overrides(VolumeVisualization)
     def shaderType(self):

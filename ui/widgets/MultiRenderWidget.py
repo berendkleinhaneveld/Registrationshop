@@ -11,15 +11,15 @@ from PySide6.QtWidgets import QGridLayout
 from PySide6.QtWidgets import QWidget
 from vtk import VTK_FLOAT
 from vtk import vtkColorTransferFunction
+from vtk import vtkGPUVolumeRayCastMapper
 from vtk import vtkImageData
 from vtk import vtkImageDataStreamer
 from vtk import vtkImagePlaneWidget
 from vtk import vtkInteractorStyleTrackballCamera
-from vtk import vtkGPUVolumeRayCastMapper
-from vtk import vtkVolume
 from vtk import vtkMultiVolume
 from vtk import vtkPiecewiseFunction
 from vtk import vtkRenderer
+from vtk import vtkVolume
 from vtk import vtkVolumeProperty
 
 from core.vtkDrawing import CreateBounds
