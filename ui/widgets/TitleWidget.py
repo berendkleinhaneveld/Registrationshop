@@ -29,7 +29,6 @@ class TitleWidget(QWidget):
         super(TitleWidget, self).__init__()
 
         if sys.platform.startswith("darwin"):
-            # FIXME: update for dark theme
             if not darkdetect.isDark():
                 color1 = QColor(230, 230, 230, 255)
                 color2 = QColor(177, 177, 177, 255)
