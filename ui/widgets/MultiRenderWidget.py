@@ -304,8 +304,7 @@ class MultiRenderWidget(QWidget):
     @Slot()
     def updateTransformation(self):
         transform = self._transformations.completeTransform()
-        # FIXME
-        # self.mapper.SetSecondInputUserTransform(transform)
+        self.movingVolume.SetUserTransform(transform)
         for item in self.movingGridItems:
             item.SetUserTransform(transform)
 
