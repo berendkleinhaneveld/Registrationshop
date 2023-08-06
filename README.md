@@ -27,3 +27,6 @@ poetry run registrationshop
 * macOS
 * Linux
 * Windows
+
+NOTE: on Linux, you might need to install libgles2-mesa-dev for VTK to work properly.
+For offscreen tests, use env var: QT_QPA_PLATFORM: offscreen
