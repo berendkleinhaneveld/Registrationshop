@@ -18,6 +18,8 @@ black = "*"
 flake8 = "*"
 flake8-black = "*"
 pytest = "*"
+pytest-qt = "*"
+pytest-xvfb = "*"
 
 [tool.poetry.scripts]
 registrationshop = 'scripts:main'
