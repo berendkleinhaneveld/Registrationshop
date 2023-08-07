@@ -13,13 +13,28 @@ PyYAML = "*"
 itk-elastix = "*"
 darkdetect = "*"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "*"
-flake8 = "*"
-flake8-black = "*"
 pytest = "*"
 pytest-qt = "*"
 pytest-xvfb = "*"
+ruff = "*"
+
+[tool.ruff]
+select = [
+	"E",  # pycodestyle
+	"F",  # pyflakes
+	"I",  # isort
+	#"N",  # pep8-naming
+	"ARG",  # flake8-unused-arguments
+	"T10",  # flake8-debugger
+	"RUF",  # Ruff-specific rules
+]
+
+[tool.ruff.isort]
+force-sort-within-sections = true
+order-by-type = false
+lines-after-imports = 2
 
 [tool.poetry.scripts]
 registrationshop = 'scripts:main'
