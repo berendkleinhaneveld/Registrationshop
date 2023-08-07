@@ -1,5 +1,5 @@
-from Elastix import Elastix
-from ElastixCommand import ElastixCommand
-from Parameter import Parameter
-from ParameterList import ParameterList
-from TransformixTransformation import TransformixTransformation
+from .Elastix import Elastix  # noqa: F401
+from .ElastixCommand import ElastixCommand  # noqa: F401
+from .Parameter import Parameter  # noqa: F401
+from .ParameterList import ParameterList  # noqa: F401
+from .TransformixTransformation import TransformixTransformation  # noqa: F401

@@ -1,3 +1,3 @@
-from Histogram import Histogram
-from HistogramWidget import HistogramWidget
-from TrackingHistogramWidget import TrackingHistogramWidget
+from .Histogram import Histogram  # noqa: F401
+from .HistogramWidget import HistogramWidget  # noqa: F401
+from .TrackingHistogramWidget import TrackingHistogramWidget  # noqa: F401

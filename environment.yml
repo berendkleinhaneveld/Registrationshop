@@ -1,8 +1,0 @@
-name: registrationshop
-channels:
-  - berend
-  - defaults
-dependencies:
-  - vtk-multivolren
-  - pyside
-  - pyyaml

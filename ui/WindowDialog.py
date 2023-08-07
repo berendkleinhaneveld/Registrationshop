@@ -2,26 +2,23 @@
 WindowDialog
 
 :Authors:
-	Berend Klein Haneveld
+    Berend Klein Haneveld
 """
+from PySide6.QtCore import QObject, Slot
+
 from ui.dialogs import ExportProgressDialog
-from PySide.QtCore import QObject
-from PySide.QtCore import Slot
 
 
 class WindowDialog(QObject):
-	"""
-	WindowDialog
-	"""
+    """
+    WindowDialog
+    """
 
-	def __init__(self):
-		super(WindowDialog, self).__init__()
+    @Slot(str)
+    def showProgressBar(self, message):
+        self._progressDialog = ExportProgressDialog(self, message)
+        self._progressDialog.open()
 
-	@Slot(str)
-	def showProgressBar(self, message):
-		self._progressDialog = ExportProgressDialog(self, message)
-		self._progressDialog.open()
-
-	@Slot()
-	def hideProgressBar(self):
-		self._progressDialog.accept()
+    @Slot()
+    def hideProgressBar(self):
+        self._progressDialog.accept()

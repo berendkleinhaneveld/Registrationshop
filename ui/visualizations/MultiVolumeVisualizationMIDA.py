@@ -2,55 +2,64 @@
 MIDAMultiVolumeVisualization
 
 :Authors:
-	Berend Klein Haneveld
+    Berend Klein Haneveld
 """
-from MultiVolumeVisualization import MultiVolumeVisualization
-from MultiVolumeVisualization import CreateEmptyFunctions
-from MultiVolumeVisualization import CreateRangeFunctions
-from core.decorators import overrides
-from PySide.QtGui import QWidget
+from PySide6.QtWidgets import QWidget
 from vtk import vtkVolumeProperty
+
+from core.decorators import overrides
+
+from .MultiVolumeVisualization import (
+    CreateEmptyFunctions,
+    CreateRangeFunctions,
+    MultiVolumeVisualization,
+)
 
 
 class MultiVolumeVisualizationMIDA(MultiVolumeVisualization):
-	"""
-	MultiVolumeVisualizationMIDA is a visualization that shows
-	two MIDA renders.
-	"""
-	def __init__(self):
-		super(MultiVolumeVisualizationMIDA, self).__init__()
+    """
+    MultiVolumeVisualizationMIDA is a visualization that shows
+    two MIDA renders.
+    """
 
-	@overrides(MultiVolumeVisualization)
-	def getParameterWidget(self):
-		return QWidget()
+    def __init__(self):
+        super(MultiVolumeVisualizationMIDA, self).__init__()
 
-	@overrides(MultiVolumeVisualization)
-	def setImageData(self, fixedImageData, movingImageData):
-		self.fixedImageData = fixedImageData
-		self.movingImageData = movingImageData
+    @overrides(MultiVolumeVisualization)
+    def getParameterWidget(self):
+        return QWidget()
 
-	@overrides(MultiVolumeVisualization)
-	def updateTransferFunctions(self):
-		self.fixedVolProp = self._createVolPropFromImageData(self.fixedImageData, [1.0, 0.5, 0.0])
-		self.movingVolProp = self._createVolPropFromImageData(self.movingImageData, [1.0, 1.0, 1.0])
+    @overrides(MultiVolumeVisualization)
+    def setImageData(self, fixedImageData, movingImageData):
+        self.fixedImageData = fixedImageData
+        self.movingImageData = movingImageData
 
-		self.updatedTransferFunction.emit()
+    @overrides(MultiVolumeVisualization)
+    def updateTransferFunctions(self):
+        self.fixedVolProp = self._createVolPropFromImageData(
+            self.fixedImageData, [1.0, 0.5, 0.0]
+        )
+        self.movingVolProp = self._createVolPropFromImageData(
+            self.movingImageData, [1.0, 1.0, 1.0]
+        )
 
-	@overrides(MultiVolumeVisualization)
-	def valueChanged(self, value):
-		self.updateTransferFunctions()
+        self.updatedTransferFunction.emit()
 
-	@overrides(MultiVolumeVisualization)
-	def setMapper(self, mapper):
-		self.mapper = mapper
+    @overrides(MultiVolumeVisualization)
+    def valueChanged(self, value):
+        self.updateTransferFunctions()
 
-	def _createVolPropFromImageData(self, imageData, color):
-		volProp = vtkVolumeProperty()
-		if imageData is not None:
-			color, opacityFunction = CreateRangeFunctions(imageData, color)
-		else:
-			color, opacityFunction = CreateEmptyFunctions()
-		volProp.SetColor(color)
-		volProp.SetScalarOpacity(opacityFunction)
+    @overrides(MultiVolumeVisualization)
+    def setMapper(self, mapper):
+        self.mapper = mapper
 
-		return volProp
+    def _createVolPropFromImageData(self, imageData, color):
+        volProp = vtkVolumeProperty()
+        if imageData is not None:
+            color, opacityFunction = CreateRangeFunctions(imageData, color)
+        else:
+            color, opacityFunction = CreateEmptyFunctions()
+        volProp.SetColor(color)
+        volProp.SetScalarOpacity(opacityFunction)
+
+        return volProp

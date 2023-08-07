@@ -1,5 +1,10 @@
 # Python byte code
 *.pyc
+# Virtual env
+.venv
+__pycache__
+# Tests cache
+.pytest_cache
 
 # OS X stuff
 .DS_Store

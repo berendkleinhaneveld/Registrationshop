@@ -2,97 +2,93 @@
 SliderWidget
 
 :Authors:
-	Berend Klein Haneveld
+    Berend Klein Haneveld
 """
-from PySide.QtGui import QWidget
-from PySide.QtGui import QLabel
-from PySide.QtGui import QSlider
-from PySide.QtGui import QSpinBox
-# from PySide.QtGui import QHBoxLayout
-from PySide.QtGui import QGridLayout
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
-from PySide.QtCore import Qt
+import sys
+
+from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtWidgets import QGridLayout, QLabel, QSlider, QSpinBox, QWidget
 
 
 class SliderWidget(QWidget):
-	"""
-	SliderWidget
-	"""
-	valueChanged = Signal(int)
+    """
+    SliderWidget
+    """
 
-	def __init__(self):
-		super(SliderWidget, self).__init__()
+    valueChanged = Signal(int)
 
-		self.label = QLabel()
-		self.slider = QSlider(Qt.Horizontal)
-		self.spinbox = QSpinBox()
+    def __init__(self):
+        super(SliderWidget, self).__init__()
 
-		self.slider.valueChanged.connect(self.changedValue)
-		self.spinbox.valueChanged.connect(self.changedValue)
+        self.label = QLabel()
+        self.slider = QSlider(Qt.Horizontal)
+        self.spinbox = QSpinBox()
 
-		layout = QGridLayout()
-		layout.setContentsMargins(0, 0, 0, 0)
-		layout.setVerticalSpacing(0)
-		layout.addWidget(self.label, 0, 0)
-		layout.addWidget(self.slider, 0, 1)
-		layout.addWidget(self.spinbox, 0, 2)
-		self.setLayout(layout)
+        self.slider.valueChanged.connect(self.changedValue)
+        self.spinbox.valueChanged.connect(self.changedValue)
 
-	def setName(self, name):
-		"""
-		Set the name for the slider
-		"""
-		self.label.setText(name)
+        layout = QGridLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setVerticalSpacing(0)
+        layout.addWidget(self.label, 0, 0)
+        layout.addWidget(self.slider, 0, 1)
+        layout.addWidget(self.spinbox, 0, 2)
+        self.setLayout(layout)
 
-	def setRange(self, range):
-		"""
-		Set the range for the value
-		"""
-		self.slider.setMinimum(range[0])
-		self.spinbox.setMinimum(range[0])
-		self.slider.setMaximum(range[1])
-		self.spinbox.setMaximum(range[1])
+    def setName(self, name):
+        """
+        Set the name for the slider
+        """
+        self.label.setText(name)
 
-	def setValue(self, value):
-		"""
-		Set the value for the slider and the spinbox
-		"""
-		self.slider.setValue(value)
-		self.spinbox.setValue(value)
+    def setRange(self, range):
+        """
+        Set the range for the value
+        """
+        self.slider.setMinimum(range[0])
+        self.spinbox.setMinimum(range[0])
+        self.slider.setMaximum(range[1])
+        self.spinbox.setMaximum(range[1])
 
-	def value(self):
-		return self.slider.value()
+    def setValue(self, value):
+        """
+        Set the value for the slider and the spinbox
+        """
+        self.slider.setValue(value)
+        self.spinbox.setValue(value)
 
-	@Slot(int)
-	def changedValue(self, value):
-		self.setValue(value)
-		self.valueChanged.emit(value)
+    def value(self):
+        return self.slider.value()
+
+    @Slot(int)
+    def changedValue(self, value):
+        self.setValue(value)
+        self.valueChanged.emit(value)
 
 
-if __name__ == '__main__':
-	from PySide.QtGui import QApplication
-	from PySide.QtGui import QVBoxLayout
-	app = QApplication([])
+if __name__ == "__main__":
+    from PySide6.QtWidgets import QApplication, QVBoxLayout
 
-	sliderWidget = SliderWidget()
-	sliderWidget.setName("Test value")
-	sliderWidget.setRange([-100, 200])
-	sliderWidget.setValue(300)
+    app = QApplication([])
 
-	label = QLabel()
+    sliderWidget = SliderWidget()
+    sliderWidget.setName("Test value")
+    sliderWidget.setRange([-100, 200])
+    sliderWidget.setValue(300)
 
-	def updateLabel(value):
-		label.setText(str(sliderWidget.value()))
+    label = QLabel()
 
-	sliderWidget.valueChanged.connect(updateLabel)
+    def updateLabel(value):
+        label.setText(str(sliderWidget.value()))
 
-	layout = QVBoxLayout()
-	layout.addWidget(QLabel("Test sliders"))
-	layout.addWidget(sliderWidget)
-	layout.addWidget(label)
+    sliderWidget.valueChanged.connect(updateLabel)
 
-	widget = QWidget()
-	widget.setLayout(layout)
-	widget.show()
-	app.exec_()
+    layout = QVBoxLayout()
+    layout.addWidget(QLabel("Test sliders"))
+    layout.addWidget(sliderWidget)
+    layout.addWidget(label)
+
+    widget = QWidget()
+    widget.setLayout(layout)
+    widget.show()
+    sys.exit(app.exec())

@@ -1,4 +1,4 @@
-from MainWindow import MainWindow
-from WindowDialog import WindowDialog
-from RenderController import RenderController
-from MultiRenderController import MultiRenderController
+from .MainWindow import MainWindow  # noqa: F401
+from .MultiRenderController import MultiRenderController  # noqa: F401
+from .RenderController import RenderController  # noqa: F401
+from .WindowDialog import WindowDialog  # noqa: F401

@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "registrationshop"
+version = "0.1.0"
+description = "3D registration tool for medical purposes"
+authors = ["Berend Klein Haneveld <berendkleinhaneveld@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9,<3.12"
+pyside6-essentials = "^6.5.2"
+vtk = "^9.2.5"
+PyYAML = "*"
+itk-elastix = "*"
+darkdetect = "*"
+
+[tool.poetry.group.dev.dependencies]
+black = "*"
+pytest = "*"
+pytest-qt = "*"
+pytest-xvfb = "*"
+ruff = "*"
+
+[tool.ruff]
+select = [
+	"E",  # pycodestyle
+	"F",  # pyflakes
+	"I",  # isort
+	#"N",  # pep8-naming
+	"ARG",  # flake8-unused-arguments
+	"T10",  # flake8-debugger
+	"RUF",  # Ruff-specific rules
+]
+
+[tool.ruff.isort]
+force-sort-within-sections = true
+order-by-type = false
+lines-after-imports = 2
+
+[tool.poetry.scripts]
+registrationshop = 'scripts:main'
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

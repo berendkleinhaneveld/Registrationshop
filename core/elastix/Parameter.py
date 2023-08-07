@@ -6,250 +6,253 @@ part is that the string representation is in the format that
 Elastix uses for its parameters.
 
 :Authors:
-	Berend Klein Haneveld
+    Berend Klein Haneveld
 """
 
 
 class Parameter(object):
-	"""
-	Simple parameter object that consists out of a key and a value.
-	Just a little more interesting over normal dict entries because of the specific representation
-	to be used in a parameter file for Elastix.
-	"""
-	
-	def __init__(self, key=None, value=None):
-		"""
-		:type key: basestring
-		:type value: basestring or bool or int, float
-		"""
-		super(Parameter, self).__init__()
+    """
+    Simple parameter object that consists out of a key and a value.
+    Just a little more interesting over normal dict entries because of the specific
+    representation to be used in a parameter file for Elastix.
+    """
 
-		if value is None and key is None:
-			self._key = None
-			self._value = None
-		else:
-			self.setKeyValue(key, value)
+    def __init__(self, key=None, value=None):
+        """
+        :type key: str
+        :type value: str or bool or int, float
+        """
+        super(Parameter, self).__init__()
 
-	def __str__(self):
-		"""
-		Return a specific representation of the key value pair in the way Elastix
-		likes: (key value). If value is a string, it should be represented like "value".
-		"""
-		value = Parameter.valueToString(self._value)
-		return "(%s %s)" % (self._key, value)
+        if value is None and key is None:
+            self._key = None
+            self._value = None
+        else:
+            self.setKeyValue(key, value)
 
-	def __eq__(self, other):
-		if not isinstance(other, Parameter):
-			return False
+    def __str__(self):
+        """
+        Return a specific representation of the key value pair in the way Elastix
+        likes: (key value). If value is a string, it should be represented like "value".
+        """
+        value = Parameter.valueToString(self._value)
+        return "(%s %s)" % (self._key, value)
 
-		return other.key() == self.key() and other.value() == self.value()
+    def __eq__(self, other):
+        if not isinstance(other, Parameter):
+            return False
 
-	def __ne__(self, other):
-		return not self.__eq__(other)
+        return other.key() == self.key() and other.value() == self.value()
 
-	def setKeyValue(self, key, value):
-		"""
-		:type key: basestring
-		:type value: float, int, basestring
-		"""
-		# Raise attribute error if the key is None while the value has a value
-		if not key and value:
-			raise AttributeError("Key attribute can't be None if a value is specified.")
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
-		if key and not isinstance(key, basestring):
-			raise TypeError("attribute key should be of string type")
+    def setKeyValue(self, key, value):
+        """
+        :type key: str
+        :type value: float, int, str
+        """
+        # Raise attribute error if the key is None while the value has a value
+        if not key and value:
+            raise AttributeError("Key attribute can't be None if a value is specified.")
 
-		self.setKey(key)
-		self.setValue(value)
+        if key and not isinstance(key, str):
+            raise TypeError("attribute key should be of string type")
 
-	def setKey(self, key):
-		"""
-		Strips whitespace characters and spaces from key.
+        self.setKey(key)
+        self.setValue(value)
 
-		:type key: basestring
-		"""
-		if not key:
-			raise AttributeError("Can't set a key to None")
+    def setKey(self, key):
+        """
+        Strips whitespace characters and spaces from key.
 
-		if not isinstance(key, basestring):
-			raise TypeError("attribute key should be of string type")
+        :type key: str
+        """
+        if not key:
+            raise AttributeError("Can't set a key to None")
 
-		key = key.strip()
-		key = key.replace(" ", "")
+        if not isinstance(key, str):
+            raise TypeError("attribute key should be of string type")
 
-		self._key = key
+        key = key.strip()
+        key = key.replace(" ", "")
 
-	def setValue(self, value):
-		"""
-		:type value: basestring, float, int
-		"""
-		if not self._key:
-			raise AttributeError("Can't set a value when the key is None")
+        self._key = key
 
-		if isinstance(value, list):
-			if len(value) == 0:
-				raise AttributeError("Can't set an empty list as value")
+    def setValue(self, value):
+        """
+        :type value: str, float, int
+        """
+        if not self._key:
+            raise AttributeError("Can't set a value when the key is None")
 
-		self._value = Parameter.convertValueToType(value)
+        if isinstance(value, list):
+            if len(value) == 0:
+                raise AttributeError("Can't set an empty list as value")
 
-	def key(self):
-		"""
-		:rtype: basestring
-		"""
-		return self._key
+        self._value = Parameter.convertValueToType(value)
 
-	def value(self):
-		"""
-		:rtype: float, int, basestring
-		"""
-		return self._value
+    def key(self):
+        """
+        :rtype: str
+        """
+        return self._key
 
-	@classmethod
-	def convertValueToType(cls, value):
-		"""
-		Returns possibly converted value
-		"""
-		if isinstance(value, basestring):
-			# Try to convert to another type
-			value, success = Parameter.valueAsBool(value)
-			if not success:
-				value, success = Parameter.valueAsInt(value)
-			if not success:
-				value, success = Parameter.valueAsFloat(value)
-			if not success:
-				value, success = Parameter.valueAsList(value)
+    def value(self):
+        """
+        :rtype: float, int, str
+        """
+        return self._value
 
-		return value
+    @classmethod
+    def convertValueToType(cls, value):
+        """
+        Returns possibly converted value
+        """
+        if isinstance(value, str):
+            # Try to convert to another type
+            value, success = Parameter.valueAsBool(value)
+            if not success:
+                value, success = Parameter.valueAsInt(value)
+            if not success:
+                value, success = Parameter.valueAsFloat(value)
+            if not success:
+                value, success = Parameter.valueAsList(value)
 
-	@classmethod
-	def valueToString(cls, value):
-		if isinstance(value, bool):
-			return '"%s"' % str(value).lower()
-		elif isinstance(value, int):
-			return str(value)
-		elif isinstance(value, float):
-			tmp = str(value)
-			if not '.' in tmp:
-				tmp += '.0'
-			return tmp
-		elif isinstance(value, basestring):
-			return '"%s"' % value
-		elif isinstance(value, list):
-			result = ''
-			for item in value[0:-1]:
-				result += Parameter.valueToString(item) + ' '
-			result += Parameter.valueToString(value[-1])
-			return result
+        return value
 
-	@classmethod
-	def valueAsBool(cls, value):
-		"""
-		Tries to convert the given value into a boolean type. If the type is
-		a string, then it checks for the existance of 'true' or 'false' in the
-		string.
-		Returns the (converted) value and a bool whether the value is
-		succesfully converted or not. If not, the original value is returned.
+    @classmethod
+    def valueToString(cls, value):
+        if isinstance(value, bool):
+            return '"%s"' % str(value).lower()
+        elif isinstance(value, int):
+            return str(value)
+        elif isinstance(value, float):
+            tmp = str(value)
+            if "." not in tmp:
+                tmp += ".0"
+            return tmp
+        elif isinstance(value, str):
+            return '"%s"' % value
+        elif isinstance(value, list):
+            result = ""
+            for item in value[0:-1]:
+                result += Parameter.valueToString(item) + " "
+            result += Parameter.valueToString(value[-1])
+            return result
 
-		:rtype: bool, bool
-		"""
-		if isinstance(value, bool):
-			return value, True
-		if isinstance(value, basestring):
-			if "true" in value.lower():
-				return True, True
-			elif "false" in value.lower():
-				return False, True
-		
-		return value, False
+    @classmethod
+    def valueAsBool(cls, value):
+        """
+        Tries to convert the given value into a boolean type. If the type is
+        a string, then it checks for the existance of 'true' or 'false' in the
+        string.
+        Returns the (converted) value and a bool whether the value is
+        succesfully converted or not. If not, the original value is returned.
 
-	@classmethod
-	def valueAsInt(cls, value):
-		"""
-		Tries to convert the given value into an integer type. If the type is
-		a string, then it checks whether the string is a representation of a
-		digit. If there is a dot in the string, it is not converted.
-		Returns the (converted) value and a bool whether the value is
-		succesfully converted or not. If not, the original value is returned.
+        :rtype: bool, bool
+        """
+        if isinstance(value, bool):
+            return value, True
+        if isinstance(value, str):
+            if "true" in value.lower():
+                return True, True
+            elif "false" in value.lower():
+                return False, True
 
-		:rtype: int, bool
-		"""
-		if isinstance(value, int) and not isinstance(value, bool):
-			return value, True
-		elif isinstance(value, basestring) and value.isdigit():
-			return int(value), True
-		
-		return value, False
-	
-	@classmethod
-	def valueAsFloat(cls, value):
-		"""
-		Tries to convert the given value into a float type. If the type is
-		a string, then it checks for the existance of a float number in the
-		string. If the value in the string is actually an integer, it will not
-		be converted.
-		Returns the (converted) value and a bool whether the value is
-		succesfully converted or not. If not, the original value is returned.
+        return value, False
 
-		:rtype: float, bool
-		"""
-		if isinstance(value, float):
-			return value, True
-		elif isinstance(value, basestring) and not value.isdigit():
-			try:
-				floatValue = float(value)
-				return floatValue, True
-			except ValueError:
-				pass
+    @classmethod
+    def valueAsInt(cls, value):
+        """
+        Tries to convert the given value into an integer type. If the type is
+        a string, then it checks whether the string is a representation of a
+        digit. If there is a dot in the string, it is not converted.
+        Returns the (converted) value and a bool whether the value is
+        succesfully converted or not. If not, the original value is returned.
 
-		return value, False
+        :rtype: int, bool
+        """
+        if isinstance(value, int) and not isinstance(value, bool):
+            return value, True
+        elif isinstance(value, str) and value.isdigit():
+            return int(value), True
 
-	@classmethod
-	def valueAsList(cls, value):
-		"""
-		"""
-		if isinstance(value, list):
-			return value, True
-		elif isinstance(value, basestring):
-			words = value.split()
-			if len(words) == 1:
-				return value, False
-			result = []
-			for word in words:
-				val = Parameter.convertValueToType(word)
-				result.append(val)
-			return result, True
+        return value, False
 
-		return value, False
+    @classmethod
+    def valueAsFloat(cls, value):
+        """
+        Tries to convert the given value into a float type. If the type is
+        a string, then it checks for the existance of a float number in the
+        string. If the value in the string is actually an integer, it will not
+        be converted.
+        Returns the (converted) value and a bool whether the value is
+        succesfully converted or not. If not, the original value is returned.
 
-	@classmethod
-	def parameterFromString(cls, line):
-		"""
-		:type value: basestring
-		:rtype: Parameter
-		"""
-		# Remove leading and trailing white space chars
-		line = line.strip()
-		indexOfComment = line.find("//")
-		if indexOfComment >= 0:
-			line = line[0:indexOfComment]
-		if len(line) > 1:
-			indexOfCaretOpen = line.find("(")
-			indexOfSpace = line.find(" ")
-			indexOfCaretClose = line.rfind(")")
-			if indexOfCaretOpen < 0 or indexOfCaretClose < 0 \
-				or indexOfSpace < 0 or indexOfCaretClose < indexOfCaretOpen \
-				or indexOfSpace < indexOfCaretOpen \
-				or indexOfSpace > indexOfCaretClose \
-				or indexOfSpace == indexOfCaretOpen+1:
-				return None
-			
-			key = line[indexOfCaretOpen+1:indexOfSpace]
-			value = line[indexOfSpace+1:indexOfCaretClose]
-			if len(key) == 0:
-				return None
-			if '"' in value:
-				value = value[1:-1]
-			param = Parameter(key, value)
-			return param
+        :rtype: float, bool
+        """
+        if isinstance(value, float):
+            return value, True
+        elif isinstance(value, str) and not value.isdigit():
+            try:
+                floatValue = float(value)
+                return floatValue, True
+            except ValueError:
+                pass
 
-		return None
+        return value, False
+
+    @classmethod
+    def valueAsList(cls, value):
+        """ """
+        if isinstance(value, list):
+            return value, True
+        elif isinstance(value, str):
+            words = value.split()
+            if len(words) == 1:
+                return value, False
+            result = []
+            for word in words:
+                val = Parameter.convertValueToType(word)
+                result.append(val)
+            return result, True
+
+        return value, False
+
+    @classmethod
+    def parameterFromString(cls, line):
+        """
+        :type value: str
+        :rtype: Parameter
+        """
+        # Remove leading and trailing white space chars
+        line = line.strip()
+        indexOfComment = line.find("//")
+        if indexOfComment >= 0:
+            line = line[0:indexOfComment]
+        if len(line) > 1:
+            indexOfCaretOpen = line.find("(")
+            indexOfSpace = line.find(" ")
+            indexOfCaretClose = line.rfind(")")
+            if (
+                indexOfCaretOpen < 0
+                or indexOfCaretClose < 0
+                or indexOfSpace < 0
+                or indexOfCaretClose < indexOfCaretOpen
+                or indexOfSpace < indexOfCaretOpen
+                or indexOfSpace > indexOfCaretClose
+                or indexOfSpace == indexOfCaretOpen + 1
+            ):
+                return None
+
+            key = line[indexOfCaretOpen + 1 : indexOfSpace]
+            value = line[indexOfSpace + 1 : indexOfCaretClose]
+            if len(key) == 0:
+                return None
+            if '"' in value:
+                value = value[1:-1]
+            param = Parameter(key, value)
+            return param
+
+        return None

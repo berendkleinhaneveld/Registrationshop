@@ -2,28 +2,24 @@
 LandmarkTransformationTool (TransformationTool)
 
 :Authors:
-	Berend Klein Haneveld
+    Berend Klein Haneveld
 """
-from Landmark import Landmark
-from TransformationTool import TransformationTool
+from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtWidgets import QComboBox, QGridLayout, QLabel, QWidget
+from vtk import vtkLandmarkTransform, vtkPoints, vtkTransform
+
+from core.decorators import overrides
+from core.project import ProjectController
+from core.vtkDrawing import TransformWithMatrix
+from ui.transformations import Transformation
+from ui.transformations.SurfacePicker import SurfacePicker
+from ui.transformations.TwoStepPicker import TwoStepPicker
 from ui.widgets.PointsWidget import PointsWidget
 from ui.widgets.StatusWidget import StatusWidget
-from ui.transformations.TwoStepPicker import TwoStepPicker
-from ui.transformations.SurfacePicker import SurfacePicker
-from ui.transformations import Transformation
-from core.decorators import overrides
-from core.vtkDrawing import TransformWithMatrix
-from core.project import ProjectController
-from vtk import vtkPoints
-from vtk import vtkLandmarkTransform
-from vtk import vtkTransform
-from PySide.QtGui import QWidget
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QComboBox
-from PySide.QtGui import QLabel
-from PySide.QtCore import Signal
-from PySide.QtCore import Slot
-from PySide.QtCore import Qt
+
+from .Landmark import Landmark
+from .TransformationTool import TransformationTool
+
 
 # Define picker types
 SurfaceType = "SurfaceType"
@@ -31,373 +27,413 @@ TwoStepType = "TwoStepType"
 
 
 class LandmarkTransformationTool(TransformationTool):
-	"""
-	LandmarkTransformationTool
-	"""
-	updatedLandmarks = Signal(list)
+    """
+    LandmarkTransformationTool
+    """
 
-	def __init__(self):
-		super(LandmarkTransformationTool, self).__init__()
+    updatedLandmarks = Signal(list)
 
-		self.fixedPickerType = SurfaceType
-		self.movingPickerType = SurfaceType
+    def __init__(self):
+        super(LandmarkTransformationTool, self).__init__()
 
-		self.fixedPicker = self._pickerForType(self.fixedPickerType)
-		self.movingPicker = self._pickerForType(self.movingPickerType)
+        self.fixedPickerType = SurfaceType
+        self.movingPickerType = SurfaceType
 
-		self.landmarkPointSets = []  # Sets of points
-		self.landmarkIndicators = []  # All the landmark indicator objects
+        self.fixedPicker = self._pickerForType(self.fixedPickerType)
+        self.movingPicker = self._pickerForType(self.movingPickerType)
 
-		self.originalTransform = None
-		self.originalScalingTransform = None
+        self.landmarkPointSets = []  # Sets of points
+        self.landmarkIndicators = []  # All the landmark indicator objects
 
-		self.activeIndex = 0
-		self.landmarkTransformType = 0  # Rigid, Similarity or Affine
+        self.originalTransform = None
+        self.originalScalingTransform = None
 
-	@overrides(TransformationTool)
-	def getParameterWidget(self):
-		self.pointsWidget = PointsWidget()
+        self.activeIndex = 0
+        self.landmarkTransformType = 0  # Rigid, Similarity or Affine
 
-		self.landmarkComboBox = QComboBox()
-		self.landmarkComboBox.addItem("Rigid body")
-		self.landmarkComboBox.addItem("Similarity")
-		self.landmarkComboBox.addItem("Affine")
+    @overrides(TransformationTool)
+    def getParameterWidget(self):
+        self.pointsWidget = PointsWidget()
 
-		layout = QGridLayout()
-		layout.setAlignment(Qt.AlignTop)
-		layout.setContentsMargins(0, 0, 0, 0)
-		layout.addWidget(QLabel("Transform type:"), 0, 0)
-		layout.addWidget(self.landmarkComboBox, 0, 1)
-		layout.addWidget(self.pointsWidget, 1, 0, 1, 2)
-		
-		self.updatedLandmarks.connect(self.pointsWidget.setPoints)
-		self.landmarkComboBox.currentIndexChanged.connect(self.landmarkTransformTypeChanged)
-		self.pointsWidget.activeLandmarkChanged.connect(self.setActiveLandmark)
-		self.pointsWidget.landmarkDeleted.connect(self.deleteLandmark)
+        self.landmarkComboBox = QComboBox()
+        self.landmarkComboBox.addItem("Rigid body")
+        self.landmarkComboBox.addItem("Similarity")
+        self.landmarkComboBox.addItem("Affine")
 
-		widget = QWidget()
-		widget.setLayout(layout)
-		return widget
+        layout = QGridLayout()
+        layout.setAlignment(Qt.AlignTop)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(QLabel("Transform type:"), 0, 0)
+        layout.addWidget(self.landmarkComboBox, 0, 1)
+        layout.addWidget(self.pointsWidget, 1, 0, 1, 2)
 
-	@overrides(TransformationTool)
-	def setRenderWidgets(self, fixed=None, moving=None, multi=None):
-		self.fixedWidget = fixed
-		self.movingWidget = moving
-		self.multiWidget = multi
+        self.updatedLandmarks.connect(self.pointsWidget.setPoints)
+        self.landmarkComboBox.currentIndexChanged.connect(
+            self.landmarkTransformTypeChanged
+        )
+        self.pointsWidget.activeLandmarkChanged.connect(self.setActiveLandmark)
+        self.pointsWidget.landmarkDeleted.connect(self.deleteLandmark)
 
-		self.fixedPicker.setWidget(self.fixedWidget)
-		self.movingPicker.setWidget(self.movingWidget)
+        widget = QWidget()
+        widget.setLayout(layout)
+        return widget
 
-		self.fixedPicker.pickedLocation.connect(self.pickedFixedLocation)
-		self.movingPicker.pickedLocation.connect(self.pickedMovingLocation)
+    @overrides(TransformationTool)
+    def setRenderWidgets(self, fixed=None, moving=None, multi=None):
+        self.fixedWidget = fixed
+        self.movingWidget = moving
+        self.multiWidget = multi
 
-		# Save the original complete transform
-		self.originalTransform = self.multiWidget.transformations.completeTransform()
-		self.originalScalingTransform = self.multiWidget.transformations.scalingTransform()
+        self.fixedPicker.setWidget(self.fixedWidget)
+        self.movingPicker.setWidget(self.movingWidget)
 
-		# Add a new transform on top of the others
-		currentProject = ProjectController.Instance().currentProject
-		transform = Transformation(vtkTransform(), Transformation.TypeLandmark, currentProject.movingData)
-		self.multiWidget.transformations.append(transform)
+        self.fixedPicker.pickedLocation.connect(self.pickedFixedLocation)
+        self.movingPicker.pickedLocation.connect(self.pickedMovingLocation)
 
-		statusWidget = StatusWidget.Instance()
-		statusWidget.setText("Place landmarks in both volumes to create a landmark transform. "
-			"Available methods for placing landmarks are the surface type and the two-step type.")
+        # Save the original complete transform
+        self.originalTransform = self.multiWidget.transformations.completeTransform()
+        self.originalScalingTransform = (
+            self.multiWidget.transformations.scalingTransform()
+        )
 
-	def setLandmarkWidgets(self, fixed, moving):
-		self.fixedLandmarkWidget = fixed
-		self.movingLandmarkWidget = moving
+        # Add a new transform on top of the others
+        currentProject = ProjectController.Instance().currentProject
+        transform = Transformation(
+            vtkTransform(), Transformation.TypeLandmark, currentProject.movingData
+        )
+        self.multiWidget.transformations.append(transform)
 
-		self.fixedLandmarkWidget.landmarkTypeChanged.connect(self.landmarkToolTypeChanged)
-		self.movingLandmarkWidget.landmarkTypeChanged.connect(self.landmarkToolTypeChanged)
+        statusWidget = StatusWidget.Instance()
+        statusWidget.setText(
+            "Place landmarks in both volumes to create a landmark transform. "
+            "Available methods for placing landmarks are the surface type and "
+            "the two-step type."
+        )
 
-		self.fixedPicker.setPropertiesWidget(self.fixedLandmarkWidget)
-		self.movingPicker.setPropertiesWidget(self.movingLandmarkWidget)
+    def setLandmarkWidgets(self, fixed, moving):
+        self.fixedLandmarkWidget = fixed
+        self.movingLandmarkWidget = moving
 
-	@overrides(TransformationTool)
-	def cancelTransform(self):
-		del self.multiWidget.transformations[-1]
+        self.fixedLandmarkWidget.landmarkTypeChanged.connect(
+            self.landmarkToolTypeChanged
+        )
+        self.movingLandmarkWidget.landmarkTypeChanged.connect(
+            self.landmarkToolTypeChanged
+        )
 
-	@overrides(TransformationTool)
-	def applyTransform(self):
-		# Add the landmark point sets to the transformation
-		transformation = self.multiWidget.transformations[-1]
-		transformation.landmarks = self.landmarkPointSets
+        self.fixedPicker.setPropertiesWidget(self.fixedLandmarkWidget)
+        self.movingPicker.setPropertiesWidget(self.movingLandmarkWidget)
 
-	@overrides(TransformationTool)
-	def cleanUp(self):
-		self.fixedPicker.cleanUp()
-		self.movingPicker.cleanUp()
+    @overrides(TransformationTool)
+    def cancelTransform(self):
+        del self.multiWidget.transformations[-1]
 
-		for landmarkIndicator in self.landmarkIndicators:
-			landmarkIndicator.cleanUp()
+    @overrides(TransformationTool)
+    def applyTransform(self):
+        # Add the landmark point sets to the transformation
+        transformation = self.multiWidget.transformations[-1]
+        transformation.landmarks = self.landmarkPointSets
 
-		self.landmarkPointSets = []
+    @overrides(TransformationTool)
+    def cleanUp(self):
+        self.fixedPicker.cleanUp()
+        self.movingPicker.cleanUp()
 
-		self.fixedWidget.render()
-		self.movingWidget.render()
-		self.multiWidget.render()
+        for landmarkIndicator in self.landmarkIndicators:
+            landmarkIndicator.cleanUp()
 
-		self.fixedLandmarkWidget.setVisible(False)
-		self.movingLandmarkWidget.setVisible(False)
+        self.landmarkPointSets = []
 
-		self.toolFinished.emit()
+        self.fixedWidget.render()
+        self.movingWidget.render()
+        self.multiWidget.render()
 
-	@Slot(int)
-	def setActiveLandmark(self, index):
-		self.activeIndex = index
-		self._update()
+        self.fixedLandmarkWidget.setVisible(False)
+        self.movingLandmarkWidget.setVisible(False)
 
-		if self.activeIndex < len(self.landmarkPointSets):
-			landmarkSet = self.landmarkPointSets[self.activeIndex]
-			self._focusCamera(self.fixedWidget, landmarkSet[0])
-			self._focusCamera(self.movingWidget, landmarkSet[1])
+        self.toolFinished.emit()
 
-		self.fixedWidget.render()
-		self.movingWidget.render()
-		self.multiWidget.render()
+    @Slot(int)
+    def setActiveLandmark(self, index):
+        self.activeIndex = index
+        self._update()
 
-	@Slot(int)
-	def deleteLandmark(self, index):
-		if index < len(self.landmarkPointSets):
-			del self.landmarkPointSets[index]
-		indices = []
-		for i in range(len(self.landmarkIndicators)):
-			indicator = self.landmarkIndicators[i]
-			if indicator.id == index:
-				indicator.cleanUp()
-				indices.append(i)
+        if self.activeIndex < len(self.landmarkPointSets):
+            landmarkSet = self.landmarkPointSets[self.activeIndex]
+            self._focusCamera(self.fixedWidget, landmarkSet[0])
+            self._focusCamera(self.movingWidget, landmarkSet[1])
 
-		indices.reverse()
-		for i in indices:
-			del self.landmarkIndicators[i]
+        self.fixedWidget.render()
+        self.movingWidget.render()
+        self.multiWidget.render()
 
-		for indicator in self.landmarkIndicators:
-			if indicator.id > index:
-				indicator.id -= 1
+    @Slot(int)
+    def deleteLandmark(self, index):
+        if index < len(self.landmarkPointSets):
+            del self.landmarkPointSets[index]
+        indices = []
+        for i in range(len(self.landmarkIndicators)):
+            indicator = self.landmarkIndicators[i]
+            if indicator.id == index:
+                indicator.cleanUp()
+                indices.append(i)
 
-		self.activeIndex = len(self.landmarkPointSets)
-		self.pointsWidget.activeIndex = self.activeIndex
-		# self.activeIndex = -1
-		self._updateTransform()
-		self._update()
-		self.updatedLandmarks.emit(self.landmarkPointSets)
+        indices.reverse()
+        for i in indices:
+            del self.landmarkIndicators[i]
 
-		self.fixedWidget.render()
-		self.movingWidget.render()
-		self.multiWidget.render()
+        for indicator in self.landmarkIndicators:
+            if indicator.id > index:
+                indicator.id -= 1
 
-	@Slot(int)
-	def landmarkTransformTypeChanged(self, value):
-		"""
-		Called when the transformation type is changed
-		from the combo box. Rigid, Similarity or Affine.
-		"""
-		if value == 2 and len(self.landmarkPointSets) < 3:
-			self.landmarkComboBox.setCurrentIndex(self.landmarkTransformType)
-			# TODO: let the user know that some more landmark point sets are needed...
-			# Or: solve in another way by only calculating the affine transform when
-			# there are actually 3 or more complete landmark point sets
-			return
-		self.landmarkTransformType = value
-		self._updateTransform()
-		self.multiWidget.render()
+        self.activeIndex = len(self.landmarkPointSets)
+        self.pointsWidget.activeIndex = self.activeIndex
+        # self.activeIndex = -1
+        self._updateTransform()
+        self._update()
+        self.updatedLandmarks.emit(self.landmarkPointSets)
 
-	@Slot(list)
-	def pickedFixedLocation(self, location):
-		"""
-		Place spheres in fixed widget and in multi-widget.
-		The input location should be in local data coordinates.
-		"""
-		self._pickedLocation(location, "fixed")
+        self.fixedWidget.render()
+        self.movingWidget.render()
+        self.multiWidget.render()
 
-	@Slot(list)
-	def pickedMovingLocation(self, location):
-		"""
-		Place spheres in moving widget and in multi-widget.
-		The input location should be in local data coordinates.
-		"""
-		self._pickedLocation(location, "moving")
+    @Slot(int)
+    def landmarkTransformTypeChanged(self, value):
+        """
+        Called when the transformation type is changed
+        from the combo box. Rigid, Similarity or Affine.
+        """
+        if value == 2 and len(self.landmarkPointSets) < 3:
+            self.landmarkComboBox.setCurrentIndex(self.landmarkTransformType)
+            # TODO: let the user know that some more landmark point sets are needed...
+            # Or: solve in another way by only calculating the affine transform when
+            # there are actually 3 or more complete landmark point sets
+            return
+        self.landmarkTransformType = value
+        self._updateTransform()
+        self.multiWidget.render()
 
-	@Slot(object)
-	def landmarkToolTypeChanged(self, widget):
-		if widget is self.fixedLandmarkWidget:
-			self.fixedPickerType = widget.landmarkType
-			self.fixedPicker.cleanUp()
-			self.fixedPicker.pickedLocation.disconnect()
-			self.fixedPicker = self._pickerForType(self.fixedPickerType)
-			self.fixedPicker.setWidget(self.fixedWidget)
-			self.fixedPicker.pickedLocation.connect(self.pickedFixedLocation)
-			self.fixedPicker.setPropertiesWidget(self.fixedLandmarkWidget)
-			if type(self.fixedPicker) == TwoStepPicker:
-				self.fixedPicker.pickedLocation.connect(self.fixedLandmarkWidget.twoStepWidget.pickedLocation)
-			self.fixedWidget.render()
-		elif widget is self.movingLandmarkWidget:
-			self.movingPickerType = widget.landmarkType
-			self.movingPicker.cleanUp()
-			self.movingPicker.pickedLocation.disconnect()
-			self.movingPicker = self._pickerForType(self.movingPickerType)
-			self.movingPicker.setWidget(self.movingWidget)
-			self.movingPicker.pickedLocation.connect(self.pickedMovingLocation)
-			self.movingPicker.setPropertiesWidget(self.movingLandmarkWidget)
-			if type(self.movingPicker) == TwoStepPicker:
-				self.movingPicker.pickedLocation.connect(self.movingLandmarkWidget.twoStepWidget.pickedLocation)
-			self.movingWidget.render()
+    @Slot(list)
+    def pickedFixedLocation(self, location):
+        """
+        Place spheres in fixed widget and in multi-widget.
+        The input location should be in local data coordinates.
+        """
+        self._pickedLocation(location, "fixed")
 
-	# Private methods
+    @Slot(list)
+    def pickedMovingLocation(self, location):
+        """
+        Place spheres in moving widget and in multi-widget.
+        The input location should be in local data coordinates.
+        """
+        self._pickedLocation(location, "moving")
 
-	def _pickerForType(self, pickerType):
-		"""
-		Returns a picker object depending on the given picker type.
-		"""
-		if pickerType == SurfaceType:
-			return SurfacePicker()
-		elif pickerType == TwoStepType:
-			return TwoStepPicker()
+    @Slot(object)
+    def landmarkToolTypeChanged(self, widget):
+        if widget is self.fixedLandmarkWidget:
+            self.fixedPickerType = widget.landmarkType
+            self.fixedPicker.cleanUp()
+            self.fixedPicker.pickedLocation.disconnect()
+            self.fixedPicker = self._pickerForType(self.fixedPickerType)
+            self.fixedPicker.setWidget(self.fixedWidget)
+            self.fixedPicker.pickedLocation.connect(self.pickedFixedLocation)
+            self.fixedPicker.setPropertiesWidget(self.fixedLandmarkWidget)
+            if type(self.fixedPicker) == TwoStepPicker:
+                self.fixedPicker.pickedLocation.connect(
+                    self.fixedLandmarkWidget.twoStepWidget.pickedLocation
+                )
+            self.fixedWidget.render()
+        elif widget is self.movingLandmarkWidget:
+            self.movingPickerType = widget.landmarkType
+            self.movingPicker.cleanUp()
+            self.movingPicker.pickedLocation.disconnect()
+            self.movingPicker = self._pickerForType(self.movingPickerType)
+            self.movingPicker.setWidget(self.movingWidget)
+            self.movingPicker.pickedLocation.connect(self.pickedMovingLocation)
+            self.movingPicker.setPropertiesWidget(self.movingLandmarkWidget)
+            if type(self.movingPicker) == TwoStepPicker:
+                self.movingPicker.pickedLocation.connect(
+                    self.movingLandmarkWidget.twoStepWidget.pickedLocation
+                )
+            self.movingWidget.render()
 
-	def _pickedLocation(self, location, landmarkType):
-		if self.activeIndex < len(self.landmarkPointSets):
-			# Just update the landmark
-			landmarks = [x for x in self.landmarkIndicators if (x.id == self.activeIndex and x.flag == landmarkType)]
-			for landmark in landmarks:
-				landmark.position = location
+    # Private methods
 
-			index = 0 if landmarkType == "fixed" else 1
-			if not self.landmarkPointSets[self.activeIndex][index]:
-				# Add another landmark indicator if there was no landmark
-				self._addLandmarkIndicator(location, landmarkType)
+    def _pickerForType(self, pickerType):
+        """
+        Returns a picker object depending on the given picker type.
+        """
+        if pickerType == SurfaceType:
+            return SurfacePicker()
+        elif pickerType == TwoStepType:
+            return TwoStepPicker()
 
-			self.landmarkPointSets[self.activeIndex][index] = location
-		else:
-			# Add the location to the landmark points as a set
-			landmarkSet = [location, None] if (landmarkType == "fixed") else [None, location]
-			self.landmarkPointSets.append(landmarkSet)
-			self._addLandmarkIndicator(location, landmarkType)
+    def _pickedLocation(self, location, landmarkType):
+        if self.activeIndex < len(self.landmarkPointSets):
+            # Just update the landmark
+            landmarks = [
+                x
+                for x in self.landmarkIndicators
+                if (x.id == self.activeIndex and x.flag == landmarkType)
+            ]
+            for landmark in landmarks:
+                landmark.position = location
 
-		self._updateTransform()
-		self._update()
-		self.updatedLandmarks.emit(self.landmarkPointSets)
-		self.multiWidget.render()
-		self.movingWidget.render()
+            index = 0 if landmarkType == "fixed" else 1
+            if not self.landmarkPointSets[self.activeIndex][index]:
+                # Add another landmark indicator if there was no landmark
+                self._addLandmarkIndicator(location, landmarkType)
 
-	def _updateTransform(self):
-		"""
-		Update the landmark transform
-		"""
-		if PointsSetsIsEmpty(self.landmarkPointSets):
-			return
+            self.landmarkPointSets[self.activeIndex][index] = location
+        else:
+            # Add the location to the landmark points as a set
+            landmarkSet = (
+                [location, None] if (landmarkType == "fixed") else [None, location]
+            )
+            self.landmarkPointSets.append(landmarkSet)
+            self._addLandmarkIndicator(location, landmarkType)
 
-		numberOfSets = NumberOfSets(self.landmarkPointSets)
-		fixedPoints = vtkPoints()
-		movingPoints = vtkPoints()
-		fixedPoints.SetNumberOfPoints(numberOfSets)
-		movingPoints.SetNumberOfPoints(numberOfSets)
+        self._updateTransform()
+        self._update()
+        self.updatedLandmarks.emit(self.landmarkPointSets)
+        self.multiWidget.render()
+        self.movingWidget.render()
 
-		pointsetIndex = 0
-		for index in range(len(self.landmarkPointSets)):
-			pointset = self.landmarkPointSets[index]
-			if pointset[0] and pointset[1]:
-				fixedPoint = pointset[0]
-				movingPoint = pointset[1]
-				# Transform the point from the moving landmark with the original transform
-				transPoint = self.originalTransform.TransformPoint(movingPoint)
-				fixedPoints.SetPoint(pointsetIndex, fixedPoint)
-				movingPoints.SetPoint(pointsetIndex, transPoint)
-				pointsetIndex += 1
+    def _updateTransform(self):
+        """
+        Update the landmark transform
+        """
+        if PointsSetsIsEmpty(self.landmarkPointSets):
+            return
 
-		landmarkTransform = vtkLandmarkTransform()
-		if self.landmarkTransformType == 0:
-			landmarkTransform.SetModeToRigidBody()
-		elif self.landmarkTransformType == 1:
-			landmarkTransform.SetModeToSimilarity()
-		elif self.landmarkTransformType == 2:
-			landmarkTransform.SetModeToAffine()
-		landmarkTransform.SetSourceLandmarks(fixedPoints)
-		landmarkTransform.SetTargetLandmarks(movingPoints)
-		landmarkTransform.Update()
+        numberOfSets = NumberOfSets(self.landmarkPointSets)
+        fixedPoints = vtkPoints()
+        movingPoints = vtkPoints()
+        fixedPoints.SetNumberOfPoints(numberOfSets)
+        movingPoints.SetNumberOfPoints(numberOfSets)
 
-		transform = TransformWithMatrix(landmarkTransform.GetMatrix())
-		transform.Inverse()
-		
-		transformation = self.multiWidget.transformations[-1]
-		assert transformation.transformType == Transformation.TypeLandmark
-		transformation.transform = transform
-		self.multiWidget.transformations[-1] = transformation
-		self._updateLandmarkTransforms()
+        pointsetIndex = 0
+        for index in range(len(self.landmarkPointSets)):
+            pointset = self.landmarkPointSets[index]
+            if pointset[0] and pointset[1]:
+                fixedPoint = pointset[0]
+                movingPoint = pointset[1]
+                # Transform the point from the moving landmark
+                # with the original transform
+                transPoint = self.originalTransform.TransformPoint(movingPoint)
+                fixedPoints.SetPoint(pointsetIndex, fixedPoint)
+                movingPoints.SetPoint(pointsetIndex, transPoint)
+                pointsetIndex += 1
 
-	def _update(self):
-		for landmark in self.landmarkIndicators:
-			landmark.active = landmark.id == self.activeIndex
-			landmark.update()
-		self._updateLandmarkTransforms()
+        landmarkTransform = vtkLandmarkTransform()
+        if self.landmarkTransformType == 0:
+            landmarkTransform.SetModeToRigidBody()
+        elif self.landmarkTransformType == 1:
+            landmarkTransform.SetModeToSimilarity()
+        elif self.landmarkTransformType == 2:
+            landmarkTransform.SetModeToAffine()
+        landmarkTransform.SetSourceLandmarks(fixedPoints)
+        landmarkTransform.SetTargetLandmarks(movingPoints)
+        landmarkTransform.Update()
 
-	def _updateLandmarkTransforms(self):
-		# Update the transforms
-		for landmarkIndicator in self.landmarkIndicators:
-			if landmarkIndicator.flag == "moving" and landmarkIndicator.renderer == self.movingWidget.renderer:
-				# landmarkIndicator.transform = self.multiWidget.transformations.scalingTransform()
-				# landmarkIndicator.update()
-				pass
-			elif landmarkIndicator.flag == "moving" and landmarkIndicator.renderer == self.multiWidget.renderer:
-				landmarkIndicator.transform = self.multiWidget.transformations.completeTransform()
-				landmarkIndicator.update()
+        transform = TransformWithMatrix(landmarkTransform.GetMatrix())
+        transform.Inverse()
 
-	def _addLandmarkIndicator(self, location, landmarkType):
-		imageData = self.fixedWidget.imageData if landmarkType == "fixed" else self.movingWidget.imageData
-		bounds = imageData.GetBounds()
-		sizes = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]
-		smallest = min(sizes)
-		scale = smallest / 30.0
+        transformation = self.multiWidget.transformations[-1]
+        assert transformation.transformType == Transformation.TypeLandmark
+        transformation.transform = transform
+        self.multiWidget.transformations[-1] = transformation
+        self._updateLandmarkTransforms()
 
-		# Create landmark for the correct widget
-		widget = self.fixedWidget if landmarkType == "fixed" else self.movingWidget
-		landmark = self._landmarkForWidget(widget, landmarkType)
-		landmark.id = self.activeIndex
-		landmark.position = location
-		landmark.scale = scale
+    def _update(self):
+        for landmark in self.landmarkIndicators:
+            landmark.active = landmark.id == self.activeIndex
+            landmark.update()
+        self._updateLandmarkTransforms()
 
-		# Create landmark for multi widget
-		landmarkMulti = self._landmarkForWidget(self.multiWidget, landmarkType)
-		landmarkMulti.id = self.activeIndex
-		landmarkMulti.position = location
-		landmarkMulti.scale = scale
+    def _updateLandmarkTransforms(self):
+        # Update the transforms
+        for landmarkIndicator in self.landmarkIndicators:
+            if (
+                landmarkIndicator.flag == "moving"
+                and landmarkIndicator.renderer == self.movingWidget.renderer
+            ):
+                # landmarkIndicator.transform
+                #     = self.multiWidget.transformations.scalingTransform()
+                # landmarkIndicator.update()
+                pass
+            elif (
+                landmarkIndicator.flag == "moving"
+                and landmarkIndicator.renderer == self.multiWidget.renderer
+            ):
+                landmarkIndicator.transform = (
+                    self.multiWidget.transformations.completeTransform()
+                )
+                landmarkIndicator.update()
 
-		self.landmarkIndicators.append(landmark)
-		self.landmarkIndicators.append(landmarkMulti)
+    def _addLandmarkIndicator(self, location, landmarkType):
+        imageData = (
+            self.fixedWidget.imageData
+            if landmarkType == "fixed"
+            else self.movingWidget.imageData
+        )
+        bounds = imageData.GetBounds()
+        sizes = [bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]]
+        smallest = min(sizes)
+        scale = smallest / 30.0
 
-	def _focusCamera(self, widget, location):
-		if not location:
-			return
+        # Create landmark for the correct widget
+        widget = self.fixedWidget if landmarkType == "fixed" else self.movingWidget
+        landmark = self._landmarkForWidget(widget, landmarkType)
+        landmark.id = self.activeIndex
+        landmark.position = location
+        landmark.scale = scale
 
-		transform = TransformWithMatrix(widget.volume.GetMatrix())
-		worldPoint = transform.TransformPoint(location)
+        # Create landmark for multi widget
+        landmarkMulti = self._landmarkForWidget(self.multiWidget, landmarkType)
+        landmarkMulti.id = self.activeIndex
+        landmarkMulti.position = location
+        landmarkMulti.scale = scale
 
-		camera = widget.renderer.GetActiveCamera()
-		camera.SetFocalPoint(worldPoint)
+        self.landmarkIndicators.append(landmark)
+        self.landmarkIndicators.append(landmarkMulti)
 
-	def _landmarkForWidget(self, widget, landmarkType):
-		return Landmark(index=self.activeIndex,
-			renderer=widget.renderer,
-			overlay=widget.rendererOverlay,
-			flag=landmarkType)
+    def _focusCamera(self, widget, location):
+        if not location:
+            return
+
+        transform = TransformWithMatrix(widget.volume.GetMatrix())
+        worldPoint = transform.TransformPoint(location)
+
+        camera = widget.renderer.GetActiveCamera()
+        camera.SetFocalPoint(worldPoint)
+
+    def _landmarkForWidget(self, widget, landmarkType):
+        return Landmark(
+            index=self.activeIndex,
+            renderer=widget.renderer,
+            overlay=widget.rendererOverlay,
+            flag=landmarkType,
+        )
 
 
 def PointsSetsIsEmpty(points):
-	"""
-	Returns whether there are actual point sets in the
-	given collection for which both landmarks are set.
-	"""
-	return NumberOfSets(points) == 0
+    """
+    Returns whether there are actual point sets in the
+    given collection for which both landmarks are set.
+    """
+    return NumberOfSets(points) == 0
 
 
 def NumberOfSets(points):
-	"""
-	Returns the total number of landmark sets in the
-	given collection of pointsets.
-	"""
-	count = 0
-	for pointset in points:
-		if pointset[0] is not None and pointset[1] is not None:
-			count += 1
+    """
+    Returns the total number of landmark sets in the
+    given collection of pointsets.
+    """
+    count = 0
+    for pointset in points:
+        if pointset[0] is not None and pointset[1] is not None:
+            count += 1
 
-	return count
+    return count

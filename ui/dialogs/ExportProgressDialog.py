@@ -2,33 +2,31 @@
 ExportProgressDialog
 
 :Authors:
-	Berend Klein Haneveld 2013
+    Berend Klein Haneveld 2013
 """
 
-from PySide.QtGui import QDialog
-from PySide.QtGui import QGridLayout
-from PySide.QtGui import QProgressBar
-from PySide.QtGui import QLabel
+from PySide6.QtWidgets import QDialog, QGridLayout, QLabel, QProgressBar
 
 
 class ExportProgressDialog(QDialog):
-	"""
-	ExportProgressDialog is a dialog that
-	shows a progress bar or busy indicator
-	"""
-	def __init__(self, parent, message):
-		super(ExportProgressDialog, self).__init__(parent)
+    """
+    ExportProgressDialog is a dialog that
+    shows a progress bar or busy indicator
+    """
 
-		self.setModal(True)
-		self.setWindowTitle(message)
+    def __init__(self, parent, message):
+        super(ExportProgressDialog, self).__init__(parent)
 
-		indicator = QProgressBar()
-		indicator.setMinimum(0)
-		indicator.setMaximum(0)
+        self.setModal(True)
+        self.setWindowTitle(message)
 
-		messageLabel = QLabel(message)
+        indicator = QProgressBar()
+        indicator.setMinimum(0)
+        indicator.setMaximum(0)
 
-		layout = QGridLayout()
-		layout.addWidget(messageLabel)
-		layout.addWidget(indicator)
-		self.setLayout(layout)
+        messageLabel = QLabel(message)
+
+        layout = QGridLayout()
+        layout.addWidget(messageLabel)
+        layout.addWidget(indicator)
+        self.setLayout(layout)
