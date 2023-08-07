@@ -5,12 +5,8 @@ ResetVisualizationDialog
     Berend Klein Haneveld 2013
 """
 
-from PySide6.QtWidgets import QDialog
-from PySide6.QtWidgets import QLayout
-from PySide6.QtWidgets import QPushButton
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QDialog, QGridLayout, QLabel, QLayout, QPushButton
 
 
 class ResetVisualizationDialog(QDialog):

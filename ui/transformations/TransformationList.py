@@ -4,14 +4,14 @@ TransformationList
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtCore import QObject
-from PySide6.QtCore import Signal
+from PySide6.QtCore import QObject, Signal
 from vtk import vtkTransform
 
-from .Transformation import Transformation
 from core.project import ProjectController
 from core.vtkDrawing import TransformWithMatrix
 from core.vtkObjectWrapper import vtkTransformWrapper
+
+from .Transformation import Transformation
 
 
 class TransformationList(QObject):

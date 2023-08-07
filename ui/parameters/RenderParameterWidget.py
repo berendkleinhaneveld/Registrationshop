@@ -5,15 +5,16 @@ RenderParameterWidget
     Berend Klein Haneveld
 """
 
-from PySide6.QtWidgets import QLabel
-from PySide6.QtWidgets import QComboBox
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QScrollArea
-from PySide6.QtWidgets import QFrame
-from PySide6.QtCore import Slot
-from PySide6.QtCore import SIGNAL
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, SIGNAL, Slot
+from PySide6.QtWidgets import (
+    QComboBox,
+    QFrame,
+    QGridLayout,
+    QLabel,
+    QScrollArea,
+    QWidget,
+)
+
 from ui.widgets import Style
 
 

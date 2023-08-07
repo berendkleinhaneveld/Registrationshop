@@ -4,8 +4,7 @@ TransformationTool
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtCore import QObject
-from PySide6.QtCore import Signal
+from PySide6.QtCore import QObject, Signal
 
 
 class TransformationTool(QObject):

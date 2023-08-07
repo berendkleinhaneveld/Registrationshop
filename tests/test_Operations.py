@@ -1,6 +1,7 @@
-import unittest
-from core.operations import Subtract, Dot, Multiply, Add, Length, Normalize, Mean
 import math
+import unittest
+
+from core.operations import Add, Dot, Length, Mean, Multiply, Normalize, Subtract
 
 
 class OperationsTest(unittest.TestCase):

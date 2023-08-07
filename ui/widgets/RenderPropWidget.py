@@ -4,15 +4,14 @@ RenderPropWidget
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QPushButton
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtWidgets import QTabWidget
-from PySide6.QtCore import Qt
-from PySide6.QtCore import Slot
-from ui.parameters import RenderParameterWidget
-from ui.parameters import RenderInfoWidget
-from ui.parameters import RenderSlicerParamWidget
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtWidgets import QPushButton, QTabWidget, QVBoxLayout, QWidget
+
+from ui.parameters import (
+    RenderInfoWidget,
+    RenderParameterWidget,
+    RenderSlicerParamWidget,
+)
 
 
 class RenderPropWidget(QWidget):

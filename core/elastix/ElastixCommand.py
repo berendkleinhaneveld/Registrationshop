@@ -6,9 +6,10 @@ ElastixCommand
 """
 
 import os
-from core.worker.Command import Command
-from core.elastix import Elastix
+
 from core.decorators import overrides
+from core.elastix import Elastix
+from core.worker.Command import Command
 
 
 class ElastixCommand(Command):

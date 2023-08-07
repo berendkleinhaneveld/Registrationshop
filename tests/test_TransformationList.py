@@ -1,7 +1,8 @@
 import unittest
-from ui.transformations import TransformationList
-from ui.transformations import Transformation
+
 from vtk import vtkTransform
+
+from ui.transformations import Transformation, TransformationList
 
 
 class TransformationListTest(unittest.TestCase):

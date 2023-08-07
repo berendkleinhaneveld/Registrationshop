@@ -7,13 +7,11 @@ SurfacePicker
 import math
 
 from PySide6.QtCore import Signal
-from vtk import vtkVolumePicker
-from vtk import vtkActor
-from vtk import vtkConeSource
-from vtk import vtkDataSetMapper
+from vtk import vtkActor, vtkConeSource, vtkDataSetMapper, vtkVolumePicker
+
+from ui.Interactor import Interactor
 
 from .Picker import Picker
-from ui.Interactor import Interactor
 
 
 class SurfacePicker(Picker, Interactor):

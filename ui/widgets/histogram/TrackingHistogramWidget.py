@@ -4,13 +4,12 @@ TrackingHistogramWidget
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtCore import Signal
-from PySide6.QtCore import QPoint
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QPoint, Qt, Signal
+
+from ui.widgets import Style
 
 from .HistogramWidget import HistogramWidget
 from .TrackingNodeItem import TrackingNodeItem
-from ui.widgets import Style
 
 
 class TrackingHistogramWidget(HistogramWidget):

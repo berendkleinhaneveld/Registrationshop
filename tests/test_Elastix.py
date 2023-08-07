@@ -1,8 +1,8 @@
-import unittest
 import os
 import shutil
-from core.elastix import Elastix
-from core.elastix import ElastixCommand
+import unittest
+
+from core.elastix import Elastix, ElastixCommand
 
 
 class ElastixTest(unittest.TestCase):

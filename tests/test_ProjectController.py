@@ -1,5 +1,6 @@
-import unittest
 import os
+import unittest
+
 from core.project import ProjectController
 
 

@@ -4,19 +4,15 @@ VolumeVisualizationSimple
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QGroupBox
 from PySide6.QtCore import Qt
-from vtk import vtkVolumeProperty
-from vtk import vtkColorTransferFunction
-from vtk import vtkPiecewiseFunction
+from PySide6.QtWidgets import QGridLayout, QGroupBox, QWidget
+from vtk import vtkColorTransferFunction, vtkPiecewiseFunction, vtkVolumeProperty
 
-from .VolumeVisualization import VolumeVisualization
-from .VolumeVisualization import VisualizationTypeSimple
 from core.decorators import overrides
-from ui.widgets.SliderFloatWidget import SliderFloatWidget
 from ui.widgets.ColorWidget import ColorChoiceWidget
+from ui.widgets.SliderFloatWidget import SliderFloatWidget
+
+from .VolumeVisualization import VisualizationTypeSimple, VolumeVisualization
 
 
 class VolumeVisualizationSimple(VolumeVisualization):

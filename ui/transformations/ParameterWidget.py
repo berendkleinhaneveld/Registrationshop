@@ -4,15 +4,13 @@ ParameterWidget
 :Authors:
     Berend Klein Haneveld 2013
 """
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtWidgets import QPushButton
-from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QPushButton, QVBoxLayout, QWidget
+
 from core.AppVars import AppVars
+from ui.transformations import ParameterListView, ParameterModel
 from ui.widgets import ButtonContainer
-from ui.transformations import ParameterModel
-from ui.transformations import ParameterListView
 
 
 class ParameterWidget(QWidget):

@@ -5,11 +5,8 @@ TransformationParameterWidget
     Berend Klein Haneveld
 """
 
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QPushButton
-from PySide6.QtCore import Qt
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtWidgets import QGridLayout, QPushButton, QWidget
 
 
 class TransformationParameterWidget(QWidget):

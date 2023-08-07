@@ -4,21 +4,18 @@ MultiVolumeVisualizationMix
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtWidgets import QGroupBox
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QLabel
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QSlider
-
 from PySide6.QtCore import Qt
-from vtk import vtkVolumeProperty
-from vtk import vtkGPUVolumeRayCastMapper
+from PySide6.QtWidgets import QGridLayout, QGroupBox, QLabel, QSlider, QWidget
+from vtk import vtkGPUVolumeRayCastMapper, vtkVolumeProperty
 
-from .MultiVolumeVisualization import MultiVolumeVisualization
-from .MultiVolumeVisualization import CreateFunctionFromProperties
-from .MultiVolumeVisualization import CreateEmptyFunctions
-from .VolumeVisualization import VisualizationTypeSimple
 from core.decorators import overrides
+
+from .MultiVolumeVisualization import (
+    CreateEmptyFunctions,
+    CreateFunctionFromProperties,
+    MultiVolumeVisualization,
+)
+from .VolumeVisualization import VisualizationTypeSimple
 
 
 class MultiVolumeVisualizationMix(MultiVolumeVisualization):

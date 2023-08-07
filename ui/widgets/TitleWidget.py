@@ -8,14 +8,9 @@ TitleWidget
 import sys
 
 import darkdetect
-from PySide6.QtWidgets import QWidget
-from PySide6.QtGui import QColor
-from PySide6.QtGui import QLinearGradient
-from PySide6.QtGui import QBrush
-from PySide6.QtGui import QPalette
-from PySide6.QtWidgets import QLabel
-from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QBrush, QColor, QLinearGradient, QPalette
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 
 class TitleWidget(QWidget):

@@ -4,14 +4,10 @@ ClippingBox
 :Authors:
     Berend Klein Haneveld
 """
+from PySide6.QtCore import QObject, Signal
+from vtk import vtkBoxWidget, vtkImagePlaneWidget, vtkPlanes, vtkPolyData, vtkTransform
+
 from ui.Interactor import Interactor
-from PySide6.QtCore import QObject
-from PySide6.QtCore import Signal
-from vtk import vtkBoxWidget
-from vtk import vtkPlanes
-from vtk import vtkImagePlaneWidget
-from vtk import vtkPolyData
-from vtk import vtkTransform
 
 
 class ClippingBox(QObject, Interactor):
@@ -211,7 +207,7 @@ class ClippingBox(QObject, Interactor):
         # Append a 4th element to the polydata points
         p = []
         for i in range(8):
-            p.append(list(polyData.GetPoint(i)) + [1.0])
+            p.append([*list(polyData.GetPoint(i)), 1.0])
 
         # Transform all the polydata points
         inv = self.transform.GetInverse()

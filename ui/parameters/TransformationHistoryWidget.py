@@ -5,16 +5,13 @@ TransformationHistoryWidget
     Berend Klein Haneveld
 """
 
-from PySide6.QtWidgets import QWidget
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtWidgets import QPushButton
-from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QMessageBox, QPushButton, QVBoxLayout, QWidget
+
 from core.AppVars import AppVars
+from ui.transformations import TransformationListView, TransformationModel
 from ui.widgets import ButtonContainer
-from ui.transformations import TransformationModel
-from ui.transformations import TransformationListView
 
 
 class TransformationHistoryWidget(QWidget):

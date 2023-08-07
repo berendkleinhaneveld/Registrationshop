@@ -6,6 +6,7 @@ AppResources
 """
 
 import os
+
 from core.AppVars import AppVars
 from core.elastix import ParameterList
 

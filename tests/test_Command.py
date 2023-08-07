@@ -1,6 +1,6 @@
 import unittest
-from core.worker.Command import Command
-from core.worker.Command import TransformCommand
+
+from core.worker.Command import Command, TransformCommand
 
 
 class CommandTest(unittest.TestCase):

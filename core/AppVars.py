@@ -9,6 +9,7 @@ author: Berend Klein Haneveld 2013
 import os
 import sys
 
+
 # Variables are adjusted by RegistrationShop
 # This serves as a sort of global environment for
 # stuff like application paths.

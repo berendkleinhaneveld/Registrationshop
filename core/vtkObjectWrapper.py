@@ -5,12 +5,15 @@ vtkObjectWrapper
     Berend Klein Haneveld
 """
 
+from vtk import (
+    vtkColorTransferFunction,
+    vtkMatrix4x4,
+    vtkPiecewiseFunction,
+    vtkTransform,
+    vtkVolumeProperty,
+)
+
 from core.decorators import overrides
-from vtk import vtkColorTransferFunction
-from vtk import vtkPiecewiseFunction
-from vtk import vtkVolumeProperty
-from vtk import vtkTransform
-from vtk import vtkMatrix4x4
 
 
 class vtkObjectWrapper(object):

@@ -5,14 +5,15 @@ MultiRenderPropWidget
     Berend Klein Haneveld
 """
 
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtWidgets import QTabWidget
 from PySide6.QtCore import Slot
-from ui.parameters import RenderParameterWidget
-from ui.parameters import RenderSlicerParamWidget
-from ui.parameters import TransformationHistoryWidget
-from ui.parameters import TransformationParameterWidget
+from PySide6.QtWidgets import QTabWidget, QVBoxLayout, QWidget
+
+from ui.parameters import (
+    RenderParameterWidget,
+    RenderSlicerParamWidget,
+    TransformationHistoryWidget,
+    TransformationParameterWidget,
+)
 
 
 class MultiRenderPropWidget(QWidget):

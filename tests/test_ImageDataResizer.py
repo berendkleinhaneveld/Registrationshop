@@ -1,7 +1,8 @@
 import unittest
+
+from vtk import VTK_FLOAT, vtkImageData
+
 from core.data import DataResizer
-from vtk import vtkImageData
-from vtk import VTK_FLOAT
 
 
 class DataResizerTest(unittest.TestCase):

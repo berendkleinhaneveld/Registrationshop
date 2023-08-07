@@ -4,11 +4,9 @@ Landmark
 :Authors:
     Berend Klein Haneveld
 """
-from vtk import vtkProp3DFollower
-from vtk import vtkTransform
-from core.vtkDrawing import CreateSphere
-from core.vtkDrawing import ColorActor
-from core.vtkDrawing import CreateCircle
+from vtk import vtkProp3DFollower, vtkTransform
+
+from core.vtkDrawing import ColorActor, CreateCircle, CreateSphere
 
 
 class Landmark(object):

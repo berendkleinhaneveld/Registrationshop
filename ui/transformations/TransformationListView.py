@@ -5,8 +5,7 @@ TransformationListView
     Berend Klein Haneveld
 """
 
-from PySide6.QtWidgets import QTreeView
-from PySide6.QtWidgets import QAbstractItemView
+from PySide6.QtWidgets import QAbstractItemView, QTreeView
 
 
 class TransformationListView(QTreeView):

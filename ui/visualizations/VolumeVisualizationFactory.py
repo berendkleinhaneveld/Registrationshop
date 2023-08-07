@@ -4,17 +4,19 @@ VolumeVisualizationFactory
 :Authors:
     Berend Klein Haneveld
 """
-from .VolumeVisualization import VisualizationTypeSimple
-from .VolumeVisualization import VisualizationTypeCT
-from .VolumeVisualization import VisualizationTypeMIP
-from .VolumeVisualization import VisualizationTypeMIDA
-from .VolumeVisualization import VisualizationTypeRamp
-from .VolumeVisualization import VisualizationTypeTransferFunction
-from .VolumeVisualizationSimple import VolumeVisualizationSimple
+from .VolumeVisualization import (
+    VisualizationTypeCT,
+    VisualizationTypeMIDA,
+    VisualizationTypeMIP,
+    VisualizationTypeRamp,
+    VisualizationTypeSimple,
+    VisualizationTypeTransferFunction,
+)
 from .VolumeVisualizationCT import VolumeVisualizationCT
-from .VolumeVisualizationMIP import VolumeVisualizationMIP
 from .VolumeVisualizationMIDA import VolumeVisualizationMIDA
+from .VolumeVisualizationMIP import VolumeVisualizationMIP
 from .VolumeVisualizationRamp import VolumeVisualizationRamp
+from .VolumeVisualizationSimple import VolumeVisualizationSimple
 from .VolumeVisualizationTransferFunction import VolumeVisualizationTransferFunction
 
 

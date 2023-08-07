@@ -5,22 +5,22 @@ SliceCompareViewerWidget
     Berend Klein Haneveld
 """
 
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Signal
-from vtk import vtkRenderer
-from vtk import vtkInteractorStyleUser
-from vtk import vtkCellPicker
-from vtk import vtkImageMapToColors
-from vtk import vtkColorTransferFunction
-from vtk import vtkDataSetMapper
-from vtk import vtkActor
-from vtk import vtkImageMathematics
+from PySide6.QtWidgets import QGridLayout, QWidget
+from vtk import (
+    vtkActor,
+    vtkCellPicker,
+    vtkColorTransferFunction,
+    vtkDataSetMapper,
+    vtkImageMapToColors,
+    vtkImageMathematics,
+    vtkInteractorStyleUser,
+    vtkRenderer,
+)
 
-from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from core.vtkDrawing import CreateLine, CreateSquare
 from ui.Interactor import Interactor
-from core.vtkDrawing import CreateSquare
-from core.vtkDrawing import CreateLine
+from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 
 class SliceCompareViewerWidget(QWidget, Interactor):
@@ -106,7 +106,7 @@ class SliceCompareViewerWidget(QWidget, Interactor):
 
         x, y = arg1.GetEventPosition()
         camera = self.renderer.GetActiveCamera()
-        cameraFP = list(camera.GetFocalPoint()) + [1.0]
+        cameraFP = [*list(camera.GetFocalPoint()), 1.0]
         self.renderer.SetWorldPoint(cameraFP[0], cameraFP[1], cameraFP[2], cameraFP[3])
         self.renderer.WorldToDisplay()
 

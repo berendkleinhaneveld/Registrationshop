@@ -4,27 +4,22 @@ LandmarkTransformationTool (TransformationTool)
 :Authors:
     Berend Klein Haneveld
 """
-from vtk import vtkPoints
-from vtk import vtkLandmarkTransform
-from vtk import vtkTransform
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QComboBox
-from PySide6.QtWidgets import QLabel
-from PySide6.QtCore import Signal
-from PySide6.QtCore import Slot
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtWidgets import QComboBox, QGridLayout, QLabel, QWidget
+from vtk import vtkLandmarkTransform, vtkPoints, vtkTransform
+
+from core.decorators import overrides
+from core.project import ProjectController
+from core.vtkDrawing import TransformWithMatrix
+from ui.transformations import Transformation
+from ui.transformations.SurfacePicker import SurfacePicker
+from ui.transformations.TwoStepPicker import TwoStepPicker
+from ui.widgets.PointsWidget import PointsWidget
+from ui.widgets.StatusWidget import StatusWidget
 
 from .Landmark import Landmark
 from .TransformationTool import TransformationTool
-from core.decorators import overrides
-from core.vtkDrawing import TransformWithMatrix
-from core.project import ProjectController
-from ui.widgets.PointsWidget import PointsWidget
-from ui.widgets.StatusWidget import StatusWidget
-from ui.transformations.TwoStepPicker import TwoStepPicker
-from ui.transformations.SurfacePicker import SurfacePicker
-from ui.transformations import Transformation
+
 
 # Define picker types
 SurfaceType = "SurfaceType"

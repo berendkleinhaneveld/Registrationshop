@@ -5,16 +5,13 @@ MultiRenderController
     Berend Klein Haneveld
 """
 
-from PySide6.QtCore import QObject
-from PySide6.QtCore import Slot
-from PySide6.QtCore import Signal
+from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtWidgets import QWidget
+
+from core.data import DataReader, DataResizer
 from core.vtkObjectWrapper import vtkCameraWrapper
-from core.data import DataReader
-from core.data import DataResizer
 from ui.transformations import TransformationList
-from ui.visualizations import MultiVisualizationTypeMix
-from ui.visualizations import MultiVolumeVisualizationFactory
+from ui.visualizations import MultiVisualizationTypeMix, MultiVolumeVisualizationFactory
 
 
 class MultiRenderController(QObject):

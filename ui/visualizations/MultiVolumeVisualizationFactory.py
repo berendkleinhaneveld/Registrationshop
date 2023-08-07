@@ -4,12 +4,14 @@ MultiVolumeVisualizationFactory
 :Authors:
     Berend Klein Haneveld
 """
-from .MultiVolumeVisualization import MultiVisualizationTypeMix
-from .MultiVolumeVisualization import MultiVisualizationTypeMIP
-from .MultiVolumeVisualization import MultiVisualizationTypeMIDA
-from .MultiVolumeVisualizationMix import MultiVolumeVisualizationMix
-from .MultiVolumeVisualizationMIP import MultiVolumeVisualizationMIP
+from .MultiVolumeVisualization import (
+    MultiVisualizationTypeMIDA,
+    MultiVisualizationTypeMIP,
+    MultiVisualizationTypeMix,
+)
 from .MultiVolumeVisualizationMIDA import MultiVolumeVisualizationMIDA
+from .MultiVolumeVisualizationMIP import MultiVolumeVisualizationMIP
+from .MultiVolumeVisualizationMix import MultiVolumeVisualizationMix
 
 
 class MultiVolumeVisualizationFactory(object):

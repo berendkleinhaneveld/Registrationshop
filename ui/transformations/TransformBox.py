@@ -4,11 +4,10 @@ TransformBox
 :Authors:
     Berend Klein Haneveld
 """
+from PySide6.QtCore import QObject, Signal
+from vtk import vtkBoxWidget, vtkTransform
+
 from ui.Interactor import Interactor
-from PySide6.QtCore import QObject
-from vtk import vtkBoxWidget
-from vtk import vtkTransform
-from PySide6.QtCore import Signal
 
 
 class TransformBox(QObject, Interactor):

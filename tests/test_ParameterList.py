@@ -1,7 +1,6 @@
 import unittest
 
-from core.elastix import ParameterList
-from core.elastix import Parameter
+from core.elastix import Parameter, ParameterList
 
 
 class ParameterListTest(unittest.TestCase):

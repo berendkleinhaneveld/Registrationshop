@@ -4,9 +4,8 @@ TransferFunctionEditor
 :Authors:
     Berend Klein Haneveld
 """
-from vtk import vtkColorTransferFunction
-from vtk import vtkPiecewiseFunction
 from PySide6.QtCore import QObject
+from vtk import vtkColorTransferFunction, vtkPiecewiseFunction
 
 
 class TransferFunction(QObject):
@@ -74,7 +73,7 @@ class TransferFunction(QObject):
                 self.opacityFunction.AddPoint(point.value, pow(point.opacity, 5))
             else:
                 self.colorFunction.SetNodeValue(
-                    index, [point.value] + point.color + [0.5, 0.0]
+                    index, [point.value, *point.color, 0.5, 0.0]
                 )
                 self.opacityFunction.SetNodeValue(
                     index, [point.value, pow(point.opacity, 5), 0.5, 0.0]

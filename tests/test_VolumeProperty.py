@@ -1,12 +1,18 @@
 import unittest
+
 import yaml
-from ui.visualizations import VolumeVisualizationFactory
-from ui.visualizations import VisualizationTypeCT
-from ui.visualizations import VisualizationTypeSimple
-from ui.visualizations import VolumeVisualizationWrapper
-from core.vtkObjectWrapper import vtkVolumePropertyWrapper
-from core.vtkObjectWrapper import vtkColorTransferFunctionWrapper
-from core.vtkObjectWrapper import vtkPiecewiseFunctionWrapper
+
+from core.vtkObjectWrapper import (
+    vtkColorTransferFunctionWrapper,
+    vtkPiecewiseFunctionWrapper,
+    vtkVolumePropertyWrapper,
+)
+from ui.visualizations import (
+    VisualizationTypeCT,
+    VisualizationTypeSimple,
+    VolumeVisualizationFactory,
+    VolumeVisualizationWrapper,
+)
 
 
 class VolumeVisualizationTest(unittest.TestCase):

@@ -4,10 +4,9 @@ MultiVolumeVisualization
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtCore import QObject
-from PySide6.QtCore import Signal
-from vtk import vtkColorTransferFunction
-from vtk import vtkPiecewiseFunction
+from PySide6.QtCore import QObject, Signal
+from vtk import vtkColorTransferFunction, vtkPiecewiseFunction
+
 
 # Define render types for multi render
 MultiVisualizationTypeMix = "Default mix"

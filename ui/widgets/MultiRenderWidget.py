@@ -5,28 +5,26 @@ MultiRenderWidget
     Berend Klein Haneveld
 """
 
-from PySide6.QtCore import Signal
-from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QWidget
-from vtk import VTK_FLOAT
-from vtk import vtkColorTransferFunction
-from vtk import vtkGPUVolumeRayCastMapper
-from vtk import vtkImageData
-from vtk import vtkImageDataStreamer
-from vtk import vtkImagePlaneWidget
-from vtk import vtkInteractorStyleTrackballCamera
-from vtk import vtkMultiVolume
-from vtk import vtkPiecewiseFunction
-from vtk import vtkRenderer
-from vtk import vtkVolume
-from vtk import vtkVolumeProperty
+from PySide6.QtCore import Signal, Slot
+from PySide6.QtWidgets import QGridLayout, QWidget
+from vtk import (
+    VTK_FLOAT,
+    vtkColorTransferFunction,
+    vtkGPUVolumeRayCastMapper,
+    vtkImageData,
+    vtkImageDataStreamer,
+    vtkImagePlaneWidget,
+    vtkInteractorStyleTrackballCamera,
+    vtkMultiVolume,
+    vtkPiecewiseFunction,
+    vtkRenderer,
+    vtkVolume,
+    vtkVolumeProperty,
+)
 
-from core.vtkDrawing import CreateBounds
-from core.vtkDrawing import CreateOrientationGrid
+from core.vtkDrawing import CreateBounds, CreateOrientationGrid
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-from ui.transformations import TransformationList
-from ui.transformations import ClippingBox
+from ui.transformations import ClippingBox, TransformationList
 
 
 class MultiRenderWidget(QWidget):

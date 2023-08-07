@@ -1,6 +1,9 @@
-from core.vtkObjectWrapper import vtkPiecewiseFunctionWrapper
-from core.vtkObjectWrapper import vtkColorTransferFunctionWrapper
-from core.vtkObjectWrapper import vtkVolumePropertyWrapper
+from core.vtkObjectWrapper import (
+    vtkColorTransferFunctionWrapper,
+    vtkPiecewiseFunctionWrapper,
+    vtkVolumePropertyWrapper,
+)
+
 from .VolumeVisualizationFactory import VolumeVisualizationFactory
 
 

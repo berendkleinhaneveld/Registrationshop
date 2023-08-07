@@ -4,12 +4,9 @@ ParameterModel
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtCore import QAbstractItemModel
-from PySide6.QtCore import QModelIndex
-from PySide6.QtCore import Qt
-from PySide6.QtCore import Slot
-from core.elastix import Parameter
-from core.elastix import ParameterList
+from PySide6.QtCore import QAbstractItemModel, QModelIndex, Qt, Slot
+
+from core.elastix import Parameter, ParameterList
 
 
 class ParameterModel(QAbstractItemModel):

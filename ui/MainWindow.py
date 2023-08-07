@@ -2,8 +2,8 @@
 MainWindow.py
 """
 
-from PySide6.QtWidgets import QMainWindow
 from PySide6 import QtCore
+from PySide6.QtWidgets import QMainWindow
 
 
 class MainWindow(QMainWindow):

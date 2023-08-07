@@ -4,11 +4,11 @@ TrackingNodeItem
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtCore import Slot
-from PySide6.QtCore import QPointF
+from PySide6.QtCore import QPointF, Slot
+
+from core.decorators import overrides
 
 from .NodeItem import NodeItem
-from core.decorators import overrides
 
 
 class TrackingNodeItem(NodeItem):

@@ -68,6 +68,7 @@ except ImportError:
 from vtkmodules.vtkRenderingCore import vtkRenderWindow
 from vtkmodules.vtkRenderingUI import vtkGenericRenderWindowInteractor
 
+
 if PyQtImpl is None:
     # Autodetect the PyQt implementation to use
     try:
@@ -100,61 +101,31 @@ if PyQtImpl is None:
 if PyQtImpl == "PySide6":
     if QVTKRWIBase == "QGLWidget":
         from PySide6.QtOpenGL import QGLWidget
-    from PySide6.QtWidgets import QWidget
-    from PySide6.QtWidgets import QSizePolicy
-    from PySide6.QtWidgets import QApplication
+    from PySide6.QtCore import QEvent, QSize, Qt, QTimer
     from PySide6.QtGui import QCursor
-    from PySide6.QtCore import Qt
-    from PySide6.QtCore import QTimer
-    from PySide6.QtCore import QObject
-    from PySide6.QtCore import QSize
-    from PySide6.QtCore import QEvent
+    from PySide6.QtWidgets import QApplication, QSizePolicy, QWidget
 elif PyQtImpl == "PyQt5":
     if QVTKRWIBase == "QGLWidget":
         from PyQt5.QtOpenGL import QGLWidget
-    from PyQt5.QtWidgets import QWidget
-    from PyQt5.QtWidgets import QSizePolicy
-    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtCore import QEvent, QSize, Qt, QTimer
     from PyQt5.QtGui import QCursor
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtCore import QTimer
-    from PyQt5.QtCore import QObject
-    from PyQt5.QtCore import QSize
-    from PyQt5.QtCore import QEvent
+    from PyQt5.QtWidgets import QApplication, QSizePolicy, QWidget
 elif PyQtImpl == "PySide2":
     if QVTKRWIBase == "QGLWidget":
         from PySide2.QtOpenGL import QGLWidget
-    from PySide2.QtWidgets import QWidget
-    from PySide2.QtWidgets import QSizePolicy
-    from PySide2.QtWidgets import QApplication
+    from PySide2.QtCore import QEvent, QSize, Qt, QTimer
     from PySide2.QtGui import QCursor
-    from PySide2.QtCore import Qt
-    from PySide2.QtCore import QTimer
-    from PySide2.QtCore import QObject
-    from PySide2.QtCore import QSize
-    from PySide2.QtCore import QEvent
+    from PySide2.QtWidgets import QApplication, QSizePolicy, QWidget
 elif PyQtImpl == "PyQt4":
     if QVTKRWIBase == "QGLWidget":
         from PyQt4.QtOpenGL import QGLWidget
-    from PyQt4.QtGui import QWidget
-    from PyQt4.QtGui import QSizePolicy
-    from PyQt4.QtGui import QApplication
-    from PyQt4.QtCore import Qt
-    from PyQt4.QtCore import QTimer
-    from PyQt4.QtCore import QObject
-    from PyQt4.QtCore import QSize
-    from PyQt4.QtCore import QEvent
+    from PyQt4.QtCore import QEvent, QSize, Qt, QTimer
+    from PyQt4.QtGui import QApplication, QSizePolicy, QWidget
 elif PyQtImpl == "PySide":
     if QVTKRWIBase == "QGLWidget":
         from PySide.QtOpenGL import QGLWidget
-    from PySide.QtGui import QWidget
-    from PySide.QtGui import QSizePolicy
-    from PySide.QtGui import QApplication
-    from PySide.QtCore import Qt
-    from PySide.QtCore import QTimer
-    from PySide.QtCore import QObject
-    from PySide.QtCore import QSize
-    from PySide.QtCore import QEvent
+    from PySide.QtCore import QEvent, QSize, Qt, QTimer
+    from PySide.QtGui import QApplication, QSizePolicy, QWidget
 else:
     raise ImportError("Unknown PyQt implementation " + repr(PyQtImpl))
 
@@ -296,7 +267,7 @@ class QVTKRenderWindowInteractor(QVTKRWIBaseClass):
 
         # Python2
         if type(WId).__name__ == "PyCObject":
-            from ctypes import pythonapi, c_void_p, py_object
+            from ctypes import c_void_p, py_object, pythonapi
 
             pythonapi.PyCObject_AsVoidPtr.restype = c_void_p
             pythonapi.PyCObject_AsVoidPtr.argtypes = [py_object]
@@ -305,7 +276,7 @@ class QVTKRenderWindowInteractor(QVTKRWIBaseClass):
 
         # Python3
         elif type(WId).__name__ == "PyCapsule":
-            from ctypes import pythonapi, c_void_p, py_object, c_char_p
+            from ctypes import c_char_p, c_void_p, py_object, pythonapi
 
             pythonapi.PyCapsule_GetName.restype = c_char_p
             pythonapi.PyCapsule_GetName.argtypes = [py_object]
@@ -584,8 +555,6 @@ def QVTKRenderWidgetConeExample():
     from vtkmodules.vtkRenderingCore import vtkActor, vtkPolyDataMapper, vtkRenderer
 
     # load implementations for rendering and interaction factory classes
-    import vtkmodules.vtkRenderingOpenGL2
-    import vtkmodules.vtkInteractionStyle
 
     # every QT app needs an app
     app = QApplication(["QVTKRenderWindowInteractor"])

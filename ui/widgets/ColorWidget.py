@@ -6,19 +6,17 @@ ColorWidget
 """
 import sys
 
-from PySide6.QtCore import QRectF
-from PySide6.QtCore import QSize
-from PySide6.QtCore import Signal
-from PySide6.QtGui import QColor
-from PySide6.QtGui import QPainter
-from PySide6.QtGui import QPen
-from PySide6.QtWidgets import QButtonGroup
-from PySide6.QtWidgets import QColorDialog
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QHBoxLayout
-from PySide6.QtWidgets import QLabel
-from PySide6.QtWidgets import QPushButton
-from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import QRectF, QSize, Signal
+from PySide6.QtGui import QColor, QPainter, QPen
+from PySide6.QtWidgets import (
+    QButtonGroup,
+    QColorDialog,
+    QGridLayout,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QWidget,
+)
 
 
 class ColorWidget(QWidget):
@@ -151,8 +149,7 @@ class ColorButton(QPushButton):
 
 
 if __name__ == "__main__":
-    from PySide6.QtWidgets import QApplication
-    from PySide6.QtWidgets import QVBoxLayout
+    from PySide6.QtWidgets import QApplication, QVBoxLayout
 
     app = QApplication([])
 

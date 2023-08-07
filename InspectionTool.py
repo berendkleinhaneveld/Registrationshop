@@ -6,21 +6,15 @@ CompareWidget
 """
 import sys
 
-from PySide6.QtWidgets import QApplication
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QLabel
-from PySide6.QtWidgets import QHBoxLayout
-from PySide6.QtCore import QObject
-from PySide6.QtCore import Slot
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QObject, Qt, Slot
+from PySide6.QtWidgets import QApplication, QGridLayout, QHBoxLayout, QLabel, QWidget
 from vtk import vtkTransform
 
 from core.data.DataReader import DataReader
-from core.data.DataTransformer import DataTransformer
 from core.data.DataResizer import DataResizer
-from ui.widgets.SliceViewerWidget import SliceViewerWidget
+from core.data.DataTransformer import DataTransformer
 from ui.widgets.SliceCompareViewerWidget import SliceCompareViewerWidget
+from ui.widgets.SliceViewerWidget import SliceViewerWidget
 
 
 class CompareWidget(QWidget):

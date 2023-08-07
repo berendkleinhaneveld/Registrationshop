@@ -8,8 +8,7 @@ from Exposure Render (http://code.google.com/p/exposure-render/)
     T. Kroes <t.kroes@tudelft.nl>
     B. Klein Haneveld <b.a.kleinhaneveld@student.tudelft.nl>
 """
-from PySide6.QtCore import QObject
-from PySide6.QtCore import Signal
+from PySide6.QtCore import QObject, Signal
 
 
 class Histogram(QObject):

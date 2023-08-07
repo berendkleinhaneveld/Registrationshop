@@ -4,10 +4,9 @@ VolumeVisualization
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtCore import Signal
-from PySide6.QtCore import QObject
-from vtk import vtkColorTransferFunction
-from vtk import vtkPiecewiseFunction
+from PySide6.QtCore import QObject, Signal
+from vtk import vtkColorTransferFunction, vtkPiecewiseFunction
+
 
 # Define Render Types
 # TODO: Render types are not suited for visualization names

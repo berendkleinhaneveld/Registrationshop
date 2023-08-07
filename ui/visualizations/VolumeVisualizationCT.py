@@ -6,18 +6,13 @@ VolumeVisualizationCT
 """
 import math
 
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QSlider
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import Qt
-from vtk import vtkVolumeProperty
-from vtk import vtkColorTransferFunction
-from vtk import vtkPiecewiseFunction
+from PySide6.QtWidgets import QGridLayout, QLabel, QSlider, QWidget
+from vtk import vtkColorTransferFunction, vtkPiecewiseFunction, vtkVolumeProperty
 
-from .VolumeVisualization import VolumeVisualization
-from .VolumeVisualization import VisualizationTypeCT
 from core.decorators import overrides
+
+from .VolumeVisualization import VisualizationTypeCT, VolumeVisualization
 
 
 class VolumeVisualizationCT(VolumeVisualization):

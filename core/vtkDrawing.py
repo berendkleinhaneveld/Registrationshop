@@ -11,30 +11,31 @@ renderer with AddViewProp().
     Berend Klein Haneveld
 """
 from functools import reduce
-
-from vtk import vtkActor
-from vtk import vtkVectorText
-from vtk import vtkLineSource
-from vtk import vtkSphereSource
-from vtk import vtkRegularPolygonSource
-from vtk import vtkDataSetMapper
-from vtk import vtkPolyDataMapper
-from vtk import vtkFollower
-from vtk import vtkAssembly
-from vtk import vtkMatrix4x4
-from vtk import vtkTransform
-from vtk import vtkOutlineSource
-from vtk import vtkConeSource
-from vtk import vtkParametricTorus
-from vtk import vtkParametricFunctionSource
-from vtk import vtkTubeFilter
-from vtk import vtkAppendPolyData
-from vtk import vtkCubeSource
-from vtk import vtkTransformFilter
 import math
-from core.operations import Add
-from core.operations import Subtract
-from core.operations import Multiply
+
+from vtk import (
+    vtkActor,
+    vtkAppendPolyData,
+    vtkAssembly,
+    vtkConeSource,
+    vtkCubeSource,
+    vtkDataSetMapper,
+    vtkFollower,
+    vtkLineSource,
+    vtkMatrix4x4,
+    vtkOutlineSource,
+    vtkParametricFunctionSource,
+    vtkParametricTorus,
+    vtkPolyDataMapper,
+    vtkRegularPolygonSource,
+    vtkSphereSource,
+    vtkTransform,
+    vtkTransformFilter,
+    vtkTubeFilter,
+    vtkVectorText,
+)
+
+from core.operations import Add, Multiply, Subtract
 
 
 def TransformWithMatrix(matrix):
@@ -509,7 +510,7 @@ def CreateOrientationGrid(bounds, camera):
     for lineActor in lineActorsX + lineActorsY + lineActorsZ:
         dataGrid.AddPart(lineActor)
 
-    return [dataGrid, textItemX, textItemY, textItemZ] + lineText
+    return [dataGrid, textItemX, textItemY, textItemZ, *lineText]
 
 
 def ClosestToMeasurement(number):

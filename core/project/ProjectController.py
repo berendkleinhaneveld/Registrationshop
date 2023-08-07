@@ -5,13 +5,12 @@ ProjectController
     Berend Klein Haneveld
 """
 
-from PySide6.QtCore import QObject
-from PySide6.QtCore import Slot
-from PySide6.QtCore import Signal
+from PySide6.QtCore import QObject, Signal, Slot
 import yaml
 
-from .Project import Project
 from core.decorators import Singleton
+
+from .Project import Project
 
 
 @Singleton

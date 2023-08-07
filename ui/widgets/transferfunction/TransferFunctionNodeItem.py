@@ -4,10 +4,10 @@ TransferFunctionNodeItem
 :Authors:
     Berend Klein Haneveld
 """
-from ui.widgets.histogram.NodeItem import NodeItem
+from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QColor
-from PySide6.QtCore import QPointF
-from PySide6.QtCore import Qt
+
+from ui.widgets.histogram.NodeItem import NodeItem
 
 
 class TransferFunctionNodeItem(NodeItem):

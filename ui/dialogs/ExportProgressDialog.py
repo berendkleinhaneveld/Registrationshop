@@ -5,10 +5,7 @@ ExportProgressDialog
     Berend Klein Haneveld 2013
 """
 
-from PySide6.QtWidgets import QDialog
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QProgressBar
-from PySide6.QtWidgets import QLabel
+from PySide6.QtWidgets import QDialog, QGridLayout, QLabel, QProgressBar
 
 
 class ExportProgressDialog(QDialog):

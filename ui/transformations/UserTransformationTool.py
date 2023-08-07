@@ -4,23 +4,17 @@ UserTransformationTool (TransformationTool)
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtWidgets import QLabel
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QLineEdit
-from PySide6.QtWidgets import QGridLayout
+from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QDoubleValidator
-from PySide6.QtWidgets import QSizePolicy
-from PySide6.QtCore import Slot
-from PySide6.QtCore import Qt
-from vtk import vtkMatrix4x4
-from vtk import vtkTransform
+from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit, QSizePolicy, QWidget
+from vtk import vtkMatrix4x4, vtkTransform
 
-from .TransformationTool import TransformationTool
 from core.decorators import overrides
 from core.project import ProjectController
-from ui.transformations import TransformBox
-from ui.transformations import Transformation
+from ui.transformations import Transformation, TransformBox
 from ui.widgets.StatusWidget import StatusWidget
+
+from .TransformationTool import TransformationTool
 
 
 class UserTransformationTool(TransformationTool):

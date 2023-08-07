@@ -5,11 +5,9 @@ FileTypeDialog
     Berend Klein Haneveld 2013
 """
 
-from PySide6.QtWidgets import QDialog
-from PySide6.QtWidgets import QPushButton
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QDialog, QGridLayout, QLabel, QPushButton
+
 from core.data import DataReader
 
 

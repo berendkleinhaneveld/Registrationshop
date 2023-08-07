@@ -10,18 +10,9 @@ from Exposure Render (http://code.google.com/p/exposure-render/)
 """
 import math
 
-from PySide6.QtWidgets import QGraphicsRectItem
-from PySide6.QtWidgets import QGraphicsPolygonItem
-from PySide6.QtWidgets import QGraphicsLineItem
-from PySide6.QtGui import QBrush
-from PySide6.QtGui import QColor
-from PySide6.QtGui import QPolygonF
-from PySide6.QtGui import QPen
-from PySide6.QtGui import QLinearGradient
-from PySide6.QtCore import QMargins
-from PySide6.QtCore import Qt
-from PySide6.QtCore import QPointF
-from PySide6.QtCore import QLineF
+from PySide6.QtCore import QLineF, QMargins, QPointF, Qt
+from PySide6.QtGui import QBrush, QColor, QLinearGradient, QPen, QPolygonF
+from PySide6.QtWidgets import QGraphicsLineItem, QGraphicsPolygonItem, QGraphicsRectItem
 
 from .Histogram import Histogram
 

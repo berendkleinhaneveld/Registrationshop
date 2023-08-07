@@ -6,14 +6,8 @@ SliderFloatWidget
 """
 import sys
 
-from PySide6.QtCore import Qt
-from PySide6.QtCore import Signal
-from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QDoubleSpinBox
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QLabel
-from PySide6.QtWidgets import QSlider
-from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtWidgets import QDoubleSpinBox, QGridLayout, QLabel, QSlider, QWidget
 
 
 class SliderFloatWidget(QWidget):
@@ -102,8 +96,7 @@ class SliderFloatWidget(QWidget):
 
 
 if __name__ == "__main__":
-    from PySide6.QtWidgets import QApplication
-    from PySide6.QtWidgets import QVBoxLayout
+    from PySide6.QtWidgets import QApplication, QVBoxLayout
 
     app = QApplication([])
 

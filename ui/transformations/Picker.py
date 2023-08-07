@@ -4,9 +4,9 @@ Picker
 :Authors:
     Berend Klein Haneveld
 """
+from PySide6.QtCore import QObject, Signal
+
 from ui.Interactor import Interactor
-from PySide6.QtCore import Signal
-from PySide6.QtCore import QObject
 
 
 class Picker(QObject, Interactor):

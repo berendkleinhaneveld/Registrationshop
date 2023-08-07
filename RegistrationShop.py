@@ -8,56 +8,52 @@ Registrationshop
     Berend Klein Haneveld 2013
 """
 
-import sys
 import os.path
+import sys
+
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtGui import QAction, QIcon
 
 # PySide stuff
-from PySide6.QtWidgets import QMainWindow
-from PySide6.QtWidgets import QApplication
-from PySide6.QtGui import QAction
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QFileDialog
-from PySide6.QtWidgets import QHBoxLayout
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QSizePolicy
-from PySide6.QtWidgets import QSplitter
-from PySide6.QtCore import Qt
-from PySide6.QtCore import Slot
+from PySide6.QtWidgets import (
+    QApplication,
+    QFileDialog,
+    QGridLayout,
+    QHBoxLayout,
+    QMainWindow,
+    QSizePolicy,
+    QSplitter,
+    QWidget,
+)
+from vtk import vtkTransform
 
 # Import core stuff
-from core import AppVars
-from core import AppResources
-from core.project import ProjectController
-from core.data import DataReader
-from core.data import DataTransformer
-from core.data import DataWriter
+from core import AppResources, AppVars
+from core.data import DataReader, DataTransformer, DataWriter
 from core.elastix import ParameterList
+from core.project import ProjectController
+from InspectionTool import CompareWidget, ComparisonController
 
 # Import ui elements
-from ui import MainWindow
-from ui import WindowDialog
-from ui import RenderController
-from ui import MultiRenderController
-from ui.dialogs import FileTypeDialog
-from ui.dialogs import ElastixMainDialog
-from ui.dialogs import ResetVisualizationDialog
-from ui.widgets import RenderWidget
-
-from ui.widgets import MultiRenderWidget
-from ui.widgets import TitleWidget
-from ui.widgets import RenderPropWidget
-from ui.widgets import MultiRenderPropWidget
-from ui.widgets import LandmarkWidget
-from ui.widgets import StatusWidget
+from ui import MainWindow, MultiRenderController, RenderController, WindowDialog
+from ui.dialogs import ElastixMainDialog, FileTypeDialog, ResetVisualizationDialog
+from ui.transformations import (
+    DeformableTransformationTool,
+    LandmarkTransformationTool,
+    Transformation,
+    UserTransformationTool,
+)
+from ui.widgets import (
+    LandmarkWidget,
+    MultiRenderPropWidget,
+    MultiRenderWidget,
+    RenderPropWidget,
+    RenderWidget,
+    StatusWidget,
+    TitleWidget,
+)
 from ui.widgets.ToolbarWidget import ToolbarWidget
-from ui.transformations import UserTransformationTool
-from ui.transformations import LandmarkTransformationTool
-from ui.transformations import DeformableTransformationTool
-from ui.transformations import Transformation
-from InspectionTool import CompareWidget
-from InspectionTool import ComparisonController
-from vtk import vtkTransform
+
 
 # Add external relative folders to sys path
 rootDir = os.path.dirname(os.path.realpath(__file__))

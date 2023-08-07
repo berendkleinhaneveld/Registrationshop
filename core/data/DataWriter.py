@@ -2,8 +2,7 @@
 DataWriter.py
 """
 
-from vtk import vtkMetaImageWriter
-from vtk import vtkXMLImageDataWriter
+from vtk import vtkMetaImageWriter, vtkXMLImageDataWriter
 
 from .DataController import DataController
 from .DataReader import DataReader

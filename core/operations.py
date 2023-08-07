@@ -7,9 +7,10 @@ Input is never adjusted.
 :Authors:
     Berend Klein Haneveld
 """
-import math
 import collections
 from functools import reduce
+import math
+
 from vtk import vtkMath
 
 

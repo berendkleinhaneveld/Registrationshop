@@ -5,21 +5,20 @@ RenderWidget
     Berend Klein Haneveld
 """
 
-from vtk import vtkRenderer
-from vtk import vtkVolume
-from vtk import vtkInteractorStyleTrackballCamera
-from vtk import vtkGPUVolumeRayCastMapper
-from vtk import vtkTransform
-from vtk import vtkImagePlaneWidget
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import Signal
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Signal, Slot
+from PySide6.QtWidgets import QGridLayout, QWidget
+from vtk import (
+    vtkGPUVolumeRayCastMapper,
+    vtkImagePlaneWidget,
+    vtkInteractorStyleTrackballCamera,
+    vtkRenderer,
+    vtkTransform,
+    vtkVolume,
+)
 
+from core.vtkDrawing import CreateBounds, CreateOrientationGrid
 from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from ui.transformations import ClippingBox
-from core.vtkDrawing import CreateBounds
-from core.vtkDrawing import CreateOrientationGrid
 
 
 class RenderWidget(QWidget):

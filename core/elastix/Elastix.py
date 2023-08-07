@@ -5,8 +5,8 @@ Elastix
     Berend Klein Haneveld
 """
 
-import os
 import multiprocessing
+import os
 
 import itk
 

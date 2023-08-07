@@ -7,6 +7,7 @@ Contains convenience functions for styling widgets.
     Berend Klein Haneveld
 """
 import sys
+
 import darkdetect
 
 

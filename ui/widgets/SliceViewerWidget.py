@@ -5,19 +5,19 @@ SliceViewerWidget
     Berend Klein Haneveld
 """
 
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Signal
-from vtk import vtkRenderer
-from vtk import vtkInteractorStyleUser
-from vtk import vtkImagePlaneWidget
-from vtk import vtkCellPicker
-from vtk import vtkColorTransferFunction
+from PySide6.QtWidgets import QGridLayout, QWidget
+from vtk import (
+    vtkCellPicker,
+    vtkColorTransferFunction,
+    vtkImagePlaneWidget,
+    vtkInteractorStyleUser,
+    vtkRenderer,
+)
 
-from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from core.vtkDrawing import CreateLine, CreateSquare
 from ui.Interactor import Interactor
-from core.vtkDrawing import CreateSquare
-from core.vtkDrawing import CreateLine
+from ui.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 
 
 class SliceViewerWidget(QWidget, Interactor):
@@ -154,7 +154,7 @@ class SliceViewerWidget(QWidget, Interactor):
         x, y = arg1.GetEventPosition()
 
         camera = self.renderer.GetActiveCamera()
-        cameraFP = list(camera.GetFocalPoint()) + [1.0]
+        cameraFP = [*list(camera.GetFocalPoint()), 1.0]
         self.renderer.SetWorldPoint(cameraFP[0], cameraFP[1], cameraFP[2], cameraFP[3])
         self.renderer.WorldToDisplay()
 

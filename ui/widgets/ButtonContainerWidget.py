@@ -10,18 +10,11 @@ they are displayed as flat buttons.
 """
 import sys
 
-from PySide6 import QtCore
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QHBoxLayout
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtGui import QPalette
-from PySide6.QtGui import QBrush
-from PySide6.QtGui import QPainter
-from PySide6.QtCore import QPoint
-from PySide6.QtGui import QLinearGradient
-from PySide6.QtGui import QColor
-from PySide6.QtCore import Qt
 import darkdetect
+from PySide6 import QtCore
+from PySide6.QtCore import QPoint, Qt
+from PySide6.QtGui import QBrush, QColor, QLinearGradient, QPainter, QPalette
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 
 
 class ButtonContainer(QWidget):

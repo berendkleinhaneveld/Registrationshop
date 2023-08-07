@@ -4,17 +4,18 @@ PickerTypeDialog
 :Authors:
     Berend Klein Haneveld
 """
-from PySide6.QtWidgets import QDialog
-from PySide6.QtWidgets import QGridLayout
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtWidgets import QRadioButton
-from PySide6.QtWidgets import QGroupBox
-from PySide6.QtWidgets import QButtonGroup
-from PySide6.QtWidgets import QPushButton
-from PySide6.QtCore import Qt
-from PySide6.QtCore import Slot
-from ui.transformations.LandmarkTransformationTool import SurfaceType
-from ui.transformations.LandmarkTransformationTool import TwoStepType
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtWidgets import (
+    QButtonGroup,
+    QDialog,
+    QGridLayout,
+    QGroupBox,
+    QPushButton,
+    QRadioButton,
+    QVBoxLayout,
+)
+
+from ui.transformations.LandmarkTransformationTool import SurfaceType, TwoStepType
 
 
 class PickerTypeDialog(QDialog):

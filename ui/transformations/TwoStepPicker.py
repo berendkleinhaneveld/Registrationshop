@@ -4,25 +4,22 @@ TwoStepPicker
 :Authors:
     Berend Klein Haneveld
 """
-from vtk import vtkAssembly
-from vtk import vtkProp3DFollower
-from vtk import vtkMath
-from vtk import vtkImageInterpolator
-from PySide6.QtCore import Signal
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Signal, Slot
+from vtk import vtkAssembly, vtkImageInterpolator, vtkMath, vtkProp3DFollower
+
+from core.decorators import overrides
+from core.operations import (
+    Add,
+    ClosestPoints,
+    Length,
+    LineIntersectionWithTriangle,
+    Multiply,
+    Normalize,
+    Subtract,
+)
+from core.vtkDrawing import CreateLine, CreateSphere, TransformWithMatrix
 
 from .Picker import Picker
-from core.decorators import overrides
-from core.operations import Multiply
-from core.operations import Add
-from core.operations import ClosestPoints
-from core.operations import Subtract
-from core.operations import LineIntersectionWithTriangle
-from core.operations import Length
-from core.operations import Normalize
-from core.vtkDrawing import CreateSphere
-from core.vtkDrawing import CreateLine
-from core.vtkDrawing import TransformWithMatrix
 
 
 class TwoStepPicker(Picker):

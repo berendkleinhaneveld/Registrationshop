@@ -7,11 +7,13 @@ DataReader
 
 import os
 
-from vtk import vtkImageData
-from vtk import vtkMetaImageReader
-from vtk import vtkXMLImageDataReader
-from vtk import vtkDICOMImageReader
-from vtk import vtkNrrdReader
+from vtk import (
+    vtkDICOMImageReader,
+    vtkImageData,
+    vtkMetaImageReader,
+    vtkNrrdReader,
+    vtkXMLImageDataReader,
+)
 
 from .DataController import DataController
 

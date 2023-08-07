@@ -8,17 +8,13 @@ Exposure Render (http://code.google.com/p/exposure-render/)
     T. Kroes <t.kroes@tudelft.nl>
     B. Klein Haneveld <b.a.kleinhaneveld@student.tudelft.nl>
 """
-from PySide6.QtWidgets import QGraphicsView
+from PySide6.QtCore import QMargins, Qt, Slot
 from PySide6.QtGui import QPainter
-from PySide6.QtWidgets import QGraphicsScene
-from PySide6.QtCore import QMargins
-from PySide6.QtWidgets import QFrame
-from PySide6.QtCore import Qt
-from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QFrame, QGraphicsScene, QGraphicsView
 
 from .BackgroundItem import BackgroundItem
-from .HistogramItem import HistogramItem
 from .GridItem import GridItem
+from .HistogramItem import HistogramItem
 
 
 class HistogramWidget(QGraphicsView):
