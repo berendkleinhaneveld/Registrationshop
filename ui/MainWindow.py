@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
     settings = QtCore.QSettings()
 
     def __init__(self, args):
-        super(MainWindow, self).__init__()
+        #super().__init__()
         self.args = args
         self._storesSizeAndPosition = True
 

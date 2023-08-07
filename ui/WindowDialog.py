@@ -14,9 +14,6 @@ class WindowDialog(QObject):
     WindowDialog
     """
 
-    def __init__(self):
-        super(WindowDialog, self).__init__()
-
     @Slot(str)
     def showProgressBar(self, message):
         self._progressDialog = ExportProgressDialog(self, message)

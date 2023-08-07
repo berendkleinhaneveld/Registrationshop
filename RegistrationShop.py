@@ -13,8 +13,6 @@ import sys
 
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QAction, QIcon
-
-# PySide stuff
 from PySide6.QtWidgets import (
     QApplication,
     QFileDialog,
@@ -80,7 +78,7 @@ class RegistrationShop(MainWindow, WindowDialog):
         Sets app specific properties.
         Initializes the UI.
         """
-        super(RegistrationShop, self).__init__(args)
+        super().__init__(args)
 
         self.setApplicationPath()
         # Instantiate the project controller
@@ -743,13 +741,7 @@ class RegistrationShop(MainWindow, WindowDialog):
 
 
 def main():
-    # Fix for PySide on OSX Mavericks
     import sys
-
-    # if sys.platform.startswith("darwin"):
-    #     from PySide6.QtGui import QFont
-
-    #     QFont.insertSubstitution(".Lucida Grande UI", "Lucida Grande")
 
     app = QApplication(sys.argv)
     app.setObjectName(APPNAME)
