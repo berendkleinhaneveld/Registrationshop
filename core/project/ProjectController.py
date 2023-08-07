@@ -30,7 +30,7 @@ class ProjectController(QObject):
     projectChanged = Signal(Project)
 
     # Define the standard project file name
-    ProjectFile = u"/project.yaml"
+    ProjectFile = "/project.yaml"
 
     def __init__(self, project=None):
         """

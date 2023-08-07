@@ -22,7 +22,6 @@ from ui.transformations.LandmarkTransformationTool import SurfaceType
 
 
 class LandmarkWidget(QWidget):
-
     landmarkTypeChanged = Signal(object)
 
     def __init__(self):

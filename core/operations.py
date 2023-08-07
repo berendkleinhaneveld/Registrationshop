@@ -53,7 +53,7 @@ def Length(u):
     """
     Returns length of vector.
     """
-    return math.sqrt(sum(map(lambda x: x ** 2, u)))
+    return math.sqrt(sum(map(lambda x: x**2, u)))
 
 
 def Normalize(u):

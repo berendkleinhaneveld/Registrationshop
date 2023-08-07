@@ -103,7 +103,7 @@ def PointCone(actor, nx, ny, nz):
     A function to point an actor along a vector.
     """
     actor.SetOrientation(0.0, 0.0, 0.0)
-    n = math.sqrt(nx ** 2 + ny ** 2 + nz ** 2)
+    n = math.sqrt(nx**2 + ny**2 + nz**2)
     if nx < 0.0:
         actor.RotateWXYZ(180, 0, 1, 0)
         n = -n

@@ -212,7 +212,6 @@ class TransferFunctionWidget(QWidget):
 
 
 class NodeItemWidget(QWidget):
-
     nodeUpdated = Signal(object)
     removePoint = Signal(object)
 

@@ -24,7 +24,6 @@ from ui.widgets.StatusWidget import StatusWidget
 
 
 class DeformableTransformationTool(TransformationTool):
-
     startedElastix = Signal(str)
     endedElastix = Signal()
 

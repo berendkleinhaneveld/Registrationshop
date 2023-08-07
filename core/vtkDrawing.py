@@ -190,7 +190,7 @@ def CreateTorus(point1, point2, axe):
     a point on the torus.
     """
     direction = list(map(lambda x, y: x - y, point2, point1))
-    length = math.sqrt(sum(map(lambda x: x ** 2, direction)))
+    length = math.sqrt(sum(map(lambda x: x**2, direction)))
 
     torus = vtkParametricTorus()
     torus.SetRingRadius(length / 1.5)
@@ -227,7 +227,7 @@ def CreateBoxOnStick(point1, point2, tipRatio=0.3):
     Use tipRatio for setting the ratio for tip of the arrow.
     """
     direction = list(map(lambda x, y: x - y, point2, point1))
-    length = math.sqrt(sum(map(lambda x: x ** 2, direction)))
+    length = math.sqrt(sum(map(lambda x: x**2, direction)))
 
     unitDir = list(map(lambda x: x / length, direction))
     shaftDir = list(map(lambda x: x * (1.0 - tipRatio), unitDir))
@@ -273,7 +273,7 @@ def CreateArrow(point1, point2, tipRatio=0.3):
     setting the ratio for tip of the arrow.
     """
     direction = list(map(lambda x, y: x - y, point2, point1))
-    length = math.sqrt(sum(map(lambda x: x ** 2, direction)))
+    length = math.sqrt(sum(map(lambda x: x**2, direction)))
 
     unitDir = list(map(lambda x: x / length, direction))
     shaftDir = list(map(lambda x: x * (1.0 - tipRatio), unitDir))
